@@ -1,0 +1,263 @@
+PARSER_BEGIN(FormExpressionParser)
+package de.xima.fc.form.expression.grammar;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
+import org.apache.commons.lang3.StringUtils;
+import de.xima.fc.form.expression.evaluation.InfixValue;
+import java.math.BigInteger;
+import de.xima.fc.form.expression.evaluation.EExpressionType;
+import de.xima.fc.form.expression.evaluation.EFunctionType;
+import de.xima.fc.form.expression.error.NoSuchFunctionException;
+import de.xima.fc.form.expression.node.*;
+
+/** Formcycle expression language.
+    http://ramkulkarni.com/blog/handling-some-of-the-warnings-and-errors-generated-by-javacc/
+ */
+public class FormExpressionParser
+{
+  /** Main entry point. */
+  public static void main(String args []) throws ParseException
+  {
+    String string = "val('my')";
+    System.out.println(string);
+    ByteArrayInputStream bais = new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
+    FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
+    MySimpleNode rootNode = parser.Root();
+    rootNode.dump("");
+  }
+}
+
+PARSER_END(FormExpressionParser)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+/** Root production. */
+MySimpleNode Root() #RootNode :
+{
+}
+{
+    [< Spaces >] Expression() [< Spaces >] < EOF >
+  {
+     jjtThis.init();
+     return jjtThis;
+  }
+}
+
+/** Expression. */
+void Expression() #ExpressionNode :
+{
+  EExpressionType type;
+}
+{
+  (
+  LOOKAHEAD(Concatenation())
+  Concatenation()
+|
+  LOOKAHEAD(Chain())
+  Chain() 
+| 
+  FunctionCall() 
+|
+  Literal()
+  )
+  {
+    jjtThis.init();
+  }
+}
+
+
+void FunctionCall() #void :
+{
+}
+{
+  (
+  LOOKAHEAD(< IDENTIFIER > "(")
+  ParenthesesFunction()
+| 
+  PlainFunction()
+  )
+}
+
+void ParenthesesFunction() #ParenthesesFunction :
+{
+  Token t;
+}
+{
+  (
+    t = < IDENTIFIER > "(" FunctionArgumentList() ")"
+  )
+  {
+    jjtThis.init(t.image);
+  }
+}
+
+void FunctionArgumentList() #void :
+{
+}
+{
+  (
+    [ Expression() ]
+    (
+      "," Expression()
+    )*
+  )
+}
+
+void String() #void :
+{
+}
+{
+  (
+    SingleQuotedString()
+|
+    DoubleQuotedString()
+  )
+}
+
+void Number() #NumberNode :
+{
+  Token t;
+}
+{
+  t = < Number >
+  {
+    jjtThis.init(t.image);
+  }
+}
+
+void DoubleQuotedString() #DoubleQuotedString :
+{
+  Token t;
+}
+{
+  t = < DoubleQuotedString >
+  {
+    jjtThis.init(t.image);
+  }
+}
+
+void SingleQuotedString() #SingleQuotedString :
+{
+  Token t;
+}
+{
+  t = < SingleQuotedString >
+  {
+    jjtThis.init(t.image);
+  }  
+}
+
+void Array() #ArrayNode :
+{
+}
+{
+    (
+      "[" ("]" | (Expression() ("," Expression())* "]"))
+    )
+    { jjtThis.init(); }
+}
+
+void Hash() #HashNode :
+{
+}
+{
+  (
+    "{" ("}" | (HashEntry() ("," HashEntry())* "}"))
+  )
+  { jjtThis.init(); }
+}
+
+void HashEntry() #void :
+{
+}
+{
+  Expression() ":" Expression()
+}
+
+/**
+ * Literal for the null object.
+ */
+void Null() #NullNode :
+{
+}
+{
+  "§null"
+  {
+    { jjtThis.init(); }
+  }
+}
+
+void Boolean() #BooleanNode :
+{
+  boolean b;
+}
+{
+    (
+        "§true" { b = true; }
+      |
+        "§false" {  b = false; }
+    )
+    {  jjtThis.init(b); }
+}
+
+void Concatenation() #Concatenation :
+{
+}
+{
+  (
+    (FunctionCall() | Literal())  <Plus> Expression()
+  )
+  {
+    jjtThis.init(jjtThis);
+  }
+}
+
+void Chain() #Chain :
+{
+}
+{
+  (
+    (FunctionCall() | Literal()) ("." FunctionCall())+
+  )
+  {
+     jjtThis.init();
+  }
+}
+
+void Literal() #void :
+{
+}
+{
+  Array() | Hash() | String() | Number() | Boolean() | Null()
+}
+
+void PlainFunction() #PlainFunction :
+{
+  Token t;
+}
+{
+  t = < IDENTIFIER >
+  {
+    jjtThis.init(t.image);
+  }
+}
+
+TOKEN :
+{
+  < DoubleQuotedString : "\"" (("\\" ~[]) | ~["\\","\""])* "\"">
+| < SingleQuotedString : "'" (("\\" ~[]) | ~["\\","'"])* "'">
+| < Number : ([ "0"-"9" ])+>
+| < Spaces : (" ")+ >
+| < Plus : (" ")* "+" (" ")*>
+}
+
+TOKEN :
+{
+  < IDENTIFIER : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
+}
