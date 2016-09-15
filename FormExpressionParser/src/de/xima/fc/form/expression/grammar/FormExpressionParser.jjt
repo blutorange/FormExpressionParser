@@ -3,9 +3,9 @@ package de.xima.fc.form.expression.grammar;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import org.apache.commons.lang3.StringUtils;
-import de.xima.fc.form.expression.evaluation.InfixValue;
+import de.xima.fc.form.expression.util.InfixValue;
 import java.math.BigInteger;
-import de.xima.fc.form.expression.evaluation.EFunctionType;
+import de.xima.fc.form.expression.util.EFunctionType;
 import de.xima.fc.form.expression.error.NoSuchFunctionException;
 import de.xima.fc.form.expression.node.*;
 
