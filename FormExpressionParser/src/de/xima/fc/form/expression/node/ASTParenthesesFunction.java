@@ -4,8 +4,8 @@ package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
-import de.xima.fc.form.expression.error.EvaluationException;
-import de.xima.fc.form.expression.error.NoSuchFunctionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.NoSuchFunctionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.util.EFunctionType;
 
 public
 @SuppressWarnings("all")
-class ASTParenthesesFunction extends FunctionCallNode {
+class ASTParenthesesFunction extends AFunctionCallNode {
 	private String name;
 	private MySimpleNode[] args;
 
@@ -38,7 +38,7 @@ class ASTParenthesesFunction extends FunctionCallNode {
 		final INamedFunction<NullLangObject> function = ec.getNamespace().globalMethod(name);
 		if (function == null) throw new NoSuchFunctionException(name, ec);
 		final ALangObject[] eval = getEvaluatedArgsArray(ec);
-		return function.evaluate(ec, NullLangObject.getInstance(), eval);
+		return ALangObject.create(function.evaluate(ec, NullLangObject.getInstance(), eval));
 	}
 
 	@Override
@@ -55,6 +55,11 @@ class ASTParenthesesFunction extends FunctionCallNode {
 		// Set name.
 		if (name == null) throw new ParseException("name is null");
 		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "ParenthesesFunction(" + String.valueOf(name) + ")";
 	}
 
 	@Override

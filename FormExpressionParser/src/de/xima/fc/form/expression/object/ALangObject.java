@@ -1,12 +1,20 @@
 package de.xima.fc.form.expression.object;
 
+
+
+import java.util.logging.Logger;
+
+import org.jetbrains.annotations.NotNull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
-import de.xima.fc.form.expression.error.CoercionException;
-import de.xima.fc.form.expression.error.EvaluationException;
-import de.xima.fc.form.expression.error.NoSuchFunctionException;
+import de.xima.fc.form.expression.exception.CoercionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.NoSuchFunctionException;
+import de.xima.fc.form.expression.util.EMethod;
 
 public abstract class ALangObject {
+	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
 
 	private final Type type;
 	private final long id;
@@ -34,9 +42,22 @@ public abstract class ALangObject {
 	/**
 	 * @return An expression that evaluates to this object. Eg. for a String
 	 *         <code>"</code>, this would return <code>"\""</code>
+	 * @see #toExpression(StringBuilder)
 	 */
 	@Override
-	public abstract String toString();
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		toExpression(sb);
+		return sb.toString();
+	}
+
+	/**
+	 * @param bulder String builder used to build the string.
+	 * @return An expression that evaluates to this object. Eg. for a String
+	 *         <code>"</code>, this would return <code>"\""</code>
+	 * @see #toString()
+	 */
+	public abstract void toExpression(StringBuilder builder);
 
 	/**
 	 * @param ec
@@ -82,30 +103,44 @@ public abstract class ALangObject {
 	 *
 	 * @param type
 	 *            Type to which this object should be coerced.
+	 * @param clazz Expected return class of the coercion. Must match the type.
 	 * @param ec
 	 *            Current evaluation context.
-	 * @return The coerced object. Can be cast to {@link Type#clazz} safely.
+	 * @return The coerced object.
 	 * @throws CoercionException
 	 *             When this object cannot be coerced to the given type.
+	 * @throws EvaluationException When clazz and type do not match.
 	 */
-	public final ALangObject coerce(final Type type, final IEvaluationContext ec) throws CoercionException {
+	@SuppressWarnings("unchecked")
+	public final <T extends ALangObject> T coerce(final Type type, final Class<T> clazz, final IEvaluationContext ec) throws CoercionException, EvaluationException {
+		if (clazz != type.clazz) throw new EvaluationException(ec, "Argument type and return class do not match");
 		if (type == getType())
-			return this;
+			return (T)this;
 		switch (type) {
 		case ARRAY:
-			return coerceArray(ec);
+			return (T)coerceArray(ec);
 		case HASH:
-			return coerceHash(ec);
+			return (T)coerceHash(ec);
 		case NULL:
 			throw new CoercionException(this, Type.NULL, ec);
 		case NUMBER:
-			return coerceNumber(ec);
+			return (T)coerceNumber(ec);
 		case STRING:
-			return coerceString(ec);
+			return (T)coerceString(ec);
 		case BOOLEAN:
-			return coerceBoolean(ec);
+			return (T)coerceBoolean(ec);
 		default:
-			throw new RuntimeException("NOT_IMPLEMENTED: add case for enum " + type);
+			// Try to coerce object with the special coerce method, when defined.
+			LOG.info("Enum might not be implemented: " + type);
+			try {
+				return (T)evaluateInstanceMethod(EMethod.COERCE.name, ec, StringLangObject.best(clazz.getSimpleName()));
+			}
+			catch (final EvaluationException e) {
+				throw new CoercionException(this, type, ec);
+			}
+			catch (final ClassCastException e) {
+				throw new CoercionException(this, type, ec);
+			}
 		}
 	}
 
@@ -127,14 +162,19 @@ public abstract class ALangObject {
 		return id;
 	}
 
+	@NotNull
 	protected final <T extends ALangObject> ALangObject evaluateMethod(final T thisContext,
 			final INamedFunction<T> function, final String name, final IEvaluationContext ec, final ALangObject... args)
 					throws EvaluationException {
 		if (function == null)
 			throw new NoSuchFunctionException(name, thisContext, ec);
-		return function.evaluate(ec, thisContext, args);
+		return ALangObject.create(function.evaluate(ec, thisContext, args));
 	}
 
+	public abstract INamedFunction<? extends ALangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException;
+	public abstract INamedFunction<? extends ALangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException;
+
+	@NotNull
 	public abstract ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException;
 

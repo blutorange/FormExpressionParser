@@ -6,9 +6,23 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.CoercionException;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.exception.CoercionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.MathDivisionByZeroException;
+import de.xima.fc.form.expression.exception.MathException;
 
+/**
+ * Number objects are immutable. Performing any operations on a number object
+ * will create a new object. <br>
+ * <br>
+ * Currently all numbers are implemented with {@link BigDecimal}. For
+ * performance, this class can be subclassed to add implementations with floats
+ * or ints. This class exposes only factory methods for object construction,
+ * when subclasses are created, factory methods should be added to this class.
+ *
+ * @author madgaksha
+ */
 public class NumberLangObject extends ALangObject {
 	private final BigDecimal value;
 	public final static MathContext MATH_CONTEXT = new MathContext(9, RoundingMode.HALF_UP);
@@ -102,6 +116,7 @@ public class NumberLangObject extends ALangObject {
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
 		return StringLangObject.create(value);
 	}
+
 	@Override
 	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
 		return value.compareTo(BigDecimal.ZERO) == 0 ? BooleanLangObject.getFalseInstance()
@@ -143,13 +158,108 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
+	public INamedFunction<NumberLangObject> instanceMethod(final String name, final IEvaluationContext ec)
+			throws EvaluationException {
+		return ec.getNamespace().instanceMethodNumber(name);
+	}
+
+	@Override
+	public INamedFunction<NumberLangObject> attrAccessor(final String name, final IEvaluationContext ec)
+			throws EvaluationException {
+		return ec.getNamespace().attrAccessorNumber(name);
+	}
+
+	@Override
 	public String inspect() {
 		return "NumberLangObject(" + value.toString() + ")";
 	}
 
 	@Override
-	public String toString() {
-		return value.toPlainString();
+	public void toExpression(final StringBuilder builder) {
+		builder.append(value.toPlainString());
 	}
 
+	/**
+	 * @param operand
+	 *            Number to add.
+	 * @return A new number, the sum of this number and the operand.
+	 */
+	public NumberLangObject add(final NumberLangObject operand) {
+		return NumberLangObject.create(bigDecimalValue().add(operand.bigDecimalValue()));
+	}
+
+	/**
+	 * @param operand
+	 *            Number to subtract.
+	 * @return A new number, the difference of this number and the operand.
+	 */
+	public NumberLangObject subtract(final NumberLangObject operand) {
+		return NumberLangObject.create(bigDecimalValue().subtract(operand.bigDecimalValue()));
+	}
+
+	/**
+	 * @param operand
+	 *            Number to multiply by.
+	 * @return A new number, the product of this number and the operand.
+	 */
+	public NumberLangObject multiply(final NumberLangObject operand) {
+		return NumberLangObject.create(bigDecimalValue().multiply(operand.bigDecimalValue()));
+	}
+
+	/**
+	 * @param operand
+	 *            Number to divide by.
+	 * @return An new number, the quotient of this number and the operand.
+	 * @throws MathDivisionByZeroException When the operand is 0.
+	 */
+	public NumberLangObject divide(final NumberLangObject operand)
+			throws MathDivisionByZeroException {
+		try {
+			return NumberLangObject.create(bigDecimalValue().divide(operand.bigDecimalValue(), MATH_CONTEXT));
+		} catch (final ArithmeticException e) {
+			throw new MathDivisionByZeroException(this, operand);
+		}
+	}
+
+	public NumberLangObject abs() {
+		return NumberLangObject.create(bigDecimalValue().abs(MATH_CONTEXT));
+	}
+
+	public NumberLangObject signum() {
+		return NumberLangObject.create(bigDecimalValue().signum());
+	}
+
+	public NumberLangObject negate() {
+		return NumberLangObject.create(bigDecimalValue().negate(MATH_CONTEXT));
+	}
+
+	public NumberLangObject round(final int precision) {
+		return NumberLangObject.create(bigDecimalValue().round(new MathContext(precision, MATH_CONTEXT.getRoundingMode())));
+	}
+
+	public NumberLangObject pow(final NumberLangObject operand) throws MathException {
+		final double x1 = bigDecimalValue().doubleValue();
+		final double x2 = operand.bigDecimalValue().doubleValue();
+		if (Double.isInfinite(x1)) throw new MathException("Base too large for double: " + inspect());
+		if (Double.isInfinite(x2)) throw new MathException("Exponent too large for double: " + operand.inspect());
+		return NumberLangObject.create(Math.pow(x1, x2));
+	}
+
+	public NumberLangObject log() throws MathException {
+		final double x = bigDecimalValue().doubleValue();
+		if (Double.isInfinite(x)) throw new MathException("Number too large for double: " + inspect());
+		return NumberLangObject.create(Math.log(x));
+	}
+
+	public NumberLangObject sin() throws MathException {
+		final double x = bigDecimalValue().doubleValue();
+		if (Double.isInfinite(x)) throw new MathException("Number too large for double: " + inspect());
+		return NumberLangObject.create(Math.sin(x));
+	}
+
+	public NumberLangObject cos() throws MathException {
+		final double x = bigDecimalValue().doubleValue();
+		if (Double.isInfinite(x)) throw new MathException("Number too large for double: " + inspect());
+		return NumberLangObject.create(Math.cos(x));
+	}
 }

@@ -6,8 +6,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.CoercionException;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.exception.CoercionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 
 public class StringLangObject extends ALangObject {
 	private final static String TRUE = "true";
@@ -32,6 +33,15 @@ public class StringLangObject extends ALangObject {
 	@Override
 	public ALangObject deepClone() {
 		return shallowClone();
+	}
+
+	@Override
+	public INamedFunction<StringLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().instanceMethodString(name);
+	}
+	@Override
+	public INamedFunction<StringLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorString(name);
 	}
 
 	@Override
@@ -62,8 +72,8 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public String toString() {
-		return new StringBuilder().append('"').append(StringEscapeUtils.escapeJava(value)).append('"').toString();
+	public void toExpression(final StringBuilder builder) {
+		builder.append('"').append(StringEscapeUtils.escapeJava(value)).append('"').toString();
 	}
 
 	// Coercion

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 

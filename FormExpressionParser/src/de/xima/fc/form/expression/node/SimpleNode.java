@@ -5,13 +5,11 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 
-public
-@SuppressWarnings("all")
-class SimpleNode implements Node {
+public class SimpleNode implements Node {
 
 	protected Node parent;
 	protected Node[] children;
-	protected int id;
+	protected final int id;
 	protected Object value;
 	protected FormExpressionParser parser;
 
@@ -72,18 +70,13 @@ class SimpleNode implements Node {
 	public String toString() { return FormExpressionParserTreeConstants.jjtNodeName[id]; }
 	public String toString(final String prefix) { return prefix + toString(); }
 
-	/* Override this method if you want to customize how the node dumps
-     out its children. */
-
 	public void dump(final String prefix) {
 		System.out.println(toString(prefix));
 		if (children != null)
 			for (int i = 0; i < children.length; ++i) {
 				final SimpleNode n = (SimpleNode)children[i];
 				if (n != null)
-					n.dump(prefix + " ");
+					n.dump(prefix + "  ");
 			}
 	}
 }
-
-/* JavaCC - OriginalChecksum=62931d2486242ab77004568064a36084 (do not edit this line) */

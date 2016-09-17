@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.xima.fc.form.expression.context.IBinding;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 

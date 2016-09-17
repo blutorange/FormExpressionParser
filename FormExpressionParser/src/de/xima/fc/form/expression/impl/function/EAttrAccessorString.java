@@ -4,13 +4,14 @@ import java.util.Locale;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NamedFunctionUtils;
 
 public enum EAttrAccessorString implements INamedFunction<StringLangObject> {
-	UPPERCASE {
+	upcase {
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -20,12 +21,12 @@ public enum EAttrAccessorString implements INamedFunction<StringLangObject> {
 			return StringLangObject.create(thisContext.stringValue().toUpperCase(locale));
 		}
 	},
-	__PLUS {
+	length {
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 				throws EvaluationException {
-			final StringLangObject s = NamedFunctionUtils.getArgOrNull(this, 0, args, StringLangObject.class, ec);
-			return StringLangObject.create(thisContext.stringValue() + s.stringValue());
+			NamedFunctionUtils.assertArgs(this, 0, args, ec);
+			return NumberLangObject.create(thisContext.stringValue().length());
 		}
 	}
 	;

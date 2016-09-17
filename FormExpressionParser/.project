@@ -6,12 +6,12 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.wst.common.project.facet.core.builder</name>
+			<name>sf.eclipse.javacc.javaccbuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>sf.eclipse.javacc.javaccbuilder</name>
+			<name>org.eclipse.wst.common.project.facet.core.builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -29,7 +29,7 @@
 	<natures>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>sf.eclipse.javacc.javaccnature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
+		<nature>sf.eclipse.javacc.javaccnature</nature>
 	</natures>
 </projectDescription>

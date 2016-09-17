@@ -16,11 +16,11 @@ import java.nio.charset.Charset;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamespace;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.GenericEvaluationContext;
-import de.xima.fc.form.expression.impl.QueueBinding;
+import de.xima.fc.form.expression.impl.formfield.FormFieldEvaluationBinding;
 import de.xima.fc.form.expression.impl.formfield.FormFieldNamespaceBuilder;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
@@ -40,14 +40,16 @@ public class FormExpressionEvaluator {
 	@SuppressWarnings("static-access")
 	public static void main(final String args[]) {
 
-		final String string = "'af'.UPPERCASE()";
+		final String string = "tf1.length";
+
+		System.out.println("Input string\n" + string);
 
 		final ByteArrayInputStream bais = new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
 		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
 		final MySimpleNode rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = parser.Root();
+			rootNode = parser.Plain();
 			final long t2 = System.nanoTime();
 			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final ParseException e) {
@@ -55,11 +57,11 @@ public class FormExpressionEvaluator {
 			return;
 		}
 
-		System.out.println("Input string\n" + string);
-
 		System.out.println("\nParse tree");
 		rootNode.dump("");
 		System.out.println("");
+
+		//if (true) System.exit(0);
 
 		final IEvaluationContext ec = getEc();
 
@@ -67,12 +69,11 @@ public class FormExpressionEvaluator {
 			final long t1 = System.nanoTime();
 			final ALangObject result = rootNode.evaluate(ec);
 			final long t2 = System.nanoTime();
-			System.out.println("Evaluating took " + (t2-t1)/1000000 + "ms\n");
+			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 
 			System.out.println("Evaluated result:");
-			System.out.println(result.coerceBoolean(ec).inspect());
-			System.out.println(result.toString());
-			System.out.println(result.inspect());
+			System.out.println("toString: " + result.toString());
+			System.out.println("internal: " + result.inspect());
 		}
 		catch (final EvaluationException e) {
 			System.err.println("Failed to evaluate expression.");
@@ -84,7 +85,7 @@ public class FormExpressionEvaluator {
 	}
 
 	private static IEvaluationContext getEc() {
-		return new GenericEvaluationContext(new QueueBinding(), getNamespace());
+		return new GenericEvaluationContext(new FormFieldEvaluationBinding(), getNamespace());
 	}
 
 	private static INamespace getNamespace() {

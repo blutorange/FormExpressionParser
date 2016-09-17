@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.util.EFunctionType;
 
 public
 @SuppressWarnings("all")
-class ASTPlainFunction extends FunctionCallNode {
+class ASTPlainFunction extends AFunctionCallNode {
 
 	private String name;
 

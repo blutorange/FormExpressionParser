@@ -25,6 +25,11 @@ public class ASTBooleanNode extends MySimpleNode {
 		return BooleanLangObject.create(booleanValue);
 	}
 
+	@Override
+	public String toString() {
+		return "BooleanNode(" + (booleanValue ? "true)" : "false)");
+	}
+
 	public void init(final boolean b) throws ParseException {
 		booleanValue = b;
 	}

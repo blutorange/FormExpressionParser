@@ -1,8 +1,9 @@
 package de.xima.fc.form.expression.object;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.EvaluationException;
-import de.xima.fc.form.expression.error.NullObjectAccessException;
+import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.NullObjectAccessException;
 
 public class NullLangObject extends ALangObject {
 	private NullLangObject() {
@@ -42,6 +43,17 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
+	public INamedFunction<NullLangObject> instanceMethod(final String name, final IEvaluationContext ec)
+			throws EvaluationException {
+		throw new NullObjectAccessException(this, ec);
+	}
+
+	@Override
+	public INamedFunction<NullLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		throw new NullObjectAccessException(this, ec);
+	}
+
+	@Override
 	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
 			throws EvaluationException {
 		throw new NullObjectAccessException(this, ec);
@@ -69,8 +81,8 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
-	public String toString() {
-		return "§null";
+	public void toExpression(final StringBuilder builder) {
+		builder.append("§null");
 	}
 
 

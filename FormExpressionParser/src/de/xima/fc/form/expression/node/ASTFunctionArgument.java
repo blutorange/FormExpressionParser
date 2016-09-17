@@ -5,7 +5,7 @@ package de.xima.fc.form.expression.node;
 
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.object.ALangObject;
 

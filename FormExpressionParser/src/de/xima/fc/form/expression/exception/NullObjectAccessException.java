@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.error;
+package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;

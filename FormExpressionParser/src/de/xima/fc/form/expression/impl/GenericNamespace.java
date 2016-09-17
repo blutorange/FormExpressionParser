@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.context.INamespace;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;

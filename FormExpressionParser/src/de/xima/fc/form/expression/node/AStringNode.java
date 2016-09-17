@@ -6,13 +6,13 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
-public abstract class StringNode extends MySimpleNode  {
+public abstract class AStringNode extends MySimpleNode  {
 	private String stringValue;
-	public StringNode(final int id) {
+	public AStringNode(final int id) {
 		super(id);
 	}
 
-	public StringNode(final FormExpressionParser p, final int id) {
+	public AStringNode(final FormExpressionParser p, final int id) {
 		super(p, id);
 	}
 

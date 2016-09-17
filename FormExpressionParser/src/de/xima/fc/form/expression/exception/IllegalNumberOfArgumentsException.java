@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.error;
+package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 
@@ -8,8 +8,7 @@ public class IllegalNumberOfArgumentsException extends EvaluationException {
 
 	public IllegalNumberOfArgumentsException(final String functionName, final int isCount, final int expectedCount,
 			final IEvaluationContext ec) {
-		super(ec, "Encountered " + isCount + "number of arguments for function " + functionName + System.lineSeparator()
-		+ "expected " + expectedCount);
+		super(ec, "Encountered " + isCount + " argument(s) for function " + functionName + ", " + "expected at least " + expectedCount);
 		this.isCount = isCount;
 		expectedCountMin = expectedCount;
 		expectedCountMax = expectedCount;

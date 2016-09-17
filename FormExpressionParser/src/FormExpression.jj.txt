@@ -3,12 +3,12 @@ package de.xima.fc.form.expression.grammar;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import org.apache.commons.lang3.StringUtils;
-import de.xima.fc.form.expression.evaluation.InfixValue;
+import de.xima.fc.form.expression.util.InfixValue;
 import java.math.BigInteger;
-import de.xima.fc.form.expression.evaluation.EExpressionType;
-import de.xima.fc.form.expression.evaluation.EFunctionType;
-import de.xima.fc.form.expression.error.NoSuchFunctionException;
+import de.xima.fc.form.expression.util.EFunctionType;
+import de.xima.fc.form.expression.exception.NoSuchFunctionException;
 import de.xima.fc.form.expression.node.*;
+import de.xima.fc.form.expression.util.EMethod;
 
 /** Formcycle expression language.
     http://ramkulkarni.com/blog/handling-some-of-the-warnings-and-errors-generated-by-javacc/
@@ -18,12 +18,7 @@ public class FormExpressionParser
   /** Main entry point. */
   public static void main(String args []) throws ParseException
   {
-    String string = "val('my')";
-    System.out.println(string);
-    ByteArrayInputStream bais = new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
-    FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
-    MySimpleNode rootNode = parser.Root();
-    rootNode.dump("");
+    System.out.println("Use as a library...");
   }
 }
 
@@ -37,50 +32,415 @@ SKIP :
 | "\r"
 }
 
-/** Root production. */
-MySimpleNode Root() #RootNode :
+/** Root for non-embedded code. */
+MySimpleNode Plain() #ExpressionNode :
 {
-}
-{
-    [< Spaces >] Expression() [< Spaces >] < EOF >
-  {
-     jjtThis.init();
-     return jjtThis;
-  }
-}
-
-/** Expression. */
-void Expression() #ExpressionNode :
-{
-  EExpressionType type;
 }
 {
   (
-  LOOKAHEAD(Concatenation())
-  Concatenation()
-|
-  LOOKAHEAD(Chain())
-  Chain() 
-| 
-  FunctionCall() 
-|
-  Literal()
+    (
+      Expression() < EOF >
+    )
+  | < EOF >
   )
+  {
+    jjtThis.init(null);
+    return jjtThis;
+  }
+}
+
+void Statement() #void :
+{
+}
+{
+  Expression() ";"
+}
+
+
+void Expression() #void :
+{
+}
+{
+  EqualTypeExpression(null)
+}
+
+void ExpressionWithMethodPassthrough(EMethod method) #void :
+{
+}
+{
+  EqualTypeExpression(method)
+}
+
+
+void EqualTypeExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    DoubleBarExpression(nextMethod)
+    (
+      (
+        "=" DoubleBarExpression(EMethod.EQUAL)
+      )
+    |
+      (
+        "+=" DoubleBarExpression(EMethod.PLUS_EQUAL)
+      )
+    |
+      (
+        "-=" DoubleBarExpression(EMethod.DASH_EQUAL)
+      )
+    |
+      (
+        "**=" DoubleBarExpression(EMethod.DOUBLE_STAR_EQUAL)
+      )
+    |
+      (
+        "*=" DoubleBarExpression(EMethod.STAR_EQUAL)
+      )
+    |
+      (
+        "/=" DoubleBarExpression(EMethod.SLASH_EQUAL)
+      )
+    |
+      (
+        "%=" DoubleBarExpression(EMethod.PERCENT_EQUAL)
+      )
+    |
+      (
+        "<<=" DoubleBarExpression(EMethod.DOUBLE_ANGLE_OPEN_EQUAL)
+      )
+    |
+      (
+        ">>=" DoubleBarExpression(EMethod.DOUBLE_ANGLE_CLOSE_EQUAL)
+      )
+    |
+      (
+        "&&=" DoubleBarExpression(EMethod.DOUBLE_AMPERSAND_EQUAL)
+      )
+    |
+      (
+        "||=" DoubleBarExpression(EMethod.DOUBLE_BAR_EQUAL)
+      )
+    |
+      (
+        "&=" DoubleBarExpression(EMethod.AMPERSAND_EQUAL)
+      )
+    |
+      (
+        "^=" DoubleBarExpression(EMethod.CIRCUMFLEX_EQUAL)
+      )
+    |
+      (
+        "|=" DoubleBarExpression(EMethod.BAR_EQUAL)
+      )
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+/*
+void TrinaryExpression() #TrinaryExpressionNode :
+{
+}
+{
+  Expression() "?" Expression() ":" Expression()
   {
     jjtThis.init();
   }
 }
+*/
 
+void DoubleBarExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  }
+{
+  (
+    DoubleAmpersandExpression(nextMethod)
+    (
+      "||" DoubleAmpersandExpression(EMethod.DOUBLE_BAR)
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    BarExpression(nextMethod)
+    (
+      "&&" BarExpression(EMethod.DOUBLE_AMPERSAND)
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void BarExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    CircumflexExpression(nextMethod)
+    (
+      "|" CircumflexExpression(EMethod.BAR)
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void CircumflexExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    AmpersandExpression(nextMethod)
+    (
+      "^" AmpersandExpression(EMethod.CIRCUMFLEX)
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void AmpersandExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    DoubleEqualTypeExpression(nextMethod)
+    (
+      "&" DoubleEqualTypeExpression(EMethod.AMPERSAND)
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    AngleTypeExpression(nextMethod)
+    (
+      (
+        "===" AngleTypeExpression(EMethod.TRIPLE_EQUAL)
+      )
+    |
+      (
+        "==" AngleTypeExpression(EMethod.DOUBLE_EQUAL)
+      )
+|
+      (
+        "!=" AngleTypeExpression(EMethod.EXCLAMATION_EQUAL)
+      )
+    |
+      (
+        "!==" AngleTypeExpression(EMethod.EXCLAMATION_DOUBLE_EQUAL)
+      )
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void AngleTypeExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    PlusLikeExpression(nextMethod)
+    (
+      (
+        "<" PlusLikeExpression(EMethod.ANGLE_OPEN)
+      )
+    |
+      (
+        ">" PlusLikeExpression(EMethod.ANGLE_CLOSE)
+      )
+    |
+      (
+        "<=" PlusLikeExpression(EMethod.ANGLE_OPEN_EQUAL)
+      )
+    |
+      (
+        ">=" PlusLikeExpression(EMethod.ANGLE_CLOSE_EQUAL)
+      )
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void PlusLikeExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    StarLikeExpression(nextMethod)
+    (
+      (
+        "+" StarLikeExpression(EMethod.PLUS)
+      )
+    |
+      (
+        "-" StarLikeExpression(EMethod.DASH)
+      )
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void StarLikeExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  UnaryExpression(nextMethod)
+  (
+    (
+      DoubleStarExpression(nextMethod)
+    |
+      (
+        "*" UnaryExpression(EMethod.STAR)
+      )
+    |
+      (
+        "/" UnaryExpression(EMethod.SLASH)
+      )
+    |
+      (
+        "%" UnaryExpression(EMethod.PERCENT)
+      )
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void UnaryExpression(EMethod method) #ExpressionNode(unaryMethod != null) :
+{
+  EMethod unaryMethod = null;
+}
+{
+  (
+    (
+      "++" UnaryExpression(null) { unaryMethod = EMethod.DOUBLE_PLUS_PREFIX; }
+    )
+  |
+    (
+      "--" UnaryExpression(null) { unaryMethod = EMethod.DOUBLE_DASH_PREFIX; }
+    )
+  |
+    (
+      "+" UnaryExpression(null) { unaryMethod = EMethod.PLUS_UNARY; }
+    )
+  |
+    (
+      "-" UnaryExpression(null) { unaryMethod = EMethod.DASH_UNARY; }
+    )
+  |
+    (
+      "!" UnaryExpression(null) { unaryMethod = EMethod.EXCLAMATION; }
+    )
+  | DoubleStarExpression(method)
+  )
+  {
+    if (unaryMethod != null) jjtThis.init(method, unaryMethod);
+  }
+}
+
+void DoubleStarExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+}
+{
+  (
+    FunctionTypeUnaryExpression(nextMethod)
+    (
+      (
+        "**" UnaryExpression(EMethod.CIRCUMFLEX)
+      )?
+    )
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void DotExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  boolean createNode = true;
+  EMethod nextMethod = method;
+}
+{
+  (
+    FunctionTypeUnaryExpression(nextMethod)
+    (
+      "." FunctionTypeUnaryExpression(nextMethod)
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void FunctionTypeUnaryExpression(EMethod method) #ExpressionNode(createNode) :
+{
+  boolean createNode = true;
+}
+{
+  (
+    Literal()
+  |
+    (
+      FunctionCall()
+    )
+  |
+    (
+      "(" ExpressionWithMethodPassthrough(method) ")"
+    )
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
 
 void FunctionCall() #void :
 {
 }
 {
   (
-  LOOKAHEAD(< IDENTIFIER > "(")
-  ParenthesesFunction()
-| 
-  PlainFunction()
+    LOOKAHEAD(< IDENTIFIER > "(")
+    ParenthesesFunction()
+  | 
+    PlainFunction()
   )
 }
 
@@ -115,7 +475,7 @@ void String() #void :
 {
   (
     SingleQuotedString()
-|
+  | 
     DoubleQuotedString()
   )
 }
@@ -123,11 +483,22 @@ void String() #void :
 void Number() #NumberNode :
 {
   Token t;
+  boolean isInt;
 }
 {
-  t = < Number >
+  (
+    t = < Integer >
+    {
+      isInt = true;
+    }
+  | 
+    t = < Float >
+    {
+      isInt = false;
+    }
+  )
   {
-    jjtThis.init(t.image);
+    jjtThis.init(t.image, isInt);
   }
 }
 
@@ -150,17 +521,30 @@ void SingleQuotedString() #SingleQuotedString :
   t = < SingleQuotedString >
   {
     jjtThis.init(t.image);
-  }  
+  }
 }
 
 void Array() #ArrayNode :
 {
 }
 {
+  (
+    "["
     (
-      "[" ("]" | (Expression() ("," Expression())* "]"))
+      "]"
+    |
+      (
+        Expression()
+        (
+          "," Expression()
+        )*
+        "]"
+      )
     )
-    { jjtThis.init(); }
+  )
+  {
+    jjtThis.init();
+  }
 }
 
 void Hash() #HashNode :
@@ -168,9 +552,22 @@ void Hash() #HashNode :
 }
 {
   (
-    "{" ("}" | (HashEntry() ("," HashEntry())* "}"))
+    "{"
+    (
+      "}"
+    |
+      (
+        HashEntry()
+        (
+          "," HashEntry()
+        )*
+        "}"
+      )
+    )
   )
-  { jjtThis.init(); }
+  {
+    jjtThis.init();
+  }
 }
 
 void HashEntry() #void :
@@ -187,9 +584,11 @@ void Null() #NullNode :
 {
 }
 {
-  "§null"
+  "\u00a7null"
   {
-    { jjtThis.init(); }
+    {
+      jjtThis.init();
+    }
   }
 }
 
@@ -198,35 +597,19 @@ void Boolean() #BooleanNode :
   boolean b;
 }
 {
-    (
-        "§true" { b = true; }
-      |
-        "§false" {  b = false; }
-    )
-    {  jjtThis.init(b); }
-}
-
-void Concatenation() #Concatenation :
-{
-}
-{
   (
-    (FunctionCall() | Literal())  <Plus> Expression()
+    "\u00a7true"
+    {
+      b = true;
+    }
+  | 
+    "\u00a7false"
+    {
+      b = false;
+    }
   )
   {
-    jjtThis.init(jjtThis);
-  }
-}
-
-void Chain() #Chain :
-{
-}
-{
-  (
-    (FunctionCall() | Literal()) ("." FunctionCall())+
-  )
-  {
-     jjtThis.init();
+    jjtThis.init(b);
   }
 }
 
@@ -234,7 +617,12 @@ void Literal() #void :
 {
 }
 {
-  Array() | Hash() | String() | Number() | Boolean() | Null()
+  Array()
+| Hash()
+| String()
+| Number()
+| Boolean()
+| Null()
 }
 
 void PlainFunction() #PlainFunction :
@@ -250,11 +638,30 @@ void PlainFunction() #PlainFunction :
 
 TOKEN :
 {
-  < DoubleQuotedString : "\"" (("\\" ~[]) | ~["\\","\""])* "\"">
-| < SingleQuotedString : "'" (("\\" ~[]) | ~["\\","'"])* "'">
-| < Number : ([ "0"-"9" ])+>
-| < Spaces : (" ")+ >
-| < Plus : (" ")* "+" (" ")*>
+  < DoubleQuotedString :
+    "\""
+    (
+      ("\\" ~[ ])
+    | ~[ "\\", "\"" ]
+    )*
+    "\"" >
+| < SingleQuotedString :
+    "'"
+    (
+      ("\\" ~[ ])
+    | ~[ "\\", "'" ]
+    )*
+    "'" >
+| 
+  < Integer : ([ "0"-"9" ])+ >
+| 
+  < Float :
+    ([ "0"-"9" ])+ "." ([ "0"-"9" ])* (< EXPONENT >)?
+  | "." ([ "0"-"9" ])+ (< EXPONENT >)?
+  | ([ "0"-"9" ])+ < EXPONENT > 
+  >
+| 
+  < #EXPONENT : [ "e", "E" ] ([ "+", "-" ])? ([ "0"-"9" ])+ >
 }
 
 TOKEN :

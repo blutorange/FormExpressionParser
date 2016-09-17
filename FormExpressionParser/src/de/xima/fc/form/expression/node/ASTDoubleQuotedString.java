@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 
 public
 @SuppressWarnings("all")
-class ASTDoubleQuotedString extends StringNode {
+class ASTDoubleQuotedString extends AStringNode {
 	public ASTDoubleQuotedString(final int id) {
 		super(id);
 	}

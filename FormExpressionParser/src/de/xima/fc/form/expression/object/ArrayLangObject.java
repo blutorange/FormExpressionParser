@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.CoercionException;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.exception.CoercionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 
 public class ArrayLangObject extends ALangObject {
 
@@ -51,6 +52,15 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
+	public INamedFunction<ArrayLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().instanceMethodArray(name);
+	}
+	@Override
+	public INamedFunction<ArrayLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorArray(name);
+	}
+
+	@Override
 	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
 		return this.evaluateMethod(this, ec.getNamespace().instanceMethodArray(name), name, ec, args);
 	}
@@ -84,13 +94,11 @@ public class ArrayLangObject extends ALangObject {
 
 
 	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		for (final ALangObject o : value) sb.append(o.toString()).append(",");
-		if (sb.length() > 1) sb.setLength(sb.length()-1);
-		sb.append("]");
-		return sb.toString();
+	public void toExpression(final StringBuilder builder) {
+		builder.append("[");
+		for (final ALangObject o : value) builder.append(o.toString()).append(",");
+		if (builder.length() > 1) builder.setLength(builder.length()-1);
+		builder.append("]");
 	}
 
 

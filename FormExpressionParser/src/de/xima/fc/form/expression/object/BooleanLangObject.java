@@ -1,8 +1,9 @@
 package de.xima.fc.form.expression.object;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.CoercionException;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.exception.CoercionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 
 public class BooleanLangObject extends ALangObject {
 	private final boolean value;
@@ -50,6 +51,15 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
+	public INamedFunction<BooleanLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().instanceMethodBoolean(name);
+	}
+	@Override
+	public INamedFunction<BooleanLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorBoolean(name);
+	}
+
+	@Override
 	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
 			throws EvaluationException {
 		return this.evaluateMethod(this, ec.getNamespace().instanceMethodBoolean(name), name, ec, args);
@@ -77,8 +87,8 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
-	public String toString() {
-		return value ? "§true" : "§false";
+	public void toExpression(final StringBuilder builder) {
+		builder.append(value ? "§true" : "§false");
 	}
 
 	public static ALangObject create(final boolean b) {

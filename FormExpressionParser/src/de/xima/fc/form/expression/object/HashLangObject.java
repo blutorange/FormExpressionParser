@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.error.CoercionException;
-import de.xima.fc.form.expression.error.EvaluationException;
+import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.exception.CoercionException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 
 public class HashLangObject extends ALangObject {
 
@@ -39,14 +40,12 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("{");
+	public void toExpression(final StringBuilder builder) {
+		builder.append("{");
 		for (final Entry<ALangObject, ALangObject> v : value.entrySet())
-			sb.append(v.getKey().toString()).append(":").append(v.getValue().toString()).append(",");
-		if (sb.length() > 1) sb.setLength(sb.length()-1);
-		sb.append("}");
-		return sb.toString();
+			builder.append(v.getKey().toString()).append(":").append(v.getValue().toString()).append(",");
+		if (builder.length() > 1) builder.setLength(builder.length()-1);
+		builder.append("}");
 	}
 
 	@Override
@@ -60,6 +59,15 @@ public class HashLangObject extends ALangObject {
 		return sb.toString();
 	}
 
+
+	@Override
+	public INamedFunction<HashLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().instanceMethodHash(name);
+	}
+	@Override
+	public INamedFunction<NumberLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorNumber(name);
+	}
 
 	@Override
 	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
