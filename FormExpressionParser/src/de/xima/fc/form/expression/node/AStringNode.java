@@ -2,14 +2,13 @@ package de.xima.fc.form.expression.node;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public abstract class AStringNode extends MySimpleNode  {
-	private String stringValue;
+	protected String stringValue;
 	public AStringNode(final int id) {
 		super(id);
 	}
@@ -26,9 +25,18 @@ public abstract class AStringNode extends MySimpleNode  {
 
 	public abstract String parseString(String literal) throws ParseException;
 
+	//TODO remove this
+	//	public ALangObject evaluate(final IEvaluationContext ec) {
+	//		return StringLangObject.create(stringValue);
+	//	}
+
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec) {
-		return StringLangObject.create(stringValue);
+	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+		return visitor.visit(this, data);
+	}
+
+	public String getStringValue() {
+		return stringValue;
 	}
 
 	@Override

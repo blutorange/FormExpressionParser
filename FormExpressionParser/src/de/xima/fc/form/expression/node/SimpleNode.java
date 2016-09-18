@@ -1,16 +1,21 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package de.xima.fc.form.expression.node;
 
-import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 
-public abstract class SimpleNode implements Node, Serializable {
+public abstract class SimpleNode implements Node {
 
-	/** The id of this node. Can be anything as long as it is unique. Does not need to be the same
-	 * for multiple runs of the program. */
+	private static AtomicInteger idProvider = new AtomicInteger();
+
+	/**
+	 * The id of this node. Can be anything as long as it is unique. Does not
+	 * need to be the same for multiple runs of the program.
+	 */
+	protected final int uniqueId;
 	protected final int id;
 	protected transient Node parent;
 	protected transient Node[] children;
@@ -18,6 +23,7 @@ public abstract class SimpleNode implements Node, Serializable {
 	protected transient FormExpressionParser parser;
 
 	public SimpleNode(final int i) {
+		uniqueId = idProvider.incrementAndGet();
 		id = i;
 	}
 
@@ -35,9 +41,14 @@ public abstract class SimpleNode implements Node, Serializable {
 	}
 
 	@Override
-	public void jjtSetParent(final Node n) { parent = n; }
+	public void jjtSetParent(final Node n) {
+		parent = n;
+	}
+
 	@Override
-	public Node jjtGetParent() { return parent; }
+	public Node jjtGetParent() {
+		return parent;
+	}
 
 	@Override
 	public void jjtAddChild(final Node n, final int i) {
@@ -61,27 +72,33 @@ public abstract class SimpleNode implements Node, Serializable {
 		return children == null ? 0 : children.length;
 	}
 
-	public void jjtSetValue(final Object value) { this.value = value; }
-	public Object jjtGetValue() { return value; }
+	public void jjtSetValue(final Object value) {
+		this.value = value;
+	}
 
-	/* You can override these two methods in subclasses of SimpleNode to
-     customize the way the node appears when the tree is dumped.  If
-     your output uses more than one line you should override
-     toString(String), otherwise overriding toString() is probably all
-     you need to do. */
+	public Object jjtGetValue() {
+		return value;
+	}
+
+	/*
+	 * You can override these two methods in subclasses of SimpleNode to
+	 * customize the way the node appears when the tree is dumped. If your
+	 * output uses more than one line you should override toString(String),
+	 * otherwise overriding toString() is probably all you need to do.
+	 */
 
 	@Override
-	public String toString() { return FormExpressionParserTreeConstants.jjtNodeName[id]; }
-	public String toString(final String prefix) { return prefix + toString(); }
+	public String toString() {
+		return FormExpressionParserTreeConstants.jjtNodeName[id];
+	}
 
 	@Override
-	public void dump(final String prefix) {
-		System.out.println(toString(prefix));
-		if (children != null)
-			for (int i = 0; i < children.length; ++i) {
-				final SimpleNode n = (SimpleNode)children[i];
-				if (n != null)
-					n.dump(prefix + "  ");
-			}
+	public int getId() {
+		return uniqueId;
+	}
+
+	@Override
+	public int getNodeTypeId() {
+		return id;
 	}
 }

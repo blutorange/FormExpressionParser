@@ -2,28 +2,39 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package de.xima.fc.form.expression.node;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.EFunctionType;
 
 public abstract class AFunctionCallNode extends MySimpleNode {
 
-	public AFunctionCallNode(final int id) {
+	public ChainType chainType;
+
+	public static enum ChainType {
+		ATTR_ACCESSOR,
+		INSTANCE_METHOD;
+	}
+
+	public AFunctionCallNode(final int id, final ChainType chainType) {
 		super(id);
+		this.chainType = chainType;
 	}
 
-	public AFunctionCallNode(final FormExpressionParser p, final int id) {
+	public AFunctionCallNode(final FormExpressionParser p, final int id, final ChainType chainType) {
 		super(p, id);
+		this.chainType = chainType;
 	}
 
-	public abstract EFunctionType getType();
+	public final ChainType getChainType() {
+		return chainType;
+	}
 
-	public abstract ALangObject chain(final ALangObject thisContext, final IEvaluationContext ec)
-			throws EvaluationException;
+	//	public abstract ALangObject chain(final ALangObject thisContext, final IEvaluationContext ec)
+	//			throws EvaluationException;
 
 	public abstract void init(String name) throws ParseException;
+
+	public abstract EFunctionType getType();
+	public abstract String getName();
 
 }

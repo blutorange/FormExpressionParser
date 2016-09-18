@@ -5,8 +5,8 @@ import java.util.Map;
 
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.NullLangObject;
 
 /**
  * Create a new binding instance with a new map for each nesting level.
@@ -35,10 +35,10 @@ public class CloneBinding implements IBinding {
 
 	/**
 	 * Value returned when variable is not in scope. May be overridden to provide other default values.
-	 * @param name Name of the form field. Defaults to {@link NullLangObject} unless overridden.
+	 * @param name Name of the form field. Defaults to throwing a {@link VariableNotDefinedException} when not overridden.
 	 */
-	protected ALangObject getDefaultValue(final String name) {
-		return NullLangObject.getInstance();
+	protected ALangObject getDefaultValue(final String name) throws VariableNotDefinedException {
+		throw new VariableNotDefinedException(name, this);
 	}
 
 	@Override

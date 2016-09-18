@@ -2,14 +2,14 @@ package de.xima.fc.form.expression.node;
 
 import java.math.BigDecimal;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTNumberNode extends MySimpleNode {
-	private BigDecimal value;
+	private BigDecimal bigDecimalValue;
 
 
 	public ASTNumberNode(final int id) {
@@ -20,10 +20,11 @@ public class ASTNumberNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	@Override
-	public ALangObject evaluate(final IEvaluationContext fc) {
-		return NumberLangObject.create(value);
-	}
+	//TODO remove this method
+	//	@Override
+	//	public ALangObject evaluate(final IEvaluationContext ec) {
+	//		return NumberLangObject.create(bigDecimalValue);
+	//	}
 
 	/**
 	 * @param string String representing the number.
@@ -31,7 +32,7 @@ public class ASTNumberNode extends MySimpleNode {
 	 */
 	public void init(final String string, final boolean isInt) throws ParseException {
 		try {
-			value = new BigDecimal(string, NumberLangObject.MATH_CONTEXT);
+			bigDecimalValue = new BigDecimal(string, NumberLangObject.MATH_CONTEXT);
 		}
 		catch (final NumberFormatException e) {
 			throw new ParseException("not a number: " + string);
@@ -39,8 +40,17 @@ public class ASTNumberNode extends MySimpleNode {
 	}
 
 	@Override
+	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+		return visitor.visit(this, data);
+	}
+
+	@Override
 	public String toString() {
-		return "NumberNode(" + value.toPlainString() + ")";
+		return "NumberNode(" + bigDecimalValue.toPlainString() + ")";
+	}
+
+	public BigDecimal getBigDecimalValue() {
+		return bigDecimalValue;
 	}
 
 }

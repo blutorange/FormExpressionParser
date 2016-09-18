@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl.formfield;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.impl.CloneBinding;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
@@ -31,10 +32,11 @@ public final class FormFieldEvaluationBinding extends CloneBinding {
 	}
 
 	@Override
-	protected ALangObject getDefaultValue(final String name) {
+	protected ALangObject getDefaultValue(final String name) throws VariableNotDefinedException {
 		String value = nameMap.get(name);
 		if (value == null) value = aliasMap.get(name);
-		return StringLangObject.best(value);
+		if (value == null) throw new VariableNotDefinedException(name, this);
+		return StringLangObject.create(value);
 	}
 
 

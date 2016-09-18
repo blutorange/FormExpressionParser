@@ -20,6 +20,8 @@ package de.xima.fc.form.expression;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -41,11 +43,12 @@ import de.xima.fc.form.expression.impl.function.EInstanceMethodNumber;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodString;
 import de.xima.fc.form.expression.node.MySimpleNode;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
 
-		final String string = "a && -1 < \" \\n\\r\\t\".indexOf(a.charAt(0))";
+		final String string = "1+2";
 
 		System.out.println("Input string\n" + string);
 
@@ -63,10 +66,16 @@ public class FormExpressionEvaluator {
 		}
 
 		System.out.println("\nParse tree");
-		rootNode.dump("");
+		try {
+			rootNode.jjtAccept(DumpVisitor.getSystemOutDumper(), StringUtils.EMPTY);
+		} catch (final EvaluationException e) {
+			// System.out probably will not throw an IOException,
+			// System.out.println just catches it anyways.
+			e.printStackTrace();
+		}
 		System.out.println("");
 
-		//if (true) System.exit(0);
+		if (true) System.exit(0);
 
 		final IEvaluationContext ec = getEc();
 

@@ -2,11 +2,10 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package de.xima.fc.form.expression.node;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTBooleanNode extends MySimpleNode {
 
@@ -20,18 +19,27 @@ public class ASTBooleanNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	@Override
-	public ALangObject evaluate(final IEvaluationContext fc) {
-		return BooleanLangObject.create(booleanValue);
-	}
+	//TODO remove me
+	//	public ALangObject evaluate(final IEvaluationContext fc) {
+	//		return BooleanLangObject.create(booleanValue);
+	//	}
 
 	@Override
 	public String toString() {
 		return "BooleanNode(" + (booleanValue ? "true)" : "false)");
 	}
 
+	@Override
+	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+		return visitor.visit(this, data);
+	}
+
 	public void init(final boolean b) throws ParseException {
 		booleanValue = b;
+	}
+
+	public boolean getBooleanValue() {
+		return booleanValue;
 	}
 
 }

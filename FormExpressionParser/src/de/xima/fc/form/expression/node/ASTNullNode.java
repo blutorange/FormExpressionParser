@@ -2,11 +2,10 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package de.xima.fc.form.expression.node;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.NullLangObject;
+import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTNullNode extends MySimpleNode {
 
@@ -18,9 +17,15 @@ public class ASTNullNode extends MySimpleNode {
 		super(p, id);
 	}
 
+	//TODO remove this
+	//	public ALangObject evaluate(final IEvaluationContext fc) {
+	//		return NullLangObject.getInstance();
+	//	}
+	//
+
 	@Override
-	public ALangObject evaluate(final IEvaluationContext fc) {
-		return NullLangObject.getInstance();
+	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+		return visitor.visit(this, data);
 	}
 
 	public void init() throws ParseException {

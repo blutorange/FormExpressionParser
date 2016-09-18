@@ -7,20 +7,23 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import org.apache.commons.lang3.StringUtils;
+
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.node.MySimpleNode;
+import de.xima.fc.form.expression.visitor.GraphvizVisitor;
 
-public class VisualizeTree {
-	@SuppressWarnings("static-access")
+public class VisualizeTreeGraphviz {
 	public static void main(final String args[]) {
 		if (args.length == 0 || args.length > 3) {
 			help();
 			return;
 		}
 
+		// Parse the expression.
 		final String expression = args[0];
-
 		final ByteArrayInputStream bais = new ByteArrayInputStream(expression.getBytes(Charset.forName("UTF-8")));
 		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
 		final MySimpleNode rootNode;
@@ -33,7 +36,14 @@ public class VisualizeTree {
 			return;
 		}
 
-		final String graphviz = rootNode.toGraphviz(expression);
+		// Visualize the parse tree.
+		String graphviz;
+		try {
+			graphviz = GraphvizVisitor.withHeaderAndFooter(rootNode, expression, System.lineSeparator());
+		} catch (final EvaluationException e) {
+			e.printStackTrace();
+			graphviz = StringUtils.EMPTY;
+		}
 		if (args.length > 1)
 			try (FileOutputStream fos = new FileOutputStream(args[1])) {
 				byte[] bytes;
@@ -60,6 +70,5 @@ public class VisualizeTree {
 		System.out.println("Usage: visualizeTree expression [outputFile] [encoding=UTF-8]");
 		System.out.println("For example, to convert the graph to a png:");
 		System.out.println("./visualizeTree.jar \"(ab+cd)*ef\" out.dot && dot -T png out.dot > out.png");
-		System.exit(-1);
 	}
 }
