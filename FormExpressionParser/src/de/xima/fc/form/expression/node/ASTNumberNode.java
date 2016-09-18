@@ -20,12 +20,6 @@ public class ASTNumberNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	//TODO remove this method
-	//	@Override
-	//	public ALangObject evaluate(final IEvaluationContext ec) {
-	//		return NumberLangObject.create(bigDecimalValue);
-	//	}
-
 	/**
 	 * @param string String representing the number.
 	 * @param isInt Whether it is an integer or float.

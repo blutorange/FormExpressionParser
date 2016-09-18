@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.NoSuchMethodException;
-import de.xima.fc.form.expression.util.EMethod;
 
 public abstract class ALangObject {
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());

@@ -1,10 +1,10 @@
 package de.xima.fc.form.expression.node;
 
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.EMethod;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTExpressionNode extends MySimpleNode {
@@ -53,24 +53,6 @@ public class ASTExpressionNode extends MySimpleNode {
 	public ASTExpressionNode[] getExpressionArray() {
 		return expressionArray;
 	}
-
-	//TODO remove this
-	//	@Override
-	//	public ALangObject evaluate(final IEvaluationContext ec) throws EvaluationException {
-	//		// Unary expression
-	//		if (child != null) {
-	//			final ALangObject res = child.evaluate(ec);
-	//			return unaryMethod == null ? res : res.evaluateInstanceMethod(unaryMethod.name, ec);
-	//		}
-	//
-	//		// Binary expression.
-	//		ALangObject res = expressionArray[0].evaluate(ec);
-	//		for (int i = 1 ; i != expressionArray.length; ++i) {
-	//			final ASTExpressionNode op = expressionArray[i];
-	//			res = res.evaluateInstanceMethod(op.method.name, ec, op.evaluate(ec));
-	//		}
-	//		return res;
-	//	}
 
 	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {

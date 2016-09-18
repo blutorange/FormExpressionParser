@@ -3,8 +3,6 @@ package de.xima.fc.form.expression;
 // TODO List
 // - ASTNodes Serializable, so that a parse can be stored in the database.
 // - EmbeddedBlocks
-// - Use visitor pattern (EvaluatorVisitor, GraphvizVisitor, SwingVisitor, PrintVisitor, SVGVisitor)
-// - Change node interface so that I don't have to cast anymore.
 
 /**
  * Das ist ein Test [%tfVorname + §_ + tfNachname%]
@@ -26,6 +24,7 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.GenericEvaluationContext;
 import de.xima.fc.form.expression.impl.formfield.FormFieldEvaluationBinding;
@@ -41,9 +40,9 @@ import de.xima.fc.form.expression.impl.function.EInstanceMethodBoolean;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodHash;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodNumber;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodString;
-import de.xima.fc.form.expression.node.MySimpleNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
+import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
@@ -54,7 +53,7 @@ public class FormExpressionEvaluator {
 
 		final ByteArrayInputStream bais = new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
 		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
-		final MySimpleNode rootNode;
+		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
 			rootNode = parser.Plain();
@@ -75,13 +74,12 @@ public class FormExpressionEvaluator {
 		}
 		System.out.println("");
 
-		if (true) System.exit(0);
-
 		final IEvaluationContext ec = getEc();
+		final EvaluateVisitor visitor = new EvaluateVisitor();
 
 		try {
 			final long t1 = System.nanoTime();
-			final ALangObject result = rootNode.evaluate(ec);
+			final ALangObject result = rootNode.jjtAccept(visitor, ec);
 			final long t2 = System.nanoTime();
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 

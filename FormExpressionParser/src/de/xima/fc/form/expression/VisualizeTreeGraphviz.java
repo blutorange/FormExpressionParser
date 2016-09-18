@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.node.MySimpleNode;
 import de.xima.fc.form.expression.visitor.GraphvizVisitor;
 
 public class VisualizeTreeGraphviz {
@@ -26,7 +26,7 @@ public class VisualizeTreeGraphviz {
 		final String expression = args[0];
 		final ByteArrayInputStream bais = new ByteArrayInputStream(expression.getBytes(Charset.forName("UTF-8")));
 		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
-		final MySimpleNode rootNode;
+		final Node rootNode;
 		try {
 			rootNode = parser.Plain();
 		} catch (final ParseException e) {

@@ -25,11 +25,6 @@ public abstract class AStringNode extends MySimpleNode  {
 
 	public abstract String parseString(String literal) throws ParseException;
 
-	//TODO remove this
-	//	public ALangObject evaluate(final IEvaluationContext ec) {
-	//		return StringLangObject.create(stringValue);
-	//	}
-
 	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
 		return visitor.visit(this, data);

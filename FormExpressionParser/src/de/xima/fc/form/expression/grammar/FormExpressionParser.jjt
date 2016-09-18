@@ -1,14 +1,7 @@
 PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import org.apache.commons.lang3.StringUtils;
-import de.xima.fc.form.expression.util.InfixValue;
-import java.math.BigInteger;
-import de.xima.fc.form.expression.util.EFunctionType;
-import de.xima.fc.form.expression.exception.NoSuchFunctionException;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.node.*;
-import de.xima.fc.form.expression.util.EMethod;
 
 /** Formcycle expression language.
     http://ramkulkarni.com/blog/handling-some-of-the-warnings-and-errors-generated-by-javacc/
@@ -33,7 +26,7 @@ SKIP :
 }
 
 /** Root for non-embedded code. */
-MySimpleNode Plain() #ExpressionNode :
+Node Plain() #ExpressionNode :
 {
 }
 {

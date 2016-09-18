@@ -3,8 +3,8 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.EMethod;
 
 /**
  * This exception is thrown when an object support the division

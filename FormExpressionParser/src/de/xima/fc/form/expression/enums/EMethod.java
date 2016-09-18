@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.util;
+package de.xima.fc.form.expression.enums;
 
 /**
  * Method names for operators internal to the language.

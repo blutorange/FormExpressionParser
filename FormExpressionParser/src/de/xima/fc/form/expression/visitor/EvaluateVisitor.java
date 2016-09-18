@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NoSuchFunctionException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -26,7 +27,6 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.EMethod;
 
 public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext>{
 
@@ -74,23 +74,22 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			final AFunctionCallNode sibling = functionArray[i];
 			switch (sibling.getChainType()) {
 			case ATTR_ACCESSOR:
-				res = res.evaluateAttrAccessor(name, ec);
+				res = res.evaluateAttrAccessor(sibling.getMethodName(), ec);
 				break;
 			case INSTANCE_METHOD:
-				final ALangObject[] eval = getEvaluatedArgsArray(ec);
-				res = res.evaluateInstanceMethod(name, ec, eval);
+				final ALangObject[] eval = getEvaluatedArgsArray(sibling.getChildArray(), ec);
+				res = res.evaluateInstanceMethod(sibling.getMethodName(), ec, eval);
 				break;
 			default:
 				throw new EvaluationException(ec, "TODO: Add enum case to EvaluationVisitor, ASTDotExpressionNode.");
 			}
-			res = sibling.chain(res, ec);
 		}
 		return res;
 	}
 
 	@Override
 	public ALangObject visit(final ASTParenthesesFunction node, final IEvaluationContext ec) throws EvaluationException {
-		final String name = node.getName();
+		final String name = node.getMethodName();
 		final INamedFunction<NullLangObject> function = ec.getNamespace().globalMethod(name);
 		if (function == null) throw new NoSuchFunctionException("global function", name, ec);
 		final ALangObject[] eval = getEvaluatedArgsArray(node.getChildArray(), ec);
@@ -135,7 +134,6 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTPlainFunction node, final IEvaluationContext ec) throws EvaluationException {
-		return ALangObject.create(ec.getBinding().getVariable(node.getName()));
+		return ALangObject.create(ec.getBinding().getVariable(node.getMethodName()));
 	}
-
 }

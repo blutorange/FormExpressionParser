@@ -14,19 +14,11 @@ public class ASTArrayNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	//TODO remove this
-	//	public ALangObject evaluate(final IEvaluationContext ec) throws EvaluationException {
-	//		final List<ALangObject> list = new ArrayList<ALangObject>(childArray.length);
-	//		for (final Node n : childArray) list.add(n.evaluate(ec));
-	//		return ArrayLangObject.create(list);
-	//	}
-
 	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
 		return visitor.visit(this, data);
 	}
 
 	public void init() throws ParseException {
-		//		childArray = getChildArray();
 	}
 }

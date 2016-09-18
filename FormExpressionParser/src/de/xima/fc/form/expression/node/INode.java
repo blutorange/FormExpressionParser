@@ -4,15 +4,13 @@ import java.io.Serializable;
 
 import org.jetbrains.annotations.NotNull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-/** Safety copy of {@link Node}, as it may be deleted by javacc at any time. */
+/* All AST nodes must implement this interface.  It provides basic
+   machinery for constructing the parent and child relationships
+   between nodes. */
 
 public interface INode extends Serializable {
 
@@ -48,14 +46,6 @@ public interface INode extends Serializable {
 
 	/** Return the number of children the node has. */
 	public int jjtGetNumChildren();
-
-	/**
-	 * @return The evaluated value of this node. May return
-	 *         {@link NullLangObject}.
-	 * @throws ParseException
-	 */
-	@NotNull
-	public ALangObject evaluate(@NotNull IEvaluationContext ec) throws EvaluationException;
 
 	public <T extends MySimpleNode> T[] getChildArray(final Class<T> clazz) throws ParseException;
 
@@ -102,7 +92,7 @@ public interface INode extends Serializable {
 	public <R, T> R jjtAccept(@NotNull final IFormExpressionParserVisitor<R, T> visitor, @NotNull final T data)
 			throws EvaluationException;
 
-
 	public int getId();
+
 	public int getNodeTypeId();
 }

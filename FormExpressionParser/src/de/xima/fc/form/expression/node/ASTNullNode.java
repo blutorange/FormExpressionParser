@@ -17,12 +17,6 @@ public class ASTNullNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	//TODO remove this
-	//	public ALangObject evaluate(final IEvaluationContext fc) {
-	//		return NullLangObject.getInstance();
-	//	}
-	//
-
 	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
 		return visitor.visit(this, data);

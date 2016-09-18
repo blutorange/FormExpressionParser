@@ -1,10 +1,10 @@
 package de.xima.fc.form.expression.node;
 
 
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.EMethod;
 
 public final class ASTDotExpressionNode extends ASTExpressionNode {
 	private Node child;
@@ -17,21 +17,6 @@ public final class ASTDotExpressionNode extends ASTExpressionNode {
 	public ASTDotExpressionNode(final FormExpressionParser p, final int id) {
 		super(p, id);
 	}
-
-	//TODO remove this
-	//	@Override
-	//	public ALangObject evaluate(final IEvaluationContext ec) throws EvaluationException {
-	//		// Unary expression
-	//		ALangObject res = child.evaluate(ec);
-	//		if (functionArray.length == 0) return res;
-	//
-	//		// Binary expression.
-	//		for (int i = 0 ; i != functionArray.length; ++i) {
-	//			final AFunctionCallNode node = functionArray[i];
-	//			res = node.chain(res, ec);
-	//		}
-	//		return res;
-	//	}
 
 	public Node getStartNode() {
 		return child;

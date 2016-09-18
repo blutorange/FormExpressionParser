@@ -22,7 +22,6 @@ import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
 import de.xima.fc.form.expression.node.AStringNode;
-import de.xima.fc.form.expression.node.MySimpleNode;
 
 public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void> {
 	private static class InstanceHolder {
@@ -66,7 +65,7 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 	 * @return The result of visiting the given node, as a string.
 	 * @throws EvaluationException
 	 */
-	public static String toString(final MySimpleNode node, final String lineSeparator, final String[] headerAndFooter,
+	public static String toString(final Node node, final String lineSeparator, final String[] headerAndFooter,
 			final int footerBegin) throws EvaluationException {
 		GraphvizVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -87,7 +86,7 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 		}
 	}
 
-	public static String withHeaderAndFooter(final MySimpleNode node, final String title, final String lineSeparator)
+	public static String withHeaderAndFooter(final Node node, final String title, final String lineSeparator)
 			throws EvaluationException {
 		final String[] headerAndFooter = new String[11];
 

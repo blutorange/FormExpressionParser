@@ -19,11 +19,6 @@ public class ASTBooleanNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	//TODO remove me
-	//	public ALangObject evaluate(final IEvaluationContext fc) {
-	//		return BooleanLangObject.create(booleanValue);
-	//	}
-
 	@Override
 	public String toString() {
 		return "BooleanNode(" + (booleanValue ? "true)" : "false)");

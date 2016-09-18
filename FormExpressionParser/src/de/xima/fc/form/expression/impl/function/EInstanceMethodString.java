@@ -4,10 +4,10 @@ import java.util.Locale;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.EMethod;
 import de.xima.fc.form.expression.util.NamedFunctionUtils;
 
 public enum EInstanceMethodString implements INamedFunction<StringLangObject> {
