@@ -28,9 +28,11 @@ public abstract class MySimpleNode extends SimpleNode {
 	 * @return The evaluated value of this node. May return {@link NullLangObject}.
 	 * @throws ParseException
 	 */
+	@Override
 	@NotNull
 	public abstract ALangObject evaluate(@NotNull IEvaluationContext ec) throws EvaluationException;
 
+	@Override
 	public final void toGraphviz(final StringBuilder builder, final String title) {
 		builder.append("digraph G {").append(System.lineSeparator());
 		final int hash = hashCode();
@@ -42,10 +44,54 @@ public abstract class MySimpleNode extends SimpleNode {
 	/**
 	 * @return The node graph as a Graphviz dot file for visualization.
 	 */
+	@Override
 	public final String toGraphviz(final String title) {
 		final StringBuilder builder = new StringBuilder();
 		toGraphviz(builder, title);
 		return builder.toString();
+	}
+
+	@Override
+	public <T extends MySimpleNode> T getSingleChild(final Class<T> clazz) throws ParseException {
+		if (jjtGetNumChildren() != 1) throw new ParseException("node does not have a single child");
+		return getNthChild(0, clazz);
+	}
+
+	@Override
+	public <T extends MySimpleNode> T[] getChildArray(final Class<T> clazz) throws ParseException {
+		if (children == null) children = EMPTY_NODE_ARRAY;
+		@SuppressWarnings("unchecked")
+		final T[] args = (T[])Array.newInstance(clazz, children.length);
+		for (int i = 0; i < args.length; ++i) {
+			final Node n = children[i];
+			if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException(String.format("Node type is %s, expected %s.", n.getClass().getSimpleName(), clazz.getSimpleName()));
+			args[i] = clazz.cast(n);
+		}
+		return args;
+	}
+
+	@Override
+	public <T extends MySimpleNode> T getNthChild(final int index, final Class<T> clazz) throws ParseException {
+		if (index >= jjtGetNumChildren()) throw new ParseException("Node does not have at least " + (index+1) + "children.");
+		final Node n = children[0];
+		if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException("node not the correct type: " + n.getClass());
+		return clazz.cast(n);
+	}
+
+	public MySimpleNode getSingleChild() throws ParseException {
+		return getSingleChild(MySimpleNode.class);
+	}
+
+	public MySimpleNode getFirstChild() throws ParseException {
+		if (jjtGetNumChildren() < 1) throw new ParseException("Node must contain at least one child");
+		final Node n = jjtGetChild(0);
+		if (!(n instanceof MySimpleNode)) throw new ParseException("Node not the correct type: " + n.getClass());
+		return (MySimpleNode)n;
+	}
+
+	public Node[] getChildArray() throws ParseException {
+		if (children == null) return EMPTY_NODE_ARRAY;
+		return children;
 	}
 
 	private final static void recursiveGraphviz(final Node node, final int hash, final StringBuilder builder) {
@@ -59,37 +105,4 @@ public abstract class MySimpleNode extends SimpleNode {
 			recursiveGraphviz(child, childHash, builder);
 		}
 	}
-
-	public <T extends MySimpleNode> T getSingleChild(final Class<T> clazz) throws ParseException {
-		if (jjtGetNumChildren() != 1) throw new ParseException("node does not have a single child");
-		final Node n = children[0];
-		if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException("node not the correct type: " + n.getClass());
-		return clazz.cast(n);
-	}
-
-	public MySimpleNode getSingleChild() throws ParseException {
-		return getSingleChild(MySimpleNode.class);
-	}
-
-	public MySimpleNode getSingleOrNoChild() throws ParseException {
-		if (jjtGetNumChildren() == 0) return null;
-		return getSingleChild();
-	}
-
-	public <T extends MySimpleNode> T[] getChildArray(final Class<T> clazz) throws ParseException {
-		if (children == null) children = EMPTY_NODE_ARRAY;
-		@SuppressWarnings("unchecked")
-		final T[] args = (T[])Array.newInstance(clazz, children.length);
-		for (int i = 0; i < args.length; ++i) {
-			final Node n = children[i];
-			if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException("node not the correct type: " + n.getClass());
-			args[i] = clazz.cast(n);
-		}
-		return args;
-	}
-
-	public MySimpleNode[] getChildArray() throws ParseException {
-		return getChildArray(MySimpleNode.class);
-	}
-
 }

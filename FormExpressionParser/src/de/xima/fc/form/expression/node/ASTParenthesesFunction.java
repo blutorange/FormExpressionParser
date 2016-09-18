@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NoSuchFunctionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
@@ -16,7 +17,7 @@ public
 @SuppressWarnings("all")
 class ASTParenthesesFunction extends AFunctionCallNode {
 	private String name;
-	private MySimpleNode[] args;
+	private Node[] args;
 
 	public ASTParenthesesFunction(final int id) {
 		super(id);
@@ -36,7 +37,7 @@ class ASTParenthesesFunction extends AFunctionCallNode {
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec) throws EvaluationException {
 		final INamedFunction<NullLangObject> function = ec.getNamespace().globalMethod(name);
-		if (function == null) throw new NoSuchFunctionException(name, ec);
+		if (function == null) throw new NoSuchFunctionException("global function", name, ec);
 		final ALangObject[] eval = getEvaluatedArgsArray(ec);
 		return ALangObject.create(function.evaluate(ec, NullLangObject.getInstance(), eval));
 	}
@@ -53,7 +54,7 @@ class ASTParenthesesFunction extends AFunctionCallNode {
 		args = getChildArray();
 
 		// Set name.
-		if (name == null) throw new ParseException("name is null");
+		if (name == null) throw new ParseException("Name is null");
 		this.name = name;
 	}
 

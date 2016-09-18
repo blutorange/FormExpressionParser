@@ -18,15 +18,15 @@ public class NoSuchFunctionException extends EvaluationException {
 
 	private static final long serialVersionUID = 1L;
 
-	public NoSuchFunctionException(final String name, final IEvaluationContext ec) {
-		super(ec, "No such function: " + name + System.lineSeparator() + "Evaluation context is " + ec);
+	public NoSuchFunctionException(final String type, final String name, final IEvaluationContext ec) {
+		super(ec, String.format("No such %s named %s. Evaluation context is %s", type, name, System.lineSeparator(), ec));
 		this.name = name;
 		thisContext = null;
 	}
 
-	public NoSuchFunctionException(final String name, final ALangObject thisContext, final IEvaluationContext ec) {
-		super(ec, String.format("No function named <%s> for %s %s %sNamespace is %s",
-				name, thisContext.getType().name(), thisContext.toString(), System.lineSeparator(), ec.getNamespace()));
+	public NoSuchFunctionException(final String type, final String name, final ALangObject thisContext, final IEvaluationContext ec) {
+		super(ec, String.format("No such %s named <%s> for %s %s %sNamespace is %s",
+				type, name, thisContext.getType().name(), thisContext.toString(), System.lineSeparator(), ec.getNamespace()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}

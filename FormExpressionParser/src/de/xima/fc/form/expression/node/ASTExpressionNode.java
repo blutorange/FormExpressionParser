@@ -8,9 +8,9 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.EMethod;
 
 public class ASTExpressionNode extends MySimpleNode {
-	private EMethod method;
-	private EMethod unaryMethod;
-	private MySimpleNode child;
+	protected EMethod method;
+	protected EMethod unaryMethod;
+	protected MySimpleNode child;
 	private ASTExpressionNode[] childArray;
 
 	public ASTExpressionNode(final int id) {
@@ -21,7 +21,7 @@ public class ASTExpressionNode extends MySimpleNode {
 		super(p, id);
 	}
 
-	public final void init(final EMethod methodName) throws ParseException {
+	public void init(final EMethod methodName) throws ParseException {
 		method = methodName;
 		if (children.length == 1)
 			child = getSingleChild();

@@ -77,7 +77,7 @@ public class HashLangObject extends ALangObject {
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateMethod(this, ec.getNamespace().attrAccessorHash(name), name, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorHash(name), name, ec);
 	}
 
 	@Override

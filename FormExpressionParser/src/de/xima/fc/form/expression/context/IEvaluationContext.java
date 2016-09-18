@@ -6,8 +6,10 @@ public interface IEvaluationContext {
 	public INamespace getNamespace();
 	public void nestBinding();
 	public void unnestBinding();
+	public int getRecursionLimit();
 
 	/**
+	 * Must be an equivalence relation.
 	 * @param name1
 	 *            Name of one variable.
 	 * @param name2

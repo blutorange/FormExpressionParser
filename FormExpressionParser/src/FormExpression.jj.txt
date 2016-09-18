@@ -44,7 +44,7 @@ MySimpleNode Plain() #ExpressionNode :
   | < EOF >
   )
   {
-    jjtThis.init(null);
+    if (jjtThis.jjtGetNumChildren() > 0) jjtThis.init(null);
     return jjtThis;
   }
 }
@@ -55,7 +55,6 @@ void Statement() #void :
 {
   Expression() ";"
 }
-
 
 void Expression() #void :
 {
@@ -71,14 +70,14 @@ void ExpressionWithMethodPassthrough(EMethod method) #void :
   EqualTypeExpression(method)
 }
 
-
-void EqualTypeExpression(EMethod method) #ExpressionNode(createNode) :
+void EqualTypeExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+  //EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    DoubleBarExpression(nextMethod)
+    DoubleBarExpression(null)
     (
       (
         "=" DoubleBarExpression(EMethod.EQUAL)
@@ -154,13 +153,14 @@ void TrinaryExpression() #TrinaryExpressionNode :
 }
 */
 
-void DoubleBarExpression(EMethod method) #ExpressionNode(createNode) :
+void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
-  }
+  boolean createNode;
+//EMethod nextMethod = createNode? null : method;
+}
 {
   (
-    DoubleAmpersandExpression(nextMethod)
+    DoubleAmpersandExpression(null)
     (
       "||" DoubleAmpersandExpression(EMethod.DOUBLE_BAR)
     )*
@@ -170,13 +170,14 @@ void DoubleBarExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode) :
+void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+   boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    BarExpression(nextMethod)
+    BarExpression(null)
     (
       "&&" BarExpression(EMethod.DOUBLE_AMPERSAND)
     )*
@@ -186,13 +187,14 @@ void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void BarExpression(EMethod method) #ExpressionNode(createNode) :
+void BarExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    CircumflexExpression(nextMethod)
+    CircumflexExpression(null)
     (
       "|" CircumflexExpression(EMethod.BAR)
     )*
@@ -202,13 +204,14 @@ void BarExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void CircumflexExpression(EMethod method) #ExpressionNode(createNode) :
+void CircumflexExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    AmpersandExpression(nextMethod)
+    AmpersandExpression(null)
     (
       "^" AmpersandExpression(EMethod.CIRCUMFLEX)
     )*
@@ -218,13 +221,14 @@ void CircumflexExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void AmpersandExpression(EMethod method) #ExpressionNode(createNode) :
+void AmpersandExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    DoubleEqualTypeExpression(nextMethod)
+    DoubleEqualTypeExpression(null)
     (
       "&" DoubleEqualTypeExpression(EMethod.AMPERSAND)
     )*
@@ -234,13 +238,14 @@ void AmpersandExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode) :
+void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    AngleTypeExpression(nextMethod)
+    AngleTypeExpression(null)
     (
       (
         "===" AngleTypeExpression(EMethod.TRIPLE_EQUAL)
@@ -249,7 +254,7 @@ void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode) :
       (
         "==" AngleTypeExpression(EMethod.DOUBLE_EQUAL)
       )
-|
+    |
       (
         "!=" AngleTypeExpression(EMethod.EXCLAMATION_EQUAL)
       )
@@ -264,13 +269,14 @@ void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void AngleTypeExpression(EMethod method) #ExpressionNode(createNode) :
+void AngleTypeExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    PlusLikeExpression(nextMethod)
+    PlusLikeExpression(null)
     (
       (
         "<" PlusLikeExpression(EMethod.ANGLE_OPEN)
@@ -294,13 +300,14 @@ void AngleTypeExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void PlusLikeExpression(EMethod method) #ExpressionNode(createNode) :
+void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+   boolean createNode;
+//EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    StarLikeExpression(nextMethod)
+    StarLikeExpression(null)
     (
       (
         "+" StarLikeExpression(EMethod.PLUS)
@@ -316,15 +323,16 @@ void PlusLikeExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void StarLikeExpression(EMethod method) #ExpressionNode(createNode) :
+void StarLikeExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+//  EMethod nextMethod = createNode? null : method;
 }
 {
-  UnaryExpression(nextMethod)
+  UnaryExpression(null)
   (
     (
-      DoubleStarExpression(nextMethod)
+      DoubleStarExpression(null)
     |
       (
         "*" UnaryExpression(EMethod.STAR)
@@ -351,23 +359,38 @@ void UnaryExpression(EMethod method) #ExpressionNode(unaryMethod != null) :
 {
   (
     (
-      "++" UnaryExpression(null) { unaryMethod = EMethod.DOUBLE_PLUS_PREFIX; }
+      "++" UnaryExpression(null)
+      {
+        unaryMethod = EMethod.DOUBLE_PLUS_PREFIX;
+      }
     )
   |
     (
-      "--" UnaryExpression(null) { unaryMethod = EMethod.DOUBLE_DASH_PREFIX; }
+      "--" UnaryExpression(null)
+      {
+        unaryMethod = EMethod.DOUBLE_DASH_PREFIX;
+      }
     )
   |
     (
-      "+" UnaryExpression(null) { unaryMethod = EMethod.PLUS_UNARY; }
+      "+" UnaryExpression(null)
+      {
+        unaryMethod = EMethod.PLUS_UNARY;
+      }
     )
   |
     (
-      "-" UnaryExpression(null) { unaryMethod = EMethod.DASH_UNARY; }
+      "-" UnaryExpression(null)
+      {
+        unaryMethod = EMethod.DASH_UNARY;
+      }
     )
   |
     (
-      "!" UnaryExpression(null) { unaryMethod = EMethod.EXCLAMATION; }
+      "!" UnaryExpression(null)
+      {
+        unaryMethod = EMethod.EXCLAMATION;
+      }
     )
   | DoubleStarExpression(method)
   )
@@ -376,13 +399,14 @@ void UnaryExpression(EMethod method) #ExpressionNode(unaryMethod != null) :
   }
 }
 
-void DoubleStarExpression(EMethod method) #ExpressionNode(createNode) :
+void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
-  final boolean createNode = method != null || jjtree.nodeArity() > 1;EMethod nextMethod = createNode ? null  : method;
+  boolean createNode;
+  //final EMethod nextMethod = createNode? null : method;
 }
 {
   (
-    FunctionTypeUnaryExpression(nextMethod)
+    DotExpression(null)
     (
       (
         "**" UnaryExpression(EMethod.CIRCUMFLEX)
@@ -394,16 +418,15 @@ void DoubleStarExpression(EMethod method) #ExpressionNode(createNode) :
   }
 }
 
-void DotExpression(EMethod method) #ExpressionNode(createNode) :
+void DotExpression(EMethod method) #DotExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
   boolean createNode = true;
-  EMethod nextMethod = method;
 }
 {
   (
-    FunctionTypeUnaryExpression(nextMethod)
+    FunctionTypeUnaryExpression(null)
     (
-      "." FunctionTypeUnaryExpression(nextMethod)
+      "." FunctionCall() 
     )*
   )
   {
@@ -437,7 +460,8 @@ void FunctionCall() #void :
 }
 {
   (
-    LOOKAHEAD(< IDENTIFIER > "(")
+    LOOKAHEAD(< IDENTIFIER >
+    "(")
     ParenthesesFunction()
   | 
     PlainFunction()

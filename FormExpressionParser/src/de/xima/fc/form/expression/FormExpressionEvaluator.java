@@ -1,5 +1,11 @@
 package de.xima.fc.form.expression;
 
+// TODO List
+// - ASTNodes Serializable, so that a parse can be stored in the database.
+// - EmbeddedBlocks
+// - Use visitor pattern (EvaluatorVisitor, GraphvizVisitor, SwingVisitor, PrintVisitor, SVGVisitor)
+// - Change node interface so that I don't have to cast anymore.
+
 /**
  * Das ist ein Test [%tfVorname + §_ + tfNachname%]
  *
@@ -37,10 +43,9 @@ import de.xima.fc.form.expression.node.MySimpleNode;
 import de.xima.fc.form.expression.object.ALangObject;
 
 public class FormExpressionEvaluator {
-	@SuppressWarnings("static-access")
 	public static void main(final String args[]) {
 
-		final String string = "tf1.length";
+		final String string = "a && -1 < \" \\n\\r\\t\".indexOf(a.charAt(0))";
 
 		System.out.println("Input string\n" + string);
 

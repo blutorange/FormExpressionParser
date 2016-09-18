@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.node;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -31,7 +33,7 @@ public abstract class AStringNode extends MySimpleNode  {
 
 	@Override
 	public String toString() {
-		return "StringNode(" + stringValue + ")";
+		return "StringNode(\"" + StringEscapeUtils.escapeJava(stringValue) + "\")";
 	}
 
 }

@@ -6,10 +6,15 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.util.EMethod;
 import de.xima.fc.form.expression.util.NamedFunctionUtils;
 
 public enum EInstanceMethodNumber implements INamedFunction<NumberLangObject> {
 	__PLUS {
+		@Override
+		public String getName() {
+			return EMethod.PLUS.name;
+		}
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 				throws EvaluationException {
@@ -18,6 +23,10 @@ public enum EInstanceMethodNumber implements INamedFunction<NumberLangObject> {
 		}
 	},
 	__STAR {
+		@Override
+		public String getName() {
+			return EMethod.STAR.name;
+		}
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 				throws EvaluationException {

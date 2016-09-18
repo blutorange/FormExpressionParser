@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.EMethod;
 import de.xima.fc.form.expression.util.NamedFunctionUtils;
 
 public enum EInstanceMethodString implements INamedFunction<StringLangObject> {
@@ -23,7 +24,7 @@ public enum EInstanceMethodString implements INamedFunction<StringLangObject> {
 	__PLUS {
 		@Override
 		public String getName() {
-			return "+";
+			return EMethod.PLUS.name;
 		}
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)

@@ -1,17 +1,21 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package de.xima.fc.form.expression.node;
 
+import java.io.Serializable;
+
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 
-public class SimpleNode implements Node {
+public abstract class SimpleNode implements Node, Serializable {
 
-	protected Node parent;
-	protected Node[] children;
+	/** The id of this node. Can be anything as long as it is unique. Does not need to be the same
+	 * for multiple runs of the program. */
 	protected final int id;
-	protected Object value;
-	protected FormExpressionParser parser;
+	protected transient Node parent;
+	protected transient Node[] children;
+	protected transient Object value;
+	protected transient FormExpressionParser parser;
 
 	public SimpleNode(final int i) {
 		id = i;
@@ -70,6 +74,7 @@ public class SimpleNode implements Node {
 	public String toString() { return FormExpressionParserTreeConstants.jjtNodeName[id]; }
 	public String toString(final String prefix) { return prefix + toString(); }
 
+	@Override
 	public void dump(final String prefix) {
 		System.out.println(toString(prefix));
 		if (children != null)

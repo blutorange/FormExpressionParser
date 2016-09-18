@@ -1,7 +1,5 @@
 package de.xima.fc.form.expression.object;
 
-
-
 import java.util.logging.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +8,8 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.NoSuchFunctionException;
+import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
+import de.xima.fc.form.expression.exception.NoSuchMethodException;
 import de.xima.fc.form.expression.util.EMethod;
 
 public abstract class ALangObject {
@@ -165,9 +164,18 @@ public abstract class ALangObject {
 	@NotNull
 	protected final <T extends ALangObject> ALangObject evaluateMethod(final T thisContext,
 			final INamedFunction<T> function, final String name, final IEvaluationContext ec, final ALangObject... args)
-					throws EvaluationException {
+					throws NoSuchMethodException, EvaluationException {
 		if (function == null)
-			throw new NoSuchFunctionException(name, thisContext, ec);
+			throw new NoSuchMethodException(name, thisContext, ec);
+		return ALangObject.create(function.evaluate(ec, thisContext, args));
+	}
+
+	@NotNull
+	protected final <T extends ALangObject> ALangObject evaluateAttrAccessor(final T thisContext,
+			final INamedFunction<T> function, final String name, final IEvaluationContext ec, final ALangObject... args)
+					throws NoSuchAttrAccessorException, EvaluationException {
+		if (function == null)
+			throw new NoSuchAttrAccessorException(name, thisContext, ec);
 		return ALangObject.create(function.evaluate(ec, thisContext, args));
 	}
 

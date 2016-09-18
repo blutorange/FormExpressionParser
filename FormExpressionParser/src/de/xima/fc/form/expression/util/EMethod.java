@@ -48,8 +48,6 @@ public enum EMethod {
 	EQUAL_TILDE("=~"), // =~
 	CIRCUMFLEX_EQUAL("^="), // ^=
 
-	DOT("."), //.
-
 	EQUAL("="), // =
 	DOUBLE_EQUAL("=="), // ==
 	TRIPLE_EQUAL("==="), // ===

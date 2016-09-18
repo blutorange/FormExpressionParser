@@ -154,7 +154,7 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateMethod(this, ec.getNamespace().attrAccessorNumber(name), name, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorNumber(name), name, ec);
 	}
 
 	@Override
