@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.AStringNode;
+import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -42,20 +42,20 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
+		final int count = node.jjtGetNumChildren();
+		final Node[] childrenArray = node.getChildArray();
+		ALangObject res = childrenArray[0].jjtAccept(this, ec);
+
 		// Unary expression
-		final Node unaryChild = node.getUnaryChild();
-		if (unaryChild != null) {
-			final ALangObject res = unaryChild.jjtAccept(this, ec);
+		if (count == 1) {
 			final EMethod unaryMethod = node.getUnaryMethod();
 			return unaryMethod == null ? res : res.evaluateInstanceMethod(unaryMethod.name, ec);
 		}
 
 		// Binary expression.
-		final ASTExpressionNode[] expressionArray = node.getExpressionArray();
-		ALangObject res = expressionArray[0].jjtAccept(this, ec);
-		for (int i = 1 ; i != expressionArray.length; ++i) {
-			final ASTExpressionNode arg = expressionArray[i];
-			res = res.evaluateInstanceMethod(arg.getBinaryMethod().name, ec, arg.jjtAccept(this, ec));
+		for (int i = 1 ; i != childrenArray.length; ++i) {
+			final Node arg = childrenArray[i];
+			res = res.evaluateInstanceMethod(arg.getSiblingMethod().name, ec, arg.jjtAccept(this, ec));
 		}
 		return res;
 	}
@@ -102,14 +102,14 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
-	public ALangObject visit(final AStringNode node, final IEvaluationContext ec) throws EvaluationException {
+	public ALangObject visit(final ASTStringNode node, final IEvaluationContext ec) throws EvaluationException {
 		return StringLangObject.create(node.getStringValue());
 	}
 
 	@Override
 	public ALangObject visit(final ASTArrayNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] childArray = node.getChildArray();
-		final List<ALangObject> list = new ArrayList<ALangObject>(childArray.length);
+		final List<ALangObject> list = new ArrayList<ALangObject>(node.jjtGetNumChildren());
 		for (final Node n : childArray) list.add(n.jjtAccept(this, ec));
 		return ArrayLangObject.create(list);
 	}

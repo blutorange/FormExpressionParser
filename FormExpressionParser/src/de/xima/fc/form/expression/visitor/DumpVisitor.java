@@ -19,8 +19,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.AStringNode;
-import de.xima.fc.form.expression.node.MySimpleNode;
+import de.xima.fc.form.expression.node.ASTStringNode;
 
 public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	private static class InstanceHolder {
@@ -50,7 +49,7 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	 * @return The result of visiting the given node, as a string.
 	 * @throws EvaluationException
 	 */
-	public static String toString(final MySimpleNode node, final String data, final String lineSeparator) throws EvaluationException {
+	public static String toString(final Node node, final String data, final String lineSeparator) throws EvaluationException {
 		DumpVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			final Charset charset = Charset.defaultCharset();
@@ -150,7 +149,7 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	}
 
 	@Override
-	public Void visit(final AStringNode node, final String data) throws EvaluationException {
+	public Void visit(final ASTStringNode node, final String data) throws EvaluationException {
 		return dump(node, data);
 	}
 

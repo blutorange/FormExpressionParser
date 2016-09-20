@@ -1,17 +1,13 @@
 package de.xima.fc.form.expression.node;
 
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTArrayNode extends MySimpleNode {
+public class ASTArrayNode extends SimpleNode {
 	public ASTArrayNode(final int id) {
 		super(id);
-	}
-
-	public ASTArrayNode(final FormExpressionParser p, final int id) {
-		super(p, id);
 	}
 
 	@Override
@@ -19,6 +15,7 @@ public class ASTArrayNode extends MySimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init() throws ParseException {
+	public void init(final EMethod method) throws ParseException {
+		siblingMethod = method;
 	}
 }

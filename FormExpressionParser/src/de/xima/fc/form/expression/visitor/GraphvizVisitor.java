@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.AStringNode;
+import de.xima.fc.form.expression.node.ASTStringNode;
 
 public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void> {
 	private static class InstanceHolder {
@@ -211,7 +211,7 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 	}
 
 	@Override
-	public Void visit(final AStringNode node, final Void data) throws EvaluationException {
+	public Void visit(final ASTStringNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 

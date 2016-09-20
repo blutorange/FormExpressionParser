@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.node;
+package de.xima.fc.form.expression.grammar;
 
 import java.io.Serializable;
 
@@ -6,14 +6,13 @@ import org.jetbrains.annotations.NotNull;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
    between nodes. */
 
-public interface INode extends Serializable {
+public interface Node extends Serializable {
 
 	/**
 	 * This method is called after the node has been made the current node. It
@@ -29,21 +28,21 @@ public interface INode extends Serializable {
 	/**
 	 * This pair of methods are used to inform the node of its parent.
 	 */
-	public void jjtSetParent(INode n);
+	public void jjtSetParent(Node n);
 
-	public INode jjtGetParent();
+	public Node jjtGetParent();
 
 	/**
 	 * This method tells the node to add its argument to the node's list of
 	 * children.
 	 */
-	public void jjtAddChild(INode n, int i);
+	public void jjtAddChild(Node n, int i);
 
 	/**
 	 * This method returns a child node. The children are numbered from zero,
 	 * left to right.
 	 */
-	public INode jjtGetChild(int i);
+	public Node jjtGetChild(int i);
 
 	/** Return the number of children the node has. */
 	public int jjtGetNumChildren();
@@ -55,7 +54,7 @@ public interface INode extends Serializable {
 	 * @return The array of children, cast to the specified type.
 	 * @throws ParseException When any child cannot be cast to the specified type.
 	 */
-	public <T extends INode> T[] getChildArrayAs(final Class<T> clazz, int start) throws ParseException;
+	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, int start) throws ParseException;
 
 	/**
 	 * @param clazz
@@ -70,7 +69,7 @@ public interface INode extends Serializable {
 	 *             calling this method.
 	 * @param <T> The class to which to cast the child node.
 	 */
-	public <T extends INode> T getNthChildAs(int index, final Class<T> clazz) throws ParseException;
+	public <T extends Node> T getNthChildAs(int index, final Class<T> clazz) throws ParseException;
 
 	/**
 	 * @param atLeast The minimum number of children this node can have.
@@ -122,6 +121,6 @@ public interface INode extends Serializable {
 	 */
 	public EMethod getSiblingMethod();
 
-	INode[] getChildArray();
+	Node[] getChildArray();
 
 }

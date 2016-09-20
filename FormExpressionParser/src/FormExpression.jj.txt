@@ -1,14 +1,7 @@
 PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import org.apache.commons.lang3.StringUtils;
-import de.xima.fc.form.expression.util.InfixValue;
-import java.math.BigInteger;
-import de.xima.fc.form.expression.util.EFunctionType;
-import de.xima.fc.form.expression.exception.NoSuchFunctionException;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.node.*;
-import de.xima.fc.form.expression.util.EMethod;
 
 /** Formcycle expression language.
     http://ramkulkarni.com/blog/handling-some-of-the-warnings-and-errors-generated-by-javacc/
@@ -33,13 +26,13 @@ SKIP :
 }
 
 /** Root for non-embedded code. */
-MySimpleNode Plain() #ExpressionNode :
+Node Plain() #ExpressionNode :
 {
 }
 {
   (
     (
-      Expression() < EOF >
+      Expression(null) < EOF >
     )
   | < EOF >
   )
@@ -49,21 +42,14 @@ MySimpleNode Plain() #ExpressionNode :
   }
 }
 
-void Statement() #void :
+void Statement(EMethod method) #void :
 {
 }
 {
-  Expression() ";"
-}
-
-void Expression() #void :
-{
-}
-{
-  EqualTypeExpression(null)
+  Expression(method) ";"
 }
 
-void ExpressionWithMethodPassthrough(EMethod method) #void :
+void Expression(EMethod method) #void :
 {
 }
 {
@@ -402,7 +388,6 @@ void UnaryExpression(EMethod method) #ExpressionNode(unaryMethod != null) :
 void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = method != null || jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  //final EMethod nextMethod = createNode? null : method;
 }
 {
   (
@@ -426,7 +411,7 @@ void DotExpression(EMethod method) #DotExpressionNode(createNode = method != nul
   (
     FunctionTypeUnaryExpression(null)
     (
-      "." FunctionCall() 
+      "." FunctionCall(null) 
     )*
   )
   {
@@ -434,77 +419,62 @@ void DotExpression(EMethod method) #DotExpressionNode(createNode = method != nul
   }
 }
 
-void FunctionTypeUnaryExpression(EMethod method) #ExpressionNode(createNode) :
+void FunctionTypeUnaryExpression(EMethod method) #void :
 {
-  boolean createNode = true;
 }
 {
   (
-    Literal()
+    Literal(method)
   |
     (
-      FunctionCall()
+      FunctionCall(method)
     )
   |
     (
-      "(" ExpressionWithMethodPassthrough(method) ")"
+      "(" Expression(method) ")"
     )
   )
-  {
-    if (createNode) jjtThis.init(method);
-  }
 }
 
-void FunctionCall() #void :
+void FunctionCall(EMethod method) #void :
 {
 }
 {
   (
-    LOOKAHEAD(< IDENTIFIER >
-    "(")
-    ParenthesesFunction()
+    LOOKAHEAD(< IDENTIFIER > "(")
+    ParenthesesFunction(method)
   | 
-    PlainFunction()
+    PlainFunction(method)
   )
 }
 
-void ParenthesesFunction() #ParenthesesFunction :
+void ParenthesesFunction(EMethod method) #ParenthesesFunction :
 {
   Token t;
 }
 {
   (
-    t = < IDENTIFIER > "(" FunctionArgumentList() ")"
+    t = < IDENTIFIER > "(" FunctionArgumentList(null) ")"
   )
   {
-    jjtThis.init(t.image);
+    jjtThis.init(method, t.image);
   }
 }
 
-void FunctionArgumentList() #void :
+void FunctionArgumentList(EMethod method) #void :
 {
 }
 {
   (
-    [ Expression() ]
+    [ Expression(method) ]
     (
-      "," Expression()
+      "," Expression(method)
     )*
   )
 }
 
-void String() #void :
-{
-}
-{
-  (
-    SingleQuotedString()
-  | 
-    DoubleQuotedString()
-  )
-}
 
-void Number() #NumberNode :
+void Number(EMethod method) #NumberNode :
 {
   Token t;
   boolean isInt;
@@ -522,33 +492,27 @@ void Number() #NumberNode :
     }
   )
   {
-    jjtThis.init(t.image, isInt);
+    jjtThis.init(method, t.image, isInt);
   }
 }
 
-void DoubleQuotedString() #DoubleQuotedString :
+void String(EMethod method) #StringNode :
 {
   Token t;
+  char delimiter;
 }
 {
-  t = < DoubleQuotedString >
+  (
+    "'" (t = < SingleQuotedString >) "'" { delimiter = '\''; }
+  | 
+    "\"" (t = < DoubleQuotedString >) "\"" { delimiter = '"'; }
+  )
   {
-    jjtThis.init(t.image);
+    jjtThis.init(method, t.image, delimiter);
   }
 }
 
-void SingleQuotedString() #SingleQuotedString :
-{
-  Token t;
-}
-{
-  t = < SingleQuotedString >
-  {
-    jjtThis.init(t.image);
-  }
-}
-
-void Array() #ArrayNode :
+void Array(EMethod method) #ArrayNode :
 {
 }
 {
@@ -558,20 +522,20 @@ void Array() #ArrayNode :
       "]"
     |
       (
-        Expression()
+        Expression(null)
         (
-          "," Expression()
+          "," Expression(null)
         )*
         "]"
       )
     )
   )
   {
-    jjtThis.init();
+    jjtThis.init(method);
   }
 }
 
-void Hash() #HashNode :
+void Hash(EMethod method) #HashNode :
 {
 }
 {
@@ -581,42 +545,42 @@ void Hash() #HashNode :
       "}"
     |
       (
-        HashEntry()
+        HashEntry(null)
         (
-          "," HashEntry()
+          "," HashEntry(null)
         )*
         "}"
       )
     )
   )
   {
-    jjtThis.init();
+    jjtThis.init(method);
   }
 }
 
-void HashEntry() #void :
+void HashEntry(EMethod method) #void :
 {
 }
 {
-  Expression() ":" Expression()
+  PlainFunction(method) ":" Expression(method)
 }
 
 /**
  * Literal for the null object.
  */
-void Null() #NullNode :
+void Null(EMethod method) #NullNode :
 {
 }
 {
   "\u00a7null"
   {
     {
-      jjtThis.init();
+      jjtThis.init(method);
     }
   }
 }
 
-void Boolean() #BooleanNode :
+void Boolean(EMethod method) #BooleanNode :
 {
   boolean b;
 }
@@ -633,30 +597,30 @@ void Boolean() #BooleanNode :
     }
   )
   {
-    jjtThis.init(b);
+    jjtThis.init(method, b);
   }
 }
 
-void Literal() #void :
+void Literal(EMethod method) #void :
 {
 }
 {
-  Array()
-| Hash()
-| String()
-| Number()
-| Boolean()
-| Null()
+  Array(method)
+| Hash(method)
+| String(method)
+| Number(method)
+| Boolean(method)
+| Null(method)
 }
 
-void PlainFunction() #PlainFunction :
+void PlainFunction(EMethod method) #PlainFunction :
 {
   Token t;
 }
 {
   t = < IDENTIFIER >
   {
-    jjtThis.init(t.image);
+    jjtThis.init(method, t.image);
   }
 }
 

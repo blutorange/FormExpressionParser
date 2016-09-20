@@ -3,20 +3,15 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EChainType;
-import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.ParseException;
 
-public abstract class AFunctionCallNode extends MySimpleNode {
+public abstract class AFunctionCallNode extends SimpleNode {
 
-	public EChainType chainType;
+	public final EChainType chainType;
 
 	public AFunctionCallNode(final int id, final EChainType chainType) {
 		super(id);
-		this.chainType = chainType;
-	}
-
-	public AFunctionCallNode(final FormExpressionParser p, final int id, final EChainType chainType) {
-		super(p, id);
 		this.chainType = chainType;
 	}
 
@@ -24,10 +19,7 @@ public abstract class AFunctionCallNode extends MySimpleNode {
 		return chainType;
 	}
 
-	//	public abstract ALangObject chain(final ALangObject thisContext, final IEvaluationContext ec)
-	//			throws EvaluationException;
-
-	public abstract void init(String name) throws ParseException;
+	public abstract void init(EMethod method, String name) throws ParseException;
 
 	public abstract String getMethodName();
 

@@ -4,7 +4,6 @@
 /FormExpressionParserTokenManager.java
 /FormExpressionParserTreeConstants.java
 /JJTFormExpressionParserState.java
-/Node.java
 /ParseException.java
 /SimpleCharStream.java
 /Token.java

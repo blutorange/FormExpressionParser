@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.AStringNode;
+import de.xima.fc.form.expression.node.ASTStringNode;
 
 public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void>{
 
@@ -69,7 +69,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void
 	}
 
 	@Override
-	public String visit(final AStringNode node, final Void data) throws EvaluationException {
+	public String visit(final ASTStringNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

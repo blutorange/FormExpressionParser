@@ -1,61 +1,68 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package de.xima.fc.form.expression.node;
 
+import java.lang.reflect.Array;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.xima.fc.form.expression.grammar.FormExpressionParser;
-import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.grammar.ParseException;
 
 public abstract class SimpleNode implements Node {
 
-	private static AtomicInteger idProvider = new AtomicInteger();
+	private final static Node[] EMPTY_NODE_ARRAY = new Node[0];
+	private final static AtomicInteger ID_PROVIDER = new AtomicInteger();
 
 	/**
-	 * The id of this node. Can be anything as long as it is unique. Does not
-	 * need to be the same for multiple runs of the program.
+	 * The id of this node. Can be anything as long as it is unique for each
+	 * node of a parse tree. Does not have to be unique for nodes of different
+	 * parse trees. Does not need to be the same for multiple runs of the program.
 	 */
 	protected final int uniqueId;
-	protected final int id;
-	protected transient Node parent;
-	protected transient Node[] children;
-	protected transient Object value;
-	protected transient FormExpressionParser parser;
 
-	public SimpleNode(final int i) {
-		uniqueId = idProvider.incrementAndGet();
-		id = i;
+	protected Node[] children = EMPTY_NODE_ARRAY;
+	protected EMethod siblingMethod;
+
+	/**
+	 * @param nodeId Node id. Not needed (yet).
+	 */
+	public SimpleNode(final int nodeId) {
+		// This will always provide a unique ID for each node of a
+		// parse tree, even if idProvider overflows and wraps around,
+		// unless a parse tree contains more than 2^32 nodes, which
+		// by itself would raise many other issues...
+		uniqueId = ID_PROVIDER.incrementAndGet();
 	}
 
-	public SimpleNode(final FormExpressionParser p, final int i) {
-		this(i);
-		parser = p;
-	}
-
+	// For performance, calls to this method may be removed.
+	// However, note that the files that call this method are
+	// generated automatically by javacc.
 	@Override
 	public void jjtOpen() {
 	}
 
+	// For performance, calls to this method may be removed.
+	// However, note that the files that call this method are
+	// generated automatically by javacc.	@Override
 	@Override
 	public void jjtClose() {
 	}
 
 	@Override
 	public void jjtSetParent(final Node n) {
-		parent = n;
+		//parent = n;
 	}
 
 	@Override
 	public Node jjtGetParent() {
-		return parent;
+		throw new UnsupportedOperationException("Getting parents has not been neccessary as of now, uncomment to enable.");
+		//return parent;
 	}
 
 	@Override
 	public void jjtAddChild(final Node n, final int i) {
-		if (children == null)
-			children = new Node[i + 1];
-		else if (i >= children.length) {
-			final Node c[] = new Node[i + 1];
+		if (i >= children.length) {
+			final Node c[] = new Node[i+1];
 			System.arraycopy(children, 0, c, 0, children.length);
 			children = c;
 		}
@@ -63,33 +70,18 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public Node jjtGetChild(final int i) {
+	public Node jjtGetChild(final int i) throws ArrayIndexOutOfBoundsException {
 		return children[i];
 	}
 
 	@Override
 	public int jjtGetNumChildren() {
-		return children == null ? 0 : children.length;
+		return children.length;
 	}
-
-	public void jjtSetValue(final Object value) {
-		this.value = value;
-	}
-
-	public Object jjtGetValue() {
-		return value;
-	}
-
-	/*
-	 * You can override these two methods in subclasses of SimpleNode to
-	 * customize the way the node appears when the tree is dumped. If your
-	 * output uses more than one line you should override toString(String),
-	 * otherwise overriding toString() is probably all you need to do.
-	 */
 
 	@Override
 	public String toString() {
-		return FormExpressionParserTreeConstants.jjtNodeName[id];
+		return getClass().getSimpleName();
 	}
 
 	@Override
@@ -98,7 +90,66 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public int getNodeTypeId() {
-		return id;
+	public Node[] getChildArray() {
+		return children;
+	}
+
+	@Override
+	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start) throws ParseException {
+		@SuppressWarnings("unchecked")
+		final T[] args = (T[])Array.newInstance(clazz, children.length-start);
+		for (int i = start; i < children.length; ++i) {
+			final Node n = children[i];
+			if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException(String.format("Node type is %s, expected %s.", n.getClass().getSimpleName(), clazz.getSimpleName()));
+			args[i-start] = clazz.cast(n);
+		}
+		return args;
+	}
+
+	@Override
+	public <T extends Node> T getNthChildAs(final int index, final Class<T> clazz) throws ParseException {
+		final Node n = children[0];
+		if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException("node not the correct type: " + n.getClass());
+		return clazz.cast(n);
+	}
+
+	@Override
+	public EMethod getSiblingMethod() {
+		return siblingMethod;
+	}
+
+	@Override
+	public void assertChildrenBetween(final int atLeast, final int atMost) throws ParseException {
+		if (children.length < atLeast || children.length > atMost)
+			throw new ParseException(
+					"Node must have between " + atLeast + " and " + atMost + " children, but has " + children.length);
+	}
+
+	@Override
+	public void assertChildrenExactly(final int count) throws ParseException {
+		if (children.length != count)
+			throw new ParseException("Node must have exactly " + count + " children, not " + children.length);
+	}
+
+	@Override
+	public void assertChildrenAtLeast(final int count) throws ParseException {
+		if (children.length < count)
+			throw new ParseException("Node must have at least " + count + " children, but has " + children.length);
+	}
+
+	@Override
+	public void assertChildrenAtMost(final int count) throws ParseException {
+		if (children.length > count)
+			throw new ParseException("Node can have at most " + count + " children, but has " + children.length);
+	}
+
+	@Override
+	public void assertChildrenEven() throws ParseException {
+		if ((children.length & 1) != 0) throw new ParseException("Node count is not even: " + children.length);
+	}
+
+	@Override
+	public void assertChildrenOdd() throws ParseException {
+		if ((children.length & 1) != 1) throw new ParseException("Node count is not odd: " + children.length);
 	}
 }

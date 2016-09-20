@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.AStringNode;
+import de.xima.fc.form.expression.node.ASTStringNode;
 
 
 @SuppressWarnings("all")
@@ -25,5 +25,5 @@ public interface IFormExpressionParserVisitor<R,T>
 	public R visit(ASTNullNode node, T data) throws EvaluationException;
 	public R visit(ASTBooleanNode node, T data) throws EvaluationException;
 	public R visit(ASTPlainFunction node, T data) throws EvaluationException;
-	public R visit(AStringNode node, T data) throws EvaluationException;
+	public R visit(ASTStringNode node, T data) throws EvaluationException;
 }

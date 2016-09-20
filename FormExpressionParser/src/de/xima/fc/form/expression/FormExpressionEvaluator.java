@@ -8,12 +8,13 @@ package de.xima.fc.form.expression;
  * Das ist ein Test [%tfVorname + §_ + tfNachname%]
  *
  * Man könnte auch mehrfache Wiederholung ermöglichen:
- *
- * [%%for(i,1,10) %]
- *  * [%tfVorname.dyn(i)%]
- * [%%endfor %]
- *
  */
+// <ul>
+// [%
+//   for(val in dyn('tfVorname')
+//    doc.out('<ul>', val, '</ul>')
+// %]
+// </ul>
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
@@ -47,7 +48,7 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
 
-		final String string = "1+2";
+		final String string = "1*3*6*6*6*6*6*6*6*6*6";
 
 		System.out.println("Input string\n" + string);
 
