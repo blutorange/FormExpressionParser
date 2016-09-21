@@ -91,6 +91,8 @@ public class BooleanLangObject extends ALangObject {
 		builder.append(value ? "§true" : "§false");
 	}
 
+	/** @deprecated Use {@link #getTrueInstance()} or {@link #getFalseInstance()} */
+	@Deprecated
 	public static ALangObject create(final boolean b) {
 		return b ? getTrueInstance() : getFalseInstance();
 	}

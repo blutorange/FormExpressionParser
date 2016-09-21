@@ -14,12 +14,19 @@ import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
+import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
+import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
+import de.xima.fc.form.expression.node.ASTProgramNode;
+import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
+import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTTryClauseNode;
+import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
 public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	private static class InstanceHolder {
@@ -175,6 +182,35 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 
 	@Override
 	public Void visit(final ASTPlainFunction node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+
+	@Override
+	public Void visit(final ASTStatementListNode node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(final ASTIfClauseNode node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(final ASTForLoopNode node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(final ASTWhileLoopNode node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(final ASTTryClauseNode node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(final ASTSwitchClauseNode node, final String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(final ASTProgramNode node, final String data) throws EvaluationException {
 		return dump(node, data);
 	}
 }

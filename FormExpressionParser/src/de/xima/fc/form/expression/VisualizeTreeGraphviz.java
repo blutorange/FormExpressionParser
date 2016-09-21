@@ -28,7 +28,7 @@ public class VisualizeTreeGraphviz {
 		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
 		final Node rootNode;
 		try {
-			rootNode = parser.Plain();
+			rootNode = parser.Program();
 		} catch (final ParseException e) {
 			System.out.println("Failed to parse expression.");
 			e.printStackTrace();

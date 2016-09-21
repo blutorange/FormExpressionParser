@@ -25,6 +25,7 @@ public class ASTExpressionNode extends SimpleNode {
 
 	@Override
 	public String toString() {
+		if (children.length == 0) return "EmptyExpressionNode(" + siblingMethod + ")";
 		if (children.length == 1)
 			return "UnaryExpressionNode(" + String.valueOf(siblingMethod) + "," + String.valueOf(unaryMethod) + ")";
 		return "BinaryExpressionNode(" + String.valueOf(siblingMethod) + ")";

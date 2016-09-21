@@ -22,7 +22,7 @@ public final class NodeSerializeTest {
 		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = parser.Plain();
+			rootNode = parser.Program();
 			final long t2 = System.nanoTime();
 			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final ParseException e) {

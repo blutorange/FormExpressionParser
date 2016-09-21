@@ -18,6 +18,8 @@ public class NullLangObject extends ALangObject {
 		return null;
 	}
 
+	/** @deprecated Use {@link #getInstance()} */
+	@Deprecated
 	public static ALangObject create() {
 		return getInstance();
 	}

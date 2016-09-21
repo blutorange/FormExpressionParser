@@ -48,7 +48,7 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
 
-		final String string = "1*3*6*6*6*6*6*6*6*6*6";
+		final String string = "if(a) { if (b) { do(); } }";
 
 		System.out.println("Input string\n" + string);
 
@@ -57,7 +57,7 @@ public class FormExpressionEvaluator {
 		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = parser.Plain();
+			rootNode = parser.Program();
 			final long t2 = System.nanoTime();
 			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final ParseException e) {
@@ -74,6 +74,8 @@ public class FormExpressionEvaluator {
 			e.printStackTrace();
 		}
 		System.out.println("");
+
+		System.exit(0);
 
 		final IEvaluationContext ec = getEc();
 		final EvaluateVisitor visitor = new EvaluateVisitor();

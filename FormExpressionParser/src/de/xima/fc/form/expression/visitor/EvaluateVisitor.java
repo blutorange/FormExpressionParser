@@ -14,12 +14,19 @@ import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
+import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
+import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
+import de.xima.fc.form.expression.node.ASTProgramNode;
+import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
+import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTTryClauseNode;
+import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -43,6 +50,10 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		final int count = node.jjtGetNumChildren();
+
+		// Empty expression node.
+		if (count == 0) return NullLangObject.getInstance();
+
 		final Node[] childrenArray = node.getChildArray();
 		ALangObject res = childrenArray[0].jjtAccept(this, ec);
 
@@ -135,5 +146,49 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTPlainFunction node, final IEvaluationContext ec) throws EvaluationException {
 		return ALangObject.create(ec.getBinding().getVariable(node.getMethodName()));
+	}
+
+	@Override
+	public ALangObject visit(final ASTStatementListNode node, final IEvaluationContext ec)
+			throws EvaluationException {
+		ALangObject res = NullLangObject.getInstance();
+		for (final Node n : node.getChildArray()) res = n.jjtAccept(this, ec);
+		return res;
+	}
+
+	@Override
+	public ALangObject visit(final ASTIfClauseNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ALangObject visit(final ASTForLoopNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ALangObject visit(final ASTTryClauseNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ALangObject visit(final ASTSwitchClauseNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ALangObject visit(final ASTProgramNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
