@@ -53,7 +53,7 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
 
-		final String string = "try { throw §exception('foobar'); } catch (e) { e; }";
+		final String string = "for (i = 3; §true ; ++i) i.print();";
 
 		System.out.println("Input string\n" + string);
 

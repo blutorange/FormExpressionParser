@@ -48,6 +48,8 @@ void Clause(EMethod method) #void :
   | SwitchClause(method)
   | TryClause(method)
   | ThrowClause(method)
+  | BreakClause(method)
+  | ContinueClause(method)
   | Statement(method)
   )
 }
