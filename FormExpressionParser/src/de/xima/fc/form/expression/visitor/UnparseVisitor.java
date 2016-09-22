@@ -2,8 +2,13 @@ package de.xima.fc.form.expression.visitor;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.node.ASTArrayNode;
+import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
+import de.xima.fc.form.expression.node.ASTBreakClauseNode;
+import de.xima.fc.form.expression.node.ASTContinueClauseNode;
+import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTDotExpressionNode;
+import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -12,14 +17,24 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.ASTProgramNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
 public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void>{
+
+	private final int indentationLevel;
+
+	public UnparseVisitor() {
+		this(4);
+	}
+
+	public UnparseVisitor(final int indentationLevel) {
+		this.indentationLevel = indentationLevel;
+	}
 
 	@Override
 	public String visit(final ASTExpressionNode node, final Void data) throws EvaluationException {
@@ -118,7 +133,37 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void
 	}
 
 	@Override
-	public String visit(final ASTProgramNode node, final Void data) throws EvaluationException {
+	public String visit(final ASTDoWhileLoopNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(final ASTAssignmentExpressionNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(final ASTExceptionNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(final ASTThrowClauseNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(final ASTBreakClauseNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(final ASTContinueClauseNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

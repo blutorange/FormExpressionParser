@@ -87,5 +87,19 @@ public class NullLangObject extends ALangObject {
 		builder.append("§null");
 	}
 
+	@Override
+	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) {
+		return BooleanLangObject.getFalseInstance();
+	}
+
+	@Override
+	public NumberLangObject coerceNumber(final IEvaluationContext ec) {
+		return NumberLangObject.getZeroInstance();
+	}
+
+	@Override
+	public StringLangObject coerceString(final IEvaluationContext ec) {
+		return StringLangObject.getNullInstance();
+	}
 
 }

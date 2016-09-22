@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -33,8 +34,11 @@ public class ArrayLangObject extends ALangObject {
 	// Coercion
 	@Override
 	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return value.size() == 0 ? BooleanLangObject.getFalseInstance()
-				: BooleanLangObject.getTrueInstance();
+		return BooleanLangObject.getTrueInstance();
+	}
+	@Override
+	public ArrayLangObject coerceArray(final IEvaluationContext ec) throws CoercionException {
+		return this;
 	}
 
 	@Override
@@ -101,6 +105,10 @@ public class ArrayLangObject extends ALangObject {
 		builder.append("]");
 	}
 
+	@Override
+	public Iterator<ALangObject> iterator() {
+		return value.iterator();
+	}
 
 	public List<ALangObject> listValue() {
 		return value;

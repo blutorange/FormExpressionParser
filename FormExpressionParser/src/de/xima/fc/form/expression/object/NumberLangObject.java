@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Iterator;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
@@ -26,6 +27,11 @@ import de.xima.fc.form.expression.exception.MathException;
 public class NumberLangObject extends ALangObject {
 	private final BigDecimal value;
 	public final static MathContext MATH_CONTEXT = new MathContext(9, RoundingMode.HALF_UP);
+
+	private static class InstanceHolder {
+		public final static NumberLangObject ZERO = NumberLangObject.create(0);
+		public final static NumberLangObject ONE = NumberLangObject.create(1);
+	}
 
 	private NumberLangObject(final BigDecimal value) {
 		super(Type.NUMBER);
@@ -119,8 +125,12 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return value.compareTo(BigDecimal.ZERO) == 0 ? BooleanLangObject.getFalseInstance()
-				: BooleanLangObject.getTrueInstance();
+		return BooleanLangObject.getTrueInstance();
+	}
+
+	@Override
+	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
+		return this;
 	}
 
 	@Override
@@ -177,6 +187,23 @@ public class NumberLangObject extends ALangObject {
 	@Override
 	public void toExpression(final StringBuilder builder) {
 		builder.append(value.toPlainString());
+	}
+
+	@Override
+	public Iterator<ALangObject> iterator() {
+		return new Iterator<ALangObject>() {
+			private BigDecimal i = BigDecimal.ZERO;
+			@Override
+			public boolean hasNext() {
+				return i.compareTo(value) < 0;
+			}
+			@Override
+			public ALangObject next() {
+				final ALangObject res = StringLangObject.create(i);
+				i = i.add(BigDecimal.ONE);
+				return res;
+			}
+		};
 	}
 
 	/**
@@ -261,5 +288,13 @@ public class NumberLangObject extends ALangObject {
 		final double x = bigDecimalValue().doubleValue();
 		if (Double.isInfinite(x)) throw new MathException("Number too large for double: " + inspect());
 		return NumberLangObject.create(Math.cos(x));
+	}
+
+	public static NumberLangObject getZeroInstance() {
+		return InstanceHolder.ZERO;
+	}
+
+	public static NumberLangObject getOneInstance() {
+		return InstanceHolder.ONE;
 	}
 }

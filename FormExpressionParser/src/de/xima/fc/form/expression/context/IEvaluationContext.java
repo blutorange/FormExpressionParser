@@ -4,12 +4,8 @@ public interface IEvaluationContext {
 
 	public IBinding getBinding();
 	public INamespace getNamespace();
+	public void setBinding(IBinding binding);
 	public int getRecursionLimit();
-
-	// Probably not needed anymore because of visitor pattern.
-	//	public void nestBinding();
-	//	public void unnestBinding();
-
 
 	/**
 	 * Must be an equivalence relation.

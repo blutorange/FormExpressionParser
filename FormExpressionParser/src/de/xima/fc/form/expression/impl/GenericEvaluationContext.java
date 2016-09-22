@@ -54,7 +54,8 @@ public class GenericEvaluationContext implements IEvaluationContext {
 		return name1.equals(name2);
 	}
 
-	private void setBinding(final IBinding binding) {
+	@Override
+	public void setBinding(final IBinding binding) {
 		this.binding = binding;
 	}
 

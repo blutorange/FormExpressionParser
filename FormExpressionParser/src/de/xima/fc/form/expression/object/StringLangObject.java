@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,13 @@ public class StringLangObject extends ALangObject {
 	private final static String FALSE = "false";
 
 	private final String value;
+
+	private static class InstanceHolder {
+		public final static StringLangObject EMPTY = StringLangObject.create("");
+		public final static StringLangObject TRUE = StringLangObject.create("true");
+		public final static StringLangObject FALSE = StringLangObject.create("false");
+		public final static StringLangObject NULL = StringLangObject.create("null");
+	}
 
 	private StringLangObject(final String value) {
 		super(Type.STRING);
@@ -46,7 +54,7 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return this.evaluateMethod(this, ec.getNamespace().instanceMethodString(name), name, ec, args);
+		return evaluateMethod(this, ec.getNamespace().instanceMethodString(name), name, ec, args);
 	}
 
 	@Override
@@ -73,6 +81,10 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
+		StringLangObject.toExpression(value, builder);
+	}
+
+	public static void toExpression(final String value, final StringBuilder builder) {
 		builder.append('"').append(StringEscapeUtils.escapeJava(value)).append('"').toString();
 	}
 
@@ -86,11 +98,33 @@ public class StringLangObject extends ALangObject {
 			return NumberLangObject.create(0);
 		}
 	}
+
 	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return value.length() == 0 ? BooleanLangObject.getFalseInstance() : BooleanLangObject.getTrueInstance();
+	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
+		return this;
 	}
 
+	@Override
+	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
+		return BooleanLangObject.getTrueInstance();
+	}
+
+	@Override
+	public Iterator<ALangObject> iterator() {
+		return new Iterator<ALangObject>() {
+			private int i = 0;
+			@Override
+			public boolean hasNext() {
+				return i < value.length();
+			}
+			@Override
+			public ALangObject next() {
+				final ALangObject res = StringLangObject.create(value.charAt(i));
+				++i;
+				return res;
+			}
+		};
+	}
 
 	/**
 	 * Factory method for creating instances.
@@ -100,6 +134,10 @@ public class StringLangObject extends ALangObject {
 	public static StringLangObject create(final String value) {
 		if (value == null) return StringLangObject.create(StringUtils.EMPTY);
 		return new StringLangObject(value);
+	}
+
+	public static StringLangObject create(final char value) {
+		return new StringLangObject(String.valueOf(value));
 	}
 
 	public static StringLangObject createFromEscapedJava(final String value) {
@@ -123,5 +161,21 @@ public class StringLangObject extends ALangObject {
 	public static ALangObject best(final String value) {
 		if (value == null) return NullLangObject.getInstance();
 		return new StringLangObject(value);
+	}
+
+	public static StringLangObject getNullInstance() {
+		return InstanceHolder.NULL;
+	}
+
+	public static StringLangObject getEmptyInstance() {
+		return InstanceHolder.EMPTY;
+	}
+
+	public static StringLangObject getTrueInstance() {
+		return InstanceHolder.TRUE;
+	}
+
+	public static StringLangObject getFalseInstance() {
+		return InstanceHolder.FALSE;
 	}
 }

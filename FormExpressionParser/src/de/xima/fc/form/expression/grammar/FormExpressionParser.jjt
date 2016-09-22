@@ -25,54 +25,108 @@ SKIP :
 | "\r"
 }
 
-Node Program() #ProgramNode :
+Node Program() #StatementListNode :
 {
 }
 {
-  (    (Clause())*
+  (    (Clause(null))*
   )
   {
-    jjtThis.init();
+    jjtThis.init(null);
     return jjtThis;
   }
 }
 
-void Clause() #void :
+void Clause(EMethod method) #void :
 {
 }
 {
  (
-    ForLoop()
-  | IfClause()
-  | WhileLoop()
-  | SwitchClause()
-  | TryClause()
-  | Statement()
+    ForLoop(method)
+  | IfClause(method)
+  | WhileLoop(method)
+  | SwitchClause(method)
+  | TryClause(method)
+  | ThrowClause(method)
+  | Statement(method)
   )
 }
 
-void SwitchClause() #SwitchClauseNode :
+
+void ContinueClause(EMethod method) #ContinueClauseNode :
 {
-  boolean hasDefault = false;
+}
+{
+  (
+    "continue" ";"
+  )
+  {
+    jjtThis.init(method);
+  }
+}
+
+void BreakClause(EMethod method) #BreakClauseNode :
+{
+}
+{
+  (
+    "break" ";"  )
+  {
+    jjtThis.init(method);
+  }
+}
+
+void ThrowClause(EMethod method) #ThrowClauseNode :
+{
+}
+{
+  (
+    "throw" Exception(null) ";"  )
+  {
+    jjtThis.init(method);
+  }
+}
+
+void SwitchClause(EMethod method) #SwitchClauseNode :
+{
 }
 {
   (
     "switch" "(" Expression(null) ")" "{"
     (
-      "case" Expression(null) ":" (Clause())*
+      SwitchCase()
     )*
-    (
-      "default" ":" (Clause())+
-      {
-        hasDefault = true;
-      }
-    )?
+    [
+      SwitchDefault()
+    ]
     "}"
   )
   {
-    jjtThis.init(hasDefault);
+    jjtThis.init(method);
   }
 }
+
+void SwitchCase() #void :
+{
+}
+{
+  (
+    (
+      "case" Expression(EMethod.SWITCHCASE) ":"
+    )+
+    (Clause(EMethod.SWITCHCLAUSE))+
+  )
+}
+
+void SwitchDefault() #void :
+{
+}
+{
+  (    "default" ":"
+      (Clause(EMethod.SWITCHDEFAULT))+
+  )
+}
+
 
 // try {
 //  1/0
@@ -80,41 +134,53 @@ void SwitchClause() #SwitchClauseNode :
 // catch (e) {
 //   log(e);
 // }
-void TryClause() #TryClauseNode :
+void TryClause(EMethod method) #TryClauseNode :
 {
+  Token t;
 }
 {
   (
     "try"
     (
-      Block()
+      Block(null)
     )
-    "catch" "(" < IDENTIFIER > ")"
+    "catch" "(" t = < IDENTIFIER > ")"
     (
-      Block()
+      Block(null)
     )
   )
   {
-    jjtThis.init();
+    jjtThis.init(method, t == null ? null : t.image);
+  }
+}
+
+// do { 1234 } while (true)
+void DoWhileLoop(EMethod method) #DoWhileLoopNode :
+{
+}
+{
+  (
+    "do"
+    BlockOrClause(null)
+    "while" "(" Expression(null) ")"
+  )
+  {
+    jjtThis.init(method);
   }
 }
 
 // while ( i -- > 0)
 //  print(i)
-void WhileLoop() #WhileLoopNode :
+void WhileLoop(EMethod method) #WhileLoopNode :
 {
 }
 {
   (
     "while" "(" Expression(null) ")"
-    (
-      LOOKAHEAD("{")
-      Block()
-    | Clause()
-    )
+    BlockOrClause(null)
   )
   {
-    jjtThis.init();
+    jjtThis.init(method);
   }
 }
 
@@ -122,7 +188,7 @@ void WhileLoop() #WhileLoopNode :
 //   log(i);
 // for ( node : getNodes() )
 //   doStuff(node);
-void ForLoop() #ForLoopNode :
+void ForLoop(EMethod method) #ForLoopNode :
 {
   Token iteratingLoopVariable = null;
 }
@@ -136,72 +202,63 @@ void ForLoop() #ForLoopNode :
       )
     |
       (
-        StatementListCommaSeparated() ";" StatementListCommaSeparated() ";" StatementListCommaSeparated()
+        StatementListCommaSeparated(null) ";" StatementListCommaSeparated(null) ";" StatementListCommaSeparated(null)
       )
     )
     ")"
-    (
-      LOOKAHEAD("{")
-      Block()
-    | Clause()
-    )
+    BlockOrClause(null)
   )
   {
-    jjtThis.init(iteratingLoopVariable != null ? iteratingLoopVariable.image : null);
+    jjtThis.init(method, iteratingLoopVariable != null ? iteratingLoopVariable.image : null);
   }
 }
 
-void IfClause() #IfClauseNode :
+void IfClause(EMethod method) #IfClauseNode :
 {
-  boolean hasElse = false;
 }
 {
   (
-    "if" "(" Expression(null) ")"
-    (
-      LOOKAHEAD("{")
-      Block()
-    | Clause()
-    )
-    (
-      "else if" "(" Expression(null) ")"
-      (
-        LOOKAHEAD("{")
-        Block()
-      | Clause()
-      )
-    )*
-    (
-      (
-        "else"
-        (
-          LOOKAHEAD("{")
-          Block()
-        | Clause()
-        )
-      )
-      {
-        hasElse = true;
-      }
-    )?
+    "if" "(" Expression(null) ")" 
+    BlockOrClause(null)
+    [
+      LOOKAHEAD(1)
+      "else" 
+      BlockOrClause(null)
+    ]
   )
   {
-    jjtThis.init(hasElse);
+    jjtThis.init(method);
   }
 }
 
-void Block() #StatementListNode :
+void BlockOrClause(EMethod method) #void :
 {
 }
 {
-  "{"
-  (
-    (Clause())*
-  )
-  "}"
+  LOOKAHEAD("{")
+  Block(method)
+| Clause(method)
 }
 
-void StatementListCommaSeparated() #StatementListNode :
+void Block(EMethod method) #StatementListNode :
+{
+}
+{
+  (
+    "{"
+    (
+      (
+        Clause(null)
+      )*
+    )
+    "}"
+  )
+  {
+    jjtThis.init(method);
+  }
+}
+
+void StatementListCommaSeparated(EMethod method) #StatementListNode :
 {
 }
 {
@@ -209,40 +266,11 @@ void StatementListCommaSeparated() #StatementListNode :
     (Expression(null))? ("," Expression(null))*
   )
   {
-    jjtThis.init();
+    jjtThis.init(method);
   }
 }
 
-/*
-void StatementListSemicolonTerminated() #StatementListNode :
-{
-}
-{
-  (
-    (Statement())+
-  )
-  {
-    if (jjtThis.jjtGetNumChildren() > 0) jjtThis.init();
-  }
-}
-*/
-
-/*
-void StatementListSemicolonSeparated() #StatementListNode :
-{
-}
-{
-  (
-    LOOKAHEAD(Statement())    (Statement())+ | Expression(null)
-  )
-  {
-    jjtThis.init();
-  }
-}
-*/
-
-
-Node Statement() #ExpressionNode :
+Node Statement(EMethod method) #ExpressionNode :
 {
 }
 {
@@ -252,7 +280,7 @@ Node Statement() #ExpressionNode :
     )
   )
   {
-    if (jjtThis.jjtGetNumChildren() > 0) jjtThis.init(null);
+    if (jjtThis.jjtGetNumChildren() > 0) jjtThis.init(method);
     return jjtThis;
   }
 }
@@ -588,9 +616,9 @@ void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
   (
     DotExpression(method)
     (
-      (
+      [
         "**" UnaryExpression(EMethod.DOUBLE_STAR)
-      )?
+      ]
     )
   )
   {
@@ -812,6 +840,17 @@ void Boolean(EMethod method) #BooleanNode :
   }
 }
 
+void Exception(EMethod method) #ExceptionNode :
+{
+}
+{
+  (    "\u00a7exception" "(" Expression(null) ")"
+  )
+  {
+    jjtThis.init(method);
+  }
+}
+
 void Literal(EMethod method) #void :
 {
 }
@@ -822,6 +861,7 @@ void Literal(EMethod method) #void :
 | Number(method)
 | Boolean(method)
 | Null(method)
+| Exception(method)
 }
 
 TOKEN :

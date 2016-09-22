@@ -44,11 +44,12 @@ public class ParserErrors {
 				"if (i==0) { error(i); }",
 				"if (i==0) { error(i); } else if (j==0) { fail(); fail();}",
 				"if (i==0) { error(i); error(); } else if (j==0) { fail(); fail();} else { success(j); }",
+				"if(a) a; else if(c) c; else b;",
 				"for (node : nodeList) print(node);",
 				"for (i=0; i != 10; ++i) print(i);",
 				"for (i=0 , j = 0; i != 10 , i>=0; ++i, ++j) { print(i); log(j);}",
 				"for (;;) spam();",
-				"try { 1/0; } catch (e) { log(me) };",
+				"try { 1/0; } catch (e) { log(me); }",
 				"switch(getEnum()) { }",
 				"switch(getEnum()) {case 1: case 2: multiple.stuff();}",
 				"switch(getEnum()) { default: a.b;}",
@@ -60,7 +61,10 @@ public class ParserErrors {
 
 	private void setupTestCaseProgramFail() {
 		testCaseProgramFail = new String[] {
-				"if (i==0) { alert() }"
+				"if (i==0) { alert() }",
+				"if(a) a; else b; else if(c) c;",
+				"if(a) a; else if (c) c; else b; else c;",
+				"try { 1/0; } catch (e) { log(me) };"
 		};
 	}
 

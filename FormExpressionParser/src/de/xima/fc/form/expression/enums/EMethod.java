@@ -62,7 +62,12 @@ public enum EMethod {
 	DOUBLE_ANGLE_CLOSE(">>"), // >>
 	ANGLE_OPEN_EQUAL("<="),// <=
 	ANGLE_CLOSE_EQUAL(">="), // >=
-	COERCE("=>")
+	COERCE("=>"),
+
+	//Special do not use
+	SWITCHCASE("SWITCHCASE"),
+	SWITCHDEFAULT("SWITCHDEFAULT"),
+	SWITCHCLAUSE("SWITCHCLAUSE")
 	;
 
 	public final String name;

@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,8 +23,11 @@ public class HashLangObject extends ALangObject {
 	// Coercion
 	@Override
 	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return value.size() == 0 ? BooleanLangObject.getFalseInstance()
-				: BooleanLangObject.getTrueInstance();
+		return BooleanLangObject.getTrueInstance();
+	}
+	@Override
+	public HashLangObject coerceHash(final IEvaluationContext ec) throws CoercionException {
+		return this;
 	}
 
 	@Override
@@ -90,6 +94,11 @@ public class HashLangObject extends ALangObject {
 		if (!(o instanceof HashLangObject)) return false;
 		final HashLangObject other = (HashLangObject)o;
 		return value.equals(other.value);
+	}
+
+	@Override
+	public Iterator<ALangObject> iterator() {
+		return value.keySet().iterator();
 	}
 
 

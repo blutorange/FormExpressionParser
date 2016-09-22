@@ -13,8 +13,13 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VisitorException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTArrayNode;
+import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
+import de.xima.fc.form.expression.node.ASTBreakClauseNode;
+import de.xima.fc.form.expression.node.ASTContinueClauseNode;
+import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTDotExpressionNode;
+import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -23,10 +28,10 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.ASTProgramNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
@@ -278,7 +283,32 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 	}
 
 	@Override
-	public Void visit(final ASTProgramNode node, final Void data) throws EvaluationException {
+	public Void visit(final ASTDoWhileLoopNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(final ASTAssignmentExpressionNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(final ASTExceptionNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(final ASTThrowClauseNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(final ASTBreakClauseNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(final ASTContinueClauseNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 }

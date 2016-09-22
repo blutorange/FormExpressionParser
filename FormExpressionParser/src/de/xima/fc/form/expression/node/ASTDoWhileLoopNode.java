@@ -5,9 +5,9 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTWhileLoopNode extends SimpleNode {
+public class ASTDoWhileLoopNode extends SimpleNode {
 
-	public ASTWhileLoopNode(final int nodeId) {
+	public ASTDoWhileLoopNode(final int nodeId) {
 		super(nodeId);
 	}
 

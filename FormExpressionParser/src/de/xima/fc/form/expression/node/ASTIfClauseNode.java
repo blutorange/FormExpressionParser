@@ -1,12 +1,11 @@
 package de.xima.fc.form.expression.node;
 
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTIfClauseNode extends SimpleNode {
-
-	private boolean hasElse;
 
 	public ASTIfClauseNode(final int nodeId) {
 		super(nodeId);
@@ -17,11 +16,8 @@ public class ASTIfClauseNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final boolean hasElse) throws ParseException {
-		this.hasElse = hasElse;
-	}
-
-	public boolean isHasElse() {
-		return hasElse;
+	public void init(final EMethod method) throws ParseException {
+		assertChildrenBetween(2, 3);
+		siblingMethod = method;
 	}
 }

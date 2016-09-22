@@ -1,7 +1,10 @@
 package de.xima.fc.form.expression;
 
 // TODO List
-// - ASTNodes Serializable, so that a parse can be stored in the database.
+// - nesting, for, while, scope
+// - +=, -=, = etc. ( a += b ==> a = a+b)
+// - throw §EXCEPTION('kl'), break, continue
+// - unparse
 // - EmbeddedBlocks
 
 /**
@@ -32,12 +35,14 @@ import de.xima.fc.form.expression.impl.formfield.FormFieldEvaluationBinding;
 import de.xima.fc.form.expression.impl.formfield.FormFieldNamespaceBuilder;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
 import de.xima.fc.form.expression.impl.function.EGlobalFunction;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodArray;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodBoolean;
+import de.xima.fc.form.expression.impl.function.EInstanceMethodException;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodHash;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodNumber;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodString;
@@ -48,7 +53,7 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
 
-		final String string = "if(a) { if (b) { do(); } }";
+		final String string = "try { throw §exception('foobar'); } catch (e) { e; }";
 
 		System.out.println("Input string\n" + string);
 
@@ -75,7 +80,7 @@ public class FormExpressionEvaluator {
 		}
 		System.out.println("");
 
-		System.exit(0);
+		//		System.exit(0);
 
 		final IEvaluationContext ec = getEc();
 		final EvaluateVisitor visitor = new EvaluateVisitor();
@@ -113,12 +118,14 @@ public class FormExpressionEvaluator {
 		builder.setInstanceMethodString(EInstanceMethodString.values());
 		builder.setInstanceMethodArray(EInstanceMethodArray.values());
 		builder.setInstanceMethodHash(EInstanceMethodHash.values());
+		builder.setInstanceMethodException(EInstanceMethodException.values());
 
 		builder.setAttrAccessorBoolean(EAttrAccessorBoolean.values());
 		builder.setAttrAccessorNumber(EAttrAccessorNumber.values());
 		builder.setAttrAccessorString(EAttrAccessorString.values());
 		builder.setAttrAccessorArray(EAttrAccessorArray.values());
 		builder.setAttrAccessorHash(EAttrAccessorHash.values());
+		builder.setAttrAccessorException(EAttrAccessorException.values());
 
 		return builder.build();
 	}

@@ -1,12 +1,11 @@
 package de.xima.fc.form.expression.node;
 
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTSwitchClauseNode extends SimpleNode {
-
-	private boolean hasDefault;
 
 	public ASTSwitchClauseNode(final int nodeId) {
 		super(nodeId);
@@ -17,11 +16,8 @@ public class ASTSwitchClauseNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final boolean hasDefault) throws ParseException {
-		this.hasDefault = hasDefault;
-	}
-
-	public boolean isHasDefault() {
-		return hasDefault;
+	public void init(final EMethod method) throws ParseException {
+		assertChildrenAtLeast(1);
+		siblingMethod = method;
 	}
 }

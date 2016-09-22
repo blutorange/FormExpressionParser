@@ -6,7 +6,13 @@ import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.NumberLangObject;
 
-public class EvaluationException extends Exception {
+public class EvaluationException extends RuntimeException {
+	public EvaluationException(final EvaluationException exception) {
+		super(exception);
+		ec = exception.ec;
+		binding = exception.binding;
+	}
+
 	public EvaluationException(final IEvaluationContext ec) {
 		super();
 		this.ec = ec;

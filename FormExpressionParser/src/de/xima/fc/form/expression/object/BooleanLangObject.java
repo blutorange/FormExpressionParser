@@ -25,13 +25,16 @@ public class BooleanLangObject extends ALangObject {
 	// Coercion
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
-		return StringLangObject.create(value);
+		return value ? StringLangObject.getTrueInstance() : StringLangObject.getFalseInstance();
 	}
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
 		return NumberLangObject.create(value ? 1 : 0);
 	}
-
+	@Override
+	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
+		return this;
+	}
 
 
 	/**
@@ -91,8 +94,6 @@ public class BooleanLangObject extends ALangObject {
 		builder.append(value ? "§true" : "§false");
 	}
 
-	/** @deprecated Use {@link #getTrueInstance()} or {@link #getFalseInstance()} */
-	@Deprecated
 	public static ALangObject create(final boolean b) {
 		return b ? getTrueInstance() : getFalseInstance();
 	}

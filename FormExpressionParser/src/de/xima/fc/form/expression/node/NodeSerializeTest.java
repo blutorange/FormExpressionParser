@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.node;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
-import java.util.Date;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -15,7 +14,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 public final class NodeSerializeTest {
 
 	public static void main(final String[] args) {
-		final String string = "kl";
+		final String string = "if('') 8 ; else 42;";
 		System.out.println("Input string\n" + string);
 		final ByteArrayInputStream bais = new ByteArrayInputStream(string.getBytes(Charset.forName("UTF-8")));
 		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
@@ -24,17 +23,17 @@ public final class NodeSerializeTest {
 			final long t1 = System.nanoTime();
 			rootNode = parser.Program();
 			final long t2 = System.nanoTime();
-			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms\n");
+			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms");
 		} catch (final ParseException e) {
 			e.printStackTrace();
 			return;
 		}
 
 		final byte[] bytes = SerializationUtils.serialize(rootNode);
-		final Date t1 = new Date();
+		final long t1 = System.nanoTime();
 		final Node n = SerializationUtils.<Node>deserialize(bytes);
-		final Date t2 = new Date();
-		System.out.println("Derser took " + (t2.getTime()-t1.getTime())/1000);
+		final long t2 = System.nanoTime();
+		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms");
 		try {
 			n.jjtAccept(DumpVisitor.getSystemOutDumper(), "");
 		} catch (final EvaluationException e) {

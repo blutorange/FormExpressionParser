@@ -6,13 +6,19 @@ import java.util.List;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NoSuchFunctionException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.AFunctionCallNode;
 import de.xima.fc.form.expression.node.ASTArrayNode;
+import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
+import de.xima.fc.form.expression.node.ASTBreakClauseNode;
+import de.xima.fc.form.expression.node.ASTContinueClauseNode;
+import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTDotExpressionNode;
+import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -21,15 +27,16 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
-import de.xima.fc.form.expression.node.ASTProgramNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -45,6 +52,13 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		for (int i = 0; i != args.length; ++i)
 			evaluatedArgs[i] = args[i].jjtAccept(this, ec);
 		return evaluatedArgs;
+	}
+
+	private void nest(final IEvaluationContext ec) {
+		ec.setBinding(ec.getBinding().nest());
+	}
+	private void unnest(final IEvaluationContext ec) {
+		ec.setBinding(ec.getBinding().unnest());
 	}
 
 	@Override
@@ -157,37 +171,133 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
-	public ALangObject visit(final ASTIfClauseNode node, final IEvaluationContext data) throws EvaluationException {
+	public ALangObject visit(final ASTIfClauseNode node, final IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		// If branch
+		if (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue())
+			return children[1].jjtAccept(this, ec);
+		// Else branch
+		else if (children.length==3)
+			return children[2].jjtAccept(this, ec);
+		// No else
+		else
+			return NullLangObject.getInstance();
+	}
+
+	@Override
+	public ALangObject visit(final ASTForLoopNode node, final IEvaluationContext ec) throws EvaluationException {
+		final String variableName = node.getIteratingLoopVariable();
+		final Node[] children = node.getChildArray();
+		ALangObject res = NullLangObject.getInstance();
+		nest(ec);
+		if (variableName == null) {
+			// Plain for loop
+			children[0].jjtAccept(this, ec);
+			while (children[1].jjtAccept(this, ec).coerceBoolean(ec).booleanValue()) {
+				res = children[3].jjtAccept(this, ec);
+				children[2].jjtAccept(this, ec);
+			}
+		} else
+			// Iterating for loop
+			for (final ALangObject value : children[0].jjtAccept(this, ec)) {
+				ec.getBinding().setVariable(variableName, value);
+				children[1].jjtAccept(this, ec);
+			}
+		unnest(ec);
+		return res;
+	}
+
+	@Override
+	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		ALangObject res = NullLangObject.getInstance();
+		nest(ec);
+		while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue())
+			res = children[1].jjtAccept(this, ec);
+		unnest(ec);
+		return res;
+	}
+
+	@Override
+	public ALangObject visit(final ASTDoWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		ALangObject res = NullLangObject.getInstance();
+		nest(ec);
+		do
+			res = children[1].jjtAccept(this, ec);
+		while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue());
+		unnest(ec);
+		return res;
+	}
+
+
+	@Override
+	public ALangObject visit(final ASTTryClauseNode node, final IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		nest(ec);
+		try {
+			return children[0].jjtAccept(this, ec);
+		}
+		catch (final EvaluationException e) {
+			final ALangObject exception = ExceptionLangObject.create(e);
+			ec.getBinding().setVariable(node.getErrorVariableName(), exception);
+			return children[1].jjtAccept(this, ec);
+		}
+		finally {
+			unnest(ec);
+		}
+	}
+
+	@SuppressWarnings("incomplete-switch")
+	@Override
+	public ALangObject visit(final ASTSwitchClauseNode node, final IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		final ALangObject switchValue = children[0].jjtAccept(this, ec);
+		ALangObject res = NullLangObject.getInstance();
+		boolean matchingCase = false;
+		for (int i = 1 ; i < children.length; ++i)
+			switch (children[i].getSiblingMethod()) {
+			case SWITCHCASE:
+				if (!matchingCase && switchValue.equals(children[i-1].jjtAccept(this, ec)))
+					matchingCase = true;
+				break;
+			case SWITCHCLAUSE:
+				if (matchingCase) res = children[i].jjtAccept(this, ec);
+				break;
+			case SWITCHDEFAULT:
+				res = children[i].jjtAccept(this, ec);
+			default:
+				throw new EvaluationException(ec, "Invalid syntax at switch.");
+			}
+		return res;
+	}
+
+	@Override
+	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
+		//TODO
+		return null;
+	}
+
+	@Override
+	public ALangObject visit(final ASTExceptionNode node, final IEvaluationContext ec) throws EvaluationException {
+		final StringLangObject message = node.jjtGetChild(0).jjtAccept(this, ec).coerceString(ec);
+		return ExceptionLangObject.create(message.stringValue());
+	}
+
+	@Override
+	public ALangObject visit(final ASTThrowClauseNode node, final IEvaluationContext ec) throws EvaluationException {
+		final String message = node.jjtGetChild(0).jjtAccept(this, ec).coerceString(ec).stringValue();
+		throw new CustomRuntimeException(message);
+	}
+
+	@Override
+	public ALangObject visit(final ASTBreakClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ALangObject visit(final ASTForLoopNode node, final IEvaluationContext data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ALangObject visit(final ASTTryClauseNode node, final IEvaluationContext data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ALangObject visit(final ASTSwitchClauseNode node, final IEvaluationContext data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ALangObject visit(final ASTProgramNode node, final IEvaluationContext data) throws EvaluationException {
+	public ALangObject visit(final ASTContinueClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -8,6 +8,7 @@ import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -20,12 +21,14 @@ public class GenericNamespace implements INamespace {
 	private final Map<String, INamedFunction<ArrayLangObject>> instanceMethodArray;
 	private final Map<String, INamedFunction<NumberLangObject>> instanceMethodNumber;
 	private final Map<String, INamedFunction<HashLangObject>> instanceMethodHash;
+	private final Map<String, INamedFunction<ExceptionLangObject>> instanceMethodException;
 	private final Map<String, INamedFunction<BooleanLangObject>> instanceMethodBoolean;
 	private final Map<String, INamedFunction<StringLangObject>> attrAccessorString;
 	private final Map<String, INamedFunction<ArrayLangObject>> attrAccessorArray;
 	private final Map<String, INamedFunction<BooleanLangObject>> attrAccessorBoolean;
 	private final Map<String, INamedFunction<NumberLangObject>> attrAccessorNumber;
 	private final Map<String, INamedFunction<HashLangObject>> attrAccessorHash;
+	private final Map<String, INamedFunction<ExceptionLangObject>> attrAccessorException;
 
 	public static class Builder {
 		private Map<String, INamedFunction<NullLangObject>> globalMethod;
@@ -34,11 +37,13 @@ public class GenericNamespace implements INamespace {
 		private Map<String, INamedFunction<BooleanLangObject>> instanceMethodBoolean;
 		private Map<String, INamedFunction<NumberLangObject>> instanceMethodNumber;
 		private Map<String, INamedFunction<HashLangObject>> instanceMethodHash;
+		private Map<String, INamedFunction<ExceptionLangObject>> instanceMethodException;
 		private Map<String, INamedFunction<StringLangObject>> attrAccessorString;
 		private Map<String, INamedFunction<ArrayLangObject>> attrAccessorArray;
 		private Map<String, INamedFunction<BooleanLangObject>> attrAccessorBoolean;
 		private Map<String, INamedFunction<NumberLangObject>> attrAccessorNumber;
 		private Map<String, INamedFunction<HashLangObject>> attrAccessorHash;
+		private Map<String, INamedFunction<ExceptionLangObject>> attrAccessorException;
 		private int count = 0;
 
 		public Builder() {
@@ -63,6 +68,9 @@ public class GenericNamespace implements INamespace {
 		protected void customInstanceMethodHash(final Map<String, INamedFunction<HashLangObject>> map) {
 		}
 		/** @param map Map that may be filled with additional custom methods. */
+		protected void customInstanceMethodException(final Map<String, INamedFunction<ExceptionLangObject>> map) {
+		}
+		/** @param map Map that may be filled with additional custom methods. */
 		protected void customAttrAccessorString(final Map<String, INamedFunction<StringLangObject>> map) {
 		}
 		/** @param map Map that may be filled with additional custom methods. */
@@ -76,6 +84,9 @@ public class GenericNamespace implements INamespace {
 		}
 		/** @param map Map that may be filled with additional custom methods. */
 		protected void customAttrAccessorHash(final Map<String, INamedFunction<HashLangObject>> map) {
+		}
+		/** @param map Map that may be filled with additional custom methods. */
+		protected void customAttrAccessorException(final Map<String, INamedFunction<ExceptionLangObject>> map) {
 		}
 
 		public final Builder setGlobalMethod(final INamedFunction<NullLangObject>[] m) {
@@ -144,6 +155,18 @@ public class GenericNamespace implements INamespace {
 			return this;
 		}
 
+		public final Builder setInstanceMethodException(final INamedFunction<ExceptionLangObject>[] m) {
+			if (instanceMethodException == null) {
+				++count;
+				instanceMethodException = new HashMap<>(m.length);
+				for (final INamedFunction<ExceptionLangObject> f : m)
+					instanceMethodException.put(f.getName(), f);
+			}
+			customInstanceMethodException(instanceMethodException);
+			return this;
+		}
+
+
 		public final Builder setAttrAccessorString(final INamedFunction<StringLangObject>[] m) {
 			if (attrAccessorString == null) {
 				++count;
@@ -199,12 +222,23 @@ public class GenericNamespace implements INamespace {
 			return this;
 		}
 
+		public final Builder setAttrAccessorException(final INamedFunction<ExceptionLangObject>[] m) {
+			if (attrAccessorException == null) {
+				++count;
+				attrAccessorException = new HashMap<>(m.length);
+				for (final INamedFunction<ExceptionLangObject> f : m)
+					attrAccessorException.put(f.getName(), f);
+			}
+			customAttrAccessorException(attrAccessorException);
+			return this;
+		}
+
 		public final INamespace build() throws IllegalStateException {
-			if (count != 11)
-				throw new IllegalStateException("all instance and attribute accessor methods must be set");
-			return new GenericNamespace(globalMethod, instanceMethodBoolean, instanceMethodNumber,
-					instanceMethodString, instanceMethodArray, instanceMethodHash, attrAccessorBoolean,
-					attrAccessorNumber, attrAccessorString, attrAccessorArray, attrAccessorHash);
+			if (count != 13)
+				throw new IllegalStateException("All instance and attribute accessor methods must be set");
+			return new GenericNamespace(globalMethod, instanceMethodBoolean, instanceMethodNumber, instanceMethodString,
+					instanceMethodArray, instanceMethodHash, instanceMethodException, attrAccessorBoolean,
+					attrAccessorNumber, attrAccessorString, attrAccessorArray, attrAccessorHash, attrAccessorException);
 		}
 	}
 
@@ -214,22 +248,26 @@ public class GenericNamespace implements INamespace {
 			final Map<String, INamedFunction<StringLangObject>> instanceMethodString,
 			final Map<String, INamedFunction<ArrayLangObject>> instanceMethodArray,
 			final Map<String, INamedFunction<HashLangObject>> instanceMethodHash,
+			final Map<String, INamedFunction<ExceptionLangObject>> instanceMethodException,
 			final Map<String, INamedFunction<BooleanLangObject>> attrAccessorBoolean,
 			final Map<String, INamedFunction<NumberLangObject>> attrAccessorNumber,
 			final Map<String, INamedFunction<StringLangObject>> attrAccessorString,
 			final Map<String, INamedFunction<ArrayLangObject>> attrAccessorArray,
-			final Map<String, INamedFunction<HashLangObject>> attrAccessorHash) {
+			final Map<String, INamedFunction<HashLangObject>> attrAccessorHash,
+			final Map<String, INamedFunction<ExceptionLangObject>> attrAccessorException) {
 		this.globalMethod = globalMethod;
 		this.instanceMethodBoolean = instanceMethodBoolean;
 		this.instanceMethodNumber = instanceMethodNumber;
 		this.instanceMethodString = instanceMethodString;
 		this.instanceMethodArray = instanceMethodArray;
 		this.instanceMethodHash = instanceMethodHash;
+		this.instanceMethodException = instanceMethodException;
 		this.attrAccessorBoolean = attrAccessorBoolean;
 		this.attrAccessorNumber = attrAccessorNumber;
 		this.attrAccessorString = attrAccessorString;
 		this.attrAccessorArray = attrAccessorArray;
 		this.attrAccessorHash = attrAccessorHash;
+		this.attrAccessorException = attrAccessorException;
 	}
 
 	@Override
@@ -263,6 +301,11 @@ public class GenericNamespace implements INamespace {
 	}
 
 	@Override
+	public INamedFunction<ExceptionLangObject> instanceMethodException(final String name) throws EvaluationException {
+		return instanceMethodException.get(name);
+	}
+
+	@Override
 	public INamedFunction<StringLangObject> attrAccessorString(final String name) throws EvaluationException {
 		return attrAccessorString.get(name);
 	}
@@ -285,5 +328,10 @@ public class GenericNamespace implements INamespace {
 	@Override
 	public INamedFunction<BooleanLangObject> attrAccessorBoolean(final String name) throws EvaluationException {
 		return attrAccessorBoolean.get(name);
+	}
+
+	@Override
+	public INamedFunction<ExceptionLangObject> attrAccessorException(final String name) throws EvaluationException {
+		return attrAccessorException.get(name);
 	}
 }

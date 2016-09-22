@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.object;
 
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -9,10 +10,11 @@ import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.NoSuchMethodException;
 
-public abstract class ALangObject {
+public abstract class ALangObject implements Iterable<ALangObject> {
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
 
 	private final Type type;
@@ -25,7 +27,8 @@ public abstract class ALangObject {
 		ARRAY(ArrayLangObject.class),
 		HASH(HashLangObject.class),
 		NULL(NullLangObject.class),
-		BOOLEAN(BooleanLangObject.class);
+		BOOLEAN(BooleanLangObject.class),
+		EXCEPTION(ExceptionLangObject.class);
 
 		public final Class<? extends ALangObject> clazz;
 
@@ -96,6 +99,13 @@ public abstract class ALangObject {
 		throw new CoercionException(this, Type.BOOLEAN, ec);
 	}
 
+	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
+		if (getType() == Type.EXCEPTION)
+			return (ExceptionLangObject) this;
+		throw new CoercionException(this, Type.EXCEPTION, ec);
+	}
+
+
 	/**
 	 * Convenience method when the caller does not need the result of the
 	 * correct class.
@@ -128,6 +138,8 @@ public abstract class ALangObject {
 			return (T)coerceString(ec);
 		case BOOLEAN:
 			return (T)coerceBoolean(ec);
+		case EXCEPTION:
+			return (T)coerceException(ec);
 		default:
 			// Try to coerce object with the special coerce method, when defined.
 			LOG.info("Enum might not be implemented: " + type);
@@ -182,6 +194,12 @@ public abstract class ALangObject {
 	public abstract INamedFunction<? extends ALangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException;
 	public abstract INamedFunction<? extends ALangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException;
 
+	@Override
+	@NotNull
+	public Iterator<ALangObject> iterator() throws EvaluationException {
+		throw new IterationNotSupportedException(this);
+	}
+
 	@NotNull
 	public abstract ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException;
@@ -219,4 +237,5 @@ public abstract class ALangObject {
 	public final Type getType() {
 		return type;
 	}
+
 }

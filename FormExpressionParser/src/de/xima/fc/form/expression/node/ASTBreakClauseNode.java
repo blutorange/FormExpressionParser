@@ -5,10 +5,9 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTWhileLoopNode extends SimpleNode {
-
-	public ASTWhileLoopNode(final int nodeId) {
-		super(nodeId);
+public class ASTBreakClauseNode extends SimpleNode {
+	public ASTBreakClauseNode(final int id) {
+		super(id);
 	}
 
 	@Override
@@ -17,7 +16,12 @@ public class ASTWhileLoopNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method) throws ParseException {
-		assertChildrenExactly(2);
+		assertChildrenExactly(0);
 		siblingMethod = method;
+	}
+
+	@Override
+	public String toString() {
+		return "BreakClauseNode";
 	}
 }
