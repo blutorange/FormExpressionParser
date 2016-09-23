@@ -4,9 +4,11 @@ public interface IEvaluationContext {
 
 	public IBinding getBinding();
 	public INamespace getNamespace();
+	public ILogger getLogger();
+	
 	public void setBinding(IBinding binding);
 	public int getRecursionLimit();
-
+	
 	/**
 	 * Must be an equivalence relation.
 	 * @param name1

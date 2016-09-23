@@ -1,6 +1,7 @@
 PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.node.*;
 
 /** Formcycle expression language.
@@ -844,6 +845,37 @@ void Boolean(EMethod method) #BooleanNode :
   }
 }
 
+void Log(EMethod method) #LogNode :
+{
+  ELogLevel logLevel;
+}
+{
+  (
+    (
+      "\u00a7loginfo"
+      {
+        logLevel = ELogLevel.INFO;
+      }
+    | "\u00a7logerror"
+      {
+        logLevel = ELogLevel.ERROR;
+      }
+    | "\u00a7logdebug"
+      {
+        logLevel = ELogLevel.DEBUG;
+      }
+    | "\u00a7logwarn"
+      {
+        logLevel = ELogLevel.WARN;
+      }
+    )
+    "(" Expression(null) ")"
+  )
+  {
+    jjtThis.init(method, logLevel);
+  }
+}
+
 void Exception(EMethod method) #ExceptionNode :
 {
 }
@@ -865,6 +897,7 @@ void Literal(EMethod method) #void :
 | Number(method)
 | Boolean(method)
 | Null(method)
+| Log(method)
 | Exception(method)
 }
 

@@ -1,15 +1,12 @@
 package de.xima.fc.form.expression.node;
 
-import java.math.BigDecimal;
-
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTNumberNode extends SimpleNode {
-	private BigDecimal bigDecimalValue;
+	private double doubleValue;
 
 	public ASTNumberNode(final int id) {
 		super(id);
@@ -21,10 +18,10 @@ public class ASTNumberNode extends SimpleNode {
 	 */
 	public void init(final EMethod method, final String string, final boolean isInt) throws ParseException {
 		try {
-			bigDecimalValue = new BigDecimal(string, NumberLangObject.MATH_CONTEXT);
+			doubleValue = Double.parseDouble(string);
 		}
 		catch (final NumberFormatException e) {
-			throw new ParseException("not a number: " + string);
+			throw new ParseException("Number not representable by a float: " + string);
 		}
 		siblingMethod = method;
 	}
@@ -36,11 +33,11 @@ public class ASTNumberNode extends SimpleNode {
 
 	@Override
 	public String toString() {
-		return "NumberNode(" + siblingMethod + "," + bigDecimalValue.toPlainString() + ")";
+		return "NumberNode(" + siblingMethod + "," + doubleValue + ")";
 	}
 
-	public BigDecimal getBigDecimalValue() {
-		return bigDecimalValue;
+	public double getDoubleValue() {
+		return doubleValue;
 	}
 
 }

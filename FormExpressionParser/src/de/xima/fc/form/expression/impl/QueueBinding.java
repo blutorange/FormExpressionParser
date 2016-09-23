@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -16,8 +17,12 @@ import de.xima.fc.form.expression.object.NullLangObject;
  * list only when necessary. May not perform well when most variables are set in
  * each scope. May perform well when there are many changes in scope and only a
  * few different variables are set.
- *
+ * <br><br>
+ * {@link LookUpBinding} should almost always perform better. This class created a Map<List<>>, LookupBinding creates List<Map<>>. 
+ * 
  * @author madgaksha
+ * 
+ * @see LookUpBinding
  */
 public class QueueBinding implements IBinding {
 
@@ -83,6 +88,7 @@ public class QueueBinding implements IBinding {
 
 	@Override
 	public final IBinding unnest() {
+		for (Entry<String, List<ALangObject>> entry : map.entrySet()) entry.getValue().set(level, null);
 		--level;
 		return this;
 	}

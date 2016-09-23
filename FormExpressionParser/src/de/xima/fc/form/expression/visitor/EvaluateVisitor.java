@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
@@ -26,6 +27,7 @@ import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
+import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
@@ -157,7 +159,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTNumberNode node, final IEvaluationContext ec) throws EvaluationException {
-		return NumberLangObject.create(node.getBigDecimalValue());
+		return NumberLangObject.create(node.getDoubleValue());
 	}
 
 	@Override
@@ -433,5 +435,31 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		jumpType = EJump.RETURN;
 		mustJump = true;
 		return NullLangObject.getInstance();
+	}
+
+	@Override
+	public ALangObject visit(ASTLogNode node, IEvaluationContext ec) throws EvaluationException {
+		// Child must be an expression and cannot contain any break, continue, or return clause.
+		final StringLangObject message = node.jjtGetChild(0).jjtAccept(this, ec).coerceString(ec);
+		final ILogger logger = ec.getLogger();
+		switch (node.getLogLevel()) {
+		case DEBUG:
+			logger.debug(message.stringValue());
+			break;
+		case ERROR:
+			logger.error(message.stringValue());
+			break;
+		case INFO:
+			logger.info(message.stringValue());
+			break;
+		case WARN:
+			logger.warn(message.stringValue());
+			break;
+		default:
+			throw new UncatchableEvaluationException(ec,
+					String.format("No such log level %s. This is most likely a bug with the parser. Contact support.",
+							node.getLogLevel()));		
+		}
+		return message;
 	}
 }

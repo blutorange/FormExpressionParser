@@ -7,6 +7,15 @@ import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.object.ALangObject;
 
+/**
+ * Same as {@link LookUpBinding}, but creates maps only when it reaches that
+ * nesting level.
+ * 
+ * @see LookUpBinding
+ * 
+ * @author madgaksha
+ *
+ */
 public class OnDemandLookUpBinding extends LookUpBinding {
 
 	/** Subject to change. Do not rely on this being set to a certain value. */
@@ -16,11 +25,15 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 		this(DEFAULT_NESTING_DEPTH);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public OnDemandLookUpBinding(int nestingDepth) {
+		this(nestingDepth, new HashMap<String, ALangObject>());
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected OnDemandLookUpBinding(int nestingDepth, Map<String, ALangObject> globalVariables) {
 		if (nestingDepth < 1) nestingDepth = 1;
 		mapArray = new Map[nestingDepth];
-		mapArray[0] = new HashMap<String, ALangObject>();
+		mapArray[0] = globalVariables;
 		currentDepth = 0;
 	}
 	
@@ -29,6 +42,7 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth, this);
 		++currentDepth;
 		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<String, ALangObject>();
+		else mapArray[currentDepth].clear();
 		return this;
 	}	
 }

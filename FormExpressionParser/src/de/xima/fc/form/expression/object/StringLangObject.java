@@ -35,7 +35,7 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public ALangObject shallowClone() {
-		return new StringLangObject(value);
+		return this;
 	}
 
 	@Override
@@ -91,12 +91,7 @@ public class StringLangObject extends ALangObject {
 	// Coercion
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
-		try {
-			return NumberLangObject.create(new BigDecimal(value, NumberLangObject.MATH_CONTEXT));
-		}
-		catch (final NumberFormatException e) {
-			return NumberLangObject.create(0);
-		}
+		return NumberLangObject.create(value);
 	}
 
 	@Override
@@ -156,6 +151,14 @@ public class StringLangObject extends ALangObject {
 
 	public static StringLangObject create(final BigDecimal value) {
 		return StringLangObject.create(value.toPlainString());
+	}
+	
+	public static StringLangObject create(final float value) {
+		return StringLangObject.create(String.valueOf(value));
+	}
+	
+	public static StringLangObject create(final double value) {
+		return StringLangObject.create(String.valueOf(value));
 	}
 
 	public static StringLangObject create(final boolean value) {

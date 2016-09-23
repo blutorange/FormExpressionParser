@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
-import de.xima.fc.form.expression.impl.CloneBinding;
+import de.xima.fc.form.expression.impl.LookUpBinding;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
-public final class FormFieldEvaluationBinding extends CloneBinding {
+public final class FormFieldEvaluationBinding extends LookUpBinding {
 	private static final Map<String, String> nameMap = new HashMap<>();
 	private static final Map<String, String> aliasMap = new HashMap<>();
 

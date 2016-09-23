@@ -22,6 +22,7 @@ import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
+import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
@@ -241,6 +242,10 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	}
 	@Override
 	public Void visit(ASTReturnClauseNode node, String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(ASTLogNode node, String data) throws EvaluationException {
 		return dump(node, data);
 	}
 }
