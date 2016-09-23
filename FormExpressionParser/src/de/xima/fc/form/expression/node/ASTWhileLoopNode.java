@@ -7,6 +7,8 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTWhileLoopNode extends SimpleNode {
 
+	private String label;
+	
 	public ASTWhileLoopNode(final int nodeId) {
 		super(nodeId);
 	}
@@ -19,5 +21,9 @@ public class ASTWhileLoopNode extends SimpleNode {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenExactly(2);
 		siblingMethod = method;
+	}
+	
+	public String getLabel() {
+		return label;
 	}
 }

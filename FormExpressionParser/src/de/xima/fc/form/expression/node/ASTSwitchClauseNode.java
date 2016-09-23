@@ -19,5 +19,5 @@ public class ASTSwitchClauseNode extends SimpleNode {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(1);
 		siblingMethod = method;
-	}
+	}	
 }
