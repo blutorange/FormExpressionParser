@@ -3,7 +3,7 @@ package de.xima.fc.form.expression;
 // TODO List
 // - nesting, for, while, scope
 // - +=, -=, = etc. ( a += b ==> a = a+b)
-// - throw §EXCEPTION('kl'), break, continue
+// - §LOG_INFO('asd',...), $LOG_ERROR, $LOG_DEBUG, $LOG_TRACE, $LOG_WARN
 // - LookUpBinding (look up in parent when not found)
 // - Functions as LangObjects, print('me') is evaluated as print -> function(){} -> functionCall
 // - unparse, variableScopeChecker
