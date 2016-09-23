@@ -241,14 +241,20 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		nest(ec);
-		try {
-			do
+		do
+			try {
 				res = children[1].jjtAccept(this, ec);
-			while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue());
-		}
-		finally {
-			unnest(ec);
-		}
+			}
+			catch (BreakClauseException breakException) {
+				if (breakException.label != null && breakException.label.equals(node.getLabel()))
+					// Pass exception to some parent loop/switch.
+					throw breakException;
+				break;
+			}
+			catch (ContinueClauseException continueException) {
+				// continue
+			}
+		while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue());
 		return res;
 	}
 
