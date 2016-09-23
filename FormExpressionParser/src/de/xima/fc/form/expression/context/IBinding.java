@@ -6,6 +6,14 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.IReset;
 
 public interface IBinding extends IReset {
+	
+	/**
+	 * Resets this binding all children, if any, created by nest.
+	 * Must not reset any parents that created this binding.
+	 */
+	@Override
+	public void reset();
+	
 	/**
 	 * Must return the same object every time it is called with equivalent
 	 * variable name, unless the value of the variable was changed with
