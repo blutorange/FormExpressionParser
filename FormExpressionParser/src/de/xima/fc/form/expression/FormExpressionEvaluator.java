@@ -24,8 +24,12 @@ package de.xima.fc.form.expression;
 // </ul>
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -57,7 +61,18 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 public class FormExpressionEvaluator {
 	public static void main(final String args[]) {
 
-		final String string = "for (i = 3; §true ; ++i) i.print();";
+		if (args.length != 1) {
+			System.err.println("Specify input file");
+			return;
+		}
+		final String string;
+		try (InputStream is = new FileInputStream(args[0])) {
+			string = IOUtils.toString(is);
+		}
+		catch (final IOException e) {
+			e.printStackTrace();
+			return;
+		}
 
 		System.out.println("Input string\n" + string);
 
