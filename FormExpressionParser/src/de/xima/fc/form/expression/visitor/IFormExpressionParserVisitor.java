@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
+import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -48,4 +49,5 @@ public interface IFormExpressionParserVisitor<R,T>
 	public R visit(ASTThrowClauseNode node, T data) throws EvaluationException;
 	public R visit(ASTBreakClauseNode node, T data) throws EvaluationException;
 	public R visit(ASTContinueClauseNode node, T data) throws EvaluationException;
+	public R visit(ASTReturnClauseNode node, T data) throws EvaluationException;
 }

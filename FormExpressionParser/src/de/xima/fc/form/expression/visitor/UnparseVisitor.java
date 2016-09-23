@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
+import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -164,6 +165,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void
 
 	@Override
 	public String visit(final ASTContinueClauseNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(ASTReturnClauseNode node, Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

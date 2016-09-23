@@ -18,6 +18,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
+import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -25,7 +26,7 @@ import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
-public class VariableScopeCheckerVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext>{
+public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext>{
 
 	@Override
 	public Void visit(ASTExpressionNode node, IEvaluationContext data) throws EvaluationException {
@@ -155,6 +156,12 @@ public class VariableScopeCheckerVisitor implements IFormExpressionParserVisitor
 
 	@Override
 	public Void visit(ASTContinueClauseNode node, IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visit(ASTReturnClauseNode node, IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
