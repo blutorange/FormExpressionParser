@@ -6,6 +6,8 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTContinueClauseNode extends SimpleNode {
+	private String label;
+
 	public ASTContinueClauseNode(final int id) {
 		super(id);
 	}
@@ -15,13 +17,18 @@ public class ASTContinueClauseNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final EMethod method) throws ParseException {
+	public void init(final EMethod method, final String label) throws ParseException {
 		assertChildrenExactly(0);
 		siblingMethod = method;
+		this.label = label;
 	}
 
 	@Override
 	public String toString() {
 		return "ContinueClauseNode";
+	}
+	
+	public String getLabel() {
+		return label;
 	}
 }

@@ -38,7 +38,7 @@ public class QueueBinding implements IBinding {
 	@Override
 	public final ALangObject getVariable(final String name) throws EvaluationException {
 		final List<ALangObject> list = map.get(name);
-		if (list == null)
+		if (list == null || list.isEmpty())
 			return getDefaultValue(name);
 		return list.get(list.size() - 1);
 	}

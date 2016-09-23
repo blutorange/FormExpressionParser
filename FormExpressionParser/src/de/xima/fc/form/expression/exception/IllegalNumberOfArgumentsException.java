@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 
-public class IllegalNumberOfArgumentsException extends EvaluationException {
+public class IllegalNumberOfArgumentsException extends CatchableEvaluationException {
 	public final int isCount, expectedCountMin, expectedCountMax;
 	public final String functionName;
 

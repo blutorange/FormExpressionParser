@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * operator, but not with a certain operand.
  *
  */
-public class IllegalArgumentValueException extends EvaluationException {
+public class IllegalArgumentValueException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 

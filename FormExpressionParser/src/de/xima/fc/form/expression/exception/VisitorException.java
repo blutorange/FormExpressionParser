@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class VisitorException extends EvaluationException {
+public class VisitorException extends UncatchableEvaluationException {
 
 	public VisitorException(final IFormExpressionParserVisitor<?,?> visitor, final Object object, final Object data, final Throwable throwable) {
 		super(String.format("Visitor %s could not visit object %s with data %s.", visitor, object, data), throwable);

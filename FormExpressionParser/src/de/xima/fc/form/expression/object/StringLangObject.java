@@ -123,6 +123,10 @@ public class StringLangObject extends ALangObject {
 				++i;
 				return res;
 			}
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException("Removal not supported for StringLangObject::iterator.");
+			}
 		};
 	}
 

@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * long as you retain the public fields.
  */
 @SuppressWarnings("all")
-public class NoSuchFunctionException extends EvaluationException {
+public class NoSuchFunctionException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 

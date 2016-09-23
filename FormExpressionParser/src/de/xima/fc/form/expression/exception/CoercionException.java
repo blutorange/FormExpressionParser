@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * and the object cannot be coerced to that type.
  *
  */
-public class CoercionException extends EvaluationException {
+public class CoercionException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 

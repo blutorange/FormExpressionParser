@@ -3,11 +3,9 @@
 package de.xima.fc.form.expression.exception;
 
 /**
- * This exception is thrown when an object is coerced to another type
- * and the object cannot be coerced to that type.
- *
+ * This exception is thrown by a throw block .
  */
-public class CustomRuntimeException extends EvaluationException {
+public class CustomRuntimeException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 

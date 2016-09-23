@@ -57,24 +57,26 @@ void Clause(EMethod method) #void :
 
 void ContinueClause(EMethod method) #ContinueClauseNode :
 {
+    Token t = null;
 }
 {
   (
-    "continue" ";"
+    "continue" [ t = < IDENTIFIER > ]";"
   )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, t == null ? null : t.image);
   }
 }
 
 void BreakClause(EMethod method) #BreakClauseNode :
 {
+  Token t = null;
 }
 {
   (
-    "break" ";"  )
+    "break" [ t = < IDENTIFIER > ]";"  )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, t == null ? null : t.image);
   }
 }
 

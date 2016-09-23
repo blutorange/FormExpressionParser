@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.exception;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 
-public class IllegalArgumentTypeException extends EvaluationException {
+public class IllegalArgumentTypeException extends CatchableEvaluationException {
 	public final Class<? extends ALangObject> isClass, expectedClass;
 	public final String functionName;
 	public int argumentIndex;

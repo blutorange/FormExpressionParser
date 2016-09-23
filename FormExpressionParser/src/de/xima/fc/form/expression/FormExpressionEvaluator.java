@@ -6,6 +6,7 @@ package de.xima.fc.form.expression;
 // - throw §EXCEPTION('kl'), break, continue
 // - unparse
 // - EmbeddedBlocks
+// - stack for evaluatorVisitor instead of recursion
 
 /**
  * Das ist ein Test [%tfVorname + §_ + tfNachname%]

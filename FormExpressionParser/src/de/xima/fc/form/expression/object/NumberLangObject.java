@@ -203,6 +203,10 @@ public class NumberLangObject extends ALangObject {
 				i = i.add(BigDecimal.ONE);
 				return res;
 			}
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException("Removal not supported for NumberLangObject::iterator.");
+			}			
 		};
 	}
 
