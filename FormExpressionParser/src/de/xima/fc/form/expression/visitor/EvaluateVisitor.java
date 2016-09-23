@@ -204,31 +204,66 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		nest(ec);
-		if (variableName == null) {
-			// Plain for loop
-			children[0].jjtAccept(this, ec);
-			while (children[1].jjtAccept(this, ec).coerceBoolean(ec).booleanValue()) {
-				res = children[3].jjtAccept(this, ec);
-				children[2].jjtAccept(this, ec);
-			}
-		} else
-			// Iterating for loop
-			for (final ALangObject value : children[0].jjtAccept(this, ec)) {
-				ec.getBinding().setVariable(variableName, value);
-				children[1].jjtAccept(this, ec);
-			}
-		unnest(ec);
+		try {
+			if (variableName == null) {
+				// Plain for loop
+				children[0].jjtAccept(this, ec);
+				while (children[1].jjtAccept(this, ec).coerceBoolean(ec).booleanValue()) {
+					try {
+						res = children[3].jjtAccept(this, ec);
+						children[2].jjtAccept(this, ec);
+					}
+					catch (ContinueClauseException continueException){
+						if (continueException.label != null && !continueException.label.equals(node.getLabel()))
+							// Pass on continue to some parent loop/switch.
+							throw continueException;
+					}
+				}
+			} else
+				// Iterating for loop
+				for (final ALangObject value : children[0].jjtAccept(this, ec)) {
+					ec.getBinding().setVariable(variableName, value);
+					try {
+						children[1].jjtAccept(this, ec);
+					}
+					catch (ContinueClauseException continueException) {
+						if (continueException.label != null && !continueException.label.equals(node.getLabel()))
+							// Pass on continue to some parent loop/switch.
+							throw continueException;
+					}
+				}
+		}
+		catch (BreakClauseException breakException) {
+			if (breakException.label != null && !breakException.label.equals(node.getLabel()))
+				// Pass on break to some parent loop/switch.
+				throw breakException;
+		}		
+		finally {
+			unnest(ec);
+		}
 		return res;
 	}
 
 	@Override
-	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
+	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {		
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		nest(ec);
 		try {
 			while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue())
-			res = children[1].jjtAccept(this, ec);
+			try {
+				res = children[1].jjtAccept(this, ec);
+			}
+			catch (final ContinueClauseException continueException) {
+				if (continueException.label != null && !continueException.label.equals(node.getLabel()))
+					// Pass on continue to some parent loop/switch.
+					throw continueException;
+			}
+		}
+		catch (final BreakClauseException breakException) {
+			if (breakException.label != null && !breakException.label.equals(node.getLabel()))
+				// Pass on continue to some parent loop/switch.
+				throw breakException;
 		}
 		finally {
 			unnest(ec);
@@ -241,20 +276,26 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		nest(ec);
-		do
-			try {
-				res = children[1].jjtAccept(this, ec);
-			}
-			catch (BreakClauseException breakException) {
-				if (breakException.label != null && breakException.label.equals(node.getLabel()))
-					// Pass exception to some parent loop/switch.
-					throw breakException;
-				break;
-			}
-			catch (ContinueClauseException continueException) {
-				// continue
-			}
-		while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue());
+		try {
+			do
+				try {
+					res = children[1].jjtAccept(this, ec);
+				}
+				catch (ContinueClauseException continueException) {
+					if (continueException.label != null && !continueException.label.equals(node.getLabel()))
+						// Pass on continue to some parent loop/switch.
+						throw continueException;
+				}
+			while (children[0].jjtAccept(this, ec).coerceBoolean(ec).booleanValue());
+		}
+		catch (BreakClauseException breakException) {
+			if (breakException.label != null && breakException.label.equals(node.getLabel()))
+				// Pass on break to some parent loop/switch.
+				throw breakException;
+		}
+		finally {
+			unnest(ec);
+		}
 		return res;
 	}
 
@@ -292,13 +333,21 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 						matchingCase = true;
 					break;
 				case SWITCHCLAUSE:
-					if (matchingCase) res = children[i].jjtAccept(this, ec);
+					if (matchingCase) {
+						final ALangObject tmp = children[i].jjtAccept(this, ec);
+						res = tmp;
+					}
 					break;
 				case SWITCHDEFAULT:
 					res = children[i].jjtAccept(this, ec);
 				default:
 					throw new UncatchableEvaluationException(ec, "Invalid switch syntax.");
 				}
+		}
+		catch (final BreakClauseException breakException) {
+			if (breakException.label != null)
+				// Pass on break to some parent loop/switch
+				throw breakException;
 		}
 		finally {
 			unnest(ec);
