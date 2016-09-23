@@ -327,20 +327,33 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTTryClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
+		ALangObject res = NullLangObject.getInstance();
+		CatchableEvaluationException exception = null;
 		nest(ec);
 		try {
 			// Try branch, no explicit check for mustJump as it returns immediately anyway
-			return children[0].jjtAccept(this, ec);
+			res = children[0].jjtAccept(this, ec);
 		}
 		catch (final CatchableEvaluationException e) {
-			final ALangObject exception = ExceptionLangObject.create(e);
-			ec.getBinding().setVariable(node.getErrorVariableName(), exception);
-			// Catch branch, no explicit check for mustJump as it returns immediately anyway
-			return children[1].jjtAccept(this, ec);
+			exception = e;
 		}
 		finally {
 			unnest(ec);
 		}
+		// If mustJump is true, break/continue/return was the last statement
+		// evaluated and no exception could have been thrown.
+		if (exception != null) {
+			try {
+				final ALangObject e = ExceptionLangObject.create(exception);
+				ec.getBinding().setVariable(node.getErrorVariableName(), e);
+				// Catch branch, no explicit check for mustJump as it returns immediately anyway
+				res = children[1].jjtAccept(this, ec);
+			}
+			finally {
+				unnest(ec);
+			}
+		}
+		return res;
 	}
 
 	@SuppressWarnings("incomplete-switch")
