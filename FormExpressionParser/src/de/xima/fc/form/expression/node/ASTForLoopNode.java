@@ -9,6 +9,8 @@ public class ASTForLoopNode extends SimpleNode {
 
 	private String iteratingLoopVariable;
 
+	private String label;
+	
 	public ASTForLoopNode(final int nodeId) {
 		super(nodeId);
 		// TODO Auto-generated constructor stub
@@ -33,6 +35,10 @@ public class ASTForLoopNode extends SimpleNode {
 	public String toString() {
 		if (iteratingLoopVariable != null) return "ForIteratingLoopNode(" + iteratingLoopVariable + ")";
 		return "ForPlainLoopNode";
+	}
+	
+	public String getLabel() {
+		return label;
 	}
 
 }

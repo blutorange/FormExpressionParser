@@ -5,10 +5,10 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTSwitchClauseNode extends SimpleNode {
+public class ASTReturnClauseNode extends SimpleNode {
 
-	public ASTSwitchClauseNode(final int nodeId) {
-		super(nodeId);
+	public ASTReturnClauseNode(final int id) {
+		super(id);
 	}
 
 	@Override
@@ -17,7 +17,12 @@ public class ASTSwitchClauseNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method) throws ParseException {
-		assertChildrenAtLeast(1);
+		assertChildrenExactly(0);
 		siblingMethod = method;
+	}
+
+	@Override
+	public String toString() {
+		return "ReturnClauseNode";
 	}	
 }

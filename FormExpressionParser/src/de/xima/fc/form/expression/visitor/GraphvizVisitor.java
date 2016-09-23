@@ -28,6 +28,7 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesesFunction;
 import de.xima.fc.form.expression.node.ASTPlainFunction;
+import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -309,6 +310,11 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 
 	@Override
 	public Void visit(final ASTContinueClauseNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(ASTReturnClauseNode node, Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 }
