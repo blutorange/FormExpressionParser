@@ -115,7 +115,15 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				break;
 			case INSTANCE_METHOD:
 				final ALangObject[] eval = getEvaluatedArgsArray(sibling.getChildArray(), ec);
-				res = res.evaluateInstanceMethod(sibling.getMethodName(), ec, eval);
+				final ALangObject tmp;
+				nest(ec);
+				try {
+					tmp = res.evaluateInstanceMethod(sibling.getMethodName(), ec, eval);
+				}
+				finally {
+					unnest(ec);
+				}
+				res = tmp;
 				break;
 			default:
 				throw new EvaluationException(ec, "TODO: Add enum case to EvaluationVisitor, ASTDotExpressionNode.");
