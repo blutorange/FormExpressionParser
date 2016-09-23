@@ -8,6 +8,7 @@ package de.xima.fc.form.expression;
 // - Functions as LangObjects, print('me') is evaluated as print -> function(){} -> functionCall
 // - unparse, variableScopeChecker
 // - EmbeddedBlocks
+// - Nesting: Each if, else-if, else, try-catch etc separate scope? Instance method needs new scope.
 
 
 /**
