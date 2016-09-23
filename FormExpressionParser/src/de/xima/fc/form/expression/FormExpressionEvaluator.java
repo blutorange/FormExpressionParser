@@ -4,9 +4,11 @@ package de.xima.fc.form.expression;
 // - nesting, for, while, scope
 // - +=, -=, = etc. ( a += b ==> a = a+b)
 // - throw §EXCEPTION('kl'), break, continue
-// - unparse
+// - LookUpBinding (look up in parent when not found)
+// - Functions as LangObjects, print('me') is evaluated as print -> function(){} -> functionCall
+// - unparse, variableScopeChecker
 // - EmbeddedBlocks
-// - stack for evaluatorVisitor instead of recursion
+
 
 /**
  * Das ist ein Test [%tfVorname + §_ + tfNachname%]
