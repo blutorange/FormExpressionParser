@@ -542,21 +542,19 @@ void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
   //  EMethod nextMethod = createNode? null : method;
 }
 {
-  UnaryExpression(method)
+  DoubleStarExpression(method)
   (
     (
-      DoubleStarExpression(null)
-    |
       (
-        "*" UnaryExpression(EMethod.STAR)
+        "*" DoubleStarExpression(EMethod.STAR)
       )
     |
       (
-        "/" UnaryExpression(EMethod.SLASH)
+        "/" DoubleStarExpression(EMethod.SLASH)
       )
     |
       (
-        "%" UnaryExpression(EMethod.PERCENT)
+        "%" DoubleStarExpression(EMethod.PERCENT)
       )
     )*
   )
@@ -565,7 +563,23 @@ void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
   }
 }
 
-void UnaryExpression(EMethod method) #ExpressionNode(unaryMethod != null) :
+void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
+{
+  boolean createNode;
+}
+{
+  (
+    UnaryExpression(method)
+    [
+      "**" DoubleStarExpression(EMethod.DOUBLE_STAR)
+    ]
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
 {
   EMethod unaryMethod = null;
 }
@@ -605,29 +619,11 @@ void UnaryExpression(EMethod method) #ExpressionNode(unaryMethod != null) :
         unaryMethod = EMethod.EXCLAMATION;
       }
     )
-  | DoubleStarExpression(method)
+  |
+    DotExpression(method)
   )
   {
     if (unaryMethod != null) jjtThis.init(method, unaryMethod);
-  }
-}
-
-void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() >
-1) :
-{
-  boolean createNode;
-}
-{
-  (
-    DotExpression(method)
-    (
-      [
-        "**" UnaryExpression(EMethod.DOUBLE_STAR)
-      ]
-    )
-  )
-  {
-    if (createNode) jjtThis.init(method);
   }
 }
 
@@ -639,7 +635,7 @@ void DotExpression(EMethod method) #DotExpressionNode(createNode = jjtree.nodeAr
   (
     FunctionTypeUnaryExpression(method)
     (
-      "." FunctionCall(null)
+      "." VariableWithOptionalCallUnaryExpression(null)
     )*
   )
   {
@@ -647,54 +643,52 @@ void DotExpression(EMethod method) #DotExpressionNode(createNode = jjtree.nodeAr
   }
 }
 
-void FunctionTypeUnaryExpression(EMethod method) #void :
+void VariableWithOptionalCallUnaryExpression(EMethod method) #CallNode(createNode = jjtree.nodeArity() > 1) :
 {
+  boolean createNode;
 }
 {
   (
-    Literal(method)
-  |
-    (
-      FunctionCall(method)
-    )
-  |
-    (
-      "(" Expression(method) ")"
-    )
-  )
-}
-
-void FunctionCall(EMethod method) #void :
-{
-}
-{
-  (
-    LOOKAHEAD(< IDENTIFIER > "(")
-    ParenthesesFunction(method)
-  | 
-    PlainFunction(method)
-  )
-}
-
-void ParenthesesFunction(EMethod method) #ParenthesesFunction :
-{
-  Token t;
-}
-{
-  (
-    t = < IDENTIFIER > "(" FunctionArgumentList(null) ")"
+    Variable(method)
+    [ "(" FunctionArgumentList(null) ")" ]
   )
   {
-    jjtThis.init(method, t.image);
+    if (createNode) jjtThis.init(method);
   }
 }
 
-void PlainFunction(EMethod method) #PlainFunction :
+void FunctionTypeUnaryExpression(EMethod method) #CallNode(createNode = jjtree.nodeArity() > 1) :
+{
+  boolean createNode;
+}
+{
+  (
+    (
+      Literal(method)
+    | 
+      Variable(method)
+    |
+      (
+        "(" Expression(method) ")"
+      )
+    )
+    (
+       "(" FunctionArgumentList(null) ")" 
+    )*
+  )
+  {
+    if (createNode) jjtThis.init(method);
+  }
+}
+
+void Variable(EMethod method) #VariableNode :
 {
   Token t;
 }
 {
-  t = < IDENTIFIER >
+  (
+    t = < IDENTIFIER >
+  )
   {
     jjtThis.init(method, t.image);
   }
@@ -809,9 +803,6 @@ void HashEntry(EMethod method) #void :
   Literal(null) ":" Expression(null)
 }
 
-/**
- * Literal for the null object.
- */
 void Null(EMethod method) #NullNode :
 {
 }
@@ -881,6 +872,18 @@ void Exception(EMethod method) #ExceptionNode :
 }
 {
   (    "\u00a7exception" "(" Expression(null) ")"
+  )
+  {
+    jjtThis.init(method);
+  }
+}
+
+void Function(EMethod method) #FunctionNode :
+{
+}
+{
+  (
+    "->" "(" FunctionArgumentList(null) ")" BlockOrClause(null)
   )
   {
     jjtThis.init(method);

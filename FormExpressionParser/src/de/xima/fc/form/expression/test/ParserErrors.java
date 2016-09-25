@@ -55,7 +55,13 @@ public class ParserErrors {
 				"switch(getEnum()) { default: a.b;}",
 				"switch(getEnum()) { case 1: shout(); loud(); case 2: cry(); case 3: ;}",
 				"switch(getEnum()) { case 1: shout(); case 2: cry(); default: beHappy();}",
-				"if(a) { if (b) { do(); } }"
+				"if(a) { if (b) { do(); } }",
+				"a()(++i);",
+				"a.b().c();",
+				"3**4**5;",
+				"a.b().c.d(foo,bar).e;",
+				"getFunction()(foo);",
+				"(a+b)(foo);"
 		};
 	}
 
@@ -64,7 +70,8 @@ public class ParserErrors {
 				"if (i==0) { alert() }",
 				"if(a) a; else b; else if(c) c;",
 				"if(a) a; else if (c) c; else b; else c;",
-				"try { 1/0; } catch (e) { log(me) };"
+				"try { 1/0; } catch (e) { log(me) };",
+				"a()9;"
 		};
 	}
 

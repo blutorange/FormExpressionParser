@@ -20,19 +20,20 @@ import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
-import de.xima.fc.form.expression.node.ASTParenthesesFunction;
-import de.xima.fc.form.expression.node.ASTPlainFunction;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
+import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
 public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
@@ -153,11 +154,6 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	}
 
 	@Override
-	public Void visit(final ASTParenthesesFunction node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
 	public Void visit(final ASTNumberNode node, final String data) throws EvaluationException {
 		return dump(node, data);
 	}
@@ -188,7 +184,7 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	}
 
 	@Override
-	public Void visit(final ASTPlainFunction node, final String data) throws EvaluationException {
+	public Void visit(final ASTVariableNode node, final String data) throws EvaluationException {
 		return dump(node, data);
 	}
 
@@ -246,6 +242,14 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	}
 	@Override
 	public Void visit(ASTLogNode node, String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(ASTFunctionNode node, String data) throws EvaluationException {
+		return dump(node, data);
+	}
+	@Override
+	public Void visit(ASTUnaryExpressionNode node, String data) throws EvaluationException {
 		return dump(node, data);
 	}
 }

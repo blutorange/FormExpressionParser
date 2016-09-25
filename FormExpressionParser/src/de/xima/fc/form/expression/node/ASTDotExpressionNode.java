@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public final class ASTDotExpressionNode extends ASTExpressionNode {
-	private AFunctionCallNode[] functionArray;
+	private ASTVariableNode[] functionArray;
 
 	public ASTDotExpressionNode(final int id) {
 		super(id);
@@ -18,7 +18,7 @@ public final class ASTDotExpressionNode extends ASTExpressionNode {
 		return children[0];
 	}
 
-	public AFunctionCallNode[] getFunctionArray() {
+	public ASTVariableNode[] getFunctionArray() {
 		return functionArray;
 	}
 
@@ -26,7 +26,7 @@ public final class ASTDotExpressionNode extends ASTExpressionNode {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(1);
 		siblingMethod = method;
-		functionArray = getChildArrayAs(AFunctionCallNode.class, 1);
+		functionArray = getChildArrayAs(ASTVariableNode.class, 1);
 	}
 
 	@Override

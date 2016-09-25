@@ -5,25 +5,27 @@ import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
+import de.xima.fc.form.expression.node.ASTCallNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
-import de.xima.fc.form.expression.node.ASTParenthesesFunction;
-import de.xima.fc.form.expression.node.ASTPlainFunction;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
+import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
 public interface IFormExpressionParserVisitor<R,T>
@@ -31,13 +33,12 @@ public interface IFormExpressionParserVisitor<R,T>
 	public R visit(ASTExpressionNode node, T data) throws EvaluationException;
 	public R visit(ASTAssignmentExpressionNode node, T data) throws EvaluationException;
 	public R visit(ASTDotExpressionNode node, T data) throws EvaluationException;
-	public R visit(ASTParenthesesFunction node, T data) throws EvaluationException;
 	public R visit(ASTNumberNode node, T data) throws EvaluationException;
 	public R visit(ASTArrayNode node, T data) throws EvaluationException;
 	public R visit(ASTHashNode node, T data) throws EvaluationException;
 	public R visit(ASTNullNode node, T data) throws EvaluationException;
 	public R visit(ASTBooleanNode node, T data) throws EvaluationException;
-	public R visit(ASTPlainFunction node, T data) throws EvaluationException;
+	public R visit(ASTVariableNode node, T data) throws EvaluationException;
 	public R visit(ASTStringNode node, T data) throws EvaluationException;
 	public R visit(ASTStatementListNode node, T data) throws EvaluationException;
 	public R visit(ASTIfClauseNode node, T data) throws EvaluationException;
@@ -52,4 +53,7 @@ public interface IFormExpressionParserVisitor<R,T>
 	public R visit(ASTContinueClauseNode node, T data) throws EvaluationException;
 	public R visit(ASTReturnClauseNode node, T data) throws EvaluationException;
 	public R visit(ASTLogNode node, T data) throws EvaluationException;
+	public R visit(ASTFunctionNode node, T data) throws EvaluationException;
+	public R visit(ASTUnaryExpressionNode node, T data) throws EvaluationException;
+	public R visit(ASTCallNode node, T data) throws EvaluationException;
 }

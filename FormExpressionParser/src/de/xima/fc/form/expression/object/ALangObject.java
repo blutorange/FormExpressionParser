@@ -28,6 +28,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		HASH(HashLangObject.class),
 		NULL(NullLangObject.class),
 		BOOLEAN(BooleanLangObject.class),
+		FUNCTION(FunctionLangObject.class),
 		EXCEPTION(ExceptionLangObject.class);
 
 		public final Class<? extends ALangObject> clazz;
@@ -104,6 +105,12 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			return (ExceptionLangObject) this;
 		throw new CoercionException(this, Type.EXCEPTION, ec);
 	}
+	
+	public FunctionLangObject coerceFunction(final IEvaluationContext ec) throws CoercionException {
+		if (getType() == Type.FUNCTION)
+			return (FunctionLangObject) this;
+		throw new CoercionException(this, Type.FUNCTION, ec);
+	}
 
 
 	/**
@@ -140,6 +147,8 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			return (T)coerceBoolean(ec);
 		case EXCEPTION:
 			return (T)coerceException(ec);
+		case FUNCTION:
+			return (T)coerceFunction(ec);
 		default:
 			// Try to coerce object with the special coerce method, when defined.
 			LOG.info("Enum might not be implemented: " + type);

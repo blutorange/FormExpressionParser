@@ -4,6 +4,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
+import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -18,6 +19,7 @@ public interface INamespace {
 	public INamedFunction<HashLangObject> instanceMethodHash(String name) throws EvaluationException;
 	public INamedFunction<BooleanLangObject> instanceMethodBoolean(String name) throws EvaluationException;
 	public INamedFunction<ExceptionLangObject> instanceMethodException(String name) throws EvaluationException;
+	public INamedFunction<FunctionLangObject> instanceMethodFunction(String name) throws EvaluationException;
 
 	public INamedFunction<StringLangObject> attrAccessorString(String name) throws EvaluationException;
 	public INamedFunction<NumberLangObject> attrAccessorNumber(String name) throws EvaluationException;
@@ -25,5 +27,6 @@ public interface INamespace {
 	public INamedFunction<HashLangObject> attrAccessorHash(String name) throws EvaluationException;
 	public INamedFunction<BooleanLangObject> attrAccessorBoolean(String name) throws EvaluationException;
 	public INamedFunction<ExceptionLangObject> attrAccessorException(String name) throws EvaluationException;
+	public INamedFunction<FunctionLangObject> attrAccessorFunction(String name) throws EvaluationException;
 
 }

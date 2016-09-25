@@ -5,16 +5,12 @@ import java.util.List;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.ILogger;
-import de.xima.fc.form.expression.context.INamedFunction;
 import de.xima.fc.form.expression.enums.EJump;
-import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.NoSuchFunctionException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.node.AFunctionCallNode;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -30,14 +26,14 @@ import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
-import de.xima.fc.form.expression.node.ASTParenthesesFunction;
-import de.xima.fc.form.expression.node.ASTPlainFunction;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
+import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -83,28 +79,26 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
+	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
+		final ALangObject res = node.jjtGetChild(0).jjtAccept(this, ec);
+		return res.evaluateInstanceMethod(node.getUnaryMethod().name, ec);		
+	}
+
+	@Override
 	public ALangObject visit(final ASTExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Arguments are expressions which cannot be clause/continue/return clauses
-		final int count = node.jjtGetNumChildren();
+		final Node[] childrenArray = node.getChildArray();
 
 		// Empty expression node.
-		if (count == 0)
+		if (childrenArray.length == 0)
 			return NullLangObject.getInstance();
 
-		final Node[] childrenArray = node.getChildArray();
 		ALangObject res = childrenArray[0].jjtAccept(this, ec);
-
-		// Unary expression
-		if (count == 1) {
-			final EMethod unaryMethod = node.getUnaryMethod();
-			return unaryMethod == null ? res : res.evaluateInstanceMethod(unaryMethod.name, ec);
-		}
-
-		// Binary expression.
 		for (int i = 1; i != childrenArray.length; ++i) {
 			final Node arg = childrenArray[i];
 			res = res.evaluateInstanceMethod(arg.getSiblingMethod().name, ec, arg.jjtAccept(this, ec));
 		}
+		
 		return res;
 	}
 
@@ -145,17 +139,17 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
-	@Override
-	public ALangObject visit(final ASTParenthesesFunction node, final IEvaluationContext ec)
-			throws EvaluationException {
-		final String name = node.getMethodName();
-		final INamedFunction<NullLangObject> function = ec.getNamespace().globalMethod(name);
-		if (function == null)
-			throw new NoSuchFunctionException("global function", name, ec);
-		final ALangObject[] eval = getEvaluatedArgsArray(node.getChildArray(), ec);
-		final ALangObject returnValue = function.evaluate(ec, NullLangObject.getInstance(), eval);
-		return ALangObject.create(returnValue);
-	}
+//	@Override
+//	public ALangObject visit(final ASTParenthesesFunction node, final IEvaluationContext ec)
+//			throws EvaluationException {
+//		final String name = node.getMethodName();
+//		final INamedFunction<NullLangObject> function = ec.getNamespace().globalMethod(name);
+//		if (function == null)
+//			throw new NoSuchFunctionException("global function", name, ec);
+//		final ALangObject[] eval = getEvaluatedArgsArray(node.getChildArray(), ec);
+//		final ALangObject returnValue = function.evaluate(ec, NullLangObject.getInstance(), eval);
+//		return ALangObject.create(returnValue);
+//	}
 
 	@Override
 	public ALangObject visit(final ASTNumberNode node, final IEvaluationContext ec) throws EvaluationException {
@@ -200,7 +194,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
-	public ALangObject visit(final ASTPlainFunction node, final IEvaluationContext ec) throws EvaluationException {
+	public ALangObject visit(final ASTVariableNode node, final IEvaluationContext ec) throws EvaluationException {
 		return ALangObject.create(ec.getBinding().getVariable(node.getMethodName()));
 	}
 

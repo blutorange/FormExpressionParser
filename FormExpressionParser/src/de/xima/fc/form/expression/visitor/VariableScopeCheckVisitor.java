@@ -12,19 +12,20 @@ import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
-import de.xima.fc.form.expression.node.ASTParenthesesFunction;
-import de.xima.fc.form.expression.node.ASTPlainFunction;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
+import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
 public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext>{
@@ -43,12 +44,6 @@ public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<V
 
 	@Override
 	public Void visit(ASTDotExpressionNode node, IEvaluationContext data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Void visit(ASTParenthesesFunction node, IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -84,7 +79,7 @@ public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<V
 	}
 
 	@Override
-	public Void visit(ASTPlainFunction node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(ASTVariableNode node, IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -169,6 +164,18 @@ public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<V
 
 	@Override
 	public Void visit(ASTLogNode node, IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visit(ASTFunctionNode node, IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visit(ASTUnaryExpressionNode node, IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
