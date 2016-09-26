@@ -96,9 +96,15 @@ public abstract class SimpleNode implements Node {
 
 	@Override
 	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start) throws ParseException {
+		return getChildArrayAs(clazz, start, children.length-1);
+	}
+
+	@Override
+	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start, int end) throws ParseException {
+		if (end < start) end = start;
 		@SuppressWarnings("unchecked")
-		final T[] args = (T[])Array.newInstance(clazz, children.length-start);
-		for (int i = start; i < children.length; ++i) {
+		final T[] args = (T[])Array.newInstance(clazz, end-start+1);
+		for (int i = start; i <= end; ++i) {
 			final Node n = children[i];
 			if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException(String.format("Node type is %s, expected %s.", n.getClass().getSimpleName(), clazz.getSimpleName()));
 			args[i-start] = clazz.cast(n);
@@ -111,6 +117,12 @@ public abstract class SimpleNode implements Node {
 		final Node n = children[0];
 		if (!clazz.isAssignableFrom(n.getClass())) throw new ParseException("node not the correct type: " + n.getClass());
 		return clazz.cast(n);
+	}
+
+	@Override
+	public Node getLastChild() throws ParseException {
+		if (children.length == 0) throw new ParseException("Node does not contain any children.");
+		return children[children.length-1];
 	}
 
 	@Override

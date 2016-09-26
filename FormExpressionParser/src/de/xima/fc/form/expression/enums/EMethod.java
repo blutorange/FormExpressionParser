@@ -67,7 +67,7 @@ public enum EMethod {
 	DOT("."),
 	BRACKET("[]"),
 	PARENTHESIS("()"),
-	
+
 	//Special do not use
 	SWITCHCASE("SWITCHCASE"),
 	SWITCHDEFAULT("SWITCHDEFAULT"),

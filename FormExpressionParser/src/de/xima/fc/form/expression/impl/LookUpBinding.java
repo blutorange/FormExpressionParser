@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * it increments the pointer to the current map. Throws a {@link NestingLevelTooDeepException}
  * when the nesting level is deeper than the number of maps. Variable lookup proceeds at the
  * current nesting level, iteratively inspecting parent maps when no variable can be found.
- *  
+ *
  * @author madgaksha
  *
  */
@@ -23,14 +23,14 @@ public class LookUpBinding implements IBinding {
 
 	/** Subject to change. Do not rely on this being set to a certain value. */
 	public final static int DEFAULT_NESTING_DEPTH = 128;
-	
+
 	protected Map<String, ALangObject>[] mapArray;
 	protected int currentDepth;
-	
+
 	public LookUpBinding() {
 		this(DEFAULT_NESTING_DEPTH);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public LookUpBinding(int nestingDepth) {
 		if (nestingDepth < 1) nestingDepth = 1;
@@ -40,12 +40,12 @@ public class LookUpBinding implements IBinding {
 		}
 		currentDepth = 0;
 	}
-	
-	protected LookUpBinding(int nestingDepth, Map<String, ALangObject> globalVariables) {
+
+	protected LookUpBinding(final int nestingDepth, final Map<String, ALangObject> globalVariables) {
 		this(nestingDepth);
 		mapArray[0] = globalVariables;
 	}
-	
+
 	@Override
 	public void reset() {
 		for (int i = currentDepth; i < mapArray.length; ++i) mapArray[i].clear();
@@ -53,7 +53,7 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public ALangObject getVariable(String name) throws EvaluationException {
+	public ALangObject getVariable(final String name) throws EvaluationException {
 		for (int i = currentDepth; i >= 0; --i) {
 			final ALangObject object = mapArray[currentDepth].get(name);
 			if (object != null) return object;
@@ -69,9 +69,9 @@ public class LookUpBinding implements IBinding {
 		throw new VariableNotDefinedException(name, this);
 	}
 
-	
+
 	@Override
-	public void setVariable(String name, ALangObject value) throws EvaluationException {
+	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
 		mapArray[currentDepth].put(name, value);
 	}
 
@@ -89,5 +89,11 @@ public class LookUpBinding implements IBinding {
 		--currentDepth;
 		return this;
 	}
-	
+
+	@Override
+	public IBinding nestLocal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

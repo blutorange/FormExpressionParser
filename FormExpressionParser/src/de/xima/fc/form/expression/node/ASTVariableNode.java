@@ -13,7 +13,7 @@ public class ASTVariableNode extends SimpleNode {
 		super(id);
 	}
 
-	public String getMethodName() {
+	public String getName() {
 		return name;
 	}
 

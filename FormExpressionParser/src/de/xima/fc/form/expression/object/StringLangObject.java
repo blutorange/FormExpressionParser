@@ -7,7 +7,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 
@@ -44,17 +45,17 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public INamedFunction<StringLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().instanceMethodString(name);
+	public IFunction<StringLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().expressionMethodString(method);
 	}
 	@Override
-	public INamedFunction<StringLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+	public IFunction<StringLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
 		return ec.getNamespace().attrAccessorString(name);
 	}
 
 	@Override
-	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return evaluateMethod(this, ec.getNamespace().instanceMethodString(name), name, ec, args);
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodString(method), method, ec, args);
 	}
 
 	@Override
@@ -152,11 +153,11 @@ public class StringLangObject extends ALangObject {
 	public static StringLangObject create(final BigDecimal value) {
 		return StringLangObject.create(value.toPlainString());
 	}
-	
+
 	public static StringLangObject create(final float value) {
 		return StringLangObject.create(String.valueOf(value));
 	}
-	
+
 	public static StringLangObject create(final double value) {
 		return StringLangObject.create(String.valueOf(value));
 	}

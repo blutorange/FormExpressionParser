@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -105,7 +105,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			return (ExceptionLangObject) this;
 		throw new CoercionException(this, Type.EXCEPTION, ec);
 	}
-	
+
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) throws CoercionException {
 		if (getType() == Type.FUNCTION)
 			return (FunctionLangObject) this;
@@ -153,7 +153,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			// Try to coerce object with the special coerce method, when defined.
 			LOG.info("Enum might not be implemented: " + type);
 			try {
-				return (T)evaluateInstanceMethod(EMethod.COERCE.name, ec, StringLangObject.best(clazz.getSimpleName()));
+				return (T)evaluateExpressionMethod(EMethod.COERCE, ec, StringLangObject.create(type.name()));
 			}
 			catch (final EvaluationException e) {
 				throw new CoercionException(this, type, ec);
@@ -183,25 +183,34 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	}
 
 	@NotNull
-	protected final <T extends ALangObject> ALangObject evaluateMethod(final T thisContext,
-			final INamedFunction<T> function, final String name, final IEvaluationContext ec, final ALangObject... args)
-					throws NoSuchMethodException, EvaluationException {
+	protected final <T extends ALangObject> ALangObject evaluateExpressionMethod(final T thisContext,
+			final IFunction<T> function, final EMethod method, final IEvaluationContext ec,
+			final ALangObject... args) throws NoSuchMethodException, EvaluationException {
 		if (function == null)
-			throw new NoSuchMethodException(name, thisContext, ec);
+			throw new NoSuchMethodException(method.name, thisContext, ec);
 		return ALangObject.create(function.evaluate(ec, thisContext, args));
 	}
 
 	@NotNull
 	protected final <T extends ALangObject> ALangObject evaluateAttrAccessor(final T thisContext,
-			final INamedFunction<T> function, final String name, final IEvaluationContext ec, final ALangObject... args)
+			final IFunction<T> function, final String name, final IEvaluationContext ec, final ALangObject... args)
 					throws NoSuchAttrAccessorException, EvaluationException {
 		if (function == null)
 			throw new NoSuchAttrAccessorException(name, thisContext, ec);
 		return ALangObject.create(function.evaluate(ec, thisContext, args));
 	}
 
-	public abstract INamedFunction<? extends ALangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException;
-	public abstract INamedFunction<? extends ALangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException;
+	public abstract IFunction<? extends ALangObject> attrAccessor(final String name, final IEvaluationContext ec)
+			throws EvaluationException;
+
+	public abstract IFunction<? extends ALangObject> expressionMethod(final EMethod method, IEvaluationContext ec)
+			throws EvaluationException;
+
+	public abstract ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec)
+			throws EvaluationException;
+
+	public abstract ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
+			final ALangObject... args) throws EvaluationException;
 
 	@Override
 	@NotNull
@@ -209,12 +218,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		throw new IterationNotSupportedException(this);
 	}
 
-	@NotNull
-	public abstract ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec,
-			final ALangObject... args) throws EvaluationException;
 
-	public abstract ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec)
-			throws EvaluationException;
 
 	@Override
 	public int hashCode() {

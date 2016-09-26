@@ -8,7 +8,6 @@ import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
-import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -18,6 +17,7 @@ import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
+import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
@@ -31,151 +31,151 @@ import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext>{
 
 	@Override
-	public Void visit(ASTExpressionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTAssignmentExpressionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTAssignmentExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTDotExpressionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTNumberNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTNumberNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTArrayNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTArrayNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTHashNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTHashNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTNullNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTNullNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTBooleanNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTBooleanNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTVariableNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTVariableNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTStringNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTStringNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTStatementListNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTStatementListNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTIfClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTIfClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTForLoopNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTForLoopNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTWhileLoopNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTWhileLoopNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTTryClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTTryClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTSwitchClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTSwitchClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTDoWhileLoopNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTDoWhileLoopNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTExceptionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTExceptionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTThrowClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTThrowClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTBreakClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTBreakClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTContinueClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTContinueClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTReturnClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTReturnClauseNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTLogNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTLogNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTFunctionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTFunctionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTUnaryExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTUnaryExpressionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTPropertyExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

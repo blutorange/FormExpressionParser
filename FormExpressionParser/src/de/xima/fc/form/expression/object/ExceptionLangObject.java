@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.object;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -38,22 +39,17 @@ public class ExceptionLangObject extends ALangObject {
 	}
 
 	@Override
-	public INamedFunction<? extends ALangObject> instanceMethod(final String name, final IEvaluationContext ec)
-			throws EvaluationException {
-		return ec.getNamespace().instanceMethodException(name);
-
+	public IFunction<ExceptionLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().expressionMethodException(method);
 	}
-
 	@Override
-	public INamedFunction<? extends ALangObject> attrAccessor(final String name, final IEvaluationContext ec)
-			throws EvaluationException {
+	public IFunction<ExceptionLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
 		return ec.getNamespace().attrAccessorException(name);
 	}
 
 	@Override
-	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
-			throws EvaluationException {
-		return evaluateMethod(this, ec.getNamespace().instanceMethodException(name), name, ec, args);
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodException(method), method, ec, args);
 	}
 
 	@Override

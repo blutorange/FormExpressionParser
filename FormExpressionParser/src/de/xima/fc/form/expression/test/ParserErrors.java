@@ -62,7 +62,12 @@ public class ParserErrors {
 				"a.b().c.d(foo,bar).e;",
 				"getFunction()(foo);",
 				"(a+b)(foo);",
-				"a[b.foo(bar)]().baz;"
+				"a[b.foo(bar)]().baz;",
+				"/klm/",
+				"/klm/i",
+				"/\\/klm/msi",
+				"for (i:10) if (i>5) break;",
+				"'012345'[0,2];"
 		};
 	}
 
@@ -72,7 +77,8 @@ public class ParserErrors {
 				"if(a) a; else b; else if(c) c;",
 				"if(a) a; else if (c) c; else b; else c;",
 				"try { 1/0; } catch (e) { log(me) };",
-				"a()9;"
+				"a()9;",
+				"^|n};"
 		};
 	}
 

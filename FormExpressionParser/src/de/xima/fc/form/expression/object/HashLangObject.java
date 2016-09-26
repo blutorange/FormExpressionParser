@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 
@@ -65,18 +66,17 @@ public class HashLangObject extends ALangObject {
 
 
 	@Override
-	public INamedFunction<HashLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().instanceMethodHash(name);
+	public IFunction<HashLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().expressionMethodHash(method);
 	}
 	@Override
-	public INamedFunction<NumberLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorNumber(name);
+	public IFunction<HashLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorHash(name);
 	}
 
 	@Override
-	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
-			throws EvaluationException {
-		return this.evaluateMethod(this, ec.getNamespace().instanceMethodHash(name), name, ec, args);
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodHash(method), method, ec, args);
 	}
 
 	@Override

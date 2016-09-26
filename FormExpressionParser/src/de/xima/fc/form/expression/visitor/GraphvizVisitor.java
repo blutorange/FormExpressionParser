@@ -18,7 +18,6 @@ import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
-import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -28,6 +27,7 @@ import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
+import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
@@ -211,11 +211,6 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 	}
 
 	@Override
-	public Void visit(final ASTDotExpressionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
 	public Void visit(final ASTNumberNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
@@ -311,22 +306,27 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 	}
 
 	@Override
-	public Void visit(ASTReturnClauseNode node, Void data) throws EvaluationException {
+	public Void visit(final ASTReturnClauseNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 
 	@Override
-	public Void visit(ASTLogNode node, Void data) throws EvaluationException {
+	public Void visit(final ASTLogNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 
 	@Override
-	public Void visit(ASTFunctionNode node, Void data) throws EvaluationException {
+	public Void visit(final ASTFunctionNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 
 	@Override
-	public Void visit(ASTUnaryExpressionNode node, Void data) throws EvaluationException {
+	public Void visit(final ASTUnaryExpressionNode node, final Void data) throws EvaluationException {
+		return graphviz(node);
+	}
+
+	@Override
+	public Void visit(final ASTPropertyExpressionNode node, final Void data) throws EvaluationException {
 		return graphviz(node);
 	}
 }

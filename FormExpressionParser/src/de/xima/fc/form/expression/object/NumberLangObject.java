@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.MathDivisionByZeroException;
@@ -114,11 +115,6 @@ public class NumberLangObject extends ALangObject {
 		return new NumberLangObject(value);
 	}
 
-	@Override
-	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
-			throws EvaluationException {
-		return this.evaluateMethod(this, ec.getNamespace().instanceMethodNumber(name), name, ec, args);
-	}
 
 	@Override
 	public int hashCode() {
@@ -134,21 +130,24 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
+	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().expressionMethodNumber(method);
+	}
+	@Override
+	public IFunction<NumberLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorNumber(name);
+	}
+
+	@Override
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodNumber(method), method, ec, args);
+	}
+
+	@Override
 	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
 		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorNumber(name), name, ec);
 	}
 
-	@Override
-	public INamedFunction<NumberLangObject> instanceMethod(final String name, final IEvaluationContext ec)
-			throws EvaluationException {
-		return ec.getNamespace().instanceMethodNumber(name);
-	}
-
-	@Override
-	public INamedFunction<NumberLangObject> attrAccessor(final String name, final IEvaluationContext ec)
-			throws EvaluationException {
-		return ec.getNamespace().attrAccessorNumber(name);
-	}
 
 	@Override
 	public String inspect() {
@@ -177,7 +176,7 @@ public class NumberLangObject extends ALangObject {
 			@Override
 			public void remove() {
 				throw new UnsupportedOperationException("Removal not supported for NumberLangObject::iterator.");
-			}			
+			}
 		};
 	}
 

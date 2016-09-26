@@ -7,7 +7,6 @@ import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
-import de.xima.fc.form.expression.node.ASTDotExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -17,6 +16,7 @@ import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
+import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
@@ -41,12 +41,6 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void
 
 	@Override
 	public String visit(final ASTExpressionNode node, final Void data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String visit(final ASTDotExpressionNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -166,25 +160,31 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<String, Void
 	}
 
 	@Override
-	public String visit(ASTReturnClauseNode node, Void data) throws EvaluationException {
+	public String visit(final ASTReturnClauseNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String visit(ASTLogNode node, Void data) throws EvaluationException {
+	public String visit(final ASTLogNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String visit(ASTFunctionNode node, Void data) throws EvaluationException {
+	public String visit(final ASTFunctionNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String visit(ASTUnaryExpressionNode node, Void data) throws EvaluationException {
+	public String visit(final ASTUnaryExpressionNode node, final Void data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visit(final ASTPropertyExpressionNode node, final Void data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

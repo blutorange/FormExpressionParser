@@ -5,7 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 
@@ -56,17 +57,18 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public INamedFunction<ArrayLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().instanceMethodArray(name);
+	public IFunction<ArrayLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().expressionMethodArray(method);
 	}
+
 	@Override
-	public INamedFunction<ArrayLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+	public IFunction<ArrayLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
 		return ec.getNamespace().attrAccessorArray(name);
 	}
 
 	@Override
-	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return this.evaluateMethod(this, ec.getNamespace().instanceMethodArray(name), name, ec, args);
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodArray(method), method, ec, args);
 	}
 
 	@Override

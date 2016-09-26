@@ -2,6 +2,7 @@ PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
+import org.apache.commons.lang3.StringUtils;
 import de.xima.fc.form.expression.node.*;
 
 /** Formcycle expression language.
@@ -30,7 +31,7 @@ Node Program() #StatementListNode :
 {
 }
 {
-  (    (Clause(null))*
+  (    (Clause(null))+ | < EOF >
   )
   {
     jjtThis.init(null);
@@ -62,7 +63,7 @@ void ContinueClause(EMethod method) #ContinueClauseNode :
 }
 {
   (
-    "continue" [ t = < IDENTIFIER > ]";"
+    < Continue > [ t = < IDENTIFIER > ]";"
   )
   {
     jjtThis.init(method, t == null ? null : t.image);
@@ -75,7 +76,7 @@ void BreakClause(EMethod method) #BreakClauseNode :
 }
 {
   (
-    "break" [ t = < IDENTIFIER > ]";"  )
+    < Break > [ t = < IDENTIFIER > ]";"  )
   {
     jjtThis.init(method, t == null ? null : t.image);
   }
@@ -86,7 +87,7 @@ void ThrowClause(EMethod method) #ThrowClauseNode :
 }
 {
   (
-    "throw" Exception(null) ";"  )
+    < Throw > Exception(null) ";"  )
   {
     jjtThis.init(method);
   }
@@ -97,7 +98,7 @@ void SwitchClause(EMethod method) #SwitchClauseNode :
 }
 {
   (
-    "switch" "(" Expression(null) ")" "{"
+    < Switch > "(" Expression(null) ")" "{"
     (
       SwitchCase()
     )*
@@ -117,7 +118,7 @@ void SwitchCase() #void :
 {
   (
     (
-      "case" Expression(EMethod.SWITCHCASE) ":"
+      < Case > Expression(EMethod.SWITCHCASE) ":"
     )+
     (Clause(EMethod.SWITCHCLAUSE))+
   )
@@ -127,7 +128,7 @@ void SwitchDefault() #void :
 {
 }
 {
-  (    "default" ":"
+  (    < Default > ":"
       (Clause(EMethod.SWITCHDEFAULT))+
   )
 }
@@ -145,11 +146,11 @@ void TryClause(EMethod method) #TryClauseNode :
 }
 {
   (
-    "try"
+    < Try >
     (
       Block(null)
     )
-    "catch" "(" t = < IDENTIFIER > ")"
+    < Catch > "(" t = < IDENTIFIER > ")"
     (
       Block(null)
     )
@@ -165,9 +166,9 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 }
 {
   (
-    "do"
+    < Do >
     BlockOrClause(null)
-    "while" "(" Expression(null) ")"
+    < While > "(" Expression(null) ")"
   )
   {
     jjtThis.init(method);
@@ -181,7 +182,7 @@ void WhileLoop(EMethod method) #WhileLoopNode :
 }
 {
   (
-    "while" "(" Expression(null) ")"
+    < While > "(" Expression(null) ")"
     BlockOrClause(null)
   )
   {
@@ -199,7 +200,7 @@ void ForLoop(EMethod method) #ForLoopNode :
 }
 {
   (
-    "for" "("
+    < For > "("
     (
       LOOKAHEAD(< IDENTIFIER > ":")
       (
@@ -223,11 +224,11 @@ void IfClause(EMethod method) #IfClauseNode :
 }
 {
   (
-    "if" "(" Expression(null) ")" 
+    < If > "(" Expression(null) ")" 
     BlockOrClause(null)
     [
       LOOKAHEAD(1)
-      "else" 
+      < Else > 
       BlockOrClause(null)
     ]
   )
@@ -870,7 +871,7 @@ void Function(EMethod method) #FunctionNode :
 }
 {
   (
-    "->" "(" FunctionArgumentList(null) ")" BlockOrClause(null)
+    "->" "(" (Variable(null))* ")" BlockOrClause(null)
   )
   {
     jjtThis.init(method);
@@ -880,18 +881,20 @@ void Function(EMethod method) #FunctionNode :
 // i Pattern.CASE_INSENSITIVE
 // m Pattern.MULTILINE
 // s Pattern.DOTALL
+/*
 void Regex(EMethod method) #RegexNode :
 {
   Token t;
-  int flags;
+  Token flags = null;
 }
 {
   (
-    t = < SLASH_QUOTED_STRING > []  )
+    t = < SlashQuotedString > [flags = < RegexFlags >]  )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.image, flags == null ? StringUtils.EMPTY : flags.image);
   }
 }
+*/
 
 void Literal(EMethod method) #void :
 {
@@ -924,13 +927,6 @@ TOKEN :
     | ~[ "\\", "'" ]
     )*
     "'" >
-| < SlashQuotedString :
-    "/"
-    (
-      ("\\" ~[ ])
-    | ~[ "\\", "/" ]
-    )*
-    "/" >
 |
   < Integer : ([ "0"-"9" ])+ >
 | 
@@ -945,5 +941,31 @@ TOKEN :
 
 TOKEN :
 {
+  < Break : "break" >
+|
+  < Continue : "continue" >
+|
+  < If : "if" >
+|
+  < Else : "else" >
+|
+  < For : "for" >
+|
+  < While : "while" >
+|
+  < Do : "do" >
+|
+  < Try : "try" >
+|
+  < Catch : "catch" >
+|
+  < Throw : "throw" >
+|
+  < Switch : "switch" >
+|
+  < Case : "case" >
+|
+  < Default : "default" >
+|
   < IDENTIFIER : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
 }

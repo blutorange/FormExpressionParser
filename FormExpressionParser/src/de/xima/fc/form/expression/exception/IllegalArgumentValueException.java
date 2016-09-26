@@ -3,7 +3,7 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -15,7 +15,7 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 
 	private static final long serialVersionUID = 1L;
 
-	public IllegalArgumentValueException(final INamedFunction<?> function, final String functionName, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
+	public IllegalArgumentValueException(final IFunction<?> function, final String functionName, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
 		super(ec, "Illegal value " + thisContext.inspect() + " for argument " + index + " of function " + functionName + ": " + argument.inspect());
 		this.functionName = functionName;
 		this.thisContext = thisContext;
@@ -28,13 +28,13 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 		this(null, functionName, thisContext, argument, index, ec);
 	}
 
-	public IllegalArgumentValueException(final INamedFunction<?> function, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
-		this(function, function.getName(), thisContext, argument, index, ec);
+	public IllegalArgumentValueException(final IFunction<?> function, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
+		this(function, function.getDeclaredName(), thisContext, argument, index, ec);
 	}
 
 	public final ALangObject thisContext;
 	public final ALangObject argument;
 	public final int index;
 	public final String functionName;
-	public final INamedFunction<?> function;
+	public final IFunction<?> function;
 }

@@ -12,6 +12,7 @@ public class ASTPropertyExpressionNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method) throws ParseException {
+		assertChildrenAtLeast(2);
 		siblingMethod = method;
 	}
 
@@ -25,5 +26,4 @@ public class ASTPropertyExpressionNode extends SimpleNode {
 			throws EvaluationException {
 		return visitor.visit(this, data);
 	}
-
 }

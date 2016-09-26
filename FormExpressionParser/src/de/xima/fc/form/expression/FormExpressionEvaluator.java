@@ -44,7 +44,6 @@ import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
-import de.xima.fc.form.expression.impl.function.EGlobalFunction;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodArray;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodBoolean;
 import de.xima.fc.form.expression.impl.function.EInstanceMethodException;
@@ -129,12 +128,12 @@ public class FormExpressionEvaluator {
 
 		builder.setGlobalMethod(EGlobalFunction.values());
 
-		builder.setInstanceMethodBoolean(EInstanceMethodBoolean.values());
-		builder.setInstanceMethodNumber(EInstanceMethodNumber.values());
-		builder.setInstanceMethodString(EInstanceMethodString.values());
-		builder.setInstanceMethodArray(EInstanceMethodArray.values());
-		builder.setInstanceMethodHash(EInstanceMethodHash.values());
-		builder.setInstanceMethodException(EInstanceMethodException.values());
+		builder.setExpressionMethodBoolean(EInstanceMethodBoolean.values());
+		builder.setExpressionMethodNumber(EInstanceMethodNumber.values());
+		builder.setExpressionMethodString(EInstanceMethodString.values());
+		builder.setExpressionMethodArray(EInstanceMethodArray.values());
+		builder.setExpressionMethodHash(EInstanceMethodHash.values());
+		builder.setExpressionMethodException(EInstanceMethodException.values());
 
 		builder.setAttrAccessorBoolean(EAttrAccessorBoolean.values());
 		builder.setAttrAccessorNumber(EAttrAccessorNumber.values());

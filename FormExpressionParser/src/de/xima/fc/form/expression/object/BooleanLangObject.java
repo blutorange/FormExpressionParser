@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.object;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 
@@ -54,18 +55,18 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
-	public INamedFunction<BooleanLangObject> instanceMethod(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().instanceMethodBoolean(name);
+	public IFunction<BooleanLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().expressionMethodBoolean(method);
 	}
+
 	@Override
-	public INamedFunction<BooleanLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
+	public IFunction<BooleanLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
 		return ec.getNamespace().attrAccessorBoolean(name);
 	}
 
 	@Override
-	public ALangObject evaluateInstanceMethod(final String name, final IEvaluationContext ec, final ALangObject... args)
-			throws EvaluationException {
-		return this.evaluateMethod(this, ec.getNamespace().instanceMethodBoolean(name), name, ec, args);
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodBoolean(method), method, ec, args);
 	}
 
 	@Override

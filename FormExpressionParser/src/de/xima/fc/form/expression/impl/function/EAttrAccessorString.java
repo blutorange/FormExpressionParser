@@ -3,14 +3,14 @@ package de.xima.fc.form.expression.impl.function;
 import java.util.Locale;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamedFunction;
+import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NamedFunctionUtils;
 
-public enum EAttrAccessorString implements INamedFunction<StringLangObject> {
+public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	upcase {
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,

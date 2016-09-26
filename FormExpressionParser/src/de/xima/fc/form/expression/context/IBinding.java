@@ -6,14 +6,14 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.IReset;
 
 public interface IBinding extends IReset {
-	
+
 	/**
 	 * Resets this binding all children, if any, created by nest.
 	 * Must not reset any parents that created this binding.
 	 */
 	@Override
 	public void reset();
-	
+
 	/**
 	 * Must return the same object every time it is called with equivalent
 	 * variable name, unless the value of the variable was changed with
@@ -39,8 +39,18 @@ public interface IBinding extends IReset {
 	 * <br><br>
 	 * Implementations are not required to return a new object, merely a binding that
 	 * behaves as specified.
+	 * @return An {@link IBinding} that keeps the current variables and can be unnested to
+	 * the current binding undoing all changes made to the nested binding.
 	 */
 	public IBinding nest();
+
+	/**
+	 * Same as {@link #nest()}, but without closure, ie forgets about all
+	 * variables previously set and starts with a new, empty scope.
+	 * @return
+	 */
+	public IBinding nestLocal();
+
 	/**
 	 * Gets the previous binding from which this binding was derived.
 	 * All side effects of {@link #setVariable(String, ALangObject)}

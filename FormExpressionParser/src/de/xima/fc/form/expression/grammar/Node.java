@@ -57,6 +57,17 @@ public interface Node extends Serializable {
 	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, int start) throws ParseException;
 
 	/**
+	 * @param <T> The class to which to cast the child nodes.
+	 * @param clazz Class to which all nodes will be casted.
+	 * @param start The returned array will contain all children starting at this index.
+	 * @param end The returned array will contain all children up to this index (inclusive).
+	 * @return The array of children, cast to the specified type.
+	 * @throws ParseException When any child cannot be cast to the specified type.
+	 */
+	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, int start, int end) throws ParseException;
+
+
+	/**
 	 * @param clazz
 	 *            Class to which the node will be casted.
 	 * @return The child, cast to the specified type.
@@ -122,5 +133,7 @@ public interface Node extends Serializable {
 	public EMethod getSiblingMethod();
 
 	Node[] getChildArray();
+
+	Node getLastChild() throws ParseException;
 
 }
