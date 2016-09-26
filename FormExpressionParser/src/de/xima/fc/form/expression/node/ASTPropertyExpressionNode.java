@@ -5,9 +5,9 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTCallNode extends SimpleNode {
+public class ASTPropertyExpressionNode extends SimpleNode {
 
-	public ASTCallNode(final int id) {
+	public ASTPropertyExpressionNode(final int id) {
 		super(id);
 	}
 
@@ -17,11 +17,13 @@ public class ASTCallNode extends SimpleNode {
 
 	@Override
 	public String toString() {
-		return "CallNode(" + siblingMethod + ")";
+		return "PropertyExpressionNode(" + siblingMethod + ")";
 	}
 
 	@Override
-	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data)
+			throws EvaluationException {
 		return visitor.visit(this, data);
 	}
+
 }

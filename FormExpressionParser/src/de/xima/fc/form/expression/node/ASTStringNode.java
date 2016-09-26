@@ -41,7 +41,7 @@ public class ASTStringNode extends SimpleNode {
 
 	@Override
 	public String toString() {
-		return "StringNode(\"" + StringEscapeUtils.escapeJava(stringValue) + "\")";
+		return "StringNode(" + siblingMethod + ",\"" + StringEscapeUtils.escapeJava(stringValue) + "\")";
 	}
 
 }

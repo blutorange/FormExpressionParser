@@ -64,6 +64,10 @@ public enum EMethod {
 	ANGLE_CLOSE_EQUAL(">="), // >=
 	COERCE("=>"),
 
+	DOT("."),
+	BRACKET("[]"),
+	PARENTHESIS("()"),
+	
 	//Special do not use
 	SWITCHCASE("SWITCHCASE"),
 	SWITCHDEFAULT("SWITCHDEFAULT"),

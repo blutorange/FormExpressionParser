@@ -61,7 +61,8 @@ public class ParserErrors {
 				"3**4**5;",
 				"a.b().c.d(foo,bar).e;",
 				"getFunction()(foo);",
-				"(a+b)(foo);"
+				"(a+b)(foo);",
+				"a[b.foo(bar)]().baz;"
 		};
 	}
 

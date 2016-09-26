@@ -620,14 +620,14 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
       }
     )
   |
-    DotExpression(method)
+    PropertyExpression(method)
   )
   {
     if (unaryMethod != null) jjtThis.init(method, unaryMethod);
   }
 }
 
-void DotExpression(EMethod method) #DotExpressionNode(createNode = jjtree.nodeArity() > 1) :
+void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode = true;
 }
@@ -635,7 +635,9 @@ void DotExpression(EMethod method) #DotExpressionNode(createNode = jjtree.nodeAr
   (
     FunctionTypeUnaryExpression(method)
     (
-      "." VariableWithOptionalCallUnaryExpression(null)
+      "." Variable(EMethod.DOT)
+    | "[" Expression(EMethod.BRACKET) "]"
+    | "(" FunctionArgumentList(EMethod.PARENTHESIS) ")"
     )*
   )
   {
@@ -643,21 +645,22 @@ void DotExpression(EMethod method) #DotExpressionNode(createNode = jjtree.nodeAr
   }
 }
 
-void VariableWithOptionalCallUnaryExpression(EMethod method) #CallNode(createNode = jjtree.nodeArity() > 1) :
+void FunctionArgumentList(EMethod method) #ArrayNode :
 {
-  boolean createNode;
 }
 {
   (
-    Variable(method)
-    [ "(" FunctionArgumentList(null) ")" ]
+    [ Expression(null) ]
+    (
+      "," Expression(null)
+    )*
   )
   {
-    if (createNode) jjtThis.init(method);
+    jjtThis.init(method);
   }
 }
 
-void FunctionTypeUnaryExpression(EMethod method) #CallNode(createNode = jjtree.nodeArity() > 1) :
+void FunctionTypeUnaryExpression(EMethod method) #void :
 {
   boolean createNode;
 }
@@ -672,12 +675,8 @@ void FunctionTypeUnaryExpression(EMethod method) #CallNode(createNode = jjtree.n
         "(" Expression(method) ")"
       )
     )
-    (
-       "(" FunctionArgumentList(null) ")" 
-    )*
   )
   {
-    if (createNode) jjtThis.init(method);
   }
 }
 
@@ -692,18 +691,6 @@ void Variable(EMethod method) #VariableNode :
   {
     jjtThis.init(method, t.image);
   }
-}
-
-void FunctionArgumentList(EMethod method) #void :
-{
-}
-{
-  (
-    [ Expression(method) ]
-    (
-      "," Expression(method)
-    )*
-  )
 }
 
 void Number(EMethod method) #NumberNode :
@@ -890,6 +877,22 @@ void Function(EMethod method) #FunctionNode :
   }
 }
 
+// i Pattern.CASE_INSENSITIVE
+// m Pattern.MULTILINE
+// s Pattern.DOTALL
+void Regex(EMethod method) #RegexNode :
+{
+  Token t;
+  int flags;
+}
+{
+  (
+    t = < SLASH_QUOTED_STRING > []  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
+
 void Literal(EMethod method) #void :
 {
 }
@@ -901,6 +904,7 @@ void Literal(EMethod method) #void :
 | Boolean(method)
 | Null(method)
 | Log(method)
+| Function(method)
 | Exception(method)
 }
 
@@ -920,7 +924,14 @@ TOKEN :
     | ~[ "\\", "'" ]
     )*
     "'" >
-| 
+| < SlashQuotedString :
+    "/"
+    (
+      ("\\" ~[ ])
+    | ~[ "\\", "/" ]
+    )*
+    "/" >
+|
   < Integer : ([ "0"-"9" ])+ >
 | 
   < Float :
