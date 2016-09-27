@@ -70,8 +70,8 @@ public class HashLangObject extends ALangObject {
 		return ec.getNamespace().expressionMethodHash(method);
 	}
 	@Override
-	public IFunction<HashLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorHash(name);
+	public IFunction<HashLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorHash(object, accessedViaDot);
 	}
 
 	@Override
@@ -80,8 +80,33 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorHash(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorHash(object, accessedViaDot), object, ec);
+	}
+
+	/**
+	 * @param key The key for which to retrieve the mapped value.
+	 * @return The value for the key, or null when it has not been set yet.
+	 */
+	public ALangObject get(final ALangObject key) {
+		return ALangObject.create(value.get(key));
+	}
+
+	/**
+	 * @param key Key to which an object should be mapped.
+	 * @param val Object to be mapped.
+	 * @return The previous value mapped to the key, or null otherwise.
+	 */
+	public ALangObject put(final ALangObject key, final ALangObject val) {
+		return value.put(key, val);
+	}
+
+	/**
+	 * @param key
+	 * @return Whether this hash contains a mapping for the given key.
+	 */
+	public BooleanLangObject contains(final ALangObject key) {
+		return BooleanLangObject.create(value.containsKey(key));
 	}
 
 	@Override
@@ -91,6 +116,7 @@ public class HashLangObject extends ALangObject {
 
 	@Override
 	public boolean equals(final Object o) {
+		if (o == this) return true;
 		if (!(o instanceof HashLangObject)) return false;
 		final HashLangObject other = (HashLangObject)o;
 		return value.equals(other.value);

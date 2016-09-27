@@ -39,6 +39,16 @@ public class NumberLangObject extends ALangObject {
 		return value;
 	}
 
+	public long longValue() throws MathException {
+		if (!Double.isFinite(value) || value > 9007199254740993f || value < -9007199254740993f) throw new MathException("Number too large to be represented as a long: " + value);
+		return (long)value;
+	}
+
+	public int intValue() throws MathException {
+		if (!Double.isFinite(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) throw new MathException("Number too large to be represented as an int: " + value);
+		return (int)value;
+	}
+
 	public static NumberLangObject create(final int value) {
 		return new NumberLangObject(value);
 	}
@@ -123,8 +133,8 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (!(o instanceof NumberLangObject))
-			return false;
+		if (this == o) return true;
+		if (!(o instanceof NumberLangObject)) return false;
 		final NumberLangObject other = (NumberLangObject) o;
 		return value == other.value;
 	}
@@ -134,8 +144,8 @@ public class NumberLangObject extends ALangObject {
 		return ec.getNamespace().expressionMethodNumber(method);
 	}
 	@Override
-	public IFunction<NumberLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorNumber(name);
+	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorNumber(object, accessedViaDot);
 	}
 
 	@Override
@@ -144,8 +154,8 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorNumber(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorNumber(object, accessedViaDot), object, ec);
 	}
 
 

@@ -6,24 +6,24 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
-import de.xima.fc.form.expression.object.ExceptionLangObject;
+import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
-public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
+public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 	/**
-	 * @return {@link StringLangObject}. The message for this exception. The empty string when this exception does not contain a message.
+	 * @return {@link StringLangObject}. The declared name of this function. The empty string when an anonymous function.
 	 */
-	message() {
+	name() {
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
+		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
 				throws EvaluationException {
-			return StringLangObject.create(thisContext.exceptionValue().getMessage());
+			return StringLangObject.create(thisContext.functionValue().getDeclaredName());
 		}
 	}
 	;
 
 	private final String[] argList;
-	private EAttrAccessorException(final String... argList) {
+	private EAttrAccessorFunction(final String... argList) {
 		this.argList = argList;
 	}
 
@@ -40,7 +40,7 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 
 	@Override
 	public Type getThisContextType() {
-		return Type.EXCEPTION;
+		return Type.FUNCTION;
 	}
 
 	@Override
@@ -49,6 +49,6 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 	}
 
 	@Override
-	public abstract ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
+	public abstract ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 			final ALangObject... args) throws EvaluationException;
 }

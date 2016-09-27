@@ -1,10 +1,15 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IFunction;
 
 public class IllegalNumberOfArgumentsException extends CatchableEvaluationException {
 	public final int isCount, expectedCountMin, expectedCountMax;
 	public final String functionName;
+
+	public IllegalNumberOfArgumentsException(final IFunction<?> function, final int isCount, final IEvaluationContext ec) {
+		this(function.getDeclaredName(), isCount, function.getDeclaredArgumentList().length, ec);
+	}
 
 	public IllegalNumberOfArgumentsException(final String functionName, final int isCount, final int expectedCount,
 			final IEvaluationContext ec) {

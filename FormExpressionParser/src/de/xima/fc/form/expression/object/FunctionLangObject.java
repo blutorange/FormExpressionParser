@@ -78,8 +78,8 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	@Override
-	public IFunction<FunctionLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorFunction(name);
+	public IFunction<FunctionLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorFunction(object, accessedViaDot);
 	}
 
 	@Override
@@ -88,8 +88,22 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorFunction(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorFunction(object, accessedViaDot), object, ec);
+	}
+
+	@Override
+	public int hashCode() {
+		// getDeclaredName can be empty for anonymous functions
+		return 31 * super.hashCode() + value.getDeclaredName().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (o == this) return true;
+		if (!(o instanceof FunctionLangObject)) return false;
+		final FunctionLangObject func = (FunctionLangObject)o;
+		return value == func.value;
 	}
 
 	public static FunctionLangObject getNoOpInstance() {

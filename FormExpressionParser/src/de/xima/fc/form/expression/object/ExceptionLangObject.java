@@ -43,8 +43,8 @@ public class ExceptionLangObject extends ALangObject {
 		return ec.getNamespace().expressionMethodException(method);
 	}
 	@Override
-	public IFunction<ExceptionLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorException(name);
+	public IFunction<ExceptionLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorException(object, accessedViaDot);
 	}
 
 	@Override
@@ -53,12 +53,13 @@ public class ExceptionLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorException(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorException(object, accessedViaDot), object, ec);
 	}
 
 	@Override
 	public boolean equals(final Object o) {
+		if (this == o) return true;
 		if (!(o instanceof ExceptionLangObject)) return false;
 		return value.equals(((ExceptionLangObject)o).value);
 	}

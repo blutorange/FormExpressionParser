@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.object;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,8 +50,8 @@ public class StringLangObject extends ALangObject {
 		return ec.getNamespace().expressionMethodString(method);
 	}
 	@Override
-	public IFunction<StringLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorString(name);
+	public IFunction<StringLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorString(object, accessedViaDot);
 	}
 
 	@Override
@@ -59,8 +60,8 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorString(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorString(object, accessedViaDot), object, ec);
 	}
 
 	@Override
@@ -126,6 +127,18 @@ public class StringLangObject extends ALangObject {
 		};
 	}
 
+	public ALangObject concat(final StringLangObject other) {
+		return StringLangObject.create(value.concat(other.value));
+	}
+
+	public ALangObject toUpperCase(final Locale locale) {
+		return StringLangObject.create(value.toUpperCase(locale));
+	}
+
+	public ALangObject toLowerCase(final Locale locale) {
+		return StringLangObject.create(value.toLowerCase(locale));
+	}
+
 	/**
 	 * Factory method for creating instances.
 	 * @param value String, the data.
@@ -185,5 +198,9 @@ public class StringLangObject extends ALangObject {
 
 	public static StringLangObject getFalseInstance() {
 		return InstanceHolder.FALSE;
+	}
+
+	public int length() {
+		return value.length();
 	}
 }

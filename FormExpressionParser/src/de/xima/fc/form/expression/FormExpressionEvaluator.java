@@ -36,25 +36,60 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.GenericEvaluationContext;
+import de.xima.fc.form.expression.impl.GenericNamespace;
 import de.xima.fc.form.expression.impl.formfield.FormFieldEvaluationBinding;
-import de.xima.fc.form.expression.impl.formfield.FormFieldNamespaceBuilder;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorFunction;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
-import de.xima.fc.form.expression.impl.function.EInstanceMethodArray;
-import de.xima.fc.form.expression.impl.function.EInstanceMethodBoolean;
-import de.xima.fc.form.expression.impl.function.EInstanceMethodException;
-import de.xima.fc.form.expression.impl.function.EInstanceMethodHash;
-import de.xima.fc.form.expression.impl.function.EInstanceMethodNumber;
-import de.xima.fc.form.expression.impl.function.EInstanceMethodString;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodException;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodFunction;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
+import de.xima.fc.form.expression.impl.function.GenericAttrAccessor;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 
 public class FormExpressionEvaluator {
+
+	private final static INamespace NAMESPACE;
+	static {
+		final GenericNamespace.Builder builder = new GenericNamespace.Builder();
+
+		builder.addExpressionMethodBoolean(EExpressionMethodBoolean.values());
+		builder.addExpressionMethodNumber(EExpressionMethodNumber.values());
+		builder.addExpressionMethodString(EExpressionMethodString.values());
+		builder.addExpressionMethodArray(EExpressionMethodArray.values());
+		builder.addExpressionMethodHash(EExpressionMethodHash.values());
+		builder.addExpressionMethodException(EExpressionMethodException.values());
+		builder.addExpressionMethodFunction(EExpressionMethodFunction.values());
+
+		builder.addAttrAccessorBoolean(EAttrAccessorBoolean.values());
+		builder.addAttrAccessorNumber(EAttrAccessorNumber.values());
+		builder.addAttrAccessorString(EAttrAccessorString.values());
+		builder.addAttrAccessorArray(EAttrAccessorArray.values());
+		builder.addAttrAccessorHash(EAttrAccessorHash.values());
+		builder.addAttrAccessorException(EAttrAccessorException.values());
+		builder.addAttrAccessorFunction(EAttrAccessorFunction.values());
+
+		builder.setGenericAttrAccessorArray(GenericAttrAccessor.ARRAY);
+		builder.setGenericAttrAccessorBoolean(GenericAttrAccessor.BOOLEAN);
+		builder.setGenericAttrAccessorException(GenericAttrAccessor.EXCEPTION);
+		builder.setGenericAttrAccessorFunction(GenericAttrAccessor.FUNCTION);
+		builder.setGenericAttrAccessorHash(GenericAttrAccessor.HASH);
+		builder.setGenericAttrAccessorNumber(GenericAttrAccessor.NUMBER);
+		builder.setGenericAttrAccessorString(GenericAttrAccessor.STRING);
+
+		NAMESPACE = builder.build();
+	}
+
 	public static void main(final String args[]) {
 
 		if (args.length != 1) {
@@ -120,28 +155,6 @@ public class FormExpressionEvaluator {
 	}
 
 	private static IEvaluationContext getEc() {
-		return new GenericEvaluationContext(new FormFieldEvaluationBinding(), getNamespace());
-	}
-
-	private static INamespace getNamespace() {
-		final FormFieldNamespaceBuilder builder = new FormFieldNamespaceBuilder(null);
-
-		builder.setGlobalMethod(EGlobalFunction.values());
-
-		builder.setExpressionMethodBoolean(EInstanceMethodBoolean.values());
-		builder.setExpressionMethodNumber(EInstanceMethodNumber.values());
-		builder.setExpressionMethodString(EInstanceMethodString.values());
-		builder.setExpressionMethodArray(EInstanceMethodArray.values());
-		builder.setExpressionMethodHash(EInstanceMethodHash.values());
-		builder.setExpressionMethodException(EInstanceMethodException.values());
-
-		builder.setAttrAccessorBoolean(EAttrAccessorBoolean.values());
-		builder.setAttrAccessorNumber(EAttrAccessorNumber.values());
-		builder.setAttrAccessorString(EAttrAccessorString.values());
-		builder.setAttrAccessorArray(EAttrAccessorArray.values());
-		builder.setAttrAccessorHash(EAttrAccessorHash.values());
-		builder.setAttrAccessorException(EAttrAccessorException.values());
-
-		return builder.build();
+		return new GenericEvaluationContext(new FormFieldEvaluationBinding(), NAMESPACE);
 	}
 }

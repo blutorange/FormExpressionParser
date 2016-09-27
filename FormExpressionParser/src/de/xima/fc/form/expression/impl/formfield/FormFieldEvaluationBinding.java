@@ -32,12 +32,9 @@ public final class FormFieldEvaluationBinding extends LookUpBinding {
 	}
 
 	@Override
-	protected ALangObject getDefaultValue(final String name) throws VariableNotDefinedException {
+	protected ALangObject getGlobalValue(final String name) throws VariableNotDefinedException {
 		String value = nameMap.get(name);
 		if (value == null) value = aliasMap.get(name);
-		if (value == null) throw new VariableNotDefinedException(name, this);
-		return StringLangObject.create(value);
+		return value == null ? null : StringLangObject.create(value);
 	}
-
-
 }

@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,8 +63,8 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public IFunction<ArrayLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorArray(name);
+	public IFunction<ArrayLangObject> attrAccessor(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorArray(name, accessedViaDot);
 	}
 
 	@Override
@@ -72,8 +73,8 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorArray(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorArray(object, accessedViaDot), object, ec);
 	}
 
 	@Override
@@ -93,6 +94,7 @@ public class ArrayLangObject extends ALangObject {
 
 	@Override
 	public boolean equals(final Object o) {
+		if (this == o) return true;
 		if (!(o instanceof ArrayLangObject)) return false;
 		final ArrayLangObject other = (ArrayLangObject)o;
 		return value.equals(other.value);
@@ -114,6 +116,38 @@ public class ArrayLangObject extends ALangObject {
 
 	public List<ALangObject> listValue() {
 		return value;
+	}
+
+	/**
+	 * @param other Object to be added to the end of this array.
+	 */
+	public void add(final ALangObject other) {
+		value.add(other);
+	}
+
+	/**
+	 * Removes all instances of the parameter from this array.
+	 * @param other Object to be removed.
+	 */
+	public void remove(final ALangObject other) {
+		value.removeAll(Collections.singleton(other));
+	}
+
+	public void addAll(final ArrayLangObject other) {
+		value.addAll(other.value);
+	}
+
+	public void removeAll(final ArrayLangObject other) {
+		value.removeAll(other.value);
+	}
+
+	/** @return The number of entries in this array. */
+	public int length() {
+		return value.size();
+	}
+
+	public ALangObject get(final int index) throws ArrayIndexOutOfBoundsException {
+		return value.get(index);
 	}
 
 }

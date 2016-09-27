@@ -3,6 +3,7 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -19,6 +20,10 @@ public class NoSuchAttrAccessorException extends NoSuchFunctionException {
 
 	public NoSuchAttrAccessorException(final String name, final IEvaluationContext ec) {
 		super("attribute accessor", name, ec);
+	}
+
+	public NoSuchAttrAccessorException(final String name, final INamespace namespace) {
+		super("attribute accessor", name, namespace);
 	}
 
 	public NoSuchAttrAccessorException(final String name, final ALangObject thisContext, final IEvaluationContext ec) {

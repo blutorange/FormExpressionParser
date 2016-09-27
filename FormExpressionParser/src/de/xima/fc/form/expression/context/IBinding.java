@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.util.IReset;
 public interface IBinding extends IReset {
 
 	/**
-	 * Resets this binding all children, if any, created by nest.
+	 * Resets this binding and all children, if any, created by {@link #nest()}.
 	 * Must not reset any parents that created this binding.
 	 */
 	@Override
@@ -45,8 +45,8 @@ public interface IBinding extends IReset {
 	public IBinding nest();
 
 	/**
-	 * Same as {@link #nest()}, but without closure, ie forgets about all
-	 * variables previously set and starts with a new, empty scope.
+	 * Same as {@link #nest()}, but without closure, the returned binding
+	 * must be empty. {@link #unnest()} must still return the previous binding.
 	 * @return
 	 */
 	public IBinding nestLocal();

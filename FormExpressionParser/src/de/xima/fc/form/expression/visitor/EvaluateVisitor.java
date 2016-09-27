@@ -124,12 +124,12 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			final Node n = children[i];
 			switch(n.getSiblingMethod()) {
 			case DOT:
-				final String nameDot = ((ASTVariableNode)n).getName();
-				res = res.evaluateAttrAccessor(nameDot, ec);
+				final StringLangObject attrDot = StringLangObject.create(((ASTVariableNode)n).getName());
+				res = res.evaluateAttrAccessor(attrDot, true, ec);
 				break;
 			case BRACKET:
-				final String nameBracket = n.jjtGetChild(0).jjtAccept(this, ec).coerceString(ec).stringValue();
-				res = res.evaluateAttrAccessor(nameBracket, ec);
+				final ALangObject attrBracket = n.jjtGetChild(0).jjtAccept(this, ec);
+				res = res.evaluateAttrAccessor(attrBracket, false, ec);
 				break;
 			case PARENTHESIS:
 				// Get a function object.

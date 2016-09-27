@@ -24,6 +24,7 @@ public class LookUpBinding implements IBinding {
 	/** Subject to change. Do not rely on this being set to a certain value. */
 	public final static int DEFAULT_NESTING_DEPTH = 128;
 
+	protected boolean[] breakpointArray;
 	protected Map<String, ALangObject>[] mapArray;
 	protected int currentDepth;
 
@@ -35,16 +36,17 @@ public class LookUpBinding implements IBinding {
 	public LookUpBinding(int nestingDepth) {
 		if (nestingDepth < 1) nestingDepth = 1;
 		mapArray = new Map[nestingDepth];
+		breakpointArray = new boolean[nestingDepth];
 		for (int i = 0; i < nestingDepth; ++i) {
 			mapArray[i] = new HashMap<String, ALangObject>();
 		}
 		currentDepth = 0;
 	}
 
-	protected LookUpBinding(final int nestingDepth, final Map<String, ALangObject> globalVariables) {
-		this(nestingDepth);
-		mapArray[0] = globalVariables;
-	}
+	//	protected LookUpBinding(final int nestingDepth, final Map<String, ALangObject> globalVariables) {
+	//		this(nestingDepth);
+	//		mapArray[0] = globalVariables;
+	//	}
 
 	@Override
 	public void reset() {
@@ -54,19 +56,23 @@ public class LookUpBinding implements IBinding {
 
 	@Override
 	public ALangObject getVariable(final String name) throws EvaluationException {
-		for (int i = currentDepth; i >= 0; --i) {
-			final ALangObject object = mapArray[currentDepth].get(name);
-			if (object != null) return object;
+		ALangObject o;
+		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
+			o = mapArray[currentDepth].get(name);
+			if (o != null) return o;
 		}
-		return getDefaultValue(name);
+		o = getGlobalValue(name);
+		if (o == null) throw new VariableNotDefinedException(name, this);
+		return o;
 	}
 
 	/**
-	 * Value returned when variable is not in scope. May be overridden to provide other default values.
-	 * @param name Name of the form field. Defaults to throwing a {@link VariableNotDefinedException} when not overridden.
+	 * When the variable not found in the current scope, a global value may be returned.
+	 * @return Value of the global variable, or null. A {@link VariableNotDefinedException} will be thrown when <code>null</code> is returned.
+	 * @param name Name of the variable.
 	 */
-	protected ALangObject getDefaultValue(final String name) throws VariableNotDefinedException {
-		throw new VariableNotDefinedException(name, this);
+	protected ALangObject getGlobalValue(final String name) {
+		return null;
 	}
 
 
@@ -85,15 +91,16 @@ public class LookUpBinding implements IBinding {
 
 	@Override
 	public IBinding unnest() {
-		if (currentDepth <= 0) throw new UncatchableEvaluationException(this, "Cannot unnest global binding, this may be an error in the parser. Contact support.");
+		if (currentDepth <= 0) throw new UncatchableEvaluationException(this, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
 		--currentDepth;
+		breakpointArray[currentDepth] = false;
 		return this;
 	}
 
 	@Override
 	public IBinding nestLocal() {
-		// TODO Auto-generated method stub
-		return null;
+		breakpointArray[currentDepth] = true;
+		return nest();
 	}
 
 }

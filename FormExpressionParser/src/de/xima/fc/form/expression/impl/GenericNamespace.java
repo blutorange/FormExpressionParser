@@ -4,11 +4,15 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
@@ -17,203 +21,233 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
+/**
+ * A generic immutable {@link INamespace} that only needs to be constructed once
+ * and can be used throughout the entire lifetime of the program from multiple threads.
+ * <br><br>
+ * Construct it with the builder:
+ * <br><br>
+ * <pre>
+ * GenericNamespace.Builder builder = new GenericNamespace.Builder();
+ * builder.addExpressionMethodBoolean(EExpressionMethodBoolean.values());
+ * builder.addAttrAccessorBoolean(EAttrAccessorBoolean.values());
+ * ...
+ * builder.addAttrAccessorBoolean(new IFunction&lt;BooleanLangObject&gt;(){
+ *   // custom attribute accessor
+ * });
+ * INamespace namespace = builder.build();
+ * </pre>
+ * @author madgaksha
+ */
 public class GenericNamespace implements INamespace {
 
-	private final EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString;
-	private final EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray;
-	private final EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber;
-	private final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash;
-	private final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
-	private final EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
-	private final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
+	private final ImmutableMap<EMethod, IFunction<StringLangObject>> expressionMethodString;
+	private final ImmutableMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray;
+	private final ImmutableMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber;
+	private final ImmutableMap<EMethod, IFunction<HashLangObject>> expressionMethodHash;
+	private final ImmutableMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
+	private final ImmutableMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
+	private final ImmutableMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
 
-	private final Map<String, IFunction<StringLangObject>> attrAccessorString;
-	private final Map<String, IFunction<ArrayLangObject>> attrAccessorArray;
-	private final Map<String, IFunction<BooleanLangObject>> attrAccessorBoolean;
-	private final Map<String, IFunction<NumberLangObject>> attrAccessorNumber;
-	private final Map<String, IFunction<HashLangObject>> attrAccessorHash;
-	private final Map<String, IFunction<ExceptionLangObject>> attrAccessorException;
-	private final Map<String, IFunction<FunctionLangObject>> attrAccessorFunction;
+	private final ImmutableMap<String, IFunction<StringLangObject>> attrAccessorString;
+	private final ImmutableMap<String, IFunction<ArrayLangObject>> attrAccessorArray;
+	private final ImmutableMap<String, IFunction<BooleanLangObject>> attrAccessorBoolean;
+	private final ImmutableMap<String, IFunction<NumberLangObject>> attrAccessorNumber;
+	private final ImmutableMap<String, IFunction<HashLangObject>> attrAccessorHash;
+	private final ImmutableMap<String, IFunction<ExceptionLangObject>> attrAccessorException;
+	private final ImmutableMap<String, IFunction<FunctionLangObject>> attrAccessorFunction;
+
+	private final IFunction<StringLangObject> genericAttrAccessorString;
+	private final IFunction<NumberLangObject> genericAttrAccessorNumber;
+	private final IFunction<BooleanLangObject> genericAttrAccessorBoolean;
+	private final IFunction<ArrayLangObject> genericAttrAccessorArray;
+	private final IFunction<HashLangObject> genericAttrAccessorHash;
+	private final IFunction<FunctionLangObject> genericAttrAccessorFunction;
+	private final IFunction<ExceptionLangObject> genericAttrAccessorException;
 
 	public static class Builder {
-		private EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString;
-		private EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray;
-		private EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
-		private EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber;
-		private EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash;
-		private EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
-		private EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
-		private Map<String, IFunction<StringLangObject>> attrAccessorString;
-		private Map<String, IFunction<ArrayLangObject>> attrAccessorArray;
-		private Map<String, IFunction<BooleanLangObject>> attrAccessorBoolean;
-		private Map<String, IFunction<NumberLangObject>> attrAccessorNumber;
-		private Map<String, IFunction<HashLangObject>> attrAccessorHash;
-		private Map<String, IFunction<ExceptionLangObject>> attrAccessorException;
-		private Map<String, IFunction<FunctionLangObject>> attrAccessorFunction;
+		private final static int FIELDS_TO_FILL = 3*7;
+		private final EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString = new EnumMap<>(EMethod.class);
+		private final EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray = new EnumMap<>(EMethod.class);
+		private final EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean = new EnumMap<>(EMethod.class);
+		private final EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber = new EnumMap<>(EMethod.class);
+		private final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash = new EnumMap<>(EMethod.class);
+		private final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException = new EnumMap<>(EMethod.class);
+		private final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction = new EnumMap<>(EMethod.class);
+		private final Map<String, IFunction<StringLangObject>> attrAccessorString = new HashMap<>();
+		private final Map<String, IFunction<ArrayLangObject>> attrAccessorArray = new HashMap<>();
+		private final Map<String, IFunction<BooleanLangObject>> attrAccessorBoolean = new HashMap<>();
+		private final Map<String, IFunction<NumberLangObject>> attrAccessorNumber = new HashMap<>();
+		private final Map<String, IFunction<HashLangObject>> attrAccessorHash = new HashMap<>();
+		private final Map<String, IFunction<ExceptionLangObject>> attrAccessorException = new HashMap<>();
+		private final Map<String, IFunction<FunctionLangObject>> attrAccessorFunction = new HashMap<>();
+		private IFunction<StringLangObject> genericAttrAccessorString;
+		private IFunction<NumberLangObject> genericAttrAccessorNumber;
+		private IFunction<BooleanLangObject> genericAttrAccessorBoolean;
+		private IFunction<ArrayLangObject> genericAttrAccessorArray;
+		private IFunction<HashLangObject> genericAttrAccessorHash;
+		private IFunction<FunctionLangObject> genericAttrAccessorFunction;
+		private IFunction<ExceptionLangObject> genericAttrAccessorException;
 		private int count = 0;
 
 		public Builder() {
 		}
 
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorString(final Map<String, IFunction<StringLangObject>> map) {
-		}
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorArray(final Map<String, IFunction<ArrayLangObject>> map) {
-		}
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorBoolean(final Map<String, IFunction<BooleanLangObject>> map) {
-		}
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorNumber(final Map<String, IFunction<NumberLangObject>> map) {
-		}
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorHash(final Map<String, IFunction<HashLangObject>> map) {
-		}
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorException(final Map<String, IFunction<ExceptionLangObject>> map) {
-		}
-		/** @param map Map that may be filled with additional custom methods. */
-		protected void customAttrAccessorFunction(final Map<String, IFunction<FunctionLangObject>> map) {
-		}
-
-		public final Builder setExpressionMethodString(final IMethod2Function<StringLangObject>[] m) {
-			if (expressionMethodString == null) {
+		private final <T extends ALangObject> Builder addAttrAccessor(final IFunction<T>[] m, final Map<String, IFunction<T>> map) {
+			if (m.length == 0) return this;
+			if (map.isEmpty()) {
 				++count;
-				expressionMethodString = new EnumMap<>(EMethod.class);
-				for (final IMethod2Function<StringLangObject> f : m)
-					expressionMethodString.put(f.getMethod(), f.getFunction());
 			}
+			for (final IFunction<T> f : m)
+				map.put(f.getDeclaredName(), f);
 			return this;
 		}
 
-		public final Builder setExpressionMethodBoolean(final IMethod2Function<BooleanLangObject>[] m) {
-			if (expressionMethodBoolean == null) {
+		private final <T extends ALangObject> Builder addExpressionMethod(final IMethod2Function<T>[] m, final EnumMap<EMethod, IFunction<T>> map) {
+			if (m.length == 0) return this;
+			if (map.isEmpty()) {
 				++count;
-				expressionMethodBoolean = new EnumMap<>(EMethod.class);
-				for (final IMethod2Function<BooleanLangObject> f : m)
-					expressionMethodBoolean.put(f.getMethod(), f.getFunction());
 			}
+			for (final IMethod2Function<T> f : m)
+				map.put(f.getMethod(), f.getFunction());
 			return this;
 		}
 
-		public final Builder setExpressionMethodNumber(final IMethod2Function<NumberLangObject>[] m) {
-			if (expressionMethodNumber == null) {
-				++count;
-				expressionMethodNumber = new EnumMap<>(EMethod.class);
-				for (final IMethod2Function<NumberLangObject> f : m)
-					expressionMethodNumber.put(f.getMethod(), f.getFunction());
-			}
+		public final Builder addExpressionMethodString(final IMethod2Function<StringLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodString);
+		}
+
+		public final Builder addExpressionMethodBoolean(final IMethod2Function<BooleanLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodBoolean);
+		}
+
+		public final Builder addExpressionMethodNumber(final IMethod2Function<NumberLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodNumber);
+		}
+
+		public final Builder addExpressionMethodHash(final IMethod2Function<HashLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodHash);
+		}
+
+		public final Builder addExpressionMethodArray(final IMethod2Function<ArrayLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodArray);
+		}
+
+		public final Builder addExpressionMethodException(final IMethod2Function<ExceptionLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodException);
+		}
+
+		public final Builder addExpressionMethodFunction(final IMethod2Function<FunctionLangObject>[] m) {
+			return addExpressionMethod(m, expressionMethodFunction);
+		}
+
+		public final Builder addAttrAccessorString(final IFunction<StringLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorString);
+		}
+
+		public final Builder addAttrAccessorFunction(final IFunction<FunctionLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorFunction);
+		}
+
+		public final Builder addAttrAccessorBoolean(final IFunction<BooleanLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorBoolean);
+		}
+
+		public final Builder addAttrAccessorNumber(final IFunction<NumberLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorNumber);
+		}
+
+		public final Builder addAttrAccessorHash(final IFunction<HashLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorHash);
+		}
+
+		public final Builder addAttrAccessorArray(final IFunction<ArrayLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorArray);
+		}
+
+		public final Builder addAttrAccessorException(final IFunction<ExceptionLangObject>[] m) {
+			return addAttrAccessor(m, attrAccessorException);
+		}
+
+		public final Builder setGenericAttrAccessorString(final IFunction<StringLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorString == null) ++ count;
+			genericAttrAccessorString = func;
 			return this;
 		}
 
-		public final Builder setExpressionMethodHash(final IMethod2Function<HashLangObject>[] m) {
-			if (expressionMethodHash == null) {
-				++count;
-				expressionMethodHash = new EnumMap<>(EMethod.class);
-				for (final IMethod2Function<HashLangObject> f : m)
-					expressionMethodHash.put(f.getMethod(), f.getFunction());
-			}
+		public final Builder setGenericAttrAccessorNumber(final IFunction<NumberLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorNumber == null) ++ count;
+			genericAttrAccessorNumber = func;
 			return this;
 		}
 
-		public final Builder setExpressionMethodArray(final IMethod2Function<ArrayLangObject>[] m) {
-			if (expressionMethodArray == null) {
-				++count;
-				expressionMethodArray = new EnumMap<>(EMethod.class);
-				for (final IMethod2Function<ArrayLangObject> f : m)
-					expressionMethodArray.put(f.getMethod(), f.getFunction());
-			}
+		public final Builder setGenericAttrAccessorBoolean(final IFunction<BooleanLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorBoolean == null) ++ count;
+			genericAttrAccessorBoolean = func;
 			return this;
 		}
 
-		public final Builder setExpressionMethodException(final IMethod2Function<ExceptionLangObject>[] m) {
-			if (expressionMethodException == null) {
-				++count;
-				expressionMethodException = new EnumMap<>(EMethod.class);
-				for (final IMethod2Function<ExceptionLangObject> f : m)
-					expressionMethodException.put(f.getMethod(), f.getFunction());
-			}
+		public final Builder setGenericAttrAccessorHash(final IFunction<HashLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorHash == null) ++ count;
+			genericAttrAccessorHash = func;
 			return this;
 		}
 
-
-		public final Builder setAttrAccessorString(final IFunction<StringLangObject>[] m) {
-			if (attrAccessorString == null) {
-				++count;
-				attrAccessorString = new HashMap<>(m.length);
-				for (final IFunction<StringLangObject> f : m)
-					attrAccessorString.put(f.getDeclaredName(), f);
-			}
-			customAttrAccessorString(attrAccessorString);
+		public final Builder setGenericAttrAccessorArray(final IFunction<ArrayLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorArray == null) ++ count;
+			genericAttrAccessorArray = func;
 			return this;
 		}
 
-		public final Builder setAttrAccessorBoolean(final IFunction<BooleanLangObject>[] m) {
-			if (attrAccessorBoolean == null) {
-				++count;
-				attrAccessorBoolean = new HashMap<>(m.length);
-				for (final IFunction<BooleanLangObject> f : m)
-					attrAccessorBoolean.put(f.getDeclaredName(), f);
-			}
-			customAttrAccessorBoolean(attrAccessorBoolean);
+		public final Builder setGenericAttrAccessorException(final IFunction<ExceptionLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorException == null) ++ count;
+			genericAttrAccessorException = func;
 			return this;
 		}
 
-		public final Builder setAttrAccessorNumber(final IFunction<NumberLangObject>[] m) {
-			if (attrAccessorNumber == null) {
-				++count;
-				attrAccessorNumber = new HashMap<>(m.length);
-				for (final IFunction<NumberLangObject> f : m)
-					attrAccessorNumber.put(f.getDeclaredName(), f);
-			}
-			customAttrAccessorNumber(attrAccessorNumber);
-			return this;
-		}
-
-		public final Builder setAttrAccessorHash(final IFunction<HashLangObject>[] m) {
-			if (attrAccessorHash == null) {
-				++count;
-				attrAccessorHash = new HashMap<>(m.length);
-				for (final IFunction<HashLangObject> f : m)
-					attrAccessorHash.put(f.getDeclaredName(), f);
-			}
-			customAttrAccessorHash(attrAccessorHash);
-			return this;
-		}
-
-		public final Builder setAttrAccessorArray(final IFunction<ArrayLangObject>[] m) {
-			if (attrAccessorArray == null) {
-				++count;
-				attrAccessorArray = new HashMap<>(m.length);
-				for (final IFunction<ArrayLangObject> f : m)
-					attrAccessorArray.put(f.getDeclaredName(), f);
-			}
-			customAttrAccessorArray(attrAccessorArray);
-			return this;
-		}
-
-		public final Builder setAttrAccessorException(final IFunction<ExceptionLangObject>[] m) {
-			if (attrAccessorException == null) {
-				++count;
-				attrAccessorException = new HashMap<>(m.length);
-				for (final IFunction<ExceptionLangObject> f : m)
-					attrAccessorException.put(f.getDeclaredName(), f);
-			}
-			customAttrAccessorException(attrAccessorException);
+		public final Builder setGenericAttrAccessorFunction(final IFunction<FunctionLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorFunction == null) ++ count;
+			genericAttrAccessorFunction = func;
 			return this;
 		}
 
 		public final INamespace build() throws IllegalStateException {
-			if (count != 14)
-				throw new IllegalStateException("All instance and attribute accessor methods must be set");
-			return new GenericNamespace(expressionMethodBoolean, expressionMethodNumber, expressionMethodString,
-					expressionMethodArray, expressionMethodHash, expressionMethodException, expressionMethodFunction, attrAccessorBoolean,
-					attrAccessorNumber, attrAccessorString, attrAccessorArray, attrAccessorHash, attrAccessorException, attrAccessorFunction);
+			if (count != FIELDS_TO_FILL)
+				throw new IllegalStateException("All expression method and attribute accessors must be set.");
+			return new GenericNamespace(
+					expressionMethodBoolean,
+					expressionMethodNumber,
+					expressionMethodString,
+					expressionMethodArray,
+					expressionMethodHash,
+					expressionMethodException,
+					expressionMethodFunction,
+					attrAccessorBoolean,
+					attrAccessorNumber,
+					attrAccessorString,
+					attrAccessorArray,
+					attrAccessorHash,
+					attrAccessorException,
+					attrAccessorFunction,
+					genericAttrAccessorBoolean,
+					genericAttrAccessorNumber,
+					genericAttrAccessorString,
+					genericAttrAccessorArray,
+					genericAttrAccessorHash,
+					genericAttrAccessorException,
+					genericAttrAccessorFunction);
 		}
 	}
 
-	private GenericNamespace(final EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean,
+	private GenericNamespace(
+			final EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean,
 			final EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber,
 			final EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString,
 			final EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray,
@@ -226,21 +260,35 @@ public class GenericNamespace implements INamespace {
 			final Map<String, IFunction<ArrayLangObject>> attrAccessorArray,
 			final Map<String, IFunction<HashLangObject>> attrAccessorHash,
 			final Map<String, IFunction<ExceptionLangObject>> attrAccessorException,
-			final Map<String, IFunction<FunctionLangObject>> attrAccessorFunction) {
-		this.expressionMethodBoolean = expressionMethodBoolean;
-		this.expressionMethodNumber = expressionMethodNumber;
-		this.expressionMethodString = expressionMethodString;
-		this.expressionMethodArray = expressionMethodArray;
-		this.expressionMethodHash = expressionMethodHash;
-		this.expressionMethodException = expressionMethodException;
-		this.expressionMethodFunction = expressionMethodFunction;
-		this.attrAccessorBoolean = attrAccessorBoolean;
-		this.attrAccessorNumber = attrAccessorNumber;
-		this.attrAccessorString = attrAccessorString;
-		this.attrAccessorArray = attrAccessorArray;
-		this.attrAccessorHash = attrAccessorHash;
-		this.attrAccessorException = attrAccessorException;
-		this.attrAccessorFunction = attrAccessorFunction;
+			final Map<String, IFunction<FunctionLangObject>> attrAccessorFunction,
+			final IFunction<BooleanLangObject> genericAttrAccessorBoolean,
+			final IFunction<NumberLangObject> genericAttrAccessorNumber,
+			final IFunction<StringLangObject> genericAttrAccessorString,
+			final IFunction<ArrayLangObject> genericAttrAccessorArray,
+			final IFunction<HashLangObject> genericAttrAccessorHash,
+			final IFunction<ExceptionLangObject> genericAttrAccessorExcepton,
+			final IFunction<FunctionLangObject> genericAttrAccessorFunction) {
+		this.expressionMethodBoolean = Maps.immutableEnumMap(expressionMethodBoolean);
+		this.expressionMethodNumber = Maps.immutableEnumMap(expressionMethodNumber);
+		this.expressionMethodString = Maps.immutableEnumMap(expressionMethodString);
+		this.expressionMethodArray = Maps.immutableEnumMap(expressionMethodArray);
+		this.expressionMethodHash = Maps.immutableEnumMap(expressionMethodHash);
+		this.expressionMethodException = Maps.immutableEnumMap(expressionMethodException);
+		this.expressionMethodFunction = Maps.immutableEnumMap(expressionMethodFunction);
+		this.attrAccessorBoolean = ImmutableMap.copyOf(attrAccessorBoolean);
+		this.attrAccessorNumber = ImmutableMap.copyOf(attrAccessorNumber);
+		this.attrAccessorString = ImmutableMap.copyOf(attrAccessorString);
+		this.attrAccessorArray = ImmutableMap.copyOf(attrAccessorArray);
+		this.attrAccessorHash = ImmutableMap.copyOf(attrAccessorHash);
+		this.attrAccessorException = ImmutableMap.copyOf(attrAccessorException);
+		this.attrAccessorFunction = ImmutableMap.copyOf(attrAccessorFunction);
+		this.genericAttrAccessorArray = genericAttrAccessorArray;
+		this.genericAttrAccessorBoolean = genericAttrAccessorBoolean;
+		this.genericAttrAccessorException = genericAttrAccessorExcepton;
+		this.genericAttrAccessorFunction = genericAttrAccessorFunction;
+		this.genericAttrAccessorHash = genericAttrAccessorHash;
+		this.genericAttrAccessorNumber = genericAttrAccessorNumber;
+		this.genericAttrAccessorString = genericAttrAccessorString;
 	}
 
 	@Override
@@ -279,37 +327,53 @@ public class GenericNamespace implements INamespace {
 	}
 
 	@Override
-	public IFunction<StringLangObject> attrAccessorString(final String name) throws EvaluationException {
-		return attrAccessorString.get(name);
+	public IFunction<StringLangObject> attrAccessorString(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<StringLangObject> func = attrAccessorString.get(name);
+		return func != null ? func : genericAttrAccessorString;
 	}
 
 	@Override
-	public IFunction<NumberLangObject> attrAccessorNumber(final String name) throws EvaluationException {
-		return attrAccessorNumber.get(name);
+	public IFunction<NumberLangObject> attrAccessorNumber(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<NumberLangObject> func = attrAccessorNumber.get(name);
+		return func != null ? func : genericAttrAccessorNumber;
 	}
 
 	@Override
-	public IFunction<ArrayLangObject> attrAccessorArray(final String name) throws EvaluationException {
-		return attrAccessorArray.get(name);
+	public IFunction<ArrayLangObject> attrAccessorArray(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<ArrayLangObject> func = attrAccessorArray.get(name);
+		return func != null ? func : genericAttrAccessorArray;
+
 	}
 
 	@Override
-	public IFunction<HashLangObject> attrAccessorHash(final String name) throws EvaluationException {
-		return attrAccessorHash.get(name);
+	public IFunction<HashLangObject> attrAccessorHash(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<HashLangObject> func = attrAccessorHash.get(name);
+		return func != null ? func : genericAttrAccessorHash;
+
 	}
 
 	@Override
-	public IFunction<BooleanLangObject> attrAccessorBoolean(final String name) throws EvaluationException {
-		return attrAccessorBoolean.get(name);
+	public IFunction<BooleanLangObject> attrAccessorBoolean(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<BooleanLangObject> func = attrAccessorBoolean.get(name);
+		return func != null ? func : genericAttrAccessorBoolean;
 	}
 
 	@Override
-	public IFunction<ExceptionLangObject> attrAccessorException(final String name) throws EvaluationException {
-		return attrAccessorException.get(name);
+	public IFunction<ExceptionLangObject> attrAccessorException(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<ExceptionLangObject> func = attrAccessorException.get(name);
+		return func != null ? func : genericAttrAccessorException;
 	}
 
 	@Override
-	public IFunction<FunctionLangObject> attrAccessorFunction(final String name) throws EvaluationException {
-		return attrAccessorFunction.get(name);
+	public IFunction<FunctionLangObject> attrAccessorFunction(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<FunctionLangObject> func = attrAccessorFunction.get(name);
+		return func != null ? func : genericAttrAccessorFunction;
 	}
 }

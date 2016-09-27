@@ -17,7 +17,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  */
 public class CloneBinding implements IBinding {
 	private final Map<String, ALangObject> map;
-	private IBinding parent;
+	private final IBinding parent;
 
 	public CloneBinding() {
 		this(16);
@@ -34,17 +34,20 @@ public class CloneBinding implements IBinding {
 	}
 
 	/**
-	 * Value returned when variable is not in scope. May be overridden to provide other default values.
-	 * @param name Name of the form field. Defaults to throwing a {@link VariableNotDefinedException} when not overridden.
+	 * When the variable not found in the current scope, a global value may be returned.
+	 * @return Value of the global variable. A {@link VariableNotDefinedException} will be thrown when <code>null</code> is returned.
+	 * @param name Name of the variable.
 	 */
-	protected ALangObject getDefaultValue(final String name) throws VariableNotDefinedException {
-		throw new VariableNotDefinedException(name, this);
+	protected ALangObject getGlobalValue(final String name) {
+		return null;
 	}
 
 	@Override
 	public final ALangObject getVariable(final String name) throws EvaluationException {
-		final ALangObject o = map.get(name);
-		return o == null ? getDefaultValue(name) : o;
+		ALangObject o = map.get(name);
+		if (o == null) o = getGlobalValue(name);
+		if (o == null) throw new VariableNotDefinedException(name, this);
+		return o;
 	}
 
 	@Override
@@ -65,6 +68,10 @@ public class CloneBinding implements IBinding {
 	@Override
 	public void reset() {
 		map.clear();
-		parent = null;
+	}
+
+	@Override
+	public IBinding nestLocal() {
+		return new CloneBinding(map.size());
 	}
 }

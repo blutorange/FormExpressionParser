@@ -23,6 +23,19 @@ public class BooleanLangObject extends ALangObject {
 		return value;
 	}
 
+	public BooleanLangObject or(final BooleanLangObject other) {
+		return BooleanLangObject.create(value||other.value);
+	}
+	public BooleanLangObject and(final BooleanLangObject other) {
+		return BooleanLangObject.create(value&&other.value);
+	}
+	public BooleanLangObject xor(final BooleanLangObject other) {
+		return BooleanLangObject.create(value^other.value);
+	}
+	public BooleanLangObject not() {
+		return BooleanLangObject.create(!value);
+	}
+
 	// Coercion
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
@@ -60,8 +73,8 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
-	public IFunction<BooleanLangObject> attrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorBoolean(name);
+	public IFunction<BooleanLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAccessorBoolean(object, accessedViaDot);
 	}
 
 	@Override
@@ -70,8 +83,8 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateAttrAccessor(final String name, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorBoolean(name), name, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorBoolean(object, accessedViaDot), object, ec);
 	}
 
 	@Override
@@ -81,6 +94,7 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public boolean equals(final Object o) {
+		if (this == o) return true;
 		if (!(o instanceof BooleanLangObject)) return false;
 		return value == ((BooleanLangObject)o).value;
 	}
@@ -95,7 +109,7 @@ public class BooleanLangObject extends ALangObject {
 		builder.append(value ? "§true" : "§false");
 	}
 
-	public static ALangObject create(final boolean b) {
+	public static BooleanLangObject create(final boolean b) {
 		return b ? getTrueInstance() : getFalseInstance();
 	}
 
