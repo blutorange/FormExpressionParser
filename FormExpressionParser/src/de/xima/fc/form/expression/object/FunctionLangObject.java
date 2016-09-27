@@ -63,13 +63,18 @@ public class FunctionLangObject extends ALangObject {
 		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(", ");
 		// Remove final comma
 		if (builder.length()>3) builder.setLength(builder.length()-1);
-		builder.append(") {\n");
+		builder.append(") {");
 		final Node n = value.getNode();
 		if (n == null)
-			builder.append("[native code]");
+			builder.append("'[native code]'");
 		else
-			builder.append("[to be implemented]");
-		builder.append("\n};");
+			builder.append("'[to be implemented]'");
+		builder.append("};");
+	}
+
+	@Override
+	public String inspect() {
+		return "FunctionLangObject(" + value.getDeclaredName() + ")";
 	}
 
 	@Override

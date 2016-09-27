@@ -49,13 +49,13 @@ public class GenericNamespace implements INamespace {
 	private final ImmutableMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
 	private final ImmutableMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
 
-	private final ImmutableMap<String, IFunction<StringLangObject>> attrAccessorString;
-	private final ImmutableMap<String, IFunction<ArrayLangObject>> attrAccessorArray;
-	private final ImmutableMap<String, IFunction<BooleanLangObject>> attrAccessorBoolean;
-	private final ImmutableMap<String, IFunction<NumberLangObject>> attrAccessorNumber;
-	private final ImmutableMap<String, IFunction<HashLangObject>> attrAccessorHash;
-	private final ImmutableMap<String, IFunction<ExceptionLangObject>> attrAccessorException;
-	private final ImmutableMap<String, IFunction<FunctionLangObject>> attrAccessorFunction;
+	private final ImmutableMap<StringLangObject, IFunction<StringLangObject>> attrAccessorString;
+	private final ImmutableMap<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray;
+	private final ImmutableMap<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean;
+	private final ImmutableMap<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber;
+	private final ImmutableMap<StringLangObject, IFunction<HashLangObject>> attrAccessorHash;
+	private final ImmutableMap<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException;
+	private final ImmutableMap<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction;
 
 	private final IFunction<StringLangObject> genericAttrAccessorString;
 	private final IFunction<NumberLangObject> genericAttrAccessorNumber;
@@ -74,13 +74,13 @@ public class GenericNamespace implements INamespace {
 		private final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash = new EnumMap<>(EMethod.class);
 		private final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException = new EnumMap<>(EMethod.class);
 		private final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction = new EnumMap<>(EMethod.class);
-		private final Map<String, IFunction<StringLangObject>> attrAccessorString = new HashMap<>();
-		private final Map<String, IFunction<ArrayLangObject>> attrAccessorArray = new HashMap<>();
-		private final Map<String, IFunction<BooleanLangObject>> attrAccessorBoolean = new HashMap<>();
-		private final Map<String, IFunction<NumberLangObject>> attrAccessorNumber = new HashMap<>();
-		private final Map<String, IFunction<HashLangObject>> attrAccessorHash = new HashMap<>();
-		private final Map<String, IFunction<ExceptionLangObject>> attrAccessorException = new HashMap<>();
-		private final Map<String, IFunction<FunctionLangObject>> attrAccessorFunction = new HashMap<>();
+		private final Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString = new HashMap<>();
+		private final Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray = new HashMap<>();
+		private final Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean = new HashMap<>();
+		private final Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber = new HashMap<>();
+		private final Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash = new HashMap<>();
+		private final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException = new HashMap<>();
+		private final Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction = new HashMap<>();
 		private IFunction<StringLangObject> genericAttrAccessorString;
 		private IFunction<NumberLangObject> genericAttrAccessorNumber;
 		private IFunction<BooleanLangObject> genericAttrAccessorBoolean;
@@ -93,13 +93,13 @@ public class GenericNamespace implements INamespace {
 		public Builder() {
 		}
 
-		private final <T extends ALangObject> Builder addAttrAccessor(final IFunction<T>[] m, final Map<String, IFunction<T>> map) {
+		private final <T extends ALangObject> Builder addAttrAccessor(final IFunction<T>[] m, final Map<StringLangObject, IFunction<T>> map) {
 			if (m.length == 0) return this;
 			if (map.isEmpty()) {
 				++count;
 			}
 			for (final IFunction<T> f : m)
-				map.put(f.getDeclaredName(), f);
+				map.put(StringLangObject.create(f.getDeclaredName()), f);
 			return this;
 		}
 
@@ -254,13 +254,13 @@ public class GenericNamespace implements INamespace {
 			final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash,
 			final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException,
 			final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction,
-			final Map<String, IFunction<BooleanLangObject>> attrAccessorBoolean,
-			final Map<String, IFunction<NumberLangObject>> attrAccessorNumber,
-			final Map<String, IFunction<StringLangObject>> attrAccessorString,
-			final Map<String, IFunction<ArrayLangObject>> attrAccessorArray,
-			final Map<String, IFunction<HashLangObject>> attrAccessorHash,
-			final Map<String, IFunction<ExceptionLangObject>> attrAccessorException,
-			final Map<String, IFunction<FunctionLangObject>> attrAccessorFunction,
+			final Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean,
+			final Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber,
+			final Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString,
+			final Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray,
+			final Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash,
+			final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException,
+			final Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction,
 			final IFunction<BooleanLangObject> genericAttrAccessorBoolean,
 			final IFunction<NumberLangObject> genericAttrAccessorNumber,
 			final IFunction<StringLangObject> genericAttrAccessorString,

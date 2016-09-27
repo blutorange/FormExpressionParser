@@ -871,7 +871,14 @@ void Function(EMethod method) #FunctionNode :
 }
 {
   (
-    "->" "(" (Variable(null))* ")" BlockOrClause(null)
+    "->" "("
+    (
+      Variable(null)
+    )*
+    ")"
+    (
+      Block(null)
+    )
   )
   {
     jjtThis.init(method);

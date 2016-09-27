@@ -2,10 +2,10 @@ package de.xima.fc.form.expression;
 
 // TODO List
 // - +=, -=, = etc. ( a += b ==> a = a+b)
-// - Functions as LangObjects, print('me') is evaluated as print -> function(){} -> functionCall
 // - unparse, variableScopeChecker
 // - EmbeddedBlocks
 // - Regex literal
+// - NamedScopes such as form::alias("tf1");
 
 
 /**

@@ -16,10 +16,10 @@ public class ASTFunctionNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method) throws ParseException {
-		assertChildrenAtLeast(2);
+		assertChildrenAtLeast(1);
 		siblingMethod = method;
 		final ASTVariableNode[] childrenArray = getChildArrayAs(ASTVariableNode.class, 0, children.length-2);
-		argNameArray = new String[childrenArray.length];
+		argNameArray = new String[childrenArray.length-1];
 		for (int i = 0; i != argNameArray.length; ++i) {
 			argNameArray[i] = childrenArray[i].getName();
 		}

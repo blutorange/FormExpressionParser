@@ -193,11 +193,11 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 
 	@NotNull
 	protected final <T extends ALangObject> ALangObject evaluateAttrAccessor(final T thisContext,
-			final IFunction<T> function, final ALangObject accessor, final IEvaluationContext ec, final ALangObject... args)
+			final IFunction<T> function, final ALangObject accessor, final IEvaluationContext ec)
 					throws NoSuchAttrAccessorException, EvaluationException {
 		if (function == null)
 			throw new NoSuchAttrAccessorException(accessor.toString(), thisContext, ec);
-		return ALangObject.create(function.evaluate(ec, thisContext, args));
+		return ALangObject.create(function.evaluate(ec, thisContext, accessor));
 	}
 
 	public abstract IFunction<? extends ALangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec)
