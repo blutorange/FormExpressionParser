@@ -102,11 +102,6 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return BooleanLangObject.getTrueInstance();
-	}
-
-	@Override
 	public Iterator<ALangObject> iterator() {
 		return new Iterator<ALangObject>() {
 			private int i = 0;

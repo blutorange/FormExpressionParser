@@ -82,14 +82,10 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append("§null");
+		builder.append("null");
 	}
 
-	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) {
-		return BooleanLangObject.getFalseInstance();
-	}
-
+	// Coercion
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) {
 		return NumberLangObject.getZeroInstance();
@@ -97,7 +93,26 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) {
-		return StringLangObject.getNullInstance();
+		return StringLangObject.getEmptyInstance();
 	}
 
+	@Override
+	public ArrayLangObject coerceArray(final IEvaluationContext ec) {
+		return ArrayLangObject.create();
+	}
+
+	@Override
+	public HashLangObject coerceHash(final IEvaluationContext ec) {
+		return HashLangObject.create();
+	}
+
+	@Override
+	public ExceptionLangObject coerceException(final IEvaluationContext ec) {
+		return ExceptionLangObject.getEmptyExceptionInstance();
+	}
+
+	@Override
+	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
+		return FunctionLangObject.getNoOpInstance();
+	}	
 }

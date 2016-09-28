@@ -43,11 +43,6 @@ public class LookUpBinding implements IBinding {
 		currentDepth = 0;
 	}
 
-	//	protected LookUpBinding(final int nestingDepth, final Map<String, ALangObject> globalVariables) {
-	//		this(nestingDepth);
-	//		mapArray[0] = globalVariables;
-	//	}
-
 	@Override
 	public void reset() {
 		for (int i = currentDepth; i < mapArray.length; ++i) mapArray[i].clear();
@@ -56,25 +51,12 @@ public class LookUpBinding implements IBinding {
 
 	@Override
 	public ALangObject getVariable(final String name) throws EvaluationException {
-		ALangObject o;
 		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
-			o = mapArray[currentDepth].get(name);
+			final ALangObject o = mapArray[currentDepth].get(name);
 			if (o != null) return o;
 		}
-		o = getGlobalValue(name);
-		if (o == null) throw new VariableNotDefinedException(name, this);
-		return o;
+		throw new VariableNotDefinedException(name, this);
 	}
-
-	/**
-	 * When the variable not found in the current scope, a global value may be returned.
-	 * @return Value of the global variable, or null. A {@link VariableNotDefinedException} will be thrown when <code>null</code> is returned.
-	 * @param name Name of the variable.
-	 */
-	protected ALangObject getGlobalValue(final String name) {
-		return null;
-	}
-
 
 	@Override
 	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
@@ -103,4 +85,9 @@ public class LookUpBinding implements IBinding {
 		return nest();
 	}
 
+	@Override
+	public int getNestingLimit() {
+		return mapArray.length-1;
+	}
+	
 }

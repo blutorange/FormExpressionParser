@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
@@ -20,7 +22,19 @@ public class ArrayLangObject extends ALangObject {
 		this.value = value;
 	}
 
+	public static ArrayLangObject create() {
+		return new ArrayLangObject(new ArrayList<ALangObject>());
+	}	
 
+	public static ArrayLangObject create(Map<ALangObject, ALangObject> value) {
+		final List<ALangObject> list = new ArrayList<>(2*value.size()); 
+		for (final Entry<ALangObject, ALangObject> entry : value.entrySet()) {
+			list.add(entry.getKey());
+			list.add(entry.getValue());
+		}
+		return new ArrayLangObject(list);
+	}
+	
 	public static ALangObject create(final ALangObject... value) {
 		if (value == null) return NullLangObject.getInstance();
 		final List<ALangObject> list = new ArrayList<>(value.length);
@@ -35,12 +49,12 @@ public class ArrayLangObject extends ALangObject {
 
 	// Coercion
 	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return BooleanLangObject.getTrueInstance();
-	}
-	@Override
 	public ArrayLangObject coerceArray(final IEvaluationContext ec) throws CoercionException {
 		return this;
+	}
+	@Override
+	public HashLangObject coerceHash(final IEvaluationContext ec) throws CoercionException {
+		return HashLangObject.create(value);
 	}
 
 	@Override
@@ -149,5 +163,4 @@ public class ArrayLangObject extends ALangObject {
 	public ALangObject get(final int index) throws ArrayIndexOutOfBoundsException {
 		return value.get(index);
 	}
-
 }

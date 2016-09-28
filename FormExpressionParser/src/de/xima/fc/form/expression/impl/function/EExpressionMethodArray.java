@@ -12,6 +12,7 @@ import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 
 public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> {
+	PLUS(EMethod.PLUS, Impl.PLUS),
 	DASH(EMethod.DASH, Impl.DASH),
 	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
 	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),

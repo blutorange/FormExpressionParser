@@ -8,38 +8,41 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
+import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
 public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	/**
-	 * @param locale {@link StringLangObject} (optional). The (IETF BCP 47) name of the locale to be used for the conversion. Defaults to the English-like {@link Locale#ROOT}.
+	 * @param locale
+	 *            {@link StringLangObject} (optional). The (IETF BCP 47) name of
+	 *            the locale to be used for the conversion. Defaults to the
+	 *            English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The upper-case version of the string.
 	 */
-	upcase("locale") {
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			return thisContext.toUpperCase(args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
-		}
-	},
+	upcase(Impl.upcase),
 	/**
 	 * @return {@link NumberLangObject}. The length of this string, >=0.
 	 */
-	length() {
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
-			return NumberLangObject.create(thisContext.stringValue().length());
-		}
-	}
-	;
+	length(Impl.length),;
 
+	private final FunctionLangObject impl;
+	private final boolean evalImmediately;
 	private final String[] argList;
-	private EAttrAccessorString(final String... argList) {
-		this.argList = argList;
+
+	private EAttrAccessorString(final Impl impl) {
+		this.impl = FunctionLangObject.create(impl);
+		argList = impl.getDeclaredArgumentList();
+		evalImmediately = argList.length == 0;
 	}
 
+	@Override
+	public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+			final ALangObject... args) throws EvaluationException {
+		if (!evalImmediately)
+			return impl;
+		return impl.functionValue().evaluate(ec, thisContext, args);
+	}
 
 	@Override
 	public String getDeclaredName() {
@@ -61,7 +64,51 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 		return null;
 	}
 
-	@Override
-	public abstract ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
-			final ALangObject... args) throws EvaluationException;
+	private static enum Impl implements IFunction<StringLangObject> {
+		upcase("locale") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.toUpperCase(
+						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+			}
+		},
+		length() {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return NumberLangObject.create(thisContext.stringValue().length());
+			}
+		};
+
+		private String[] argList;
+
+		private Impl(String... argList) {
+			this.argList = argList;
+		}
+
+		@Override
+		public String[] getDeclaredArgumentList() {
+			return argList;
+		}
+
+		@Override
+		public String getDeclaredName() {
+			return toString();
+		}
+
+		@Override
+		public Type getThisContextType() {
+			return Type.STRING;
+		}
+
+		@Override
+		public Node getNode() {
+			return null;
+		}
+
+		@Override
+		public abstract ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+				final ALangObject... args) throws EvaluationException;
+	}
 }

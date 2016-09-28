@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.object;
 
-import java.math.BigDecimal;
 import java.util.Iterator;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -15,8 +14,8 @@ import de.xima.fc.form.expression.exception.MathException;
  * Number objects are immutable. Performing any operations on a number object
  * will create a new object. <br>
  * <br>
- * Currently all numbers are implemented with {@link BigDecimal}. For
- * performance, this class can be subclassed to add implementations with floats
+ * Currently all numbers are implemented with <code<double</code>s. For
+ * performance, this class could be subclassed to add implementations with floats
  * or ints. This class exposes only factory methods for object construction,
  * when subclasses are created, factory methods should be added to this class.
  *
@@ -40,12 +39,12 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	public long longValue() throws MathException {
-		if (!Double.isFinite(value) || value > 9007199254740993f || value < -9007199254740993f) throw new MathException("Number too large to be represented as a long: " + value);
+		if (Double.isNaN(value) || value > 9007199254740993f || value < -9007199254740993f) throw new MathException("Number too large to be represented as a long: " + value);
 		return (long)value;
 	}
 
 	public int intValue() throws MathException {
-		if (!Double.isFinite(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) throw new MathException("Number too large to be represented as an int: " + value);
+		if (Double.isNaN(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) throw new MathException("Number too large to be represented as an int: " + value);
 		return (int)value;
 	}
 
@@ -104,12 +103,6 @@ public class NumberLangObject extends ALangObject {
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
 		return StringLangObject.create(value);
 	}
-
-	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return BooleanLangObject.getTrueInstance();
-	}
-
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
 		return this;
@@ -128,7 +121,8 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public int hashCode() {
-		return Double.hashCode(value);
+		final long l = Double.doubleToLongBits(value);
+		return (int)(l^(l>>32));
 	}
 
 	@Override

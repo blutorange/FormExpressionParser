@@ -60,7 +60,7 @@ public class FunctionLangObject extends ALangObject {
 	@Override
 	public void toExpression(final StringBuilder builder) {
 		builder.append("->(");
-		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(", ");
+		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(",");
 		// Remove final comma
 		if (builder.length()>3) builder.setLength(builder.length()-1);
 		builder.append(") {");
@@ -111,11 +111,18 @@ public class FunctionLangObject extends ALangObject {
 		return value == func.value;
 	}
 
+	
+	// Coercion
+	@Override
+	public StringLangObject coerceString(IEvaluationContext ec) {
+		return StringLangObject.create(value.getDeclaredName());
+	}
+	
 	public static FunctionLangObject getNoOpInstance() {
 		return InstanceHolder.NO_OP;
 	}
 
-	public static ALangObject create(final IFunction<? extends ALangObject> value) {
+	public static FunctionLangObject create(final IFunction<? extends ALangObject> value) {
 		if (value == null) return getNoOpInstance();
 		return new FunctionLangObject((IFunction<ALangObject>)value);
 	}

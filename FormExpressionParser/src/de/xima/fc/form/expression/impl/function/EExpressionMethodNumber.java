@@ -12,10 +12,26 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 
 public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject> {
+	/**
+	 * @param summand {@link NumberLangObject} The number to be added to this number.
+	 * @return {@link NumberLangObject}. The arithmetic sum of this number and the argument.
+	 */
 	PLUS(EMethod.PLUS, Impl.PLUS),
+	/**
+	 * @param multiplicand {@link NumberLangObject}. The number to be multiplied to this number.
+	 * @return The arithmetic product of this number and the argument.
+	 */
 	STAR(EMethod.STAR, Impl.STAR),
+	/**
+	 * @param comparand {@link ALangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
+	 */
 	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),
+	/**
+	 * @param comparand {@link ALangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this number is numerically equivalent to the argument.
+	 */
+	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.DOUBLE_EQUAL),
 	;
 	private final EMethod method;
 	private final IFunction<NumberLangObject> function;
@@ -34,10 +50,6 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	}
 
 	private static enum Impl implements IFunction<NumberLangObject> {
-		/**
-		 * @param summand {@link NumberLangObject} The number to be added to this number.
-		 * @return {@link NumberLangObject}. The arithmetic sum of this number and the argument.
-		 */
 		PLUS("summand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
@@ -45,10 +57,6 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
 		},
-		/**
-		 * @param multiplicand {@link NumberLangObject}. The number to be multiplied to this number.
-		 * @return The arithmetic product of this number and the argument.
-		 */
 		STAR("multiplicand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
@@ -56,26 +64,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 		},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-		 */
 		DOUBLE_EQUAL("comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return BooleanLangObject.create(thisContext.equals(args[0]));
 			}},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
-		 */
-		TRIPLE_EQUAL("comparand"){
-				@Override
-				public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-						throws EvaluationException {
-					return BooleanLangObject.create(thisContext == args[0]);
-				}},
 		;
 
 		private final String[] argList;

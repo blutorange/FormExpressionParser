@@ -43,13 +43,8 @@ public class BooleanLangObject extends ALangObject {
 	}
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
-		return NumberLangObject.create(value ? 1 : 0);
+		return value ? NumberLangObject.getOneInstance() : NumberLangObject.getZeroInstance();
 	}
-	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return this;
-	}
-
 
 	/**
 	 *  @return <code>this</code>, as only one object exists for true and false.
@@ -106,7 +101,7 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(value ? "§true" : "§false");
+		builder.append(value ? "true" : "false");
 	}
 
 	public static BooleanLangObject create(final boolean b) {

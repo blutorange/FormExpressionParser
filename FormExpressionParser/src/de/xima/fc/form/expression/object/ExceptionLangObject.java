@@ -1,17 +1,24 @@
 package de.xima.fc.form.expression.object;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 
 public class ExceptionLangObject extends ALangObject {
 
-	private final EvaluationException value;
+	private final CatchableEvaluationException value;
 
-	private ExceptionLangObject(final EvaluationException value) {
+	private final static class InstanceHolder {
+		public final static ExceptionLangObject EMPTY_EXCEPTION = new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY));
+	}
+	
+	private ExceptionLangObject(final CatchableEvaluationException value) {
 		super(Type.EXCEPTION);
 		this.value = value;
 	}
@@ -73,26 +80,26 @@ public class ExceptionLangObject extends ALangObject {
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
 		return StringLangObject.create(value.getMessage());
 	}
-
-	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return BooleanLangObject.getTrueInstance();
-	}
 	@Override
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
 		return this;
 	}
-
+	
 	public EvaluationException exceptionValue() {
 		return value;
 	}
 
-	public static ALangObject create(final EvaluationException value) {
+	public static ALangObject create(final CatchableEvaluationException value) {
 		if (value == null) return NullLangObject.getInstance();
 		return new ExceptionLangObject(value);
 	}
 
 	public static ExceptionLangObject create(final String message) {
+		if (message == null || message.length()==0) return getEmptyExceptionInstance();
 		return new ExceptionLangObject(new CustomRuntimeException(message));
+	}
+
+	public static ExceptionLangObject getEmptyExceptionInstance() {
+		return InstanceHolder.EMPTY_EXCEPTION;
 	}
 }

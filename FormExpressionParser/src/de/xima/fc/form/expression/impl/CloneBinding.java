@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 
@@ -33,19 +34,9 @@ public class CloneBinding implements IBinding {
 		this.parent = parent;
 	}
 
-	/**
-	 * When the variable not found in the current scope, a global value may be returned.
-	 * @return Value of the global variable. A {@link VariableNotDefinedException} will be thrown when <code>null</code> is returned.
-	 * @param name Name of the variable.
-	 */
-	protected ALangObject getGlobalValue(final String name) {
-		return null;
-	}
-
 	@Override
 	public final ALangObject getVariable(final String name) throws EvaluationException {
-		ALangObject o = map.get(name);
-		if (o == null) o = getGlobalValue(name);
+		final ALangObject o = map.get(name);
 		if (o == null) throw new VariableNotDefinedException(name, this);
 		return o;
 	}
@@ -56,7 +47,7 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public final IBinding nest() {
+	public final IBinding nest() throws NestingLevelTooDeepException {
 		return new CloneBinding(this);
 	}
 
@@ -74,4 +65,9 @@ public class CloneBinding implements IBinding {
 	public IBinding nestLocal() {
 		return new CloneBinding(map.size());
 	}
+
+	@Override
+	public int getNestingLimit() {
+		return -1;
+	}		
 }

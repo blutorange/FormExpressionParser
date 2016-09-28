@@ -31,10 +31,10 @@ public final class FormFieldEvaluationBinding extends LookUpBinding {
 		aliasMap.put("NachnameUnicode","Wachsmuth");
 	}
 
-	@Override
-	protected ALangObject getGlobalValue(final String name) throws VariableNotDefinedException {
-		String value = nameMap.get(name);
-		if (value == null) value = aliasMap.get(name);
-		return value == null ? null : StringLangObject.create(value);
-	}
+//	@Override
+//	protected ALangObject getGlobalValue(final String name) throws VariableNotDefinedException {
+//		String value = nameMap.get(name);
+//		if (value == null) value = aliasMap.get(name);
+//		return value == null ? null : StringLangObject.create(value);
+//	}
 }

@@ -120,15 +120,18 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTPropertyExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
 		ALangObject res = children[0].jjtAccept(this, ec);
+		ALangObject thisContext = res;
 		for (int i = 1; i < children.length; ++i) {
 			final Node n = children[i];
 			switch(n.getSiblingMethod()) {
 			case DOT:
+				thisContext = res;
 				final StringLangObject attrDot = StringLangObject.create(((ASTVariableNode)n).getName());
 				res = res.evaluateAttrAccessor(attrDot, true, ec);
 				break;
 			case BRACKET:
-				final ALangObject attrBracket = n.jjtGetChild(0).jjtAccept(this, ec);
+				thisContext = res;
+				final ALangObject attrBracket = n.jjtAccept(this, ec);
 				res = res.evaluateAttrAccessor(attrBracket, false, ec);
 				break;
 			case PARENTHESIS:
@@ -139,13 +142,13 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				final ALangObject[] args = evaluateChildren(n, ec);
 
 				// Check thisContext of the function.
-				if (func.getThisContextType() != res.getType())
+				if (func.getThisContextType() != thisContext.getType())
 					throw new IllegalThisContextException(res, func.getThisContextType(), func, ec);
 
 				nestLocal(ec);
 				try {
 					// Evaluate function
-					res = func.evaluate(ec, res, args);
+					thisContext = res = func.evaluate(ec, thisContext, args);
 				}
 				finally {
 					unnest(ec);

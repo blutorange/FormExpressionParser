@@ -14,6 +14,113 @@ import de.xima.fc.form.expression.exception.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.NoSuchMethodException;
 
+/**
+ * <h1>Coercion rules</h1>
+ * Right: Object to be coerced.
+ * Down: Coercion target.
+ * <table style="text-align:center;">
+ *   <th>
+ *     <td>{@link NullLangObject}</td>
+ *     <td>{@link BooleanLangObject}</td>
+ *     <td>{@link NumberLangObject}</td>
+ *     <td>{@link StringLangObject}</td>
+ *     <td>{@link ArrayLangObject}</td>
+ *     <td>{@link HashLangObject}</td>
+ *     <td>{@link ExceptionLangObject}</td>
+ *     <td>{@link FunctionLangObject}</td>
+ *   <th>
+ *   <tr>
+ *     <td>{@link NullLangObject}</td>
+ *     <td>-</td>
+ *     <td><code>false</code></td>
+ *     <td><code>0</code></td>
+ *     <td><code>""</code></td>
+ *     <td><code>[]</code></td>
+ *     <td><code>{}</code></td>
+ *     <td><code>exception("")</code></td>
+ *     <td>{@link FunctionLangObject#getNoOpInstance()}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link BooleanLangObject}</td>
+ *     <td>-</td>
+ *     <td>-</td>
+ *     <td><code>0</code> / <code>1</code></td>
+ *     <td><code>false</code> / <code>true</code></td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link NumberLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>-</td>
+ *     <td>Decimal representation of the number, eg <code>1.0</code>.</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link StringLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>Interpreted as decimal; or <code>0</code> when not a valid decimal number.</td>
+ *     <td>-</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link ArrayLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link ArrayLangObject#toExpression(StringBuilder)}</td>
+ *     <td>-</td>
+ *     <td>Each pair is interpreted as a key-value pair. When it contains an odd number of entries, the last key will be mapped to <code>null</code>.</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link HashLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link HashLangObject#toExpression(StringBuilder)}</td>
+ *     <td>An array twice the size of the hash, with each key as the <code>2n</code>-th entry and the corresponding value as the <code>2n+1</code>-th entry.</td>
+ *     <td>-</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link ExceptionLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>Message of the exception.</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>-</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link FunctionLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>Declared name of the function. Empty string when anonymous function.</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>-</td>
+ *   </tr>
+ * </table>
+ * @author mad_gaksha
+ *
+ */
 public abstract class ALangObject implements Iterable<ALangObject> {
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
 
@@ -63,17 +170,13 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	public abstract void toExpression(StringBuilder builder);
 
 	/**
-	 * @param ec
-	 *            Current evaluation context.
-	 * @return The coerced object. Must return <code>this</code> when this
-	 *         object is already of the correct type.
-	 * @throws CoercionException
-	 *             When this object cannot be coerced to the given type.
+	 * Override this for different conversions.
+	 * @param ec Context to be used.
 	 */
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
 		if (getType() == Type.STRING)
 			return (StringLangObject) this;
-		throw new CoercionException(this, Type.STRING, ec);
+		return StringLangObject.create(toString());
 	}
 
 	public ArrayLangObject coerceArray(final IEvaluationContext ec) throws CoercionException {
@@ -94,10 +197,24 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		throw new CoercionException(this, Type.NUMBER, ec);
 	}
 
+	/**
+	 * Can be overridden, but I recommend not to. By default, only
+	 * <code>null</code> and <code>false</code> is coerced to <code>false</code>,
+	 * everything else to <code>true</code>.
+	 * @param ec Context to use.
+	 * @return Coerced object.
+	 * @throws CoercionException When the object cannot be coerced.
+	 */
 	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.BOOLEAN)
-			return (BooleanLangObject) this;
-		throw new CoercionException(this, Type.BOOLEAN, ec);
+		switch (getType()) {
+		case BOOLEAN:
+			return (BooleanLangObject)this;
+		case NULL:
+			return BooleanLangObject.getFalseInstance();
+			//$CASES-OMITTED$
+		default:
+			return BooleanLangObject.getTrueInstance();
+		}
 	}
 
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
@@ -250,5 +367,29 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	public final Type getType() {
 		return type;
 	}
-
+	
+	public final boolean isArray() {
+		return type == Type.ARRAY;
+	}
+	public final boolean isNumber() {
+		return type == Type.NUMBER;
+	}
+	public final boolean isString() {
+		return type == Type.STRING;
+	}
+	public final boolean isHash() {
+		return type == Type.HASH;
+	}
+	public final boolean isBoolean() {
+		return type == Type.BOOLEAN;
+	}
+	public final boolean isFunction() {
+		return type == Type.FUNCTION;
+	}
+	public final boolean isException() {
+		return type == Type.EXCEPTION;
+	}
+	public final boolean isNull() {
+		return type == Type.NULL;
+	}
 }

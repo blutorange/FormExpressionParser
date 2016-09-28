@@ -23,12 +23,12 @@ public class HashLangObject extends ALangObject {
 
 	// Coercion
 	@Override
-	public BooleanLangObject coerceBoolean(final IEvaluationContext ec) throws CoercionException {
-		return BooleanLangObject.getTrueInstance();
-	}
-	@Override
 	public HashLangObject coerceHash(final IEvaluationContext ec) throws CoercionException {
 		return this;
+	}
+	@Override
+	public ArrayLangObject coerceArray(final IEvaluationContext ec) throws CoercionException {
+		return ArrayLangObject.create(value);
 	}
 
 	@Override
@@ -133,6 +133,11 @@ public class HashLangObject extends ALangObject {
 		return new HashLangObject(value);
 	}
 
+	/** @return An empty hash. */
+	public static HashLangObject create() {
+		return new HashLangObject(new HashMap<ALangObject, ALangObject>());
+	}
+	
 	/**
 	 * @param value An array with an even number of entries, each pair of two representing a key-value pair.
 	 * @return The hash map.
@@ -150,8 +155,9 @@ public class HashLangObject extends ALangObject {
 	 * @param value A list with an even number of entries, each pair of two representing a key-value pair.
 	 * @return The hash map.
 	 */
-	public static ALangObject create(final List<ALangObject> value) {
-		if (value == null) return NullLangObject.getInstance();
+	public static HashLangObject create(final List<ALangObject> value) {
+		if (value == null)
+			return new HashLangObject(new HashMap<ALangObject, ALangObject>());
 		final int len = value.size() - value.size()%2;
 		final Map<ALangObject, ALangObject> map = new HashMap<>(len/2);
 		for (int i = 0 ; i != len; i += 2)
@@ -161,5 +167,9 @@ public class HashLangObject extends ALangObject {
 
 	public Map<ALangObject, ALangObject> hashValue() {
 		return value;
+	}
+
+	public int length() {
+		return value.size();
 	}
 }
