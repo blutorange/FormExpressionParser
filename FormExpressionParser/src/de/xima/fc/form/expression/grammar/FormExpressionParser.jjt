@@ -53,7 +53,7 @@ void Clause(EMethod method) #void :
   | ThrowClause(method)
   | BreakClause(method)
   | ContinueClause(method)
-  | Statement(method)
+  | Statement(method, false)
   )
 }
 
@@ -273,7 +273,7 @@ void StatementListCommaSeparated(EMethod method) #StatementListNode :
   }
 }
 
-Node Statement(EMethod method) #ExpressionNode :
+Node Statement(EMethod method, boolean createNode) #ExpressionNode(createNode) :
 {
 }
 {
@@ -283,6 +283,7 @@ Node Statement(EMethod method) #ExpressionNode :
     )
   )
   {
+    if (!createNode) return null;
     if (jjtThis.jjtGetNumChildren() > 0) jjtThis.init(method);
     return jjtThis;
   }
@@ -295,7 +296,7 @@ void Expression(EMethod method) #void :
   EqualTypeExpression(method)
 }
 
-void EqualTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
+void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
 }
@@ -361,7 +362,7 @@ void EqualTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
+    if (createNode) jjtThis.init(method, this);
   }
 }
 

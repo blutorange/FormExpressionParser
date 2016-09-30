@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
+import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -90,6 +91,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
+		// Child must be an expression and cannot be break/continue/return.
 		final ALangObject res = node.jjtGetChild(0).jjtAccept(this, ec);
 		return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
@@ -104,9 +106,11 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			return NullLangObject.getInstance();
 
 		// Binary expression node.
+		// Children are expressions and cannot contain break/clause/return clauses.
 		ALangObject res = childrenArray[0].jjtAccept(this, ec);
 		for (int i = 1; i != childrenArray.length; ++i) {
 			final Node arg = childrenArray[i];
+			// Children are expressions and cannot contain break/clause/return clauses.
 			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, arg.jjtAccept(this, ec));
 		}
 
@@ -116,6 +120,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTPropertyExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
+		// Child is an expressions and cannot contain break/clause/return clauses.
 		ALangObject res = children[0].jjtAccept(this, ec);
 		ALangObject thisContext = NullLangObject.getInstance();
 		for (int i = 1; i < children.length; ++i) {
@@ -222,8 +227,12 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTVariableNode node, final IEvaluationContext ec) throws EvaluationException {
 		final String scope = node.getScope();
-		return scope != null ? ALangObject.create(ec.getScope().getVariable(scope, node.getName()))
-				: ec.getUnqualifiedVariable(node.getName());
+		if (scope != null) {
+			final ALangObject value = ec.getScope().getVariable(scope, node.getName());
+			if (value == null) throw new VariableNotDefinedException(scope, node.getName(), ec);
+			return value;
+		}
+		return ec.getUnqualifiedVariable(node.getName());
 	}
 
 	@Override
@@ -499,14 +508,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTIdentifierNameNode node, final IEvaluationContext data) throws EvaluationException {
 		return StringLangObject.create(node.getName());
-	}
-	
-	@Override
-	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec)
-			throws EvaluationException {
-		// TODO
-		return null;
-	}
+	}	
 
 	@Override
 	public ALangObject visit(ASTWithClauseNode node, IEvaluationContext ec) throws EvaluationException {
@@ -514,13 +516,47 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final int len = children.length-1;
 		// Set scopes.
 		for (int i = 0; i != len; ++i) {
+			// Children can only be identifiers, not break/continue/return.
 			ec.beginDefaultScope(children[i].jjtAccept(this, ec).coerceString(ec).stringValue());
 		}
 		// Evaluate block.
-		final ALangObject res = children[children.length-1].jjtAccept(this, ec);
-		// Remove scopes.
-		for (int i = 0; i != len; ++i)
-			ec.endDefaultScope();
-		return res;
+		try {
+			// Need not check for must jump as we return immediately anyway.
+			return children[children.length-1].jjtAccept(this, ec);
+		}
+		finally {
+			// Remove scopes.
+			for (int i = 0; i != len; ++i)
+				ec.endDefaultScope();
+		}
+	}
+	
+	@Override
+	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec)
+			throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		// Child must be an expression and cannot contain break/continue/return.
+		final ALangObject assignee = children[children.length-1].jjtAccept(this, ec);
+		for (int i = children.length - 2; i>=0; --i) {
+			switch (children[i].getSiblingMethod()) {
+			case ASSIGNMENT_DIRECT:
+				final ASTVariableNode var = (ASTVariableNode)children[i];
+				final String scope = var.getScope();
+				if (scope != null) ec.getScope().setVariable(scope, var.getName(), assignee);
+				else ec.setUnqualifiedVariable(var.getName(), assignee);
+				break;
+			case ASSIGNMENT_PROPERTY:
+				//TODO
+				final ASTAssignmentExpressionNode ass = (ASTAssignmentExpressionNode)children[i];
+				break;
+				//$CASES-OMITTED$
+			default:
+				throw new UncatchableEvaluationException(ec,
+						String.format(
+								"Unknown assignment type %s. This is likely a bug with the parser. Contact support.",
+								children[i].getSiblingMethod()));
+			}
+		}
+		return assignee;
 	}
 }
