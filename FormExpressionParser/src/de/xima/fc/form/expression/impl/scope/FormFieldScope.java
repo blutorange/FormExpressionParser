@@ -47,9 +47,9 @@ public final class FormFieldScope implements ICustomScope {
 
 	@Override
 	public ALangObject fetch(String variableName) {
-		String value = formVersion.getFieldValueByAlias(variableName);
-		if (value == null) value = formVersion.getFieldValueByName(variableName);
-		return StringLangObject.create(value);
+		final String value = formVersion.getFieldValueByAlias(variableName);
+		if (value != null) return StringLangObject.create(value);
+		return StringLangObject.create(formVersion.getFieldValueByName(variableName));
 	}
 
 	@Override

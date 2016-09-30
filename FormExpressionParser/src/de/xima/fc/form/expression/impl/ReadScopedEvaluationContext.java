@@ -105,7 +105,7 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 	}
 
 	@Override
-	public void endDefaultScope(String scope) {
+	public void endDefaultScope() {
 		defaultScopeList.remove(defaultScopeList.size() - 1);
 	}
 

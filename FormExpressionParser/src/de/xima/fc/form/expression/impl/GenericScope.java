@@ -30,8 +30,8 @@ public class GenericScope implements IScope {
 	public ALangObject getVariable(String scope, String name) throws EvaluationException {
 		final ALangObject value = map.get(scope, name);
 		if (custom == null || value != null) return value;
-		final ICustomScope key = custom.get(scope);
-		return key == null ? null : key.fetch(name);
+		final ICustomScope customScope = custom.get(scope);
+		return customScope == null ? null : customScope.fetch(name);
 	}
 
 	@Override
@@ -58,13 +58,11 @@ public class GenericScope implements IScope {
 		}
 		
 		public void addCustomScope(ICustomScope customScope) {
+			if (customScope == null ) return;
+			useCustomScope = true;
 			custom.put(customScope.getScopeName(), customScope);
 		}
-		
-		public void setUseCustomScope(boolean useCustomScope) {
-			this.useCustomScope = useCustomScope;
-		}
-		
+				
 		public IScope build() {
 			return new GenericScope(map, useCustomScope ? custom : null);
 		}

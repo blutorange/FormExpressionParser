@@ -549,8 +549,18 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
-	public ALangObject visit(ASTWithClauseNode node, IEvaluationContext data) throws EvaluationException {
-		
+	public ALangObject visit(ASTWithClauseNode node, IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		final int len = children.length-1;
+		// Set scopes.
+		for (int i = 0; i != len; ++i) {
+			ec.beginDefaultScope(children[i].jjtAccept(this, ec).coerceString(ec).stringValue());
+		}
+		// Evaluate block.
+		final ALangObject res = children[children.length-1].jjtAccept(this, ec);
+		// Remove scopes.
+		for (int i = 0; i != len; ++i)
+			ec.endDefaultScope();
+		return res;
 	}
-
 }

@@ -27,4 +27,9 @@ public class ASTIdentifierNameNode extends SimpleNode {
 	public String getName() {
 		return name;
 	}
+	
+	@Override
+	public String toString() {
+		return "IdentifierNode(" + siblingMethod + "," + name + ")";
+	}
 }

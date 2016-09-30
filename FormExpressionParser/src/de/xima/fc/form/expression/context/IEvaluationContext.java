@@ -35,24 +35,23 @@ public interface IEvaluationContext {
 
 	/**
 	 * Called at the beginning of a scope block:
-	 * <code>
+	 * <pre>
 	 * with scope foobar {
 	 *   ...
 	 * }
-	 * </code>
+	 * </pre>
 	 * @param scope Name of the scope to be added to the list of default lookup scopes for unqualified variables.
 	 */
 	public void beginDefaultScope(String scope);
 	/**
-	 * Called at the end of a scope block:
-	 * <code>
+	 * Called at the end of a scope block and remove the scope added most recently.
+	 * <pre>
 	 * with scope foobar {
 	 *   ...
 	 * }
-	 * </code>
-	 * @param scope Name of the scope to be removed from the list of default lookup scopes for unqualified variables.
+	 * </pre>
 	 */
-	public void endDefaultScope(String name);
+	public void endDefaultScope();
 
 	/**
 	 * Must be an equivalence relation.
