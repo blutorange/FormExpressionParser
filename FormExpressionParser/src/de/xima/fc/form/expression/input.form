@@ -1,3 +1,6 @@
-with (fields) {
-  tf1;
-}
+->(x,y,z) {
+  for (arg : arguments)
+    §loginfo(arg);
+  if (z) x+y;
+  else x-y;
+}(43,2,true);

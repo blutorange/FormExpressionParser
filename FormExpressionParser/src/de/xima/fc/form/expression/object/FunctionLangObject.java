@@ -118,6 +118,11 @@ public class FunctionLangObject extends ALangObject {
 		return StringLangObject.create(value.getDeclaredName());
 	}
 	
+	@Override
+	public FunctionLangObject coerceFunction(IEvaluationContext ec) {
+		return this;
+	}
+	
 	public static FunctionLangObject getNoOpInstance() {
 		return InstanceHolder.NO_OP;
 	}

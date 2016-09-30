@@ -51,7 +51,7 @@ public class LookUpBinding implements IBinding {
 	@Override
 	public ALangObject getVariable(final String name) throws EvaluationException {
 		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
-			final ALangObject o = mapArray[currentDepth].get(name);
+			final ALangObject o = mapArray[i].get(name);
 			if (o != null) return o;
 		}
 		return null;

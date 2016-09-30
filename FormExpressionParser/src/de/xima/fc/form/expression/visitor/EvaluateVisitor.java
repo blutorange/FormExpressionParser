@@ -3,9 +3,6 @@ package de.xima.fc.form.expression.visitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
-import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.ILogger;
@@ -46,7 +43,6 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
@@ -55,7 +51,6 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
 
 public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext> {
 
@@ -122,7 +117,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTPropertyExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
 		ALangObject res = children[0].jjtAccept(this, ec);
-		ALangObject thisContext = res;
+		ALangObject thisContext = NullLangObject.getInstance();
 		for (int i = 1; i < children.length; ++i) {
 			final Node n = children[i];
 			switch(n.getSiblingMethod()) {
@@ -498,42 +493,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTFunctionNode node, final IEvaluationContext ec) throws EvaluationException {
-		final Node[] children = node.getChildArray();
-		final String[] argList = new String[children.length-1];
-		for (int i=0; i != argList.length; ++i)
-			argList[i] = children[i].jjtAccept(this, ec).coerceString(ec).stringValue();
-		return FunctionLangObject.create(new IFunction<NullLangObject>() {
-			@Override
-			public Node getNode() {
-				return children[children.length-1];
-			}
-			@Override
-			public String[] getDeclaredArgumentList() {
-				return argList;
-			}
-			@Override
-			public String getDeclaredName() {
-				return StringUtils.EMPTY;
-			}
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NullLangObject thisContext,
-					final ALangObject... args) throws EvaluationException {
-				final IBinding binding = ec.getBinding();
-				final String[] names = getDeclaredArgumentList();
-				// Set variables passed as special variables.
-				binding.setVariable(CmnCnst.Variable.ARGUMENTS, NumberLangObject.create(args.length));
-				binding.setVariable(CmnCnst.Variable.THIS, thisContext);
-				// Set variables passed as function arguments
-				for (int i = 0; i != names.length; ++i)
-					binding.setVariable(names[i], i < args.length ? args[i] : NullLangObject.getInstance());
-				// Evaluate function.
-				return node.jjtAccept(EvaluateVisitor.this, ec);
-			}
-			@Override
-			public Type getThisContextType() {
-				return Type.NULL;
-			}
-		});
+		return FunctionLangObject.create(new EvaluateVisitorAnonymousFunction(this, node, ec));
 	}
 
 	@Override

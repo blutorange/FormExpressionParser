@@ -18,6 +18,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 */
 	PLUS(EMethod.PLUS, Impl.PLUS),
 	/**
+	 * @param summand {@link NumberLangObject} The number to be subtracted to this number.
+	 * @return {@link NumberLangObject}. The arithmetic difference of this number and the argument.
+	 */
+	DASH(EMethod.DASH, Impl.DASH),
+	/**
 	 * @param multiplicand {@link NumberLangObject}. The number to be multiplied to this number.
 	 * @return The arithmetic product of this number and the argument.
 	 */
@@ -55,6 +60,13 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(args[0].coerceNumber(ec));
+			}
+		},
+		DASH("subtrahend") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.subtract(args[0].coerceNumber(ec));
 			}
 		},
 		STAR("multiplicand") {

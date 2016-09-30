@@ -42,7 +42,7 @@ public class SystemLogger implements ILogger {
 	
 	@Override
 	public void error(String message) {
-		if (level.numeric >= Level.ERROR.numeric) System.err.println(String.format("[ERROR] (%s) %s %s", getDate(), message));
+		if (level.numeric >= Level.WARN.numeric) System.err.println(String.format("[ERROR] (%s) %s %s", getDate(), prefix, message));
 	}
 
 	@Override
