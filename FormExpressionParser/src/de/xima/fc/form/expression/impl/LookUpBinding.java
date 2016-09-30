@@ -7,7 +7,6 @@ import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
-import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -55,7 +54,7 @@ public class LookUpBinding implements IBinding {
 			final ALangObject o = mapArray[currentDepth].get(name);
 			if (o != null) return o;
 		}
-		throw new VariableNotDefinedException(name, this);
+		return null;
 	}
 
 	@Override

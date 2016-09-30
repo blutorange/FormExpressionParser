@@ -20,7 +20,10 @@ public class StringLangObject extends ALangObject {
 	private final String value;
 
 	private static class InstanceHolder {
-		public final static StringLangObject EMPTY = StringLangObject.create("");
+		public final static StringLangObject EMPTY = StringLangObject.create(StringUtils.EMPTY);
+		public final static StringLangObject SPACE = StringLangObject.create(StringUtils.SPACE);
+		public final static StringLangObject LF = StringLangObject.create(StringUtils.LF);
+		public final static StringLangObject CR = StringLangObject.create(StringUtils.CR);
 		public final static StringLangObject TRUE = StringLangObject.create("true");
 		public final static StringLangObject FALSE = StringLangObject.create("false");
 		public final static StringLangObject NULL = StringLangObject.create("null");
@@ -140,7 +143,7 @@ public class StringLangObject extends ALangObject {
 	 * @return {@link ALangObject} representing the parameter string best, may not be an instance of {@link StringLangObject}.
 	 */
 	public static StringLangObject create(final String value) {
-		if (value == null) return StringLangObject.create(StringUtils.EMPTY);
+		if (value == null) return StringLangObject.getEmptyInstance();
 		return new StringLangObject(value);
 	}
 
@@ -186,6 +189,19 @@ public class StringLangObject extends ALangObject {
 	public static StringLangObject getEmptyInstance() {
 		return InstanceHolder.EMPTY;
 	}
+
+	public static StringLangObject getSpaceInstance() {
+		return InstanceHolder.SPACE;
+	}
+	
+	public static StringLangObject getLineFeedInstance() {
+		return InstanceHolder.LF;
+	}
+	
+	public static StringLangObject getCarriageReturnInstance() {
+		return InstanceHolder.CR;
+	}
+
 
 	public static StringLangObject getTrueInstance() {
 		return InstanceHolder.TRUE;

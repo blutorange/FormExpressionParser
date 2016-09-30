@@ -49,6 +49,7 @@ void Clause(EMethod method) #void :
   | WhileLoop(method)
   | SwitchClause(method)
   | TryClause(method)
+  | WithClause(method)
   | ThrowClause(method)
   | BreakClause(method)
   | ContinueClause(method)
@@ -56,6 +57,16 @@ void Clause(EMethod method) #void :
   )
 }
 
+void WithClause(EMethod method) #WithClauseNode :
+{
+}
+{
+  (
+    < With > "(" (IdentifierName(null))+ ")" BlockOrClause(null)  )
+  {
+    jjtThis.init(method);
+  }
+}
 
 void ContinueClause(EMethod method) #ContinueClauseNode :
 {
@@ -133,13 +144,6 @@ void SwitchDefault() #void :
   )
 }
 
-
-// try {
-//  1/0
-// }
-// catch (e) {
-//   log(e);
-// }
 void TryClause(EMethod method) #TryClauseNode :
 {
   Token t;
@@ -160,7 +164,6 @@ void TryClause(EMethod method) #TryClauseNode :
   }
 }
 
-// do { 1234 } while (true)
 void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 {
 }
@@ -175,8 +178,6 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
   }
 }
 
-// while ( i -- > 0)
-//  print(i)
 void WhileLoop(EMethod method) #WhileLoopNode :
 {
 }
@@ -190,10 +191,6 @@ void WhileLoop(EMethod method) #WhileLoopNode :
   }
 }
 
-// for ( i = 0 ; i != 10 ; ++i )
-//   log(i);
-// for ( node : getNodes() )
-//   doStuff(node);
 void ForLoop(EMethod method) #ForLoopNode :
 {
   Token iteratingLoopVariable = null;
@@ -636,13 +633,25 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
   (
     FunctionTypeUnaryExpression(method)
     (
-      "." Variable(EMethod.DOT)
+      "." IdentifierName(EMethod.DOT)
     | "[" Expression(EMethod.BRACKET) "]"
     | "(" FunctionArgumentList(EMethod.PARENTHESIS) ")"
     )*
   )
   {
     if (createNode) jjtThis.init(method);
+  }
+}
+
+void IdentifierName(EMethod method) #IdentifierNameNode :
+{
+  Token t;
+}
+{
+  (    t = < IDENTIFIER >
+  )
+  {
+    jjtThis.init(method, t.image);
   }
 }
 
@@ -670,7 +679,7 @@ void FunctionTypeUnaryExpression(EMethod method) #void :
     (
       Literal(method)
     | 
-      Variable(method)
+      VariableWithOptionalScope(method)
     |
       (
         "(" Expression(method) ")"
@@ -681,16 +690,20 @@ void FunctionTypeUnaryExpression(EMethod method) #void :
   }
 }
 
-void Variable(EMethod method) #VariableNode :
+void VariableWithOptionalScope(EMethod method) #VariableNode :
 {
-  Token t;
+  Token part1;
+  Token part2 = null;
 }
 {
   (
-    t = < IDENTIFIER >
+    part1 = < IDENTIFIER > ["::" part2 = < IDENTIFIER >]
   )
   {
-    jjtThis.init(method, t.image);
+    if (part2 ==null)
+      jjtThis.init(method, null, part1.image);
+    else
+      jjtThis.init(method, part1.image, part2.image);
   }
 }
 
@@ -873,8 +886,11 @@ void Function(EMethod method) #FunctionNode :
   (
     "->" "("
     (
-      Variable(null)
-    )*
+      [ IdentifierName(null) ]
+      (
+        "," IdentifierName(null)
+      )*
+    )
     ")"
     (
       Block(null)
@@ -948,6 +964,8 @@ TOKEN :
 
 TOKEN :
 {
+  < With : "with" >
+| 
   < Break : "break" >
 |
   < Continue : "continue" >

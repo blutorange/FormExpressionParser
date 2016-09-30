@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.context;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.IReset;
 
 public interface IBinding extends IReset {
@@ -24,16 +24,27 @@ public interface IBinding extends IReset {
 	 *
 	 * @param name
 	 *            Variable name.
-	 * @return The value of the variable, or {@link NullLangObject} when it does
-	 *         not exist. May also return null, which is converted to
-	 *         {@link NullLangObject} automatically.
+	 * @return The value of the variable, or null when it does
+	 *         not exist.
 	 * @throws EvaluationException
 	 *             When the value of the variable cannot be retrieved for any
-	 *             reason other than that it does not exist.
+	 *             reason other than that it does not exist. Must not throw
+	 *             an exception when the variable does not exist, but return
+	 *             <code>null</code> instead.
 	 */
 	public ALangObject getVariable(String name) throws EvaluationException;
-	public void setVariable(String name, ALangObject value) throws EvaluationException;
 
+	/**
+	 * Sets a local variable. Must never look it up in any scopes. When the variable
+	 * does not exist yet, it will be created. After it has been set,
+	 * {@link #getVariable(String)} must not throw a {@link VariableNotDefinedException}
+	 * anymore.
+	 * @param name Name of the variable.
+	 * @param value Value to set.
+	 * @throws EvaluationException When the variable cannot be set.
+	 */
+	public void setVariable(String name, ALangObject value) throws EvaluationException;
+	
 	/**
 	 * Creates a new binding derived from the this binding. {@link #getVariable(String)}
 	 * must return the same value unless #{@link #setVariable(String, ALangObject)} was called.

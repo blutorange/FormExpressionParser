@@ -149,6 +149,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 
 	public abstract ALangObject deepClone();
 
+	
 	/**
 	 * @return An expression that evaluates to this object. Eg. for a String
 	 *         <code>"</code>, this would return <code>"\""</code>

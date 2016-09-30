@@ -29,6 +29,7 @@ import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
+import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
@@ -43,6 +44,7 @@ import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -126,7 +128,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			switch(n.getSiblingMethod()) {
 			case DOT:
 				thisContext = res;
-				final StringLangObject attrDot = StringLangObject.create(((ASTVariableNode)n).getName());
+				final StringLangObject attrDot = n.jjtAccept(this, ec).coerceString(ec);
 				res = res.evaluateAttrAccessor(attrDot, true, ec);
 				break;
 			case BRACKET:
@@ -224,7 +226,9 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTVariableNode node, final IEvaluationContext ec) throws EvaluationException {
-		return ALangObject.create(ec.getBinding().getVariable(node.getName()));
+		final String scope = node.getScope();
+		return scope != null ? ALangObject.create(ec.getScope().getVariable(scope, node.getName()))
+				: ec.getUnqualifiedVariable(node.getName());
 	}
 
 	@Override
@@ -494,14 +498,18 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTFunctionNode node, final IEvaluationContext ec) throws EvaluationException {
+		final Node[] children = node.getChildArray();
+		final String[] argList = new String[children.length-1];
+		for (int i=0; i != argList.length; ++i)
+			argList[i] = children[i].jjtAccept(this, ec).coerceString(ec).stringValue();
 		return FunctionLangObject.create(new IFunction<NullLangObject>() {
 			@Override
 			public Node getNode() {
-				return node.getEvaluationNode();
+				return children[children.length-1];
 			}
 			@Override
 			public String[] getDeclaredArgumentList() {
-				return node.getArgNameArray();
+				return argList;
 			}
 			@Override
 			public String getDeclaredName() {
@@ -529,9 +537,20 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
+	public ALangObject visit(final ASTIdentifierNameNode node, final IEvaluationContext data) throws EvaluationException {
+		return StringLangObject.create(node.getName());
+	}
+	
+	@Override
 	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		// TODO
 		return null;
 	}
+
+	@Override
+	public ALangObject visit(ASTWithClauseNode node, IEvaluationContext data) throws EvaluationException {
+		
+	}
+
 }

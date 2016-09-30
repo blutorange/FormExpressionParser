@@ -1,0 +1,77 @@
+[%tf1%]
+
+means:
+  using scope fields;
+  tf1; // same as fields::tf1
+  tfVorname; // same as form::tfVorname
+  //Scope "fields" contains the names/aliases of all form fields.
+  form::name("tf1"); // Returns the value of the form field with the name "tf1"
+  form::alias("kürzel"); // Returns the value of the form field with the alias "kürzel".
+  i = 0; // Same as fields::i = 0, possibly overriding the value of a form field named "i"
+  
+  function foo() { // same as fields::foo = ->(){return 42;};
+    return 42;
+  }
+
+  foo(); // same as fields::foo();
+  
+  function bar() {
+    return foo(); 
+  }
+  
+  Function name is registered in the current (or specified) scope.
+  Unqualified variables inside the function are looked up in the
+  scope of the function's declaration.
+  
+  -----------------------------------------------------------------  
+  [%@ ... %] // without implicit scope
+  i = 0;  // local0::i;
+  j = 0;
+  if (true) {
+    i = 1; // resolves to local1::i;
+    print(j); // resolves to local0::j, as local1::j does not exist.
+  }
+  print(i); // prints 0, as it refers to local0::i
+  function foo(){
+    print(i); // exception: i is not defined
+              // i resolves to foo::i;
+  }
+  
+  fields::tf1 = 0;// cannot be nested, always refers to one variable.
+  if (true) {
+    fields::tf1 = 1; // refers to the same variable fields::tf1, no nesting
+  }
+  print(fields::tf1); // prints 1
+  function foo(){
+    fields::tf1 = 2;
+  }
+  foo();
+  print(fields::tf1); // now prints 2
+  
+  [%tf1%] // requirement: tf1 must resolve to fields::tf1.
+  with scope fields { // looks up variables in scope fields first, then local scope
+    with scope form { // try form first, then fields, then local
+      i=tf1; // tf1 resolves to fields::tf1, i resolves to local0::i
+      tf1 = 9; 
+    }
+  }
+  
+  function foo() {
+    
+  }
+  
+  
+// C++ makes a distinction between reading from and writing to a variable.
+// When writing to a variable, it is always interpreted a local variable. Using a
+//  namespace qualifier is even not allowed. I will allow it, however, as there is no
+//  concept of variable declarations (inside a namespace).
+// When reading a variable, it may be qualified with a namespace. When no namespace
+//  is specified, it is interpreted as a local variable.
+//  Furthermore, namespaces can be imported. In that case, variables are looked up in
+//  the local namespace first, then in the imported namespace.
+  
+  
+                Reading                                  Writing
+without Scope   first local, then imported namespace(s)  only local
+with Scope      from the scope                           from the scope 
+  

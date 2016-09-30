@@ -5,19 +5,20 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTFunctionNode extends SimpleNode {
+public class ASTWithClauseNode extends SimpleNode {
 
-	public ASTFunctionNode(final int nodeId) {
+	public ASTWithClauseNode(int nodeId) {
 		super(nodeId);
 	}
 
-	public void init(final EMethod method) throws ParseException {
-		assertChildrenAtLeast(1);
-		siblingMethod = method;
-	}
-
 	@Override
-	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+	public <R, T> R jjtAccept(IFormExpressionParserVisitor<R, T> visitor, T data) throws EvaluationException {
 		return visitor.visit(this, data);
 	}
+
+	public void init(EMethod method) throws ParseException {
+		assertChildrenAtLeast(2);
+		siblingMethod = method;
+	}
+	
 }

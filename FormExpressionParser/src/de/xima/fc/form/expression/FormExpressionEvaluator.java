@@ -5,8 +5,6 @@ package de.xima.fc.form.expression;
 // - unparse, variableScopeChecker
 // - EmbeddedBlocks
 // - Regex literal
-// - NamedScopes such as form::alias("tf1");
-
 
 /**
  * Das ist ein Test [%tfVorname + §_ + tfNachname%]
@@ -29,15 +27,19 @@ import java.nio.charset.Charset;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.context.IBinding;
+import de.xima.fc.form.expression.context.ICustomScope;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamespace;
+import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.impl.GenericEvaluationContext;
 import de.xima.fc.form.expression.impl.GenericNamespace;
-import de.xima.fc.form.expression.impl.formfield.FormFieldEvaluationBinding;
+import de.xima.fc.form.expression.impl.GenericScope;
+import de.xima.fc.form.expression.impl.OnDemandLookUpBinding;
+import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
@@ -53,6 +55,8 @@ import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
 import de.xima.fc.form.expression.impl.function.GenericAttrAccessor;
+import de.xima.fc.form.expression.impl.scope.FormFieldScope;
+import de.xima.fc.form.expression.impl.scope.FormFieldScope.FormVersion;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
@@ -154,7 +158,16 @@ public class FormExpressionEvaluator {
 		}
 	}
 
+	private static IScope getScope() {
+		final ICustomScope formFieldScope = new FormFieldScope(new FormVersion());
+		final GenericScope.Builder builder = new GenericScope.Builder();
+		builder.addCustomScope(formFieldScope);
+		return builder.build();
+	}
+	
 	private static IEvaluationContext getEc() {
-		return new GenericEvaluationContext(new FormFieldEvaluationBinding(), NAMESPACE);
+		final IBinding binding = new OnDemandLookUpBinding();
+		final IScope scope = getScope();
+		return new ReadScopedEvaluationContext(binding, scope, NAMESPACE);
 	}
 }

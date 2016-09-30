@@ -12,6 +12,7 @@ import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
+import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
@@ -26,6 +27,7 @@ import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
 public interface IFormExpressionParserVisitor<R,T>
 {
@@ -54,4 +56,6 @@ public interface IFormExpressionParserVisitor<R,T>
 	public R visit(ASTFunctionNode node, T data) throws EvaluationException;
 	public R visit(ASTUnaryExpressionNode node, T data) throws EvaluationException;
 	public R visit(ASTPropertyExpressionNode node, T data) throws EvaluationException;
+	public R visit(ASTIdentifierNameNode node, T data) throws EvaluationException;
+	public R visit(ASTWithClauseNode node, T data) throws EvaluationException;
 }

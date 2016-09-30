@@ -11,34 +11,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VisitorException;
-import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.node.ASTArrayNode;
-import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
-import de.xima.fc.form.expression.node.ASTBooleanNode;
-import de.xima.fc.form.expression.node.ASTBreakClauseNode;
-import de.xima.fc.form.expression.node.ASTContinueClauseNode;
-import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
-import de.xima.fc.form.expression.node.ASTExceptionNode;
-import de.xima.fc.form.expression.node.ASTExpressionNode;
-import de.xima.fc.form.expression.node.ASTForLoopNode;
-import de.xima.fc.form.expression.node.ASTFunctionNode;
-import de.xima.fc.form.expression.node.ASTHashNode;
-import de.xima.fc.form.expression.node.ASTIfClauseNode;
-import de.xima.fc.form.expression.node.ASTLogNode;
-import de.xima.fc.form.expression.node.ASTNullNode;
-import de.xima.fc.form.expression.node.ASTNumberNode;
-import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
-import de.xima.fc.form.expression.node.ASTReturnClauseNode;
-import de.xima.fc.form.expression.node.ASTStatementListNode;
-import de.xima.fc.form.expression.node.ASTStringNode;
-import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
-import de.xima.fc.form.expression.node.ASTThrowClauseNode;
-import de.xima.fc.form.expression.node.ASTTryClauseNode;
-import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableNode;
-import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
-public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void> {
+public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[]> {
 	private static class InstanceHolder {
 		public final static GraphvizVisitor SYSTEM_OUT_GRAPHVIZ = new GraphvizVisitor(System.out);
 		public final static GraphvizVisitor SYSTEM_ERR_GRAPHVIZ = new GraphvizVisitor(System.err);
@@ -80,7 +54,7 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 	 * @return The result of visiting the given node, as a string.
 	 * @throws EvaluationException
 	 */
-	public static String toString(final Node node, final String lineSeparator, final String[] headerAndFooter,
+	public static String toString(final de.xima.fc.form.expression.grammar.Node node, final String lineSeparator, final String[] headerAndFooter,
 			final int footerBegin) throws EvaluationException {
 		GraphvizVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -101,7 +75,7 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 		}
 	}
 
-	public static String withHeaderAndFooter(final Node node, final String title, final String lineSeparator)
+	public static String withHeaderAndFooter(final de.xima.fc.form.expression.grammar.Node node, final String title, final String lineSeparator)
 			throws EvaluationException {
 		final String[] headerAndFooter = new String[11];
 
@@ -177,11 +151,10 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 		bytesLabelOpen = " [label=\"".getBytes(charset);
 		bytesLabelClose = "\"]".getBytes(charset);
 		bytesArrow = "->".getBytes(charset);
-
 	}
 
-	private Void graphviz(final Node node) throws EvaluationException {
-		final int len = node.jjtGetNumChildren();
+	@Override
+	protected byte[] visitNode(final Node node, byte[] parentId) throws EvaluationException {
 		final String label = StringEscapeUtils.escapeHtml4(node.toString());
 		final byte[] nodeId = String.valueOf(node.getId()).getBytes(charset);
 		try {
@@ -189,144 +162,18 @@ public class GraphvizVisitor implements IFormExpressionParserVisitor<Void, Void>
 			outputStream.write(bytesLabelOpen);
 			outputStream.write(label.getBytes(charset));
 			outputStream.write(bytesLabelClose);
+			
 			outputStream.write(lineSeparator);
-			for (int i = 0; i != len; ++i) {
-				final Node child = node.jjtGetChild(i);
-				final byte[] childId = String.valueOf(child.getId()).getBytes(charset);
-				outputStream.write(nodeId);
+			
+			if (parentId != null) {
+				outputStream.write(parentId);
 				outputStream.write(bytesArrow);
-				outputStream.write(childId);
+				outputStream.write(nodeId);
 				outputStream.write(lineSeparator);
-				child.jjtAccept(this, null);
 			}
 		} catch (final IOException e) {
 			throw new VisitorException(this, node, null, e);
 		}
-		return null;
-	}
-
-	@Override
-	public Void visit(final ASTExpressionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTNumberNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTStringNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTArrayNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTHashNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTNullNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTBooleanNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTVariableNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTStatementListNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTIfClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTForLoopNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTWhileLoopNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTTryClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTSwitchClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTDoWhileLoopNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTAssignmentExpressionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTExceptionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTThrowClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTBreakClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTContinueClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTReturnClauseNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTLogNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTFunctionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTUnaryExpressionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
-	}
-
-	@Override
-	public Void visit(final ASTPropertyExpressionNode node, final Void data) throws EvaluationException {
-		return graphviz(node);
+		return nodeId;
 	}
 }

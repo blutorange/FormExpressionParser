@@ -6,7 +6,6 @@ import java.util.Map;
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -36,9 +35,7 @@ public class CloneBinding implements IBinding {
 
 	@Override
 	public final ALangObject getVariable(final String name) throws EvaluationException {
-		final ALangObject o = map.get(name);
-		if (o == null) throw new VariableNotDefinedException(name, this);
-		return o;
+		return map.get(name);
 	}
 
 	@Override

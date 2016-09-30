@@ -8,7 +8,8 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTVariableNode extends SimpleNode {
 
 	private String name;
-
+    private String scope;
+	
 	public ASTVariableNode(final int id) {
 		super(id);
 	}
@@ -16,16 +17,25 @@ public class ASTVariableNode extends SimpleNode {
 	public String getName() {
 		return name;
 	}
+	
+	public String getScope() {
+		return scope;
+	}
+	
+	public boolean hasScope() {
+		return scope != null;
+	}
 
-	public void init(final EMethod method, final String name) throws ParseException {
+	public void init(final EMethod method, final String scope, final String name) throws ParseException {
 		if (name == null) throw new ParseException("name is null");
 		siblingMethod = method;
 		this.name =  name;
+		this.scope = scope;
 	}
 
 	@Override
 	public String toString() {
-		return "VariableNode(" + siblingMethod + "," + name + ")";
+		return "VariableNode(" + siblingMethod + "," + scope + "," + name + ")";
 	}
 
 	@Override

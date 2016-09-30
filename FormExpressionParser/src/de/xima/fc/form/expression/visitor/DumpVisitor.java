@@ -7,36 +7,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VisitorException;
-import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.node.ASTArrayNode;
-import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
-import de.xima.fc.form.expression.node.ASTBooleanNode;
-import de.xima.fc.form.expression.node.ASTBreakClauseNode;
-import de.xima.fc.form.expression.node.ASTContinueClauseNode;
-import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
-import de.xima.fc.form.expression.node.ASTExceptionNode;
-import de.xima.fc.form.expression.node.ASTExpressionNode;
-import de.xima.fc.form.expression.node.ASTForLoopNode;
-import de.xima.fc.form.expression.node.ASTFunctionNode;
-import de.xima.fc.form.expression.node.ASTHashNode;
-import de.xima.fc.form.expression.node.ASTIfClauseNode;
-import de.xima.fc.form.expression.node.ASTLogNode;
-import de.xima.fc.form.expression.node.ASTNullNode;
-import de.xima.fc.form.expression.node.ASTNumberNode;
-import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
-import de.xima.fc.form.expression.node.ASTReturnClauseNode;
-import de.xima.fc.form.expression.node.ASTStatementListNode;
-import de.xima.fc.form.expression.node.ASTStringNode;
-import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
-import de.xima.fc.form.expression.node.ASTThrowClauseNode;
-import de.xima.fc.form.expression.node.ASTTryClauseNode;
-import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableNode;
-import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
-public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
+public class DumpVisitor extends GenericDepthFirstVisitor<String, String> {
 	private static class InstanceHolder {
 		public final static DumpVisitor SYSTEM_OUT_DUMPER = new DumpVisitor(System.out);
 		public final static DumpVisitor SYSTEM_ERR_DUMPER = new DumpVisitor(System.err);
@@ -64,7 +40,7 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 	 * @return The result of visiting the given node, as a string.
 	 * @throws EvaluationException
 	 */
-	public static String toString(final Node node, final String data, final String lineSeparator) throws EvaluationException {
+	public static String toString(final de.xima.fc.form.expression.grammar.Node node, final String data, final String lineSeparator) throws EvaluationException {
 		DumpVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			final Charset charset = Charset.defaultCharset();
@@ -129,7 +105,13 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 		this.lineSeparator = lineSeparator.getBytes(charset);
 	}
 
-	private Void dump(final Node node, final String prefix) throws EvaluationException {
+	@Override
+	protected String map(final String prefix) {
+		return prefix + StringUtils.SPACE;
+	}
+	
+	@Override
+	protected String visitNode(final Node node, final String prefix) throws EvaluationException {
 		try {
 			outputStream.write(prefix.getBytes(charset));
 			outputStream.write(node.toString().getBytes(charset));
@@ -137,118 +119,6 @@ public class DumpVisitor implements IFormExpressionParserVisitor<Void, String> {
 		} catch (final IOException e) {
 			throw new VisitorException(this, node, prefix, e);
 		}
-		final Node[] children = node.getChildArray();
-		for (int i = 0; i != children.length; ++i)
-			children[i].jjtAccept(this, prefix + "  ");
-		return null;
-	}
-
-	@Override
-	public Void visit(final ASTExpressionNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTNumberNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTStringNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTArrayNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTHashNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTNullNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTBooleanNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTVariableNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTStatementListNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTIfClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTForLoopNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTWhileLoopNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTTryClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTSwitchClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTDoWhileLoopNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTAssignmentExpressionNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTExceptionNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTThrowClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTBreakClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTContinueClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTReturnClauseNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTLogNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTFunctionNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTUnaryExpressionNode node, final String data) throws EvaluationException {
-		return dump(node, data);
-	}
-	@Override
-	public Void visit(final ASTPropertyExpressionNode node, final String data) throws EvaluationException {
-		return dump(node, data);
+		return prefix;
 	}
 }
