@@ -6,14 +6,15 @@ import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.IReset;
 
-public interface IBinding extends IReset {
+public interface IBinding extends IReset<IBinding> {
 
 	/**
 	 * Resets this binding and all children, if any, created by {@link #nest()}.
-	 * Must not reset any parents that created this binding.
+	 * Must also reset any parents that created this binding and return the
+	 * binding at nesting depth 0.
 	 */
 	@Override
-	public void reset();
+	public IBinding reset();
 
 	/**
 	 * Must return the same object every time it is called with equivalent

@@ -5,6 +5,7 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
+import de.xima.fc.form.expression.visitor.AEvaluationVisitor;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
@@ -13,7 +14,8 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	private final ILogger logger;
 	private final IScope scope;
 	private final int recursionLimit;
-
+	private AEvaluationVisitor<?,?> visitor;
+	
 	/**
 	 * Creates a new evaluation context.
 	 * 
@@ -77,4 +79,14 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	public IScope getScope() {
 		return scope;
 	}
+
+	@Override
+	public final AEvaluationVisitor<?,?> getEvaluationVisitor() {
+		return visitor;
+	}
+
+	@Override
+	public final void setEvaluationVisitor(AEvaluationVisitor<?,?> visitor) {
+		this.visitor = visitor;
+	}		
 }

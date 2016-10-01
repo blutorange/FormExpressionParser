@@ -11,6 +11,7 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 import de.xima.fc.form.expression.context.ICustomScope;
 import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -66,5 +67,5 @@ public class GenericScope implements IScope {
 		public IScope build() {
 			return new GenericScope(map, useCustomScope ? custom : null);
 		}
-	}
+	}	
 }

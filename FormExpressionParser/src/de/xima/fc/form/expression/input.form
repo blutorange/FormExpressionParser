@@ -1,10 +1,4 @@
-i = 0;
-while (true) {
-  a=9;
-}
-
-a=2; try {
-  test = 9;
-}
-catch (e) {
-}
+j = 42;
+for (i : 500000)
+  if (true) if (true) if (true) if (true) if (true) j = j+1;
+j;

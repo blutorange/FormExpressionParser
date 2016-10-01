@@ -43,9 +43,10 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public void reset() {
-		for (int i = currentDepth; i < mapArray.length; ++i) mapArray[i].clear();
+	public IBinding reset() {
+		for (int i = 0; i < mapArray.length; ++i) mapArray[i].clear();
 		currentDepth = 0;
+		return this;
 	}
 
 	@Override
@@ -59,6 +60,13 @@ public class LookUpBinding implements IBinding {
 
 	@Override
 	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
+		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
+			final ALangObject o = mapArray[i].get(name);
+			if (o != null) {
+				mapArray[i].put(name, value);
+				return;
+			}
+		}
 		mapArray[currentDepth].put(name, value);
 	}
 

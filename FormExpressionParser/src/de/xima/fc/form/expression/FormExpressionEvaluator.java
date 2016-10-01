@@ -141,7 +141,7 @@ public class FormExpressionEvaluator {
 
 		try {
 			final long t1 = System.nanoTime();
-			final ALangObject result = rootNode.jjtAccept(visitor, ec);
+			final ALangObject result = visitor.performVisit(rootNode, ec);
 			final long t2 = System.nanoTime();
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 

@@ -392,6 +392,7 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
   )
   {
     if (createNode) jjtThis.init(method, this);
+    jjtThis.setEndPosition(token);
   }
 }
 

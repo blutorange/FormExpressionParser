@@ -9,7 +9,8 @@ import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * Same as {@link LookUpBinding}, but creates maps only when it reaches that
- * nesting level.
+ * nesting level. This way, the nesting level can be effectively unlimited, while
+ * still imposing a limit to prevent bad code from using too much memory.
  *
  * @see LookUpBinding
  *

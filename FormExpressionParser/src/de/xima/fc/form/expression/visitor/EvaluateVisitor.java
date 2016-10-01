@@ -53,22 +53,22 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
-public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext> {
+public class EvaluateVisitor extends AEvaluationVisitor<ALangObject, IEvaluationContext> {
 
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
 
 	public EvaluateVisitor() {
-		reinit();
 	}
 
-	public void reinit() {
+	public ALangObject performVisit(Node node, IEvaluationContext ec) throws EvaluationException{
 		mustJump = false;
 		jumpType = null;
 		jumpLabel = null;
+		ec.setEvaluationVisitor(this);
+		return node.jjtAccept(this, ec);
 	}
-
 
 	private void nestLocal(final IEvaluationContext ec) {
 		ec.setBinding(ec.getBinding().nestLocal());
@@ -89,6 +89,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Child must be an expression and cannot be break/continue/return.
@@ -96,6 +98,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Arguments are expressions which cannot be clause/continue/return clauses
@@ -117,6 +121,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTPropertyExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -182,16 +188,22 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTNumberNode node, final IEvaluationContext ec) throws EvaluationException {
 		return NumberLangObject.create(node.getDoubleValue());
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTStringNode node, final IEvaluationContext ec) throws EvaluationException {
 		return StringLangObject.create(node.getStringValue());
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTArrayNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] childArray = node.getChildArray();
@@ -203,6 +215,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return ArrayLangObject.create(list);
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTHashNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] childArray = node.getChildArray();
@@ -214,16 +228,22 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return HashLangObject.create(list);
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTNullNode node, final IEvaluationContext ec) throws EvaluationException {
 		return NullLangObject.getInstance();
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTBooleanNode node, final IEvaluationContext ec) throws EvaluationException {
 		return BooleanLangObject.create(node.getBooleanValue());
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTVariableNode node, final IEvaluationContext ec) throws EvaluationException {
 		final String scope = node.getScope();
@@ -235,6 +255,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return ec.getUnqualifiedVariable(node.getName());
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTStatementListNode node, final IEvaluationContext ec) throws EvaluationException {
 		ALangObject res = NullLangObject.getInstance();
@@ -245,6 +267,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTIfClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -265,6 +289,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		}
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTForLoopNode node, final IEvaluationContext ec) throws EvaluationException {
 		final String variableName = node.getIteratingLoopVariable();
@@ -308,6 +334,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -331,6 +359,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTDoWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -355,6 +385,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTTryClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -387,6 +419,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	public ALangObject visit(final ASTSwitchClauseNode node, final IEvaluationContext ec) throws EvaluationException {
@@ -436,6 +470,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return res;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTExceptionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or return clause.
@@ -443,6 +479,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return ExceptionLangObject.create(message.stringValue());
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTThrowClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or return clause.
@@ -450,6 +488,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		throw new CustomRuntimeException(message);
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTBreakClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		jumpLabel = node.getLabel();
@@ -458,6 +498,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return NullLangObject.getInstance();
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTContinueClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		jumpLabel = node.getLabel();
@@ -466,6 +508,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return NullLangObject.getInstance();
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTReturnClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		jumpLabel = null;
@@ -474,6 +518,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return NullLangObject.getInstance();
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTLogNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Child must be an expression and cannot contain any break, continue, or return clause.
@@ -500,16 +546,22 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return message;
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTFunctionNode node, final IEvaluationContext ec) throws EvaluationException {
 		return FunctionLangObject.create(new EvaluateVisitorAnonymousFunction(this, node, ec));
 	}
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTIdentifierNameNode node, final IEvaluationContext data) throws EvaluationException {
 		return StringLangObject.create(node.getName());
 	}	
 
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(ASTWithClauseNode node, IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -531,6 +583,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		}
 	}
 	
+	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */
+	@Deprecated
 	@Override
 	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
