@@ -7,12 +7,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.grammar.Token;
 
 public abstract class SimpleNode implements Node {
 
 	private final static Node[] EMPTY_NODE_ARRAY = new Node[0];
 	private final static AtomicInteger ID_PROVIDER = new AtomicInteger();
-
+	
 	/**
 	 * The id of this node. Can be anything as long as it is unique for each
 	 * node of a parse tree. Does not have to be unique for nodes of different
@@ -20,8 +21,10 @@ public abstract class SimpleNode implements Node {
 	 */
 	protected final int uniqueId;
 
+	private transient Token startToken;
 	protected Node[] children = EMPTY_NODE_ARRAY;
 	protected EMethod siblingMethod;
+	private int startLine, endLine, startColumn, endColumn;
 
 	/**
 	 * @param nodeId Node id. Not needed (yet).
@@ -80,8 +83,24 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public String toString() {
-		return getClass().getSimpleName();
+	public final String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append(nodeName());
+		sb.append("(");
+		sb.append(siblingMethod);
+		sb.append(",");
+		sb.append(startLine);
+		sb.append(":");
+		sb.append(startColumn);
+		sb.append("-");
+		sb.append(endLine);
+		sb.append(":");
+		sb.append(endColumn);
+		sb.append(",");
+		additionalToStringFields(sb);
+		sb.setLength(sb.length()-1);
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override
@@ -163,5 +182,49 @@ public abstract class SimpleNode implements Node {
 	@Override
 	public void assertChildrenOdd() throws ParseException {
 		if ((children.length & 1) != 1) throw new ParseException("Node count is not odd: " + children.length);
+	}
+	
+	@Override
+	public final void setStartPosition(Token t) {
+		startLine = t.beginLine;
+		startColumn = t.beginColumn;
+		startToken = t;
+	}
+	@Override
+	public final void setEndPosition(Token t) {
+		Token next = startToken == null ? null : startToken.next;
+		if (next != null) {
+			startLine = next.beginLine;
+			startColumn = next.beginColumn;
+		}
+		endLine = t.endLine;
+		endColumn = t.endColumn;
+	}
+	@Override
+	public final int getStartLine() {
+		return startLine;
+	}
+	@Override
+	public final int getStartColumn() {
+		return startColumn;
+	}
+	@Override
+	public final int getEndLine() {
+		return endLine;
+	}
+	@Override
+	public final int getEndColumn() {
+		return endColumn;
+	}
+
+	/**
+	 * Subclasses may add additional info for {@link #toString()}.
+	 * @param sb String builder to use.
+	 */
+	protected void additionalToStringFields(StringBuilder sb) {
+	}
+
+	protected String nodeName() {
+		return getClass().getSimpleName();
 	}
 }

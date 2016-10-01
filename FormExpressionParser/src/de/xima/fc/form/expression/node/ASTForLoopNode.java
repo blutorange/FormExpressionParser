@@ -32,9 +32,13 @@ public class ASTForLoopNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		if (iteratingLoopVariable != null) return "ForIteratingLoopNode(" + iteratingLoopVariable + ")";
-		return "ForPlainLoopNode";
+	protected void additionalToStringFields(StringBuilder sb) {
+		if (iteratingLoopVariable != null) sb.append(iteratingLoopVariable).append(",");
+	}
+	
+	@Override
+	protected String nodeName() {
+		return iteratingLoopVariable != null ? "ForIteratingLoopNode" : "ForPlainLoopNode";
 	}
 	
 	public String getLabel() {

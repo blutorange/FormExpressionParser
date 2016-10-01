@@ -16,13 +16,6 @@ public class ASTExpressionNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		if (children.length == 0) return "EmptyExpressionNode(" + siblingMethod + ")";
-		return "ExpressionNode(" + String.valueOf(siblingMethod) + ")";
-	}
-
-
-	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
 		return visitor.visit(this, data);
 	}

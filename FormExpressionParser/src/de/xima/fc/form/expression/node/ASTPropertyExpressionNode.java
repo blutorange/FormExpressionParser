@@ -17,11 +17,6 @@ public class ASTPropertyExpressionNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		return "PropertyExpressionNode(" + siblingMethod + ")";
-	}
-
-	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data)
 			throws EvaluationException {
 		return visitor.visit(this, data);

@@ -22,11 +22,6 @@ public class ASTContinueClauseNode extends SimpleNode {
 		siblingMethod = method;
 		this.label = label;
 	}
-
-	@Override
-	public String toString() {
-		return "ContinueClauseNode";
-	}
 	
 	public String getLabel() {
 		return label;

@@ -19,9 +19,4 @@ public class ASTThrowClauseNode extends SimpleNode {
 		assertChildrenExactly(1);
 		siblingMethod = method;
 	}
-
-	@Override
-	public String toString() {
-		return "ThrowClauseNode";
-	}
 }

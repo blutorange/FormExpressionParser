@@ -29,6 +29,9 @@
  */
 package de.xima.fc.form.expression.visualize.swing;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -38,6 +41,7 @@ import javax.swing.JScrollPane;
 import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
+import org.apache.commons.io.FileUtils;
 
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visualize.FormExpressionTreeFactory;
@@ -85,8 +89,13 @@ public class SwingDemo {
 		if (args.length < 1) {
 			help();
 			expression = JOptionPane.showInputDialog("Enter expression:");
-		}
-		else expression = args[0];
+		} else
+			try {
+				expression = FileUtils.readFileToString(new File(args[0]), "UTF-8");
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
 
 		TreeForTreeLayout<TextInBox> tree;
 		try {

@@ -105,7 +105,13 @@ public class TextInBoxTreePane extends JComponent {
 	private void paintBox(final Graphics g, final TextInBox textInBox) {
 		final String[] lines = textInBox.text.split("\n");
 		final FontMetrics m = getFontMetrics(getFont());
-		final Rectangle2D rect = m.getStringBounds(textInBox.text, g);
+		int stringWidth = 0;
+		double stringHeight = 0;
+		for (String line : textInBox.text.split("\n")) {
+			final Rectangle2D rect = m.getStringBounds(line, g);
+			stringWidth = Math.max(stringWidth, (int)rect.getWidth());
+			stringHeight += rect.getHeight() + 1;
+		}
 
 		// draw the box in the background
 		g.setColor(BOX_COLOR);
@@ -118,8 +124,8 @@ public class TextInBoxTreePane extends JComponent {
 
 		// draw the text on top of the box (possibly multiple lines)
 		g.setColor(TEXT_COLOR);
-		final int x = (int)(box.x + box.width/2-rect.getWidth()/2);
-		int y = (int)(box.y + m.getAscent() + box.height/2 - rect.getHeight()/2);
+		final int x = (int)(box.x + box.width/2-stringWidth/2);
+		int y = (int)(box.y + m.getAscent() + box.height/2 - (int)stringHeight/2);
 
 		for (int i = 0; i < lines.length; i++) {
 			g.drawString(lines[i], x, y);

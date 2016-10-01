@@ -34,8 +34,8 @@ public class ASTVariableNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		return "VariableNode(" + siblingMethod + "," + scope + "," + name + ")";
+	protected void additionalToStringFields(StringBuilder sb) {
+		sb.append(scope).append(",").append(name).append(",");
 	}
 
 	@Override

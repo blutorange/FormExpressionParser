@@ -27,9 +27,10 @@ public class ASTLogNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+
 	@Override
-	public String toString() {
-		return "LogNode(" + logLevel + ")";
+	protected void additionalToStringFields(StringBuilder sb) {
+		sb.append(logLevel).append(",");
 	}
 	
 	public ELogLevel getLogLevel() {

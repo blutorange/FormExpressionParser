@@ -22,11 +22,6 @@ public class ASTBreakClauseNode extends SimpleNode {
 		siblingMethod = method;
 		this.label = label;
 	}
-
-	@Override
-	public String toString() {
-		return "BreakClauseNode";
-	}
 	
 	public String getLabel() {
 		return label;

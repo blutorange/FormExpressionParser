@@ -14,10 +14,10 @@ public class ASTBooleanNode extends SimpleNode {
 	public ASTBooleanNode(final int id) {
 		super(id);
 	}
-
+	
 	@Override
-	public String toString() {
-		return "BooleanNode(" + (booleanValue ? "true)" : "false)");
+	protected void additionalToStringFields(StringBuilder sb) {
+		sb.append((booleanValue ? "true)" : "false)")).append(",");
 	}
 
 	@Override

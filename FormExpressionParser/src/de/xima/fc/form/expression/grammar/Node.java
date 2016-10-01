@@ -132,8 +132,14 @@ public interface Node extends Serializable {
 	 */
 	public EMethod getSiblingMethod();
 
-	Node[] getChildArray();
+	public Node[] getChildArray();
 
-	Node getLastChild() throws ParseException;
-
+	public Node getLastChild() throws ParseException;
+	
+	public void setStartPosition(Token token);
+	public void setEndPosition(Token token);
+	public int getStartLine();
+	public int getStartColumn();
+	public int getEndLine();
+	public int getEndColumn();
 }

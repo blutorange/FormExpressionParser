@@ -18,9 +18,4 @@ public class ASTArrayNode extends SimpleNode {
 	public void init(final EMethod method) throws ParseException {
 		siblingMethod = method;
 	}
-	
-	@Override
-	public String toString() {
-		return "ArrayNode(" + siblingMethod + ")";
-	}
 }

@@ -29,7 +29,7 @@ public class ASTIdentifierNameNode extends SimpleNode {
 	}
 	
 	@Override
-	public String toString() {
-		return "IdentifierNode(" + siblingMethod + "," + name + ")";
+	protected void additionalToStringFields(StringBuilder sb) {
+		sb.append(name).append(",");
 	}
 }

@@ -20,9 +20,4 @@ public class ASTReturnClauseNode extends SimpleNode {
 		assertChildrenExactly(0);
 		siblingMethod = method;
 	}
-
-	@Override
-	public String toString() {
-		return "ReturnClauseNode";
-	}	
 }

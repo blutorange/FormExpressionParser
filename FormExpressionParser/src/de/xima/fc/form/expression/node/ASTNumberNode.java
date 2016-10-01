@@ -32,8 +32,8 @@ public class ASTNumberNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		return "NumberNode(" + siblingMethod + "," + doubleValue + ")";
+	protected void additionalToStringFields(StringBuilder sb) {
+		sb.append(doubleValue).append(",");
 	}
 
 	public double getDoubleValue() {

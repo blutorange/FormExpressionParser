@@ -49,7 +49,10 @@ public class TextInBox {
 	public TextInBox(final String string) {
 		final String[] lines = string.split("\n");
 		text = string;
-		width = string.length()*10;
-		height = Math.max(20, (lines.length-1)/2*20);
+		int w = lines[0].length();
+		for (int i = 1; i<lines.length; ++i)
+			w = Math.max(w, lines[i].length());
+		width = w*10;
+		height = Math.max(20, (lines.length-1)*20);
 	}
 }

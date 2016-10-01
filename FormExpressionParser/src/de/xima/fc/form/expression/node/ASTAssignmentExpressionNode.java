@@ -32,11 +32,6 @@ public class ASTAssignmentExpressionNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		return "AssignmentExpressionNode(" + String.valueOf(siblingMethod) + ")";
-	}
-
-	@Override
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
 		return visitor.visit(this, data);
 	}

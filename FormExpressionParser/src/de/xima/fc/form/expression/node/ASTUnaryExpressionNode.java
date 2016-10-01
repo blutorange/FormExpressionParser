@@ -19,8 +19,8 @@ public class ASTUnaryExpressionNode extends SimpleNode {
 	}
 
 	@Override
-	public String toString() {
-		return "UnaryExpressionNode(" + String.valueOf(siblingMethod) + "," + String.valueOf(unaryMethod) + ")";
+	protected void additionalToStringFields(StringBuilder sb) {
+		sb.append(unaryMethod).append(",");
 	}
 
 	public EMethod getUnaryMethod() {

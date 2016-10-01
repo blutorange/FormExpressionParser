@@ -23,10 +23,4 @@ public class ASTExceptionNode extends SimpleNode {
 	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
 		return visitor.visit(this, data);
 	}
-
-	@Override
-	public String toString() {
-		return "ExceptionNode";
-	}
-
 }
