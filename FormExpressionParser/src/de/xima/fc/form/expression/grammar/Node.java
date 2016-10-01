@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.grammar;
 import java.io.Serializable;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.enums.EMethod;
@@ -135,8 +136,18 @@ public interface Node extends Serializable, ITraceElement {
 
 	public Node[] getChildArray();
 
-	public Node getLastChild() throws ParseException;
-	
+	@Nullable
+	public Node getLastChild();
+	@Nullable
+	public Node getFirstChild();
+
 	public void setStartPosition(Token token);
 	public void setEndPosition(Token token);
+
+	/**
+	 * @return The id of this node.
+	 * @see FormExpressionParserTreeConstants
+	 */
+	public int jjtGetNodeId();
+
 }

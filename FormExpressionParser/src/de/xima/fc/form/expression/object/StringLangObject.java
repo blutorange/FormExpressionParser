@@ -58,6 +58,11 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
+	public IFunction<StringLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAssignerString(name, accessedViaDot);
+	}
+
+	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
 		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodString(method), method, ec, args);
 	}
@@ -65,6 +70,11 @@ public class StringLangObject extends ALangObject {
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
 		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorString(object, accessedViaDot), object, accessedViaDot, ec);
+	}
+
+	@Override
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		executeAttrAssigner(this, ec.getNamespace().attrAssignerString(object, accessedViaDot), object, accessedViaDot, value, ec);
 	}
 
 	@Override
@@ -101,6 +111,11 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
+		return this;
+	}
+
+	@Override
+	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
@@ -193,11 +208,11 @@ public class StringLangObject extends ALangObject {
 	public static StringLangObject getSpaceInstance() {
 		return InstanceHolder.SPACE;
 	}
-	
+
 	public static StringLangObject getLineFeedInstance() {
 		return InstanceHolder.LF;
 	}
-	
+
 	public static StringLangObject getCarriageReturnInstance() {
 		return InstanceHolder.CR;
 	}

@@ -1,5 +1,10 @@
 package de.xima.fc.form.expression.enums;
 
+import java.util.EnumMap;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
 /**
  * Method names for operators internal to the language.
  * <br><br>
@@ -31,6 +36,8 @@ public enum EMethod {
 	CIRCUMFLEX("^"), // ^
 
 	TILDE("~"), // ~
+	TILDE_EQUAL("~="), // ~=
+	EQUAL_TILDE("=~"), // =~
 
 	PLUS_EQUAL("+="), // +=
 	DASH_EQUAL("-="), // -=
@@ -44,8 +51,6 @@ public enum EMethod {
 	DOUBLE_AMPERSAND_EQUAL("&&="), // &&=
 	BAR_EQUAL("|="), // |=
 	DOUBLE_BAR_EQUAL("||="), // ||=
-	TILDE_EQUAL("~="), // ~=
-	EQUAL_TILDE("=~"), // =~
 	CIRCUMFLEX_EQUAL("^="), // ^=
 
 	EQUAL("="), // =
@@ -72,12 +77,32 @@ public enum EMethod {
 	SWITCHCASE("SWITCHCASE"),
 	SWITCHDEFAULT("SWITCHDEFAULT"),
 	SWITCHCLAUSE("SWITCHCLAUSE"),
-	ASSIGNMENT_DIRECT("ASSIGNMENT_DIRECT"),
-	ASSIGNMENT_PROPERTY("ASSIGNMENT_PROPERTY"),
 	;
 
 	public final String name;
 	private EMethod(final String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Maps between equal method and their plain methods, eg. <code>+=</code> to <code>+</code>.
+	 */
+	public final static ImmutableMap<EMethod, EMethod> equalTypeMap;
+	static {
+		final EnumMap<EMethod, EMethod> tmp = new EnumMap<>(EMethod.class);
+		tmp.put(PLUS_EQUAL, PLUS);
+		tmp.put(DASH_EQUAL, DASH);
+		tmp.put(STAR_EQUAL, STAR);
+		tmp.put(DOUBLE_STAR_EQUAL, DOUBLE_STAR);
+		tmp.put(SLASH_EQUAL, SLASH);
+		tmp.put(PERCENT_EQUAL, PERCENT);
+		tmp.put(AMPERSAND_EQUAL, AMPERSAND);
+		tmp.put(DOUBLE_AMPERSAND_EQUAL, DOUBLE_AMPERSAND);
+		tmp.put(BAR_EQUAL, BAR);
+		tmp.put(DOUBLE_BAR_EQUAL, DOUBLE_BAR);
+		tmp.put(DOUBLE_ANGLE_OPEN_EQUAL, DOUBLE_ANGLE_OPEN);
+		tmp.put(DOUBLE_ANGLE_CLOSE_EQUAL, DOUBLE_ANGLE_CLOSE);
+		tmp.put(CIRCUMFLEX, CIRCUMFLEX);
+		equalTypeMap = Maps.immutableEnumMap(tmp);
 	}
 }

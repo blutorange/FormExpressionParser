@@ -4,8 +4,8 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 
-public class NullObjectAccessException extends NoSuchAttrAccessorException {
-	public NullObjectAccessException(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) {
+public class NullObjectAssignException extends NoSuchAttrAssignerException {
+	public NullObjectAssignException(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) {
 		super(object.inspect(), NullLangObject.getInstance(), accessedViaDot, ec);
 	}
 }

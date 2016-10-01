@@ -12,12 +12,9 @@ public interface IEvaluationContext {
 	public INamespace getNamespace();
 	public ILogger getLogger();
 	public ITracer<Node> getTracer();
-	
-//	public void setEvaluationVisitor(AEvaluationVisitor<?,?> visitor);
-//	public AEvaluationVisitor<?,?> getEvaluationVisitor();
-	
+
 	public void setBinding(IBinding binding);
-	public int getRecursionLimit();
+
 	/**
 	 * When reading an unqualified variable, this method must resolve
 	 * the variable either to a local variable or a variable from

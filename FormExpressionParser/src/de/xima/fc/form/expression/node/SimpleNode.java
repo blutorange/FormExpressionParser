@@ -4,7 +4,10 @@ package de.xima.fc.form.expression.node;
 import java.lang.reflect.Array;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jetbrains.annotations.Nullable;
+
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
@@ -14,7 +17,7 @@ public abstract class SimpleNode implements Node {
 
 	private final static Node[] EMPTY_NODE_ARRAY = new Node[0];
 	private final static AtomicInteger ID_PROVIDER = new AtomicInteger();
-	
+
 	/**
 	 * The id of this node. Can be anything as long as it is unique for each
 	 * node of a parse tree. Does not have to be unique for nodes of different
@@ -23,6 +26,7 @@ public abstract class SimpleNode implements Node {
 	protected final int uniqueId;
 
 	private transient Token startToken;
+	protected int nodeId;
 	protected Node parent;
 	protected Node[] children = EMPTY_NODE_ARRAY;
 	protected EMethod siblingMethod;
@@ -37,6 +41,7 @@ public abstract class SimpleNode implements Node {
 		// unless a parse tree contains more than 2^32 nodes, which
 		// by itself would raise many other issues...
 		uniqueId = ID_PROVIDER.incrementAndGet();
+		this.nodeId = nodeId;
 	}
 
 	// For performance, calls to this method may be removed.
@@ -56,6 +61,15 @@ public abstract class SimpleNode implements Node {
 	@Override
 	public void jjtSetParent(final Node n) {
 		parent = n;
+	}
+
+	/**
+	 * @return The id for this TYPE of node.
+	 * @see FormExpressionParserTreeConstants
+	 */
+	@Override
+	public int jjtGetNodeId() {
+		return nodeId;
 	}
 
 	@Override
@@ -105,6 +119,9 @@ public abstract class SimpleNode implements Node {
 		return sb.toString();
 	}
 
+	/**
+	 * @return A unique ID for this node.
+	 */
 	@Override
 	public int getId() {
 		return uniqueId;
@@ -141,9 +158,17 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public Node getLastChild() throws ParseException {
-		if (children.length == 0) throw new ParseException("Node does not contain any children.");
+	@Nullable
+	public Node getLastChild() {
+		if (children.length == 0) return null;
 		return children[children.length-1];
+	}
+
+	@Override
+	@Nullable
+	public Node getFirstChild() {
+		if (children.length == 0) return null;
+		return children[0];
 	}
 
 	@Override
@@ -185,20 +210,21 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenOdd() throws ParseException {
 		if ((children.length & 1) != 1) throw new ParseException("Node count is not odd: " + children.length);
 	}
-	
+
 	@Override
-	public final void setStartPosition(Token t) {
+	public final void setStartPosition(final Token t) {
 		startLine = t.beginLine;
 		startColumn = t.beginColumn;
 		startToken = t;
 	}
 	@Override
-	public final void setEndPosition(Token t) {
-		Token next = startToken == null ? null : startToken.next;
+	public final void setEndPosition(final Token t) {
+		final Token next = startToken == null ? null : startToken.next;
 		if (next != null) {
 			startLine = next.beginLine;
 			startColumn = next.beginColumn;
 		}
+		startToken = null;
 		endLine = t.endLine;
 		endColumn = t.endColumn;
 	}
@@ -220,18 +246,21 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public String getPositionName() {
-		if (this instanceof ASTFunctionNode) {
+	public String getMethodName() {
+		if (this instanceof ASTFunctionClauseNode) {
+			return ((ASTFunctionClauseNode)this).getFunctionName();
+		}
+		else if (this instanceof ASTFunctionNode) {
 			return CmnCnst.TRACER_POSITION_NAME_ANONYMOUS_FUNCTION;
 		}
-		return parent == null ? CmnCnst.TRACER_POSITION_NAME_GLOBAL : parent.getPositionName();
+		return parent == null ? CmnCnst.TRACER_POSITION_NAME_GLOBAL : parent.getMethodName();
 	}
-	
+
 	/**
 	 * Subclasses may add additional info for {@link #toString()}.
 	 * @param sb String builder to use.
 	 */
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 	}
 
 	protected String nodeName() {

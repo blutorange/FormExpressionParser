@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xima.fc.form.expression.context.IBinding;
+import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
@@ -78,30 +79,30 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public IBinding nest() {
-		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth, this);
+	public IBinding nest(final IEvaluationContext ec) {
+		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth, ec);
 		++currentDepth;
 		mapArray[currentDepth].clear();
 		return this;
 	}
 
 	@Override
-	public IBinding unnest() {
-		if (currentDepth <= 0) throw new UncatchableEvaluationException(this, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
+	public IBinding unnest(final IEvaluationContext ec) {
+		if (currentDepth <= 0) throw new UncatchableEvaluationException(ec, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
 		--currentDepth;
 		breakpointArray[currentDepth] = false;
 		return this;
 	}
 
 	@Override
-	public IBinding nestLocal() {
+	public IBinding nestLocal(final IEvaluationContext ec) {
 		breakpointArray[currentDepth] = true;
-		return nest();
+		return nest(ec);
 	}
 
 	@Override
 	public int getNestingLimit() {
 		return mapArray.length-1;
 	}
-	
+
 }

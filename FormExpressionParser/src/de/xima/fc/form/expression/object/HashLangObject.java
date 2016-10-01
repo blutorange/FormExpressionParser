@@ -75,6 +75,11 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
+	public IFunction<HashLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAssignerHash(name, accessedViaDot);
+	}
+
+	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
 		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodHash(method), method, ec, args);
 	}
@@ -82,6 +87,11 @@ public class HashLangObject extends ALangObject {
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
 		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorHash(object, accessedViaDot), object, accessedViaDot, ec);
+	}
+
+	@Override
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		executeAttrAssigner(this, ec.getNamespace().attrAssignerHash(object, accessedViaDot), object, accessedViaDot, value, ec);
 	}
 
 	/**
@@ -123,6 +133,11 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
+	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
+		return this;
+	}
+
+	@Override
 	public Iterator<ALangObject> iterator() {
 		return value.keySet().iterator();
 	}
@@ -137,7 +152,7 @@ public class HashLangObject extends ALangObject {
 	public static HashLangObject create() {
 		return new HashLangObject(new HashMap<ALangObject, ALangObject>());
 	}
-	
+
 	/**
 	 * @param value An array with an even number of entries, each pair of two representing a key-value pair.
 	 * @return The hash map.

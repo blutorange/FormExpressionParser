@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xima.fc.form.expression.context.IBinding;
+import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
@@ -33,7 +34,7 @@ public class CloneBinding implements IBinding {
 		isBreakpoint = true;
 	}
 
-	private CloneBinding(final CloneBinding parent, final CloneBinding top, boolean isBreakpoint) {
+	private CloneBinding(final CloneBinding parent, final CloneBinding top, final boolean isBreakpoint) {
 		map = new HashMap<>(parent.map);
 		this.parent = parent;
 		this.top = top;
@@ -45,7 +46,7 @@ public class CloneBinding implements IBinding {
 		final ALangObject res = getVariableInternal(name);
 		return res != null ? res : top.map.get(name);
 	}
-	
+
 	private ALangObject getVariableInternal(final String name) throws EvaluationException {
 		final ALangObject res = map.get(name);
 		if (res != null) return res;
@@ -57,8 +58,8 @@ public class CloneBinding implements IBinding {
 		if (setVariableInternal(name, value)) return;
 		map.put(name, value);
 	}
-	
-	private boolean setVariableInternal(String name, final ALangObject value) throws EvaluationException {
+
+	private boolean setVariableInternal(final String name, final ALangObject value) throws EvaluationException {
 		if (isBreakpoint) {
 			if (map.containsKey(name)) {
 				map.put(name, value);
@@ -69,13 +70,13 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public final IBinding nest() throws NestingLevelTooDeepException {
+	public final IBinding nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
 		return new CloneBinding(this, top, true);
 	}
 
 	@Override
-	public final IBinding unnest() {
-		if (parent == null) throw new UncatchableEvaluationException(this, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
+	public final IBinding unnest(final IEvaluationContext ec) {
+		if (parent == null) throw new UncatchableEvaluationException(ec, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
 		return parent;
 	}
 
@@ -86,12 +87,12 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public IBinding nestLocal() {
+	public IBinding nestLocal(final IEvaluationContext ec) {
 		return new CloneBinding(this, top, false);
 	}
 
 	@Override
 	public int getNestingLimit() {
 		return -1;
-	}		
+	}
 }

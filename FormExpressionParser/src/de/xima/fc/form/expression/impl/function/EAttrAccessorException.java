@@ -20,10 +20,12 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 	private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	private final String[] argList;
+	private final String varArgsName;
 
 	private EAttrAccessorException(final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
+		varArgsName = impl.getVarArgsName();
 		evalImmediately = argList.length == 0;
 	}
 
@@ -53,8 +55,13 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 		return null;
 	}
 
+	@Override
+	public String getVarArgsName() {
+		return varArgsName;
+	}
+
 	private static enum Impl implements IFunction<ExceptionLangObject> {
-		message() {
+		message(null) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -64,9 +71,16 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 		;
 
 		private String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

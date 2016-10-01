@@ -16,4 +16,13 @@ public final class CmnCnst {
 	public static final String TRACER_POSITION_NAME_GLOBAL = "main";
 	public static final Object TRACER_POSITION_UNKNOWN = "unknown line";
 	public static final String TRACER_POSITION_NAME_UNKNOWN = "unknown";
+
+	public static final String SYNTAX_IF = "if";
+	public static final String SYNTAX_ELSE = "else";
+	public static final String SYNTAX_BRACE_OPEN = "{";
+	public static final String SYNTAX_BRACE_CLOSE = "}";
+	public static final String SYNTAX_PAREN_OPEN = "(";
+	public static final String SYNTAX_PAREN_CLOSE = ")";
+	public static final String SYNTAX_SEMI_COLON = ";";
 }
+

@@ -15,36 +15,30 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	private final ILogger logger;
 	final ITracer<Node> tracer;
 	private final IScope scope;
-	private final int recursionLimit;
-	
 	/**
 	 * Creates a new evaluation context.
-	 * 
+	 *
 	 * @param binding
 	 *            Binding to use.
 	 * @param namespace
 	 *            Namespace to use.
 	 * @param logger
 	 *            The logger used for logging.
-	 * @param recursionLimit
-	 *            The limit for recursive method calls.
 	 */
-	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final ILogger logger,
-			final int recursionLimit) {
+	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final ILogger logger) {
 		this.binding = binding;
 		this.namespace = namespace;
 		this.scope = scope;
 		this.tracer = tracer;
 		this.logger = logger;
-		this.recursionLimit = recursionLimit;
 	}
 
 	public void nestBinding() {
-		setBinding(getBinding().nest());
+		setBinding(getBinding().nest(this));
 	}
 
 	public void unnestBinding() {
-		setBinding(getBinding().unnest());
+		setBinding(getBinding().unnest(this));
 	}
 
 	@Override
@@ -73,15 +67,10 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	}
 
 	@Override
-	public int getRecursionLimit() {
-		return recursionLimit;
-	}
-
-	@Override
 	public IScope getScope() {
 		return scope;
 	}
-	
+
 	@Override
 	public ITracer<Node> getTracer() {
 		return tracer;

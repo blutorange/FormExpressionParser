@@ -35,6 +35,10 @@ public class FunctionLangObject extends ALangObject {
 			public Type getThisContextType() {
 				return ALangObject.Type.NULL;
 			}
+			@Override
+			public String getVarArgsName() {
+				return null;
+			}
 		});
 	}
 
@@ -88,6 +92,11 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	@Override
+	public IFunction<FunctionLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAssignerFunction(name, accessedViaDot);
+	}
+
+	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
 		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodFunction(method), method, ec, args);
 	}
@@ -95,6 +104,11 @@ public class FunctionLangObject extends ALangObject {
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
 		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorFunction(object, accessedViaDot), object, accessedViaDot, ec);
+	}
+
+	@Override
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		executeAttrAssigner(this, ec.getNamespace().attrAssignerFunction(object, accessedViaDot), object, accessedViaDot, value, ec);
 	}
 
 	@Override
@@ -111,18 +125,18 @@ public class FunctionLangObject extends ALangObject {
 		return value == func.value;
 	}
 
-	
+
 	// Coercion
 	@Override
-	public StringLangObject coerceString(IEvaluationContext ec) {
+	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return StringLangObject.create(value.getDeclaredName());
 	}
-	
+
 	@Override
-	public FunctionLangObject coerceFunction(IEvaluationContext ec) {
+	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
 		return this;
 	}
-	
+
 	public static FunctionLangObject getNoOpInstance() {
 		return InstanceHolder.NO_OP;
 	}

@@ -107,7 +107,7 @@ public class TextInBoxTreePane extends JComponent {
 		final FontMetrics m = getFontMetrics(getFont());
 		int stringWidth = 0;
 		double stringHeight = 0;
-		for (String line : textInBox.text.split("\n")) {
+		for (final String line : textInBox.text.split("\n")) {
 			final Rectangle2D rect = m.getStringBounds(line, g);
 			stringWidth = Math.max(stringWidth, (int)rect.getWidth());
 			stringHeight += rect.getHeight() + 1;

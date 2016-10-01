@@ -37,7 +37,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		 * @param stringToJoin {@link StringLangObject} The string to be concatenated to this string.
 		 * @return {@link StringLangObject} The concatenation between this string and the argument.
 		 */
-		PLUS("stringToJoin") {
+		PLUS(null, "stringToJoin") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -48,7 +48,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		 * @param comparand {@link ALangObject}. Object to compare this object to.
 		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
 		 */
-		DOUBLE_EQUAL("comparand"){
+		DOUBLE_EQUAL(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -58,7 +58,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		 * @param comparand {@link ALangObject}. Object to compare this object to.
 		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
 		 */
-		TRIPLE_EQUAL("comparand"){
+		TRIPLE_EQUAL(null, "comparand"){
 				@Override
 				public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 						throws EvaluationException {
@@ -67,9 +67,16 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		;
 
 		private final String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(final String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

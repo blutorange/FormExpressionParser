@@ -31,6 +31,9 @@ public interface IFunction<T extends ALangObject> {
 	@NotNull
 	public String[] getDeclaredArgumentList();
 
+	@Nullable
+	public String getVarArgsName();
+
 	/**
 	 * Runs the function and returns the result.
 	 *

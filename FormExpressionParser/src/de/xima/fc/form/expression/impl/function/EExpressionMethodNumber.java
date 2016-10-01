@@ -55,28 +55,28 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	}
 
 	private static enum Impl implements IFunction<NumberLangObject> {
-		PLUS("summand") {
+		PLUS(null, "summand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
 		},
-		DASH("subtrahend") {
+		DASH(null, "subtrahend") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(args[0].coerceNumber(ec));
 			}
 		},
-		STAR("multiplicand") {
+		STAR(null, "multiplicand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 		},
-		DOUBLE_EQUAL("comparand"){
+		DOUBLE_EQUAL(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -85,9 +85,16 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 		;
 
 		private final String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(final String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

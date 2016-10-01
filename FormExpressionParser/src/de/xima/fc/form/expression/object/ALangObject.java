@@ -12,6 +12,7 @@ import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
+import de.xima.fc.form.expression.exception.NoSuchAttrAssignerException;
 import de.xima.fc.form.expression.exception.NoSuchMethodException;
 
 /**
@@ -149,7 +150,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 
 	public abstract ALangObject deepClone();
 
-	
+
 	/**
 	 * @return An expression that evaluates to this object. Eg. for a String
 	 *         <code>"</code>, this would return <code>"\""</code>
@@ -318,25 +319,39 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		return function.evaluate(ec, thisContext, accessor, BooleanLangObject.create(accessedViaDot));
 	}
 
+	@NotNull
+	protected final <T extends ALangObject> void executeAttrAssigner(final T thisContext, final IFunction<T> function,
+			final ALangObject accessor, final boolean accessedViaDot, final ALangObject value,
+			final IEvaluationContext ec) throws NoSuchAttrAccessorException, EvaluationException {
+		if (function == null)
+			throw new NoSuchAttrAssignerException(accessor.toString(), thisContext, ec);
+		function.evaluate(ec, thisContext, accessor, BooleanLangObject.create(accessedViaDot), value);
+	}
+
 	public abstract IFunction<? extends ALangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec)
 			throws EvaluationException;
-
+	public abstract IFunction<? extends ALangObject> attrAssigner(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec)
+			throws EvaluationException;
 	public abstract IFunction<? extends ALangObject> expressionMethod(final EMethod method, IEvaluationContext ec)
 			throws EvaluationException;
-
 	public abstract ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec)
 			throws EvaluationException;
-
+	public abstract void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec)
+			throws EvaluationException;
 	public abstract ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException;
 
-	@Override
-	@NotNull
-	public Iterator<ALangObject> iterator() throws EvaluationException {
-		throw new IterationNotSupportedException(this);
+	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
+		throw new IterationNotSupportedException(this, ec);
 	}
 
-
+	/** @deprecated Use {@link #getIterable(IEvaluationContext)}. */
+	@Override
+	@NotNull
+	@Deprecated
+	public Iterator<ALangObject> iterator() throws EvaluationException, UnsupportedOperationException {
+		throw new UnsupportedOperationException("Don't iterate directly, use getIterable(IEvaluationContext).");
+	}
 
 	@Override
 	public int hashCode() {
@@ -368,7 +383,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	public final Type getType() {
 		return type;
 	}
-	
+
 	public final boolean isArray() {
 		return type == Type.ARRAY;
 	}

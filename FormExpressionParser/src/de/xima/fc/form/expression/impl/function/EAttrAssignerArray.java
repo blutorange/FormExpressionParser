@@ -6,23 +6,22 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
-import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.NullLangObject;
 
-public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
+public enum EAttrAssignerArray implements IFunction<ArrayLangObject> {
 	/**
-	 * @return {@link NumberLangObject}. <code>0</code>, when this is false, <code>1</code> when this is true.
+	 * @param newLength The new length of the array. Padded with {@link NullLangObject} as necessary.
 	 */
-	to_number(Impl.to_number),
+	length(Impl.length),
 	;
 
 	private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	private final String[] argList;
 	private final String varArgsName;
-
-	private EAttrAccessorBoolean(final Impl impl) {
+	private EAttrAssignerArray(final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -30,9 +29,10 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
-		return evalImmediately ? impl.functionValue().evaluate(ec, thisContext, args) : impl;
+	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+			throws EvaluationException {
+		if (!evalImmediately) return impl;
+		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 
 	@Override
 	public Type getThisContextType() {
-		return Type.BOOLEAN;
+		return Type.ARRAY;
 	}
 
 	@Override
@@ -60,12 +60,14 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 		return varArgsName;
 	}
 
-	private static enum Impl implements IFunction<BooleanLangObject> {
-		to_number(null) {
+	private static enum Impl implements IFunction<ArrayLangObject> {
+		length(null, "newLength") {
 			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				return thisContext.coerceNumber(ec);
+				final int len = args[2].coerceNumber(ec).intValue(ec);
+				thisContext.setLength(len);
+				return thisContext;
 			}
 		}
 		;
@@ -95,7 +97,7 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 
 		@Override
 		public Type getThisContextType() {
-			return Type.BOOLEAN;
+			return Type.ARRAY;
 		}
 
 		@Override
@@ -104,7 +106,7 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 		}
 
 		@Override
-		public abstract ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
+		public abstract ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException;
 	}
 }

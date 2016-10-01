@@ -41,7 +41,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param orOperand {@link BooleanLangObject}. Argument for the OR.
 		 * @return {@link BooleanLangObject}. The result of the logical OR disjunction between this boolean and the argument.
 		 */
-		DOUBLE_BAR("orOperand"){
+		DOUBLE_BAR(null, "orOperand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -52,7 +52,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param andOperand {@link BooleanLangObject}. Argument for the AND.
 		 * @return {@link BooleanLangObject}. The result of the logical AND conjunction between this boolean and the argument.
 		 */
-		DOUBLE_AMPERSAND("andOperand"){
+		DOUBLE_AMPERSAND(null, "andOperand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -63,7 +63,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param xorOperand {@link BooleanLangObject}. Argument for the XOR.
 		 * @return {@link BooleanLangObject}. The result of the logical XOR exclusive disjunction between this boolean and the argument.
 		 */
-		CIRCUMFLEX("xorOperand"){
+		CIRCUMFLEX(null, "xorOperand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -73,7 +73,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		/**
 		 * @return {@link BooleanLangObject}. The logical negation of this boolean.
 		 */
-		EXCLAMATION(){
+		EXCLAMATION(null){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -84,7 +84,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param comparand {@link ALangObject}. Object to compare this object to.
 		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
 		 */
-		DOUBLE_EQUAL("comparand"){
+		DOUBLE_EQUAL(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -94,7 +94,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param comparand {@link ALangObject}. Object to compare this object to.
 		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
 		 */
-		TRIPLE_EQUAL("comparand"){
+		TRIPLE_EQUAL(null, "comparand"){
 				@Override
 				public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 						throws EvaluationException {
@@ -103,9 +103,16 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		;
 
 		private final String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(final String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

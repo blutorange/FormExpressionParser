@@ -46,7 +46,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 public class FormExpressionTreeFactory {
 	public static DefaultTreeForTreeLayout<TextInBox> createForExpression(String expression) throws ParseException {
 		expression = expression == null ? "EMPTY" : expression;
-		final TextInBox root = new TextInBox( "<" + expression + ">");
+		final TextInBox root = new TextInBox(expression.isEmpty() ? "<EMPTY>" : expression);
 		final DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(
 				root);
 

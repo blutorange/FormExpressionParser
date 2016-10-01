@@ -51,6 +51,11 @@ public class ExceptionLangObject extends ALangObject {
 	}
 
 	@Override
+	public IFunction<ExceptionLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAssignerException(name, accessedViaDot);
+	}
+
+	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
 		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodException(method), method, ec, args);
 	}
@@ -58,6 +63,11 @@ public class ExceptionLangObject extends ALangObject {
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
 		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorException(object, accessedViaDot), object, accessedViaDot, ec);
+	}
+
+	@Override
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		executeAttrAssigner(this, ec.getNamespace().attrAssignerException(object, accessedViaDot), object, accessedViaDot, value, ec);
 	}
 
 	@Override
@@ -80,7 +90,7 @@ public class ExceptionLangObject extends ALangObject {
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
 		return this;
 	}
-	
+
 	public EvaluationException exceptionValue() {
 		return value;
 	}

@@ -27,4 +27,12 @@ public interface INamespace {
 	public IFunction<BooleanLangObject> attrAccessorBoolean(ALangObject name, boolean accessedViaDot) throws EvaluationException;
 	public IFunction<ExceptionLangObject> attrAccessorException(ALangObject name, boolean accessedViaDot) throws EvaluationException;
 	public IFunction<FunctionLangObject> attrAccessorFunction(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+
+	public IFunction<StringLangObject> attrAssignerString(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	public IFunction<NumberLangObject> attrAssignerNumber(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	public IFunction<ArrayLangObject> attrAssignerArray(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	public IFunction<HashLangObject> attrAssignerHash(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	public IFunction<BooleanLangObject> attrAssignerBoolean(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	public IFunction<ExceptionLangObject> attrAssignerException(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	public IFunction<FunctionLangObject> attrAssignerFunction(ALangObject name, boolean accessedViaDot) throws EvaluationException;
 }

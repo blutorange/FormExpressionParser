@@ -7,6 +7,8 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NullObjectAccessException;
+import de.xima.fc.form.expression.exception.NullObjectAssignException;
+import de.xima.fc.form.expression.exception.NullObjectMethodException;
 
 public class NullLangObject extends ALangObject {
 	private NullLangObject() {
@@ -49,21 +51,30 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAccessException(this, ec);
+		throw new NullObjectMethodException(method.name, ec);
 	}
 	@Override
 	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAccessException(this, ec);
+		throw new NullObjectAccessException(object, accessedViaDot, ec);
+	}
+	@Override
+	public IFunction<NumberLangObject> attrAssigner(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		throw new NullObjectAssignException(object, accessedViaDot, ec);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		throw new NullObjectAccessException(this, ec);
+		throw new NullObjectMethodException(method.name, ec);
+	}
+
+	@Override
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		throw new NullObjectAssignException(object, accessedViaDot, ec);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAccessException(this, ec);
+		throw new NullObjectAccessException(object, accessedViaDot, ec);
 	}
 
 	@Override
@@ -116,5 +127,5 @@ public class NullLangObject extends ALangObject {
 	@Override
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
 		return FunctionLangObject.getNoOpInstance();
-	}	
+	}
 }

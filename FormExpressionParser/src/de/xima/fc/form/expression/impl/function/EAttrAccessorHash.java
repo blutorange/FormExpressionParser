@@ -40,10 +40,12 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 	private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	private final String[] argList;
+	private final String varArgsName;
 
 	private EAttrAccessorHash(final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
+		varArgsName = impl.getVarArgsName();
 		evalImmediately = argList.length == 0;
 	}
 
@@ -66,6 +68,11 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 	}
 
 	@Override
+	public String getVarArgsName() {
+		return varArgsName;
+	}
+
+	@Override
 	public Type getThisContextType() {
 		return Type.HASH;
 	}
@@ -76,14 +83,14 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 	}
 
 	private static enum Impl implements IFunction<HashLangObject> {
-		get("key") {
+		get(null, "key") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.hashValue().get(args.length == 0 ? NullLangObject.getInstance() : args[0]);
 			}
 		},
-		contains("key") {
+		contains(null, "key") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -91,19 +98,26 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 						.create(thisContext.contains(args.length == 0 ? NullLangObject.getInstance() : args[0]));
 			}
 		},
-		length() {
+		length(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, HashLangObject thisContext, ALangObject... args)
-					throws EvaluationException {
+			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
 				return NumberLangObject.create(thisContext.length());
 			}
 		}
 		;
 
 		private String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

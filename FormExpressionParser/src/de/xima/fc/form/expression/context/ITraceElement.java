@@ -5,5 +5,5 @@ public interface ITraceElement {
 	public int getStartColumn();
 	public int getEndLine();
 	public int getEndColumn();
-	public String getPositionName();
+	public String getMethodName();
 }

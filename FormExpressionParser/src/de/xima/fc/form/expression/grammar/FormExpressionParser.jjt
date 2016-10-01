@@ -48,6 +48,7 @@ void Clause(EMethod method) #void :
  (
     ForLoop(method)
   | IfClause(method)
+  | FunctionClause(method)
   | WhileLoop(method)
   | SwitchClause(method)
   | TryClause(method)
@@ -55,8 +56,34 @@ void Clause(EMethod method) #void :
   | ThrowClause(method)
   | BreakClause(method)
   | ContinueClause(method)
+  | ReturnClause(method)
   | Statement(method, false)
   )
+}
+
+void FunctionClause(EMethod method) #FunctionClauseNode :
+{
+  Token t;
+  jjtThis.setStartPosition(token);  
+}
+{
+  (
+    < Function > VariableWithOptionalScope(null) "("
+    (
+      [ IdentifierName(null) ]
+      (
+        "," IdentifierName(null)
+      )*
+    )
+    ")"
+    (
+      Block(null)
+    )
+  )
+  {
+    jjtThis.init(method);
+    jjtThis.setEndPosition(token);
+  }
 }
 
 void WithClause(EMethod method) #WithClauseNode :
@@ -96,6 +123,19 @@ void BreakClause(EMethod method) #BreakClauseNode :
     < Break > [ t = < IDENTIFIER > ]";"  )
   {
     jjtThis.init(method, t == null ? null : t.image);
+    jjtThis.setEndPosition(token);
+  }
+}
+
+void ReturnClause(EMethod method) #ReturnClauseNode :
+{
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    < Return > [ Expression(null) ] ";"  )
+  {
+    jjtThis.init(method);
     jjtThis.setEndPosition(token);
   }
 }
@@ -306,7 +346,7 @@ Node Statement(EMethod method, boolean createNode) #ExpressionNode(createNode) :
 {
   (
     (
-      Expression(null) ";" | ";"
+      Expression(method) ";" | ";"
     )
   )
   {
@@ -1041,9 +1081,13 @@ TOKEN :
 |
   < Continue : "continue" >
 |
+  < Return : "return" >
+|
   < If : "if" >
 |
   < Else : "else" >
+|
+  < Function : "function" >
 |
   < For : "for" >
 |

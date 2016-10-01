@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression;
 
 // TODO List
-// - +=, -=, = etc. ( a += b ==> a = a+b)
 // - unparse, variableScopeChecker
 // - EmbeddedBlocks
 // - Regex literal
@@ -45,6 +44,7 @@ import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
+import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 public class FormExpressionEvaluator {
 
@@ -88,7 +88,10 @@ public class FormExpressionEvaluator {
 		}
 		System.out.println("");
 
-		//		System.exit(0);
+		final UnparseVisitor unparse = new UnparseVisitor();
+		System.out.println("Unparse:");
+		System.out.println(rootNode.jjtAccept(unparse, 0).toString());
+		System.out.println();
 
 		final IEvaluationContext ec = getEc();
 		final EvaluateVisitor visitor = new EvaluateVisitor();
@@ -118,7 +121,7 @@ public class FormExpressionEvaluator {
 		builder.addCustomScope(formFieldScope);
 		return builder.build();
 	}
-	
+
 	private static IEvaluationContext getEc() {
 		final IBinding binding = new OnDemandLookUpBinding();
 		final ITracer<Node> tracer = new GenericTracer();

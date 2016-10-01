@@ -9,9 +9,11 @@ public class IllegalThisContextException extends CatchableEvaluationException {
 
 	public IllegalThisContextException(final ALangObject thisContext, final Type expectedType,
 			final IFunction<ALangObject> function, final IEvaluationContext ec) {
-		super(ec, String.format("Expected type %s for function %s does not match the provided this context %s",
-				expectedType, function.getDeclaredName().length() == 0 ? "(anonymous)" : function.getDeclaredName(),
-						thisContext.toString()));
+		super(ec,
+				String.format(
+						"Provided this context <%s> of type %s does not match the expected type %s for function <%s>.",
+						thisContext.toString(), thisContext.getType(), expectedType,
+						function.getDeclaredName().length() == 0 ? "(anonymous)" : function.getDeclaredName()));
 		this.thisContext = thisContext;
 		this.expectedType = expectedType;
 		this.function = function;

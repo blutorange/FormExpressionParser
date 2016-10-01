@@ -47,7 +47,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * @throws EvaluationException When the variable cannot be set.
 	 */
 	public void setVariable(String name, ALangObject value) throws EvaluationException;
-	
+
 	/**
 	 * Creates a new binding derived from the this binding. {@link #getVariable(String)}
 	 * must return the same value unless #{@link #setVariable(String, ALangObject)} was called.
@@ -57,7 +57,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * @return An {@link IBinding} that keeps the current variables and can be unnested to
 	 * the current binding undoing all changes made to the nested binding.
 	 */
-	public IBinding nest() throws NestingLevelTooDeepException;
+	public IBinding nest(IEvaluationContext ec) throws NestingLevelTooDeepException;
 
 	/**
 	 * Same as {@link #nest()}, but without falling back to the parent binding.
@@ -65,7 +65,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * return the previous binding (a binding equivalent to this one).
 	 * @return
 	 */
-	public IBinding nestLocal();
+	public IBinding nestLocal(IEvaluationContext ec);
 
 	/**
 	 * Gets the previous binding from which this binding was derived.
@@ -73,7 +73,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * must be undone.
 	 * @return The parent binding. Undefined behaviour when there is no such binding.
 	 */
-	public IBinding unnest();
+	public IBinding unnest(IEvaluationContext ec);
 
 	/**
 	 * The limit on nesting. Each if-clause, loop, try-clause, switch,

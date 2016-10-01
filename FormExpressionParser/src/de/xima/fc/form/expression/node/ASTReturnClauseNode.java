@@ -17,7 +17,7 @@ public class ASTReturnClauseNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method) throws ParseException {
-		assertChildrenExactly(0);
+		assertChildrenBetween(0, 1);
 		siblingMethod = method;
 	}
 }

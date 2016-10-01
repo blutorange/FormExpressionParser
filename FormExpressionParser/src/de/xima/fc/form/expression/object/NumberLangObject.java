@@ -38,13 +38,13 @@ public class NumberLangObject extends ALangObject {
 		return value;
 	}
 
-	public long longValue() throws MathException {
-		if (Double.isNaN(value) || value > 9007199254740993f || value < -9007199254740993f) throw new MathException("Number too large to be represented as a long: " + value);
+	public long longValue(final IEvaluationContext ec) throws MathException {
+		if (Double.isNaN(value) || value > 9007199254740993f || value < -9007199254740993f) throw new MathException("Number too large to be represented as a long: " + value, ec);
 		return (long)value;
 	}
 
-	public int intValue() throws MathException {
-		if (Double.isNaN(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) throw new MathException("Number too large to be represented as an int: " + value);
+	public int intValue(final IEvaluationContext ec) throws MathException {
+		if (Double.isNaN(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) throw new MathException("Number too large to be represented as an int: " + value, ec);
 		return (int)value;
 	}
 
@@ -137,9 +137,15 @@ public class NumberLangObject extends ALangObject {
 	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
 		return ec.getNamespace().expressionMethodNumber(method);
 	}
+
 	@Override
 	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
 		return ec.getNamespace().attrAccessorNumber(object, accessedViaDot);
+	}
+
+	@Override
+	public IFunction<NumberLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
+		return ec.getNamespace().attrAssignerNumber(name, accessedViaDot);
 	}
 
 	@Override
@@ -152,6 +158,10 @@ public class NumberLangObject extends ALangObject {
 		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorNumber(object, accessedViaDot), object, accessedViaDot, ec);
 	}
 
+	@Override
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		executeAttrAssigner(this, ec.getNamespace().attrAssignerNumber(object, accessedViaDot), object, accessedViaDot, value, ec);
+	}
 
 	@Override
 	public String inspect() {
@@ -161,6 +171,11 @@ public class NumberLangObject extends ALangObject {
 	@Override
 	public void toExpression(final StringBuilder builder) {
 		builder.append(value);
+	}
+
+	@Override
+	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
+		return this;
 	}
 
 	@Override

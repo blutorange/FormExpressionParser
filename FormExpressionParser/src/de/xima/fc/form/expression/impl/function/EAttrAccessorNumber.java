@@ -18,10 +18,12 @@ public enum EAttrAccessorNumber implements IFunction<NumberLangObject> {
 	private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	private final String[] argList;
+	private final String varArgsName;
 
 	private EAttrAccessorNumber(final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
+		varArgsName = impl.getVarArgsName();
 		evalImmediately = argList.length == 0;
 	}
 
@@ -53,8 +55,13 @@ public enum EAttrAccessorNumber implements IFunction<NumberLangObject> {
 		return null;
 	}
 
+	@Override
+	public String getVarArgsName() {
+		return varArgsName;
+	}
+
 	private static enum Impl implements IFunction<NumberLangObject> {
-		sin() {
+		sin(null) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -63,9 +70,16 @@ public enum EAttrAccessorNumber implements IFunction<NumberLangObject> {
 		};
 
 		private String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

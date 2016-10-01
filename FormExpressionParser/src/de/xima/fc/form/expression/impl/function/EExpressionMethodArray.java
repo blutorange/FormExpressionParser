@@ -40,7 +40,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToAdd {@link ALangObject}. Element(s) to be added to this array. When an array, all of the array's elements are added at the end of this array. Otherwise, the object itself is added to the end of this array.
 		 * @return <code>this</code>, with the elements specified by the argument added.
 		 */
-		PLUS("elementsToAdd"){
+		PLUS(null, "elementsToAdd"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -53,7 +53,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToRemove {@link ArrayLangObject}. Element(s) to be removed from this array. When an array, all of the array's elements are removed from this array. Otherwise, all occurences of the object are removed from this array.
 		 * @return <code>this</code>, with the elements specified by the argument removed.
 		 */
-		DASH("elementsToRemove"){
+		DASH(null, "elementsToRemove"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -66,7 +66,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param comparand {@link ALangObject}. Object to compare this object to.
 		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
 		 */
-		DOUBLE_EQUAL("comparand"){
+		DOUBLE_EQUAL(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -76,7 +76,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param comparand {@link ALangObject}. Object to compare this object to.
 		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
 		 */
-		TRIPLE_EQUAL("comparand"){
+		TRIPLE_EQUAL(null, "comparand"){
 				@Override
 				public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 						throws EvaluationException {
@@ -86,9 +86,16 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 
 
 		private final String[] argList;
+		private String optionalArgumentsName;
 
-		private Impl(final String... argList) {
+		private Impl(final String optArg, final String... argList) {
 			this.argList = argList;
+			this.optionalArgumentsName = optArg;
+		}
+
+		@Override
+		public String getVarArgsName() {
+			return optionalArgumentsName;
 		}
 
 		@Override

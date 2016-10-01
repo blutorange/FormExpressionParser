@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.enums.EJump;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.BreakClauseException;
 import de.xima.fc.form.expression.exception.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.ContinueClauseException;
@@ -14,6 +15,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -24,6 +26,7 @@ import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
@@ -43,6 +46,7 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
@@ -79,15 +83,23 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	private void nestLocal(final IEvaluationContext ec) {
-		ec.setBinding(ec.getBinding().nestLocal());
+		ec.setBinding(ec.getBinding().nestLocal(ec));
 	}
 
 	private void nest(final IEvaluationContext ec) {
-		ec.setBinding(ec.getBinding().nest());
+		ec.setBinding(ec.getBinding().nest(ec));
 	}
 
 	private void unnest(final IEvaluationContext ec) {
-		ec.setBinding(ec.getBinding().unnest());
+		ec.setBinding(ec.getBinding().unnest(ec));
+	}
+
+	private ALangObject setVariable(final ASTVariableNode var, final ALangObject val, final IEvaluationContext ec) {
+		if (var.getScope() != null)
+			ec.getScope().setVariable(var.getScope(), var.getName(), val);
+		else
+			ec.setUnqualifiedVariable(var.getName(), val);
+		return val;
 	}
 
 	private ALangObject[] evaluateChildren(final Node node, final IEvaluationContext ec) {
@@ -95,6 +107,77 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final ALangObject[] res = new ALangObject[children.length];
 		for (int i = 0; i != children.length; ++i)
 			res[i] = jjtAccept(node, children[i], ec);
+		return res;
+	}
+
+	private ALangObject evaluatePropertyExpression(final Node parentNode, final int indexOneAfterEnd,
+			final IEvaluationContext ec) {
+		final Node[] children = parentNode.getChildArray();
+		// Child is an expressions and cannot contain break/clause/return
+		// clauses.
+		ALangObject res = jjtAccept(parentNode, children[0], ec);
+		ALangObject thisContext = NullLangObject.getInstance();
+		for (int i = 1; i < indexOneAfterEnd; ++i) {
+			final Node n = children[i];
+			switch (n.getSiblingMethod()) {
+			case DOT:
+				thisContext = res;
+				final StringLangObject attrDot = jjtAccept(parentNode, n, ec).coerceString(ec);
+				res = res.evaluateAttrAccessor(attrDot, true, ec);
+				break;
+			case BRACKET:
+				thisContext = res;
+				final ALangObject attrBracket = jjtAccept(parentNode, n, ec);
+				res = res.evaluateAttrAccessor(attrBracket, false, ec);
+				break;
+			case PARENTHESIS:
+				// Get a function object.
+				final IFunction<ALangObject> func = res.coerceFunction(ec).functionValue();
+
+				// Evaluate function arguments
+				final ALangObject[] args = evaluateChildren(n, ec);
+
+				// Check thisContext of the function.
+				if (func.getThisContextType() != Type.NULL && func.getThisContextType() != thisContext.getType())
+					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
+
+				nestLocal(ec);
+				ec.getTracer().descend(parentNode);
+				try {
+					// Evaluate function
+					thisContext = res = func.evaluate(ec,
+							func.getThisContextType() == Type.NULL ? NullLangObject.getInstance() : thisContext, args);
+				}
+				finally {
+					ec.getTracer().ascend();
+					unnest(ec);
+				}
+				// Check for disallowed break / continue clauses.
+				if (mustJump) {
+					switch (jumpType) {
+					case RETURN:
+						mustJump = false;
+						break;
+					case BREAK:
+						throw new BreakClauseException(jumpLabel, ec);
+					case CONTINUE:
+						throw new ContinueClauseException(jumpLabel, ec);
+					default:
+						throw new EvaluationException(ec,
+								String.format(
+										"Unknown jump type %s after function evaluation. This is most likely a bug with the parser. Contact support.",
+										jumpType));
+					}
+				}
+				break;
+				// $CASES-OMITTED$
+			default:
+				throw new UncatchableEvaluationException(ec,
+						String.format(
+								"Illegal enum constant %s at ASTPropertyExpressionNode. This is likely a bug with the parser. Contact support.",
+								n.getSiblingMethod()));
+			}
+		}
 		return res;
 	}
 
@@ -133,69 +216,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTPropertyExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
-		final Node[] children = node.getChildArray();
-		// Child is an expressions and cannot contain break/clause/return
-		// clauses.
-		ALangObject res = jjtAccept(node, children[0], ec);
-		ALangObject thisContext = NullLangObject.getInstance();
-		for (int i = 1; i < children.length; ++i) {
-			final Node n = children[i];
-			switch (n.getSiblingMethod()) {
-			case DOT:
-				thisContext = res;
-				final StringLangObject attrDot = jjtAccept(node, n, ec).coerceString(ec);
-				res = res.evaluateAttrAccessor(attrDot, true, ec);
-				break;
-			case BRACKET:
-				thisContext = res;
-				final ALangObject attrBracket = jjtAccept(node, n, ec);
-				res = res.evaluateAttrAccessor(attrBracket, false, ec);
-				break;
-			case PARENTHESIS:
-				// Get a function object.
-				final IFunction<ALangObject> func = res.coerceFunction(ec).functionValue();
-
-				// Evaluate function arguments
-				final ALangObject[] args = evaluateChildren(n, ec);
-
-				// Check thisContext of the function.
-				if (func.getThisContextType() != thisContext.getType())
-					throw new IllegalThisContextException(res, func.getThisContextType(), func, ec);
-
-				nestLocal(ec);
-				ec.getTracer().descend(node);
-				try {
-					// Evaluate function
-					thisContext = res = func.evaluate(ec, thisContext, args);
-				} finally {
-					ec.getTracer().ascend();
-					unnest(ec);
-				}
-				// Check for disallowed break / continue clauses.
-				if (mustJump) {
-					switch (jumpType) {
-					case RETURN:
-						mustJump = false;
-						break;
-					case BREAK:
-						throw new BreakClauseException(jumpLabel, ec);
-					case CONTINUE:
-						throw new ContinueClauseException(jumpLabel, ec);
-					default:
-						throw new EvaluationException(ec,
-								String.format(
-										"Unknown jump type %s after function evaluation. This is most likely a bug with the parser. Contact support.",
-										jumpType));
-					}
-				}
-				break;
-			// $CASES-OMITTED$
-			default:
-				throw new EvaluationException(ec, "Illegal enum constant " + n.getSiblingMethod()
-						+ " at ASTPropertyExpressionNode. This is likely a bug with the parser. Contact support.");
-			}
-		}
-		return res;
+		return evaluatePropertyExpression(node, node.jjtGetNumChildren(), ec);
 	}
 
 	@Override
@@ -281,7 +302,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			// No else
 			else
 				return NullLangObject.getInstance();
-		} finally {
+		}
+		finally {
 			unnest(ec);
 		}
 	}
@@ -308,9 +330,10 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 					}
 					jjtAccept(node, children[2], ec);
 				}
-			} else {
+			}
+			else {
 				// Iterating for loop
-				forloop: for (final ALangObject value : jjtAccept(node, children[0], ec)) {
+				forloop: for (final ALangObject value : jjtAccept(node, children[0], ec).getIterable(ec)) {
 					ec.getBinding().setVariable(variableName, value);
 					res = jjtAccept(node, children[1], ec);
 					// Handle break, continue, return.
@@ -323,7 +346,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 					}
 				}
 			}
-		} finally {
+		}
+		finally {
 			unnest(ec);
 		}
 		return res;
@@ -346,7 +370,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 						break whileloop;
 				}
 			}
-		} finally {
+		}
+		finally {
 			unnest(ec);
 		}
 		return res;
@@ -368,8 +393,10 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 					if (jumpType == EJump.BREAK)
 						break doloop;
 				}
-			} while (jjtAccept(node, children[0], ec).coerceBoolean(ec).booleanValue());
-		} finally {
+			}
+			while (jjtAccept(node, children[0], ec).coerceBoolean(ec).booleanValue());
+		}
+		finally {
 			unnest(ec);
 		}
 		return res;
@@ -385,9 +412,11 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			// Try branch, no explicit check for mustJump as it returns
 			// immediately anyway
 			res = jjtAccept(node, children[0], ec);
-		} catch (final CatchableEvaluationException e) {
+		}
+		catch (final CatchableEvaluationException e) {
 			exception = e;
-		} finally {
+		}
+		finally {
 			unnest(ec);
 		}
 		// If mustJump is true, break/continue/return was the last statement
@@ -400,7 +429,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				// Catch branch, no explicit check for mustJump as it returns
 				// immediately anyway
 				res = jjtAccept(node, children[1], ec);
-			} finally {
+			}
+			finally {
 				unnest(ec);
 			}
 		}
@@ -416,12 +446,12 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		nest(ec);
 		try {
 			final ALangObject switchValue = jjtAccept(node, children[0], ec);
-			for (int i = 1; i < children.length; ++i) {
-				switchclause: switch (children[i].getSiblingMethod()) {
+			forloop : for (int i = 1; i < children.length; ++i) {
+				switch (children[i].getSiblingMethod()) {
 				case SWITCHCASE:
 					// Case contains an expression and may not contain break,
 					// continue, or throw clauses.
-					if (!matchingCase && switchValue.equals(jjtAccept(node, children[i - 1], ec))) {
+					if (!matchingCase && switchValue.equals(jjtAccept(node, children[i], ec))) {
 						matchingCase = true;
 					}
 					break;
@@ -434,7 +464,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 								return res;
 							mustJump = false;
 							if (jumpType == EJump.BREAK)
-								break switchclause;
+								break forloop;
 						}
 					}
 					break;
@@ -446,14 +476,16 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 							return res;
 						mustJump = false;
 						if (jumpType == EJump.BREAK)
-							break switchclause;
+							break forloop;
 					}
+					break;
 				default:
 					throw new UncatchableEvaluationException(ec,
 							"Invalid switch syntax. This is most likely an error with the parser. Contact support.");
 				}
 			}
-		} finally {
+		}
+		finally {
 			unnest(ec);
 		}
 		return res;
@@ -495,7 +527,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		jumpLabel = null;
 		jumpType = EJump.RETURN;
 		mustJump = true;
-		return NullLangObject.getInstance();
+		return node.jjtGetNumChildren() == 0 ? NullLangObject.getInstance() : jjtAccept(node, node.jjtGetChild(0), ec);
 	}
 
 	@Override
@@ -531,12 +563,18 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
+	public ALangObject visit(final ASTFunctionClauseNode node, final IEvaluationContext ec) throws EvaluationException {
+		final ALangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec));
+		return setVariable((ASTVariableNode)node.getFirstChild(), func, ec);
+	}
+
+	@Override
 	public ALangObject visit(final ASTIdentifierNameNode node, final IEvaluationContext ec) throws EvaluationException {
 		return StringLangObject.create(node.getName());
 	}
 
 	@Override
-	public ALangObject visit(ASTWithClauseNode node, IEvaluationContext ec) throws EvaluationException {
+	public ALangObject visit(final ASTWithClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
 		final int len = children.length - 1;
 		// Set scopes.
@@ -548,7 +586,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		try {
 			// Need not check for must jump as we return immediately anyway.
 			return jjtAccept(node, children[children.length - 1], ec);
-		} finally {
+		}
+		finally {
 			// Remove scopes.
 			for (int i = 0; i != len; ++i)
 				ec.endDefaultScope();
@@ -559,23 +598,56 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		final Node[] children = node.getChildArray();
+		// Iterate from the end of each assignment pair and assign the rvalue to the lvalue.
 		// Child must be an expression and cannot contain break/continue/return.
-		final ALangObject assignee = jjtAccept(node, children[children.length - 1], ec);
+		ALangObject assignee = jjtAccept(node, children[children.length - 1], ec);
 		for (int i = children.length - 2; i >= 0; --i) {
-			switch (children[i].getSiblingMethod()) {
-			case ASSIGNMENT_DIRECT:
+			final EMethod method = children[i + 1].getSiblingMethod();
+			switch (children[i].jjtGetNodeId()) {
+			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
 				final ASTVariableNode var = (ASTVariableNode) children[i];
-				final String scope = var.getScope();
-				if (scope != null)
-					ec.getScope().setVariable(scope, var.getName(), assignee);
-				else
-					ec.setUnqualifiedVariable(var.getName(), assignee);
+				// For compound assignments (+=, *= etc.), first we need to
+				// evaluate the left hand side.
+				if (method != EMethod.EQUAL)
+					assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalTypeMap.get(method), ec,
+							assignee);
+				// Now we can set the variable to its new value.
+				setVariable(var, assignee, ec);
 				break;
-			case ASSIGNMENT_PROPERTY:
-				// TODO
-				final ASTAssignmentExpressionNode ass = (ASTAssignmentExpressionNode) children[i];
+			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
+				final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode) children[i];
+				final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
+				final Node last = prop.getLastChild();
+				switch (last.getSiblingMethod()) {
+				case DOT:
+					final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
+					// For compound assignments (+=, *= etc.), first we need to
+					// evaluate the left hand side.
+					if (method != EMethod.EQUAL)
+						assignee = res.evaluateAttrAccessor(attrDot, true, ec)
+						.evaluateExpressionMethod(EMethod.equalTypeMap.get(method), ec, assignee);
+					// Now we can call the attribute assigner and assign the
+					// value.
+					res.executeAttrAssigner(attrDot, true, assignee, ec);
+					break;
+				case BRACKET:
+					final ALangObject attrBracket = jjtAccept(prop, last, ec);
+					// For compound assignments (+=, *= etc.), first we need to
+					// evaluate the left hand side.
+					if (method != EMethod.EQUAL)
+						assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
+						.evaluateExpressionMethod(EMethod.equalTypeMap.get(method), ec, assignee);
+					res.executeAttrAssigner(attrBracket, false, assignee, ec);
+					break;
+					// $CASES-OMITTED$
+				default:
+					throw new UncatchableEvaluationException(ec,
+							String.format(
+									"Illegal enum constant %s at ASTPropertyExpressionNode. This is likely a bug with the parser. Contact support.",
+									last.getSiblingMethod()));
+				}
 				break;
-			// $CASES-OMITTED$
+				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
 						String.format(
