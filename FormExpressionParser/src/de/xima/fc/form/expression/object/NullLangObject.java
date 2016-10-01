@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.object;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
@@ -108,7 +110,7 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) {
-		return ExceptionLangObject.getEmptyExceptionInstance();
+		return ExceptionLangObject.create(StringUtils.EMPTY, ec);
 	}
 
 	@Override

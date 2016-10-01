@@ -12,6 +12,21 @@ import de.xima.fc.form.expression.context.IMethod2Function;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorFunction;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodException;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodFunction;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
+import de.xima.fc.form.expression.impl.function.GenericAttrAccessor;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -375,5 +390,42 @@ public class GenericNamespace implements INamespace {
 			throws EvaluationException {
 		final IFunction<FunctionLangObject> func = attrAccessorFunction.get(name);
 		return func != null ? func : genericAttrAccessorFunction;
+	}
+	
+	public static INamespace getGenericNamespaceInstance() {
+		return InstanceHolder.GENERIC;
+	}
+	
+	private final static class InstanceHolder {
+		public final static INamespace GENERIC;
+		static {
+			final GenericNamespace.Builder builder = new GenericNamespace.Builder();
+
+			builder.addExpressionMethodBoolean(EExpressionMethodBoolean.values());
+			builder.addExpressionMethodNumber(EExpressionMethodNumber.values());
+			builder.addExpressionMethodString(EExpressionMethodString.values());
+			builder.addExpressionMethodArray(EExpressionMethodArray.values());
+			builder.addExpressionMethodHash(EExpressionMethodHash.values());
+			builder.addExpressionMethodException(EExpressionMethodException.values());
+			builder.addExpressionMethodFunction(EExpressionMethodFunction.values());
+
+			builder.addAttrAccessorBoolean(EAttrAccessorBoolean.values());
+			builder.addAttrAccessorNumber(EAttrAccessorNumber.values());
+			builder.addAttrAccessorString(EAttrAccessorString.values());
+			builder.addAttrAccessorArray(EAttrAccessorArray.values());
+			builder.addAttrAccessorHash(EAttrAccessorHash.values());
+			builder.addAttrAccessorException(EAttrAccessorException.values());
+			builder.addAttrAccessorFunction(EAttrAccessorFunction.values());
+
+			builder.setGenericAttrAccessorArray(GenericAttrAccessor.ARRAY);
+			builder.setGenericAttrAccessorBoolean(GenericAttrAccessor.BOOLEAN);
+			builder.setGenericAttrAccessorException(GenericAttrAccessor.EXCEPTION);
+			builder.setGenericAttrAccessorFunction(GenericAttrAccessor.FUNCTION);
+			builder.setGenericAttrAccessorHash(GenericAttrAccessor.HASH);
+			builder.setGenericAttrAccessorNumber(GenericAttrAccessor.NUMBER);
+			builder.setGenericAttrAccessorString(GenericAttrAccessor.STRING);
+
+			GENERIC = builder.build();
+		}
 	}
 }

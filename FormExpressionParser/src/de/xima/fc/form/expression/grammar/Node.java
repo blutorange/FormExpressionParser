@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.jetbrains.annotations.NotNull;
 
+import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
@@ -12,7 +13,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
    machinery for constructing the parent and child relationships
    between nodes. */
 
-public interface Node extends Serializable {
+public interface Node extends Serializable, ITraceElement {
 
 	/**
 	 * This method is called after the node has been made the current node. It
@@ -138,8 +139,4 @@ public interface Node extends Serializable {
 	
 	public void setStartPosition(Token token);
 	public void setEndPosition(Token token);
-	public int getStartLine();
-	public int getStartColumn();
-	public int getEndLine();
-	public int getEndColumn();
 }

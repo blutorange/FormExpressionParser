@@ -5,16 +5,17 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
-import de.xima.fc.form.expression.visitor.AEvaluationVisitor;
+import de.xima.fc.form.expression.context.ITracer;
+import de.xima.fc.form.expression.grammar.Node;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
 	private IBinding binding;
 	private final INamespace namespace;
 	private final ILogger logger;
+	final ITracer<Node> tracer;
 	private final IScope scope;
 	private final int recursionLimit;
-	private AEvaluationVisitor<?,?> visitor;
 	
 	/**
 	 * Creates a new evaluation context.
@@ -28,11 +29,12 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	 * @param recursionLimit
 	 *            The limit for recursive method calls.
 	 */
-	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ILogger logger,
+	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final ILogger logger,
 			final int recursionLimit) {
 		this.binding = binding;
 		this.namespace = namespace;
 		this.scope = scope;
+		this.tracer = tracer;
 		this.logger = logger;
 		this.recursionLimit = recursionLimit;
 	}
@@ -79,14 +81,9 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	public IScope getScope() {
 		return scope;
 	}
-
+	
 	@Override
-	public final AEvaluationVisitor<?,?> getEvaluationVisitor() {
-		return visitor;
+	public ITracer<Node> getTracer() {
+		return tracer;
 	}
-
-	@Override
-	public final void setEvaluationVisitor(AEvaluationVisitor<?,?> visitor) {
-		this.visitor = visitor;
-	}		
 }

@@ -8,6 +8,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public abstract class SimpleNode implements Node {
 
@@ -22,6 +23,7 @@ public abstract class SimpleNode implements Node {
 	protected final int uniqueId;
 
 	private transient Token startToken;
+	protected Node parent;
 	protected Node[] children = EMPTY_NODE_ARRAY;
 	protected EMethod siblingMethod;
 	private int startLine, endLine, startColumn, endColumn;
@@ -53,13 +55,13 @@ public abstract class SimpleNode implements Node {
 
 	@Override
 	public void jjtSetParent(final Node n) {
-		//parent = n;
+		parent = n;
 	}
 
 	@Override
 	public Node jjtGetParent() {
-		throw new UnsupportedOperationException("Getting parents has not been neccessary as of now, uncomment to enable.");
-		//return parent;
+		//throw new UnsupportedOperationException("Getting parents has not been neccessary as of now, uncomment to enable.");
+		return parent;
 	}
 
 	@Override
@@ -217,6 +219,14 @@ public abstract class SimpleNode implements Node {
 		return endColumn;
 	}
 
+	@Override
+	public String getPositionName() {
+		if (this instanceof ASTFunctionNode) {
+			return CmnCnst.TRACER_POSITION_NAME_ANONYMOUS_FUNCTION;
+		}
+		return parent == null ? CmnCnst.TRACER_POSITION_NAME_GLOBAL : parent.getPositionName();
+	}
+	
 	/**
 	 * Subclasses may add additional info for {@link #toString()}.
 	 * @param sb String builder to use.

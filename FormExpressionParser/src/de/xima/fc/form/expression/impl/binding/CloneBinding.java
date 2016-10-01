@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl;
+package de.xima.fc.form.expression.impl.binding;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +19,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 public class CloneBinding implements IBinding {
 	private final Map<String, ALangObject> map;
 	private final CloneBinding parent;
+	private final CloneBinding top;
 	private final boolean isBreakpoint;
 
 	public CloneBinding() {
@@ -28,23 +29,27 @@ public class CloneBinding implements IBinding {
 	public CloneBinding(final int initialCapacity) {
 		map = new HashMap<>(initialCapacity);
 		parent = null;
+		top = this;
 		isBreakpoint = true;
 	}
 
-	private CloneBinding(final CloneBinding parent, boolean isBreakpoint) {
+	private CloneBinding(final CloneBinding parent, final CloneBinding top, boolean isBreakpoint) {
 		map = new HashMap<>(parent.map);
 		this.parent = parent;
+		this.top = top;
 		this.isBreakpoint = isBreakpoint;
 	}
 
 	@Override
 	public final ALangObject getVariable(final String name) throws EvaluationException {
 		final ALangObject res = getVariableInternal(name);
-		return res == null ? map.get(name) : res;
+		return res != null ? res : top.map.get(name);
 	}
 	
 	private ALangObject getVariableInternal(final String name) throws EvaluationException {
-		return isBreakpoint ? map.get(name) : parent.getVariable(name);
+		final ALangObject res = map.get(name);
+		if (res != null) return res;
+		return isBreakpoint ? res : parent.getVariable(name);
 	}
 
 	@Override
@@ -65,7 +70,7 @@ public class CloneBinding implements IBinding {
 
 	@Override
 	public final IBinding nest() throws NestingLevelTooDeepException {
-		return new CloneBinding(this, true);
+		return new CloneBinding(this, top, true);
 	}
 
 	@Override
@@ -82,7 +87,7 @@ public class CloneBinding implements IBinding {
 
 	@Override
 	public IBinding nestLocal() {
-		return new CloneBinding(this, false);
+		return new CloneBinding(this, top, false);
 	}
 
 	@Override

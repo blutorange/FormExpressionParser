@@ -14,10 +14,6 @@ public class ExceptionLangObject extends ALangObject {
 
 	private final CatchableEvaluationException value;
 
-	private final static class InstanceHolder {
-		public final static ExceptionLangObject EMPTY_EXCEPTION = new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY));
-	}
-	
 	private ExceptionLangObject(final CatchableEvaluationException value) {
 		super(Type.EXCEPTION);
 		this.value = value;
@@ -94,12 +90,8 @@ public class ExceptionLangObject extends ALangObject {
 		return new ExceptionLangObject(value);
 	}
 
-	public static ExceptionLangObject create(final String message) {
-		if (message == null || message.length()==0) return getEmptyExceptionInstance();
-		return new ExceptionLangObject(new CustomRuntimeException(message));
-	}
-
-	public static ExceptionLangObject getEmptyExceptionInstance() {
-		return InstanceHolder.EMPTY_EXCEPTION;
+	public static ExceptionLangObject create(final String message, final IEvaluationContext ec) {
+		if (message == null || message.length()==0) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
+		return new ExceptionLangObject(new CustomRuntimeException(message, ec));
 	}
 }

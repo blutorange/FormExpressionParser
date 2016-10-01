@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl;
+package de.xima.fc.form.expression.impl.scope;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,10 +7,14 @@ import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
+import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
+import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.impl.GenericEvaluationContext;
+import de.xima.fc.form.expression.impl.GenericNamespace;
 import de.xima.fc.form.expression.impl.logger.SystemLogger;
-import de.xima.fc.form.expression.impl.logger.SystemLogger.Level;
+import de.xima.fc.form.expression.impl.tracer.DummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -50,39 +54,11 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 
 	private final List<String> defaultScopeList = new ArrayList<>(16);
 	
-	public ReadScopedEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ILogger logger,
+	private ReadScopedEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final ILogger logger,
 			final int recursionLimit) {
-		super(binding, scope, namespace, logger, recursionLimit);
+		super(binding, scope, namespace, tracer, logger, recursionLimit);
 	}
-	
-	/**
-	 * A new evaluation context with the given binding and namespace, a
-	 * {@link SystemLogger} at {@link Level#INFO} and a recursion limit of 10.
-	 * 
-	 * @param binding
-	 *            Binding to use.
-	 * @param namespace
-	 *            Namespace to use.
-	 */
-	public ReadScopedEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace) {
-		this(binding, scope, namespace, SystemLogger.getInfoLogger(), 10);
-	}
-
-	/**
-	 * A new evaluation context with the given binding and namespace, and a
-	 * recursion limit of 10.
-	 * 
-	 * @param binding
-	 *            Binding to use.
-	 * @param namespace
-	 *            Namespace to use.
-	 * @param logger
-	 *            The logger used for logging.
-	 */
-	public ReadScopedEvaluationContext(final IBinding binding, IScope scope, final INamespace namespace, ILogger logger) {
-		this(binding, scope, namespace, logger, 10);
-	}
-	
+		
 	@Override
 	public ALangObject getUnqualifiedVariable(String name) throws EvaluationException {
 		final ALangObject loc = getBinding().getVariable(name);
@@ -109,4 +85,45 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		defaultScopeList.remove(defaultScopeList.size() - 1);
 	}
 
+	public final static class Builder {
+		private ILogger logger = SystemLogger.getInfoLogger();
+		private ITracer<Node> tracer = DummyTracer.INSTANCE;
+		private INamespace namespace = GenericNamespace.getGenericNamespaceInstance();
+		private int recursionLimit = 10;
+
+		private IBinding binding;
+		private IScope scope;
+		
+		public Builder() {			
+		}
+		public Builder setRecursionLimit(final int recursionLimit) {
+			if (recursionLimit > 0) this.recursionLimit = recursionLimit;
+			return this;
+		}		
+		public Builder setNamespace(final INamespace namespace) {
+			if (namespace != null) this.namespace = namespace;
+			return this;
+		}		
+		public Builder setBinding(final IBinding binding) {
+			if (binding != null) this.binding = binding;
+			return this;
+		}		
+		public Builder setScope(final IScope scope) {
+			if (scope != null) this.scope = scope;
+			return this;
+		}		
+		public Builder setLogger(final ILogger logger) {
+			if (logger != null) this.logger = logger;
+			return this;
+		}		
+		public Builder setTracer(final ITracer<Node> tracer) {
+			if (tracer != null) this.tracer = tracer;
+			return this;
+		}		
+		public ReadScopedEvaluationContext build() throws IllegalStateException {
+			if (binding == null) throw new IllegalStateException("Binding not set.");
+			if (scope == null) throw new IllegalStateException("Scope not set.");
+			return new ReadScopedEvaluationContext(binding, scope, namespace, tracer, logger, recursionLimit);
+		}
+	}	
 }

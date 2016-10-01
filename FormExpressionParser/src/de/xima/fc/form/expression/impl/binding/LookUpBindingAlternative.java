@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl;
+package de.xima.fc.form.expression.impl.binding;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,9 +45,9 @@ public class LookUpBindingAlternative implements IBinding {
 		final ALangObject[] array = map.get(name);
 		if (array == null) return null;
 		final int len = currentDepth < array.length ? currentDepth : array.length-1;
-		for (int i = len; i >= 0 && !breakpoints[i]; --i)
+		for (int i = len; i > 0 && !breakpoints[i]; --i)
 			if (array[i] != null) return array[i];
-		return null;
+		return array[0];
 	}
 
 	@Override

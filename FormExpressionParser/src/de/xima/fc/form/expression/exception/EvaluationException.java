@@ -1,13 +1,16 @@
 package de.xima.fc.form.expression.exception;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.INamespace;
-import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class EvaluationException extends RuntimeException {
 	public EvaluationException(final EvaluationException exception) {
@@ -73,13 +76,42 @@ public class EvaluationException extends RuntimeException {
 		namespace = ec == null ? null : ec.getNamespace();
 	}
 
-	@SuppressWarnings("boxing")
+	/**
+	 * Builds the exception and the stack trace.
+	 * @param msg Message of the exception.
+	 * @param ec Current context.
+	 * @return The message with the stack trace.
+	 */
 	private static String msgWithContext(String msg, IEvaluationContext ec) {
-		final Node n = ec.getEvaluationVisitor().getCurrentlyProcessedNode();
-		if (n == null) return String.format("(line unknown) %s%sEvaluation context is %s.", msg, System.lineSeparator(), String.valueOf(ec));
-		return String.format("(line %s, column %s) %s%sEvaluation context is %s.", n.getStartLine(), n.getStartColumn(), msg, System.lineSeparator(), String.valueOf(ec));
-	}
+		final StringBuilder sb = new StringBuilder();
+		sb.append(msg).append(System.lineSeparator());
+		appendTraceElement(sb, ec.getTracer().getCurrentlyProcessed());
+		for (ITraceElement el : ec.getTracer().getStackTrace()) {
+			sb.append(System.lineSeparator());
+			appendTraceElement(sb, el);
+		}
+		sb.append(System.lineSeparator());
+		sb.append("Evaluation context is ");
+		sb.append(ec);
+		return sb.toString();
+	}	
 
+	private static void appendTraceElement(StringBuilder sb, ITraceElement el) {
+		sb.append("\tat ")
+			.append(el == null ? CmnCnst.TRACER_POSITION_NAME_UNKNOWN : el.getPositionName())
+			.append(" (");
+		if (el == null) {
+			sb.append(CmnCnst.TRACER_POSITION_UNKNOWN);
+		}
+		else {
+			sb.append("line ")
+				.append(el.getStartLine())
+				.append(", column ")
+				.append(el.getStartColumn());
+		}		
+		sb.append(')');
+	}
+	
 	private static String msgWithBinding(String msg, IBinding binding) {
 		return String.format("%s%sBinding is %s.", msg, System.lineSeparator(), String.valueOf(binding));
 	}

@@ -4,6 +4,8 @@ import org.jetbrains.annotations.Nullable;
 
 import de.xima.fc.form.expression.grammar.Node;
 
+
+@Deprecated
 public abstract class AEvaluationVisitor<R,T> implements IFormExpressionParserVisitor<R, T> {
 	protected Node currentlyProcessedNode;
 	@Nullable

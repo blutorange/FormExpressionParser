@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.context;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.visitor.AEvaluationVisitor;
 
 public interface IEvaluationContext {
 
@@ -11,9 +11,10 @@ public interface IEvaluationContext {
 	public IBinding getBinding();
 	public INamespace getNamespace();
 	public ILogger getLogger();
+	public ITracer<Node> getTracer();
 	
-	public void setEvaluationVisitor(AEvaluationVisitor<?,?> visitor);
-	public AEvaluationVisitor<?,?> getEvaluationVisitor();
+//	public void setEvaluationVisitor(AEvaluationVisitor<?,?> visitor);
+//	public AEvaluationVisitor<?,?> getEvaluationVisitor();
 	
 	public void setBinding(IBinding binding);
 	public int getRecursionLimit();

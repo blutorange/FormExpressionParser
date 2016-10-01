@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl;
+package de.xima.fc.form.expression.impl.binding;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,14 @@ import de.xima.fc.form.expression.object.ALangObject;
  * it increments the pointer to the current map. Throws a {@link NestingLevelTooDeepException}
  * when the nesting level is deeper than the number of maps. Variable lookup proceeds at the
  * current nesting level, iteratively inspecting parent maps when no variable can be found.
- *
+ * <br><br>
+ * Retrieving variables: The current nesting level is tried, then parent nesting levels,
+ * unless nesting was done via {@link #nestLocal()}. When no variable could be found,
+ * the top level is tried.
+ * <br><br>
+ * Setting variables: first searches for a variable that may exist on higher nesting
+ * levels, respecting breakpoints set by {@link #nestLocal()}. When no variable could be found, creates a new variable
+ * at the current nesting level.
  * @author madgaksha
  *
  */
@@ -51,11 +58,11 @@ public class LookUpBinding implements IBinding {
 
 	@Override
 	public ALangObject getVariable(final String name) throws EvaluationException {
-		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
+		for (int i = currentDepth; i > 0 && !breakpointArray[i]; --i) {
 			final ALangObject o = mapArray[i].get(name);
 			if (o != null) return o;
 		}
-		return null;
+		return mapArray[0].get(name);
 	}
 
 	@Override

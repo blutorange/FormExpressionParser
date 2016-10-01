@@ -30,69 +30,23 @@ import org.apache.commons.lang3.StringUtils;
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.ICustomScope;
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
+import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.impl.GenericNamespace;
 import de.xima.fc.form.expression.impl.GenericScope;
-import de.xima.fc.form.expression.impl.OnDemandLookUpBinding;
-import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorFunction;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodException;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodFunction;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
-import de.xima.fc.form.expression.impl.function.GenericAttrAccessor;
+import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 import de.xima.fc.form.expression.impl.scope.FormFieldScope;
 import de.xima.fc.form.expression.impl.scope.FormFieldScope.FormVersion;
+import de.xima.fc.form.expression.impl.scope.ReadScopedEvaluationContext.Builder;
+import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 
 public class FormExpressionEvaluator {
-
-	private final static INamespace NAMESPACE;
-	static {
-		final GenericNamespace.Builder builder = new GenericNamespace.Builder();
-
-		builder.addExpressionMethodBoolean(EExpressionMethodBoolean.values());
-		builder.addExpressionMethodNumber(EExpressionMethodNumber.values());
-		builder.addExpressionMethodString(EExpressionMethodString.values());
-		builder.addExpressionMethodArray(EExpressionMethodArray.values());
-		builder.addExpressionMethodHash(EExpressionMethodHash.values());
-		builder.addExpressionMethodException(EExpressionMethodException.values());
-		builder.addExpressionMethodFunction(EExpressionMethodFunction.values());
-
-		builder.addAttrAccessorBoolean(EAttrAccessorBoolean.values());
-		builder.addAttrAccessorNumber(EAttrAccessorNumber.values());
-		builder.addAttrAccessorString(EAttrAccessorString.values());
-		builder.addAttrAccessorArray(EAttrAccessorArray.values());
-		builder.addAttrAccessorHash(EAttrAccessorHash.values());
-		builder.addAttrAccessorException(EAttrAccessorException.values());
-		builder.addAttrAccessorFunction(EAttrAccessorFunction.values());
-
-		builder.setGenericAttrAccessorArray(GenericAttrAccessor.ARRAY);
-		builder.setGenericAttrAccessorBoolean(GenericAttrAccessor.BOOLEAN);
-		builder.setGenericAttrAccessorException(GenericAttrAccessor.EXCEPTION);
-		builder.setGenericAttrAccessorFunction(GenericAttrAccessor.FUNCTION);
-		builder.setGenericAttrAccessorHash(GenericAttrAccessor.HASH);
-		builder.setGenericAttrAccessorNumber(GenericAttrAccessor.NUMBER);
-		builder.setGenericAttrAccessorString(GenericAttrAccessor.STRING);
-
-		NAMESPACE = builder.build();
-	}
 
 	public static void main(final String args[]) {
 
@@ -141,7 +95,7 @@ public class FormExpressionEvaluator {
 
 		try {
 			final long t1 = System.nanoTime();
-			final ALangObject result = visitor.performVisit(rootNode, ec);
+			final ALangObject result = rootNode.jjtAccept(visitor, ec);
 			final long t2 = System.nanoTime();
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 
@@ -167,7 +121,12 @@ public class FormExpressionEvaluator {
 	
 	private static IEvaluationContext getEc() {
 		final IBinding binding = new OnDemandLookUpBinding();
+		final ITracer<Node> tracer = new GenericTracer();
+		final Builder builder = new Builder();
 		final IScope scope = getScope();
-		return new ReadScopedEvaluationContext(binding, scope, NAMESPACE);
+		builder.setBinding(binding);
+		builder.setScope(scope);
+		builder.setTracer(tracer);
+		return builder.build();
 	}
 }

@@ -22,7 +22,9 @@ public interface IBinding extends IReset<IBinding> {
 	 * {@link #setVariable(String, ALangObject)} in the mean time.
 	 * Implementations are free to decide whether variable names are treated
 	 * case-insensitively or are mapped in any other way.
-	 *
+	 * <br><br>
+	 * Details on how variables are retrieved from different nesting levels
+	 * my be decided by implementations.
 	 * @param name
 	 *            Variable name.
 	 * @return The value of the variable, or null when it does
