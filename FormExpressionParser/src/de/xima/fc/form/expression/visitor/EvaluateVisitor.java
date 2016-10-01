@@ -406,6 +406,7 @@ public class EvaluateVisitor extends AEvaluationVisitor<ALangObject, IEvaluation
 		// If mustJump is true, break/continue/return was the last statement
 		// evaluated and no exception could have been thrown.
 		if (exception != null) {
+			nest(ec);
 			try {
 				final ALangObject e = ExceptionLangObject.create(exception);
 				ec.getBinding().setVariable(node.getErrorVariableName(), e);
@@ -484,8 +485,7 @@ public class EvaluateVisitor extends AEvaluationVisitor<ALangObject, IEvaluation
 	@Override
 	public ALangObject visit(final ASTThrowClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or return clause.
-		final String message = node.jjtGetChild(0).jjtAccept(this, ec).coerceString(ec).stringValue();
-		throw new CustomRuntimeException(message);
+		throw node.jjtGetChild(0).jjtAccept(this, ec).coerceException(ec).exceptionValue();
 	}
 
 	/** @deprecated Use {@link #performVisit(Node, IEvaluationContext)}. */

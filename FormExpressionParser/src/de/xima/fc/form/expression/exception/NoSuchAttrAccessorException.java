@@ -22,6 +22,10 @@ public class NoSuchAttrAccessorException extends NoSuchFunctionException {
 		super("attribute accessor", name, ec);
 	}
 
+	public NoSuchAttrAccessorException(final String name, final boolean accessedViaDot, final IEvaluationContext ec) {
+		super(accessedViaDot ? "dot attribute accessor" : "bracket attribute accessor", name, ec);
+	}
+	
 	public NoSuchAttrAccessorException(final String name, final INamespace namespace) {
 		super("attribute accessor", name, namespace);
 	}

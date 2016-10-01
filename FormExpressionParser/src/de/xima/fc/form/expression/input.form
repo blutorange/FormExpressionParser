@@ -1,4 +1,2 @@
-j = 42;
-for (i : 500000)
-  if (true) if (true) if (true) if (true) if (true) j = j+1;
-j;
+i=9;
+i + i + k;

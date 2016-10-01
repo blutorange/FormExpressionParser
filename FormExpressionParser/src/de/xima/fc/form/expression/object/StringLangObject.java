@@ -64,7 +64,7 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorString(object, accessedViaDot), object, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorString(object, accessedViaDot), object, accessedViaDot, ec);
 	}
 
 	@Override

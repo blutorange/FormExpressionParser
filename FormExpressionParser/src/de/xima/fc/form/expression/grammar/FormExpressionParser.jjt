@@ -107,7 +107,7 @@ void ThrowClause(EMethod method) #ThrowClauseNode :
 }
 {
   (
-    < Throw > Exception(null) ";"  )
+    < Throw > Expression(null) ";"  )
   {
     jjtThis.init(method);
     jjtThis.setEndPosition(token);

@@ -20,27 +20,27 @@ public class NoSuchFunctionException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
 	public NoSuchFunctionException(final String type, final String name, final IEvaluationContext ec) {
-		super(ec, String.format("No such %s named %s. Evaluation context is %s", type, name, System.lineSeparator(), ec));
+		super(ec, String.format("No such %s named %s.", type, name));
 		this.name = name;
 		thisContext = null;
 	}
 
 	public NoSuchFunctionException(final String type, final String name, final INamespace namespace) {
-		super(namespace, String.format("No such %s named %s. Evaluation context is %s", type, name, System.lineSeparator(), namespace));
+		super(namespace, String.format("No such %s named %s.", type, name));
 		this.name = name;
 		thisContext = null;
 	}
 
 	public NoSuchFunctionException(final String type, final String name, final ALangObject thisContext, final INamespace namespace) {
-		super(namespace, String.format("No such %s named <%s> for %s %s %sNamespace is %s",
-				type, name, thisContext.getType().name(), thisContext.toString(), System.lineSeparator(), namespace));
+		super(namespace, String.format("No such %s named <%s> for %s %s.",
+				type, name, thisContext.getType().name(), thisContext.toString()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}
 
 	public NoSuchFunctionException(final String type, final String name, final ALangObject thisContext, final IEvaluationContext ec) {
-		super(ec, String.format("No such %s named <%s> for %s %s %sNamespace is %s",
-				type, name, thisContext.getType().name(), thisContext.toString(), System.lineSeparator(), ec.getNamespace()));
+		super(ec, String.format("No such %s named <%s> for %s %s.",
+				type, name, thisContext.getType().name(), thisContext.toString()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}

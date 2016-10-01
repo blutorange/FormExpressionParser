@@ -15,7 +15,7 @@ public class CoercionException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
 	public CoercionException(final ALangObject from, final ALangObject.Type to, final IEvaluationContext ec) {
-		super(ec, "Object " + from.inspect() + " cannot be coerced to " + to.clazz.getSimpleName());
+		super(ec, String.format("Object %s of class %s cannot be coerced to %s.", from.toString(), from.getType(), to));
 		this.from = from;
 		this.to = to;
 	}

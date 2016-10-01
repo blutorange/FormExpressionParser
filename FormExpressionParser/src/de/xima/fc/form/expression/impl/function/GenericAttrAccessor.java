@@ -4,6 +4,7 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.MathException;
+import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
@@ -27,7 +28,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
  *
  * <br><br>
  *
- * The argument array is guaranteed (by the grammar) to contain exactly one entry, ie. <code>args[0]</code> may be accessed safely.
+ * The argument array is guaranteed to contain exactly two entry, the {@link ALangObject} <code>thisContext<code> and the {@link BooleanLangObject} <code>accessedViaDot</dot>. <code>args[0]</code> may be accessed safely.
  *
  * @author madgaksha
  *
@@ -45,6 +46,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 				throws EvaluationException, MathException {
+			if (((BooleanLangObject)args[1]).booleanValue()) throw new NoSuchAttrAccessorException(args[0].toString(), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue();
 			final int len = thisContext.length();
 			if (index >= len || index < -len) return NullLangObject.getInstance();
@@ -63,6 +65,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 				throws EvaluationException, MathException {
+			if (((BooleanLangObject)args[1]).booleanValue()) throw new NoSuchAttrAccessorException(args[0].toString(),true, ec);
 			final int index = args[0].coerceNumber(ec).intValue();
 			final int len = thisContext.length();
 			if (index >= len || index < -len) return NullLangObject.getInstance();
