@@ -7,6 +7,8 @@ import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
+import de.xima.fc.form.expression.impl.scope.ReadScopedEvaluationContext.Builder;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
@@ -74,5 +76,18 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	@Override
 	public ITracer<Node> getTracer() {
 		return tracer;
+	}
+	
+	/**
+	 * To help you get started, use this method to acquire a new
+	 * basic evaluation context. Details are subject to change,
+	 * so this should only be used for testing purposes.
+	 * @return Some evaluation context.
+	 */
+	public static IEvaluationContext getNewBasicEvaluationContext() {
+		final Builder b = new Builder();
+		b.setBinding(new OnDemandLookUpBinding());
+		b.setScope(GenericScope.getNewEmptyScope());
+		return b.build();
 	}
 }

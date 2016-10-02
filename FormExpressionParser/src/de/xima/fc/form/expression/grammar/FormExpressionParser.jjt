@@ -10,11 +10,7 @@ import de.xima.fc.form.expression.node.*;
  */
 public class FormExpressionParser
 {
-  /** Main entry point. */
-  public static void main(String args []) throws ParseException
-  {
-    System.out.println("Use as a library...");
-  }
+  // Use this as a library.
 }
 
 PARSER_END(FormExpressionParser)
@@ -27,12 +23,84 @@ SKIP :
 | "\r"
 }
 
+TOKEN :
+{
+  < With : "with" >
+| 
+  < Break : "break" >
+|
+  < Continue : "continue" >
+|
+  < Return : "return" >
+|
+  < If : "if" >
+|
+  < Else : "else" >
+|
+  < Function : "function" >
+|
+  < For : "for" >
+|
+  < While : "while" >
+|
+  < Do : "do" >
+|
+  < Try : "try" >
+|
+  < Catch : "catch" >
+|
+  < Throw : "throw" >
+|
+  < Switch : "switch" >
+|
+  < Case : "case" >
+|
+  < Default : "default" >
+|
+  < True : "true" >
+|
+  < False : "false" >
+|
+  < Null : "null" >
+|
+  < Exception : "exception" >   
+|
+  < Integer : ([ "0"-"9" ])+ >
+| 
+  < Float :
+    ([ "0"-"9" ])+ "." ([ "0"-"9" ])* (< EXPONENT >)?
+  | "." ([ "0"-"9" ])+ (< EXPONENT >)?
+  | ([ "0"-"9" ])+ < EXPONENT > 
+  >
+| 
+  < #EXPONENT : [ "e", "E" ] ([ "+", "-" ])? ([ "0"-"9" ])+ >
+| 
+  < Identifier : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
+|
+  < DoubleQuotedString :
+    "\""
+    (
+      ("\\" ~[ ])
+    | ~[ "\\", "\"" ]
+    )*
+    "\"" >
+|
+  < SingleQuotedString :
+    "'"
+    (
+      ("\\" ~[ ])
+    | ~[ "\\", "'" ]
+    )*
+    "'" >
+}
+
+
 Node Program() #StatementListNode :
 {
   jjtThis.setStartPosition(token);
 }
 {
-  (    (Clause(null))+ | < EOF >
+  (    (Clause(null))+ < EOF > | < EOF >
   )
   {
     jjtThis.init(null);
@@ -50,6 +118,7 @@ void Clause(EMethod method) #void :
   | IfClause(method)
   | FunctionClause(method)
   | WhileLoop(method)
+  | DoWhileLoop(method)
   | SwitchClause(method)
   | TryClause(method)
   | WithClause(method)
@@ -57,7 +126,7 @@ void Clause(EMethod method) #void :
   | BreakClause(method)
   | ContinueClause(method)
   | ReturnClause(method)
-  | Statement(method, false)
+  | Statement(method)
   )
 }
 
@@ -92,7 +161,7 @@ void WithClause(EMethod method) #WithClauseNode :
 }
 {
   (
-    < With > "(" (IdentifierName(null))+ ")" BlockOrClause(null)  )
+    < With > "(" [IdentifierName(null)] ("," IdentifierName(null))* ")" BlockOrClause(null)  )
   {
     jjtThis.init(method);
     jjtThis.setEndPosition(token);
@@ -105,7 +174,7 @@ void ContinueClause(EMethod method) #ContinueClauseNode :
 }
 {
   (
-    < Continue > [ t = < IDENTIFIER > ]";"
+    < Continue > [ t = < Identifier > ]";"
   )
   {
     jjtThis.init(method, t == null ? null : t.image);
@@ -120,7 +189,7 @@ void BreakClause(EMethod method) #BreakClauseNode :
 }
 {
   (
-    < Break > [ t = < IDENTIFIER > ]";"  )
+    < Break > [ t = < Identifier > ]";"  )
   {
     jjtThis.init(method, t == null ? null : t.image);
     jjtThis.setEndPosition(token);
@@ -207,7 +276,7 @@ void TryClause(EMethod method) #TryClauseNode :
     (
       Block(null)
     )
-    < Catch > "(" t = < IDENTIFIER > ")"
+    < Catch > "(" t = < Identifier > ")"
     (
       Block(null)
     )
@@ -226,7 +295,7 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
   (
     < Do >
     BlockOrClause(null)
-    < While > "(" Expression(null) ")"
+    < While > "(" Expression(null) ")" ";"
   )
   {
     jjtThis.init(method);
@@ -257,9 +326,9 @@ void ForLoop(EMethod method) #ForLoopNode :
   (
     < For > "("
     (
-      LOOKAHEAD(< IDENTIFIER > ":")
+      LOOKAHEAD(< Identifier > ":")
       (
-        iteratingLoopVariable = < IDENTIFIER > ":" Expression(null)
+        iteratingLoopVariable = < Identifier > ":" Expression(null)
       )
     |
       (
@@ -339,23 +408,35 @@ void StatementListCommaSeparated(EMethod method) #StatementListNode :
   }
 }
 
-Node Statement(EMethod method, boolean createNode) #ExpressionNode(createNode) :
+void Statement(EMethod method) #void :
 {
-  jjtThis.setStartPosition(token);  
 }
 {
   (
     (
-      Expression(method) ";" | ";"
+      Expression(method) ";"
     )
+  | EmptyStatement(method)
   )
   {
-    if (!createNode) return null;
-    if (jjtThis.jjtGetNumChildren() > 0) jjtThis.init(method);
+  }
+}
+
+Node EmptyStatement(EMethod method) #EmptyNode :
+{
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+      ";"
+  )
+  {
+    jjtThis.init(method);
     jjtThis.setEndPosition(token);
     return jjtThis;
   }
 }
+
 
 void Expression(EMethod method) #void :
 {
@@ -736,7 +817,7 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
   jjtThis.setStartPosition(token);  
 }
 {
-  (    t = < IDENTIFIER >
+  (    t = < Identifier >
   )
   {
     jjtThis.init(method, t.image);
@@ -789,7 +870,7 @@ void VariableWithOptionalScope(EMethod method) #VariableNode :
 }
 {
   (
-    part1 = < IDENTIFIER > ["::" part2 = < IDENTIFIER >]
+    part1 = < Identifier > ["::" part2 = < Identifier >]
   )
   {
     if (part2 ==null)
@@ -1045,75 +1126,3 @@ void Literal(EMethod method) #void :
 | Exception(method)
 }
 
-TOKEN :
-{
-  < DoubleQuotedString :
-    "\""
-    (
-      ("\\" ~[ ])
-    | ~[ "\\", "\"" ]
-    )*
-    "\"" >
-| < SingleQuotedString :
-    "'"
-    (
-      ("\\" ~[ ])
-    | ~[ "\\", "'" ]
-    )*
-    "'" >
-|
-  < Integer : ([ "0"-"9" ])+ >
-| 
-  < Float :
-    ([ "0"-"9" ])+ "." ([ "0"-"9" ])* (< EXPONENT >)?
-  | "." ([ "0"-"9" ])+ (< EXPONENT >)?
-  | ([ "0"-"9" ])+ < EXPONENT > 
-  >
-| 
-  < #EXPONENT : [ "e", "E" ] ([ "+", "-" ])? ([ "0"-"9" ])+ >
-}
-
-TOKEN :
-{
-  < With : "with" >
-| 
-  < Break : "break" >
-|
-  < Continue : "continue" >
-|
-  < Return : "return" >
-|
-  < If : "if" >
-|
-  < Else : "else" >
-|
-  < Function : "function" >
-|
-  < For : "for" >
-|
-  < While : "while" >
-|
-  < Do : "do" >
-|
-  < Try : "try" >
-|
-  < Catch : "catch" >
-|
-  < Throw : "throw" >
-|
-  < Switch : "switch" >
-|
-  < Case : "case" >
-|
-  < Default : "default" >
-|
-  < True : "true" >
-|
-  < False : "false" >
-|
-  < Null : "null" >
-|
-  < Exception : "exception" >  
-| 
-  < IDENTIFIER : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
-}

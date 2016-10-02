@@ -86,4 +86,13 @@ public class GenericScope implements IScope {
 			return scope;
 		}
 	}
+	
+	public static IScope getNewEmptyScope() {
+		return getNewEmptyScope(16);
+	}
+	
+	public static IScope getNewEmptyScope(int initialSize) {
+		final MultiKeyMap<String, ALangObject> map = MultiKeyMap.multiKeyMap(new HashedMap<MultiKey<? extends String>, ALangObject>(initialSize));
+		return new GenericScope(map, null);
+	}
 }

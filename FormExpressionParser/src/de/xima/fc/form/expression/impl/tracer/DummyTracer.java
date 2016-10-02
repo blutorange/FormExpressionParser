@@ -1,7 +1,5 @@
 package de.xima.fc.form.expression.impl.tracer;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
 
@@ -13,6 +11,7 @@ import de.xima.fc.form.expression.grammar.Node;
  */
 public enum DummyTracer implements ITracer<Node> {
 	INSTANCE;
+	private final static Node[] EMPTY_NODE_ARRAY = new Node[0];
 	@Override
 	public void setCurrentlyProcessed(Node object) {
 	}
@@ -32,7 +31,6 @@ public enum DummyTracer implements ITracer<Node> {
 
 	@Override
 	public Node[] getStackTrace() {
-		return (Node[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
+		return EMPTY_NODE_ARRAY;
 	}
-
 }

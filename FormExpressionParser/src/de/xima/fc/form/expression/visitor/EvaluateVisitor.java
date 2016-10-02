@@ -23,6 +23,7 @@ import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -656,5 +657,10 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			}
 		}
 		return assignee;
+	}
+
+	@Override
+	public ALangObject visit(ASTEmptyNode node, IEvaluationContext data) throws EvaluationException {
+		return NullLangObject.getInstance();
 	}
 }
