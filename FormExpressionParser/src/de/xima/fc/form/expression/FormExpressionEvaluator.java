@@ -36,6 +36,7 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.GenericScope;
+import de.xima.fc.form.expression.impl.binding.LookUpBindingAlternative;
 import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 import de.xima.fc.form.expression.impl.scope.FormFieldScope;
 import de.xima.fc.form.expression.impl.scope.FormFieldScope.FormVersion;
@@ -44,7 +45,6 @@ import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
-import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 public class FormExpressionEvaluator {
 
@@ -88,17 +88,14 @@ public class FormExpressionEvaluator {
 		}
 		System.out.println("");
 
-		final UnparseVisitor unparse = new UnparseVisitor();
-		System.out.println("Unparse:");
-		System.out.println(rootNode.jjtAccept(unparse, 0).toString());
-		System.out.println();
-
-		final IEvaluationContext ec = getEc();
-		final EvaluateVisitor visitor = new EvaluateVisitor();
+//		final UnparseVisitor unparse = new UnparseVisitor();
+//		System.out.println("Unparse:");
+//		System.out.println(rootNode.jjtAccept(unparse, 0).toString());
+//		System.out.println();
 
 		try {
 			final long t1 = System.nanoTime();
-			final ALangObject result = rootNode.jjtAccept(visitor, ec);
+			final ALangObject result = EvaluateVisitor.evaluateProgram(rootNode, getEc());
 			final long t2 = System.nanoTime();
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 

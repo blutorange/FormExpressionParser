@@ -38,7 +38,7 @@ public class ExceptionLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return "ExpressionLangObject(" + value.getMessage() + ")";
+		return "ExceptionLangObject(" + value.getMessage() + ")";
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class ExceptionLangObject extends ALangObject {
 	}
 
 	public static ExceptionLangObject create(final String message, final IEvaluationContext ec) {
-		if (message == null || message.length()==0) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
+		if (message == null || message.length() == 0) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
 		return new ExceptionLangObject(new CustomRuntimeException(message, ec));
 	}
 }

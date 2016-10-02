@@ -79,9 +79,9 @@ public enum EMethod {
 	SWITCHCLAUSE("SWITCHCLAUSE"),
 	;
 
-	public final String name;
+	public final String methodName;
 	private EMethod(final String name) {
-		this.name = name;
+		this.methodName = name;
 	}
 
 	/**

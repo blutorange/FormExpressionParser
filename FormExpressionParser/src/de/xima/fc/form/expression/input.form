@@ -1,1 +1,1 @@
-if(a) if (b) do; while(false);
+k=0;if(true)k=42;k;

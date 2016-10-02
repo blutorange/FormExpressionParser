@@ -235,7 +235,18 @@ public class NumberLangObject extends ALangObject {
 	public NumberLangObject divide(final NumberLangObject operand) {
 		return NumberLangObject.create(value/operand.value);
 	}
-
+	public boolean isNaN() {
+		return value != value;
+	}
+	
+	public boolean isInfinite() {
+		return value == Double.POSITIVE_INFINITY || value == Double.NEGATIVE_INFINITY;
+	}
+	
+	public boolean isFinite() {
+		return value <= 0.0d ? -value <= Double.MAX_VALUE : value <= Double.MAX_VALUE;
+	}
+	
 	public NumberLangObject abs() {
 		return NumberLangObject.create(value < 0.0d ? -value : value);
 	}

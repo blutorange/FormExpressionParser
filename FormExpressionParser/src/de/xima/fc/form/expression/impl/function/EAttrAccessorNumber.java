@@ -5,6 +5,7 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -13,7 +14,20 @@ public enum EAttrAccessorNumber implements IFunction<NumberLangObject> {
 	/**
 	 * @return {@link NumberLangObject}. The sine of this number.
 	 */
-	sin(Impl.sin);
+	sin(Impl.sin),
+	/**
+	 * @return {@link BooleanLangObject} True iff this number is <code>NaN</code>.
+	 */
+	nan(Impl.nan),
+	/**
+	 * @return {@link BooleanLangObject} True iff this number is <code>Infinity</code> or <code>-Infinity</code>.
+	 */
+	infinite(Impl.infinite),
+	/**
+	 * @return {@link BooleanLangObject} True iff this number is neither <code>NaN</code> nor <code>Infinity</code> or <code>-Infinity</code>.
+	 */
+	finite(Impl.finite),
+	;
 
 	private final FunctionLangObject impl;
 	private final boolean evalImmediately;
@@ -67,7 +81,30 @@ public enum EAttrAccessorNumber implements IFunction<NumberLangObject> {
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.sin();
 			}
-		};
+		},
+		nan(null) {
+			@Override
+			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.isNaN());
+			}			
+		},
+		infinite(null) {
+			@Override
+			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.isInfinite());
+			}			
+		},
+		finite(null) {
+			@Override
+			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.isFinite());
+			}			
+		}
+
+		;
 
 		private String[] argList;
 		private String optionalArgumentsName;

@@ -13,6 +13,7 @@ import de.xima.fc.form.expression.exception.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.ContinueClauseException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.IllegalThisContextException;
+import de.xima.fc.form.expression.exception.ReturnClauseException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
@@ -59,11 +60,29 @@ import de.xima.fc.form.expression.object.StringLangObject;
 
 public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext> {
 
+	/**
+	 * Evaluates the given node as a complete program with the given context.
+	 * This method may be used by multiple threads, however, the node and 
+	 * evaluation context passed require external synchronization. This is
+	 * because usually you would create a new evaluation context for each
+	 * evaluation; and {@link Node} (should) be immutable after parsing.
+	 * @param node Node to evaluate.
+	 * @param ec Evaluation context to use.
+	 * @return The evaluated result.
+	 * @throws EvaluationException When the code cannot be evaluated.
+	 */
+	public static ALangObject evaluateProgram(Node node, IEvaluationContext ec) throws EvaluationException {
+		final EvaluateVisitor v = new EvaluateVisitor();
+		final ALangObject res = node.jjtAccept(v, ec);
+		v.assertNoJumps(ec);
+		return res;
+	}
+	
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
 
-	public EvaluateVisitor() {
+	private EvaluateVisitor() {
 		reinit();
 	}
 
@@ -72,7 +91,23 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		jumpType = null;
 		jumpLabel = null;
 	}
-
+	
+	private void assertNoJumps(IEvaluationContext ec) throws UncatchableEvaluationException {
+		if (mustJump) {
+			switch (jumpType) {
+			case BREAK:
+				throw new BreakClauseException(jumpLabel, ec);
+			case CONTINUE:
+				throw new ContinueClauseException(jumpLabel, ec);
+			case RETURN:
+				throw new ReturnClauseException(ec);
+			default:
+				throw new UncatchableEvaluationException(ec, String.format(
+						"Invalid jump type %s. This is likely a bug with the paser. Contact support.", jumpType));
+			}
+		}
+	}
+	
 	private ALangObject jjtAccept(final Node parentNode, final Node node, final IEvaluationContext ec) {
 		ec.getTracer().setCurrentlyProcessed(node);
 		try {

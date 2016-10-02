@@ -55,8 +55,7 @@ public class CloneBinding implements IBinding {
 
 	@Override
 	public final void setVariable(final String name, final ALangObject value) throws EvaluationException {
-		if (setVariableInternal(name, value)) return;
-		map.put(name, value);
+		if (!setVariableInternal(name, value)) map.put(name, value);
 	}
 
 	private boolean setVariableInternal(final String name, final ALangObject value) throws EvaluationException {
@@ -65,13 +64,14 @@ public class CloneBinding implements IBinding {
 				map.put(name, value);
 				return true;
 			}
+			return false;
 		}
 		return parent.setVariableInternal(name, value);
 	}
 
 	@Override
 	public final IBinding nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
-		return new CloneBinding(this, top, true);
+		return new CloneBinding(this, top, false);
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class CloneBinding implements IBinding {
 
 	@Override
 	public IBinding nestLocal(final IEvaluationContext ec) {
-		return new CloneBinding(this, top, false);
+		return new CloneBinding(this, top, true);
 	}
 
 	@Override

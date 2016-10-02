@@ -9,10 +9,4 @@ public class BreakClauseException extends UncatchableEvaluationException {
 		super(ec, MESSAGE);
 		this.label = label;
 	}
-
-	@Override
-	public synchronized Throwable fillInStackTrace() {
-		return this;
-	}
-
 }

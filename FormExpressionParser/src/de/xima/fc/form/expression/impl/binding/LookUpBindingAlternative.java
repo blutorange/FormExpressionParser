@@ -43,10 +43,15 @@ public class LookUpBindingAlternative implements IBinding {
 
 	@Override
 	public ALangObject getVariable(final String name) throws EvaluationException {
-		final ALangObject[] array = map.get(name);
+		ALangObject[] array = map.get(name);
 		if (array == null) return null;
-		final int len = currentDepth < array.length ? currentDepth : array.length-1;
-		for (int i = len; i > 0 && !breakpoints[i]; --i)
+		// Enlarge breakpoint array
+		if (currentDepth >= breakpoints.length)
+			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth);
+		// Enlarge array
+		if (currentDepth >= array.length)
+			map.put(name, array = Arrays.copyOf(array, 2*currentDepth+1));
+		for (int i = currentDepth; i > 0 && !breakpoints[i]; --i)
 			if (array[i] != null) return array[i];
 		return array[0];
 	}
@@ -54,20 +59,17 @@ public class LookUpBindingAlternative implements IBinding {
 	@Override
 	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
 		ALangObject[] array = map.get(name);
-		if (array == null) {
-			// Create array
-			array = new ALangObject[2*currentDepth+1];
-			map.put(name, array);
-		}
-		else if (currentDepth >= array.length) {
-			// Enlarge array.
-			final ALangObject[] newArray = new ALangObject[2*currentDepth+1];
-			System.arraycopy(array, 0, newArray, 0, array.length);
-			array = newArray;
-		}
+		// Create array
+		if (array == null)
+			map.put(name, array = new ALangObject[2*currentDepth+1]);
+		// Enlarge array
+		else if (currentDepth >= array.length)
+			map.put(name, array = Arrays.copyOf(array, 2*currentDepth+1));
+		// Enlarge breakpoint array
+		if (currentDepth >= breakpoints.length)
+			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth);
 		// Set variable.
-		final int len = currentDepth < array.length ? currentDepth : array.length-1;
-		for (int i = len; i >= 0 && !breakpoints[i]; --i)
+		for (int i = currentDepth; i >= 0 && !breakpoints[i]; --i)
 			if (array[i] != null) {
 				array[i] = value;
 				return;
@@ -80,21 +82,15 @@ public class LookUpBindingAlternative implements IBinding {
 		++currentDepth;
 		for (final ALangObject[] values : map.values())
 			if (currentDepth < values.length) values[currentDepth] = null;
-		if (currentDepth >= breakpoints.length) {
-			final boolean[] newArray = new boolean[2*currentDepth];
-			System.arraycopy(breakpoints, 0, newArray, 0, breakpoints.length);
-			breakpoints = newArray;
-		}
+		if (currentDepth >= breakpoints.length)
+			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth);
 		return this;
 	}
 
 	@Override
 	public IBinding nestLocal(final IEvaluationContext ec) {
-		if (currentDepth >= breakpoints.length) {
-			final boolean[] newArray = new boolean[2*currentDepth];
-			System.arraycopy(breakpoints, 0, newArray, 0, breakpoints.length);
-			breakpoints = newArray;
-		}
+		if (currentDepth >= breakpoints.length)
+			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth+1);
 		breakpoints[currentDepth] = true;
 		return nest(ec);
 	}

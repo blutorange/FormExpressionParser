@@ -17,7 +17,7 @@ public class IllegalDividendException extends IllegalArgumentValueException {
 	private static final long serialVersionUID = 1L;
 
 	public IllegalDividendException(final ALangObject divisor, final ALangObject dividend, final int index, final IEvaluationContext ec) {
-		super(EMethod.SLASH.name, divisor, dividend, index, ec);
+		super(EMethod.SLASH.methodName, divisor, dividend, index, ec);
 		this.dividend = dividend;
 		this.divisor = divisor;
 	}

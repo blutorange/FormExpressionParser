@@ -56,10 +56,12 @@ public class EvaluationException extends RuntimeException {
 	private static String msgWithContext(final String msg, final IEvaluationContext ec) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(msg).append(System.lineSeparator());
-		appendTraceElement(sb, ec.getTracer().getCurrentlyProcessed());
-		for (final ITraceElement el : ec.getTracer().getStackTrace()) {
-			sb.append(System.lineSeparator());
-			appendTraceElement(sb, el);
+		if (ec != null) {
+			appendTraceElement(sb, ec.getTracer().getCurrentlyProcessed());
+			for (final ITraceElement el : ec.getTracer().getStackTrace()) {
+				sb.append(System.lineSeparator());
+				appendTraceElement(sb, el);
+			}
 		}
 		sb.append(System.lineSeparator());
 		sb.append("Evaluation context is ");

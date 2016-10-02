@@ -13,12 +13,20 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 
 public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject> {
 	/**
+	 * @return {@link NumberLangObject} This number.
+	 */
+	PLUS_UNARY(EMethod.PLUS_UNARY, Impl.PLUS_UNARY),
+	/**
+	 * @return {@link NumberLangObject}. The additive inverse of this number.
+	 */
+	DASH_UNARY(EMethod.DASH_UNARY, Impl.DASH_UNARY),
+	/**
 	 * @param summand {@link NumberLangObject} The number to be added to this number.
 	 * @return {@link NumberLangObject}. The arithmetic sum of this number and the argument.
 	 */
 	PLUS(EMethod.PLUS, Impl.PLUS),
 	/**
-	 * @param summand {@link NumberLangObject} The number to be subtracted to this number.
+	 * @param subtrahend {@link NumberLangObject} The number to be subtracted to this number.
 	 * @return {@link NumberLangObject}. The arithmetic difference of this number and the argument.
 	 */
 	DASH(EMethod.DASH, Impl.DASH),
@@ -28,15 +36,20 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 */
 	STAR(EMethod.STAR, Impl.STAR),
 	/**
+	 * @param dividend {@link NumberLangObject}. The number to through which to divide this number.
+	 * @return The ration of this number divided by the argument.
+	 */
+	SLASH(EMethod.SLASH, Impl.SLASH),
+	/**
 	 * @param comparand {@link ALangObject}. Object to compare this object to.
 	 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
 	 */
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
+	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.EQUALITY),
 	/**
 	 * @param comparand {@link ALangObject}. Object to compare this object to.
 	 * @return {@link BooleanLangObject}. True iff this number is numerically equivalent to the argument.
 	 */
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.DOUBLE_EQUAL),
+	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.EQUALITY),
 	;
 	private final EMethod method;
 	private final IFunction<NumberLangObject> function;
@@ -55,6 +68,13 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	}
 
 	private static enum Impl implements IFunction<NumberLangObject> {
+		PLUS_UNARY(null) {
+			@Override
+			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+					throws EvaluationException {
+				return thisContext;
+			}
+		},
 		PLUS(null, "summand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
@@ -69,6 +89,13 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.subtract(args[0].coerceNumber(ec));
 			}
 		},
+		DASH_UNARY(null) {
+			@Override
+			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+					throws EvaluationException {
+				return thisContext.negate();
+			}
+		},
 		STAR(null, "multiplicand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
@@ -76,7 +103,14 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 		},
-		DOUBLE_EQUAL(null, "comparand"){
+		SLASH(null, "dividend") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.divide(args[0].coerceNumber(ec));
+			}
+		},
+		EQUALITY(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {

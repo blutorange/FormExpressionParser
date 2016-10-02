@@ -51,7 +51,7 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectMethodException(method.name, ec);
+		throw new NullObjectMethodException(method, ec);
 	}
 	@Override
 	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
@@ -64,7 +64,7 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		throw new NullObjectMethodException(method.name, ec);
+		throw new NullObjectMethodException(method, ec);
 	}
 
 	@Override

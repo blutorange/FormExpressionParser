@@ -306,7 +306,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			final IFunction<T> function, final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws NoSuchMethodException, EvaluationException {
 		if (function == null)
-			throw new NoSuchMethodException(method.name, thisContext, ec);
+			throw new NoSuchMethodException(method, thisContext, ec);
 		return ALangObject.create(function.evaluate(ec, thisContext, args));
 	}
 
