@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.impl;
 
 import de.xima.fc.form.expression.context.IBinding;
+import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.context.INamespace;
@@ -17,6 +18,8 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	private final ILogger logger;
 	final ITracer<Node> tracer;
 	private final IScope scope;
+	private final IEmbedment embedment;
+
 	/**
 	 * Creates a new evaluation context.
 	 *
@@ -27,12 +30,13 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	 * @param logger
 	 *            The logger used for logging.
 	 */
-	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final ILogger logger) {
+	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final IEmbedment embedment, final ILogger logger) {
 		this.binding = binding;
 		this.namespace = namespace;
 		this.scope = scope;
 		this.tracer = tracer;
 		this.logger = logger;
+		this.embedment = embedment;
 	}
 
 	public void nestBinding() {
@@ -59,6 +63,11 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	}
 
 	@Override
+	public IEmbedment getEmbedment() {
+		return embedment;
+	}
+
+	@Override
 	public boolean variableNameEquals(final String name1, final String name2) {
 		return name1.equals(name2);
 	}
@@ -77,7 +86,7 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	public ITracer<Node> getTracer() {
 		return tracer;
 	}
-	
+
 	/**
 	 * To help you get started, use this method to acquire a new
 	 * basic evaluation context. Details are subject to change,

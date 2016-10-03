@@ -5,8 +5,8 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
+import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 
@@ -84,26 +84,25 @@ public enum EAttrAccessorNumber implements IFunction<NumberLangObject> {
 		},
 		nan(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return BooleanLangObject.create(thisContext.isNaN());
-			}			
+			}
 		},
 		infinite(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return BooleanLangObject.create(thisContext.isInfinite());
-			}			
+			}
 		},
 		finite(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return BooleanLangObject.create(thisContext.isFinite());
-			}			
-		}
-
+			}
+		},
 		;
 
 		private String[] argList;

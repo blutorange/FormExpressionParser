@@ -12,6 +12,7 @@ public interface IEvaluationContext {
 	public INamespace getNamespace();
 	public ILogger getLogger();
 	public ITracer<Node> getTracer();
+	public IEmbedment getEmbedment();
 
 	public void setBinding(IBinding binding);
 

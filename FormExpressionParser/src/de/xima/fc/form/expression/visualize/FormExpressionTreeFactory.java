@@ -29,14 +29,11 @@
  */
 package de.xima.fc.form.expression.visualize;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-
 import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 
-import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.FormExpressionParseFactory.Template;
 
 /**
  * Creates "Sample" trees, e.g. to be used in demonstrations.
@@ -50,14 +47,10 @@ public class FormExpressionTreeFactory {
 		final DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(
 				root);
 
-		final ByteArrayInputStream bais = new ByteArrayInputStream(expression.getBytes(Charset.forName("UTF-8")));
-		final FormExpressionParser parser = new FormExpressionParser(bais, "UTF-8");
-		final Node rootNode;
 		final long t1 = System.nanoTime();
-		rootNode = parser.Program();
+		final Node rootNode= Template.parse(expression);
 		final long t2 = System.nanoTime();
 		System.out.println("Parsing took " + (t2 - t1) / 1000000 + "ms\n");
-
 
 		addNodes(tree, rootNode, root);
 		return tree;

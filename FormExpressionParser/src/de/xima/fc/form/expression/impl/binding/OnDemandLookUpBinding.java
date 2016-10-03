@@ -42,7 +42,7 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 
 	@Override
 	public IBinding nest(final IEvaluationContext ec) {
-		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth, ec);
+		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth+1, ec);
 		++currentDepth;
 		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<String, ALangObject>();
 		else mapArray[currentDepth].clear();

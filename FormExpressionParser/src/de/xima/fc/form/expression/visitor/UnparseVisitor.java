@@ -20,6 +20,7 @@ import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
+import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
@@ -27,6 +28,7 @@ import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTTemplateNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
@@ -256,7 +258,19 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<StringBuilde
 	}
 
 	@Override
-	public StringBuilder visit(ASTEmptyNode node, Integer data) throws EvaluationException {
+	public StringBuilder visit(final ASTEmptyNode node, final Integer data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public StringBuilder visit(final ASTLosNode node, final Integer data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public StringBuilder visit(final ASTTemplateNode node, final Integer data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}

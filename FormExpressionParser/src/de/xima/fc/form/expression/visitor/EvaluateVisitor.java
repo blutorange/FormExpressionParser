@@ -34,6 +34,7 @@ import de.xima.fc.form.expression.node.ASTHashNode;
 import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTLogNode;
+import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
@@ -41,6 +42,7 @@ import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTTemplateNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
@@ -62,7 +64,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	/**
 	 * Evaluates the given node as a complete program with the given context.
-	 * This method may be used by multiple threads, however, the node and 
+	 * This method may be used by multiple threads, however, the node and
 	 * evaluation context passed require external synchronization. This is
 	 * because usually you would create a new evaluation context for each
 	 * evaluation; and {@link Node} (should) be immutable after parsing.
@@ -71,13 +73,13 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	 * @return The evaluated result.
 	 * @throws EvaluationException When the code cannot be evaluated.
 	 */
-	public static ALangObject evaluateProgram(Node node, IEvaluationContext ec) throws EvaluationException {
+	public static ALangObject evaluateProgram(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res = node.jjtAccept(v, ec);
 		v.assertNoJumps(ec);
 		return res;
 	}
-	
+
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
@@ -91,8 +93,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		jumpType = null;
 		jumpLabel = null;
 	}
-	
-	private void assertNoJumps(IEvaluationContext ec) throws UncatchableEvaluationException {
+
+	private void assertNoJumps(final IEvaluationContext ec) throws UncatchableEvaluationException {
 		if (mustJump) {
 			switch (jumpType) {
 			case BREAK:
@@ -107,7 +109,6 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			}
 		}
 	}
-	
 	private ALangObject jjtAccept(final Node parentNode, final Node node, final IEvaluationContext ec) {
 		ec.getTracer().setCurrentlyProcessed(node);
 		try {
@@ -695,7 +696,23 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	@Override
-	public ALangObject visit(ASTEmptyNode node, IEvaluationContext data) throws EvaluationException {
+	public ALangObject visit(final ASTEmptyNode node, final IEvaluationContext ec) throws EvaluationException {
 		return NullLangObject.getInstance();
+	}
+
+	@Override
+	public ALangObject visit(final ASTLosNode node, final IEvaluationContext ec) throws EvaluationException {
+		ec.getEmbedment().output(node.getText(), ec);
+		return NullLangObject.getInstance();
+	}
+
+	@Override
+	public ALangObject visit(final ASTTemplateNode node, final IEvaluationContext ec) throws EvaluationException {
+		ALangObject res = NullLangObject.getInstance();
+		for (final Node n : node.getChildArray()) {
+			res = n.jjtAccept(this, ec);
+			if (mustJump) break;
+		}
+		return res;
 	}
 }

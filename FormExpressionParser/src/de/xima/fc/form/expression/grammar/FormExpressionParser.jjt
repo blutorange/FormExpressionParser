@@ -1,20 +1,42 @@
 PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
+import java.lang.StringBuilder;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import org.apache.commons.lang3.StringUtils;
 import de.xima.fc.form.expression.node.*;
 
-/** Formcycle expression language.
-    http://ramkulkarni.com/blog/handling-some-of-the-warnings-and-errors-generated-by-javacc/
- */
 public class FormExpressionParser
 {
-  // Use this as a library.
+  private boolean _customLosAllowed = false;
+  public void setLosAllowed(boolean losAllowed) {
+    this._customLosAllowed = losAllowed;
+  }
 }
 
 PARSER_END(FormExpressionParser)
 
+< LOS >
+TOKEN :
+{
+  < LosOpen : "[%" ([ "%", "$", "@", "=" ])* > : CODE
+| 
+  < LosChar : ~[ ] >
+}
+
+< MULTI_LINE_COMMENT >
+SKIP :
+{
+  "*/" : CODE
+}
+
+< MULTI_LINE_COMMENT >
+MORE :
+{
+  < ~[ ] >
+}
+
+< CODE >
 SKIP :
 {
   " "
@@ -23,48 +45,159 @@ SKIP :
 | "\r"
 }
 
+< CODE >
 TOKEN :
 {
+  < AngleOpen : "<" >
+| 
+  < AngleClose : ">" >
+| 
+  < Ampersand : "&" >
+| 
+  < Plus : "+" >
+| 
+  < Dash : "-" >
+| 
+  < Star : "*" >
+| 
+  < Slash : "/" >
+| 
+  < Circumflex : "^" >
+| 
+  < Bar : "|" >
+| 
+  < Equal : "=" >
+| 
+  < ParenOpen : "(" >
+| 
+  < ParenClose : ")" >
+| 
+  < BracesOpen : "{" >
+| 
+  < BracesClose : "}" >
+| 
+  < BracketOpen : "[" >
+| 
+  < BracketClose : "]" >
+| 
+  < Comma : "," >
+| 
+  < Colon : ":" >
+| 
+  < Dot : "." >
+| 
+  < SemiColon : ";" >
+| 
+  < Exclamation : "!" >
+| 
+  < Percent : "%" >
+| 
+  < LosBodyClose : "%]" > : LOS
+| 
+  < MultiCommentBegin : "/*" > : MULTI_LINE_COMMENT
+| 
+  < ScopeSeparator : "::" >
+| 
+  < LambdaArrow : "->" >
+| 
+  < DoublePlus : "++" >
+| 
+  < DoubleDash : "--" >
+| 
+  < PlusEqual : "+=" >
+| 
+  < DashEqual : "-=" >
+| 
+  < StarEqual : "*=" >
+| 
+  < SlashEqual : "/=" >
+| 
+  < PercentEqual : "%=" >
+| 
+  < DoubleAmpersand : "&&" >
+| 
+  < DoubleBar : "||" >
+| 
+  < AmpersandEqual : "&=" >
+| 
+  < AngleOpenEqual : "<=" >
+| 
+  < AngleCloseEqual : ">=" >
+| 
+  < BarEqual : "|=" >
+| 
+  < CircumflexEqual : "^=" >
+| 
+  < DoubleStar : "**" >
+| 
+  < DoubleEqual : "==" >
+| 
+  < If : "if" >
+| 
+  < Do : "do" >
+| 
+  < ExclamationEqual : "!=" >
+| 
+  < DoubleStarEqual : "**=" >
+| 
+  < DoubleAmpersandEqual : "&&=" >
+| 
+  < DoubleBarEqual : "||=" >
+| 
+  < DoubleAngleOpenEqual : "<<=" >
+| 
+  < DoubleAngleCloseEqual : " >>=" >
+| 
+  < TripleEqual : "===" >
+| 
+  < ExclamationDoubleEqual : "!==" >
+| 
+  < For : "for" >
+| 
+  < Try : "try" >
+| 
   < With : "with" >
 | 
-  < Break : "break" >
-|
-  < Continue : "continue" >
-|
-  < Return : "return" >
-|
-  < If : "if" >
-|
   < Else : "else" >
-|
-  < Function : "function" >
-|
-  < For : "for" >
-|
-  < While : "while" >
-|
-  < Do : "do" >
-|
-  < Try : "try" >
-|
-  < Catch : "catch" >
-|
-  < Throw : "throw" >
-|
-  < Switch : "switch" >
-|
+| 
   < Case : "case" >
-|
-  < Default : "default" >
-|
+| 
   < True : "true" >
-|
-  < False : "false" >
-|
+| 
   < Null : "null" >
-|
-  < Exception : "exception" >   
-|
+| 
+  < Break : "break" >
+| 
+  < While : "while" >
+| 
+  < Catch : "catch" >
+| 
+  < Throw : "throw" >
+| 
+  < False : "false" >
+| 
+  < Return : "return" >
+| 
+  < Switch : "switch" >
+| 
+  < LogInfo : "loginfo" >
+| 
+  < LogWarn : "logwarn" >
+| 
+  < Default : "default" >
+| 
+  < Continue : "continue" >
+| 
+  < Function : "function" >
+| 
+  < LogError : "logerror" >
+| 
+  < LogDebug : "logdebug" >
+| 
+  < Exception : "exception" >
+| 
+  < Identifier : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
+| 
   < Integer : ([ "0"-"9" ])+ >
 | 
   < Float :
@@ -75,8 +208,6 @@ TOKEN :
 | 
   < #EXPONENT : [ "e", "E" ] ([ "+", "-" ])? ([ "0"-"9" ])+ >
 | 
-  < Identifier : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
-|
   < DoubleQuotedString :
     "\""
     (
@@ -84,7 +215,7 @@ TOKEN :
     | ~[ "\\", "\"" ]
     )*
     "\"" >
-|
+| 
   < SingleQuotedString :
     "'"
     (
@@ -94,18 +225,130 @@ TOKEN :
     "'" >
 }
 
-
-Node Program() #StatementListNode :
+Node Template(EMethod method) #TemplateNode :
 {
   jjtThis.setStartPosition(token);
 }
 {
-  (    (Clause(null))+ < EOF > | < EOF >
+  (
+    (
+      (
+        LosChars(null) [ LosOpen(null) TemplateProgram(null) ]
+      )
+    | 
+      (        LosOpen(null) TemplateProgram(null)
+      )
+    )
+    < EOF >
   )
   {
-    jjtThis.init(null);
+    jjtThis.init(method);
     jjtThis.setEndPosition(token);
     return jjtThis;
+  }
+}
+
+/* Los = Literal Output Statement */
+void LosChars(EMethod method) #LosNode :
+{
+  Token t;
+  final StringBuilder sb = new StringBuilder();
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    (
+      t = < LosChar >
+      {
+        sb.append(t.image.charAt(0));
+      }
+    )+
+  )
+  {
+    jjtThis.init(method, null, sb.toString(), false);
+    jjtThis.setEndPosition(token);
+  }
+}
+
+void LosOpen(EMethod method) #LosNode :
+{
+  Token t;
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    t = < LosOpen >
+  )
+  {
+    if (!_customLosAllowed) throw new ParseException(
+      String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
+    jjtThis.init(method, t.image, StringUtils.EMPTY, false);
+    jjtThis.setEndPosition(token);
+  }
+}
+
+
+void LosBody(EMethod method) #LosNode :
+{
+  Token t = null;
+  Token p = null;
+  final StringBuilder sb = new StringBuilder();
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    < LosBodyClose >
+    (
+      t = < LosChar >
+      {
+        sb.append(t.image.charAt(0));
+      }
+    )*
+    [ p = < LosOpen > ]
+  )
+  {
+    if (!_customLosAllowed) throw new ParseException(
+      String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
+    jjtThis.init(method, p != null ? p.image : null, sb.toString(), true);
+    jjtThis.setEndPosition(token);
+  }
+}
+
+Node CompleteProgram(EMethod method) #StatementListNode :
+{
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    (
+      (
+        Clause(null)
+      )+
+      < EOF >
+    )
+  | < EOF >
+  )
+  {
+    jjtThis.init(method);
+    jjtThis.setEndPosition(token);
+    return jjtThis;
+  }
+}
+
+void TemplateProgram(EMethod method) #StatementListNode :
+{
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    (
+      Clause(null)
+    | LosBody(null)
+    )+
+  )
+  {
+    jjtThis.init(method);
+    jjtThis.setEndPosition(token);
   }
 }
 
@@ -113,7 +356,7 @@ void Clause(EMethod method) #void :
 {
 }
 {
- (
+  (
     ForLoop(method)
   | IfClause(method)
   | FunctionClause(method)
@@ -133,18 +376,18 @@ void Clause(EMethod method) #void :
 void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    < Function > VariableWithOptionalScope(null) "("
+    < Function > VariableWithOptionalScope(null) < ParenOpen >
     (
       [ IdentifierName(null) ]
       (
-        "," IdentifierName(null)
+        < Comma > IdentifierName(null)
       )*
     )
-    ")"
+    < ParenClose >
     (
       Block(null)
     )
@@ -161,7 +404,12 @@ void WithClause(EMethod method) #WithClauseNode :
 }
 {
   (
-    < With > "(" [IdentifierName(null)] ("," IdentifierName(null))* ")" BlockOrClause(null)  )
+    < With > < ParenOpen > [ IdentifierName(null) ]
+    (
+      < Comma > IdentifierName(null)
+    )*
+    < ParenClose > BlockOrClause(null)
+  )
   {
     jjtThis.init(method);
     jjtThis.setEndPosition(token);
@@ -170,11 +418,11 @@ void WithClause(EMethod method) #WithClauseNode :
 
 void ContinueClause(EMethod method) #ContinueClauseNode :
 {
-    Token t = null;
+  Token t = null;
 }
 {
   (
-    < Continue > [ t = < Identifier > ]";"
+  < Continue > [ t = < Identifier > ] < SemiColon >
   )
   {
     jjtThis.init(method, t == null ? null : t.image);
@@ -189,7 +437,8 @@ void BreakClause(EMethod method) #BreakClauseNode :
 }
 {
   (
-    < Break > [ t = < Identifier > ]";"  )
+  < Break > [ t = < Identifier > ] < SemiColon >
+  )
   {
     jjtThis.init(method, t == null ? null : t.image);
     jjtThis.setEndPosition(token);
@@ -202,7 +451,8 @@ void ReturnClause(EMethod method) #ReturnClauseNode :
 }
 {
   (
-    < Return > [ Expression(null) ] ";"  )
+    < Return > [ Expression(null) ] < SemiColon >
+  )
   {
     jjtThis.init(method);
     jjtThis.setEndPosition(token);
@@ -212,11 +462,11 @@ void ReturnClause(EMethod method) #ReturnClauseNode :
 void ThrowClause(EMethod method) #ThrowClauseNode :
 {
   jjtThis.setStartPosition(token);
-  
 }
 {
   (
-    < Throw > Expression(null) ";"  )
+    < Throw > Expression(null) < SemiColon >
+  )
   {
     jjtThis.init(method);
     jjtThis.setEndPosition(token);
@@ -229,14 +479,14 @@ void SwitchClause(EMethod method) #SwitchClauseNode :
 }
 {
   (
-    < Switch > "(" Expression(null) ")" "{"
+    < Switch > < ParenOpen > Expression(null) < ParenClose > < BracesOpen >
     (
       SwitchCase()
     )*
-    [
-      SwitchDefault()
-    ]
-    "}"
+    [ 
+    SwitchDefault() 
+    ] 
+    < BracesClose >
   )
   {
     jjtThis.init(method);
@@ -250,9 +500,11 @@ void SwitchCase() #void :
 {
   (
     (
-      < Case > Expression(EMethod.SWITCHCASE) ":"
+      < Case > Expression(EMethod.SWITCHCASE) < Colon >
     )+
-    (Clause(EMethod.SWITCHCLAUSE))+
+    (
+      Clause(EMethod.SWITCHCLAUSE)
+    )+
   )
 }
 
@@ -260,8 +512,11 @@ void SwitchDefault() #void :
 {
 }
 {
-  (    < Default > ":"
-      (Clause(EMethod.SWITCHDEFAULT))+
+  (
+    < Default > < Colon >
+    (
+      Clause(EMethod.SWITCHDEFAULT)
+    )+
   )
 }
 
@@ -276,7 +531,7 @@ void TryClause(EMethod method) #TryClauseNode :
     (
       Block(null)
     )
-    < Catch > "(" t = < Identifier > ")"
+    < Catch > < ParenOpen > t = < Identifier > < ParenClose >
     (
       Block(null)
     )
@@ -293,9 +548,9 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 }
 {
   (
-    < Do >
-    BlockOrClause(null)
-    < While > "(" Expression(null) ")" ";"
+    < Do > 
+    BlockOrClause(null) 
+    < While > < ParenOpen > Expression(null) < ParenClose > < SemiColon >
   )
   {
     jjtThis.init(method);
@@ -304,11 +559,11 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 
 void WhileLoop(EMethod method) #WhileLoopNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    < While > "(" Expression(null) ")"
+    < While > < ParenOpen > Expression(null) < ParenClose > 
     BlockOrClause(null)
   )
   {
@@ -320,22 +575,22 @@ void WhileLoop(EMethod method) #WhileLoopNode :
 void ForLoop(EMethod method) #ForLoopNode :
 {
   Token iteratingLoopVariable = null;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    < For > "("
+    < For > < ParenOpen >
     (
-      LOOKAHEAD(< Identifier > ":")
+      LOOKAHEAD(< Identifier > < Colon >)
       (
-        iteratingLoopVariable = < Identifier > ":" Expression(null)
+        iteratingLoopVariable = < Identifier > < Colon > Expression(null)
       )
     |
       (
-        StatementListCommaSeparated(null) ";" StatementListCommaSeparated(null) ";" StatementListCommaSeparated(null)
+        StatementListCommaSeparated(null) < SemiColon > StatementListCommaSeparated(null) < SemiColon > StatementListCommaSeparated(null)
       )
     )
-    ")"
+    < ParenClose > 
     BlockOrClause(null)
   )
   {
@@ -350,8 +605,8 @@ void IfClause(EMethod method) #IfClauseNode :
 }
 {
   (
-    < If >
-    "(" Expression(null) ")" 
+    < If > 
+    < ParenOpen > Expression(null) < ParenClose > 
     BlockOrClause(null)
     [
       LOOKAHEAD(1)
@@ -369,24 +624,25 @@ void BlockOrClause(EMethod method) #void :
 {
 }
 {
-  LOOKAHEAD("{")
+  LOOKAHEAD(< BracesOpen >)
   Block(method)
 | Clause(method)
 }
 
 void Block(EMethod method) #StatementListNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    "{"
+    < BracesOpen >
     (
       (
         Clause(null)
+      | LosBody(null)
       )*
     )
-    "}"
+    < BracesClose >
   )
   {
     jjtThis.init(method);
@@ -396,11 +652,16 @@ void Block(EMethod method) #StatementListNode :
 
 void StatementListCommaSeparated(EMethod method) #StatementListNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    (Expression(null))? ("," Expression(null))*
+    (
+      Expression(null)
+    )?
+    (
+      < Comma > Expression(null)
+    )*
   )
   {
     jjtThis.init(method);
@@ -414,7 +675,7 @@ void Statement(EMethod method) #void :
 {
   (
     (
-      Expression(method) ";"
+      Expression(method) < SemiColon >
     )
   | EmptyStatement(method)
   )
@@ -428,7 +689,7 @@ Node EmptyStatement(EMethod method) #EmptyNode :
 }
 {
   (
-      ";"
+  < SemiColon >
   )
   {
     jjtThis.init(method);
@@ -436,7 +697,6 @@ Node EmptyStatement(EMethod method) #EmptyNode :
     return jjtThis;
   }
 }
-
 
 void Expression(EMethod method) #void :
 {
@@ -448,66 +708,67 @@ void Expression(EMethod method) #void :
 void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     DoubleBarExpression(method)
     (
       (
-        "=" DoubleBarExpression(EMethod.EQUAL)
+        < Equal >
+        DoubleBarExpression(EMethod.EQUAL)
       )
     |
       (
-        "+=" DoubleBarExpression(EMethod.PLUS_EQUAL)
+        < PlusEqual > DoubleBarExpression(EMethod.PLUS_EQUAL)
       )
     |
       (
-        "-=" DoubleBarExpression(EMethod.DASH_EQUAL)
+        < DashEqual > DoubleBarExpression(EMethod.DASH_EQUAL)
       )
     |
       (
-        "**=" DoubleBarExpression(EMethod.DOUBLE_STAR_EQUAL)
+        < DoubleStarEqual > DoubleBarExpression(EMethod.DOUBLE_STAR_EQUAL)
       )
     |
       (
-        "*=" DoubleBarExpression(EMethod.STAR_EQUAL)
+        < StarEqual > DoubleBarExpression(EMethod.STAR_EQUAL)
       )
     |
       (
-        "/=" DoubleBarExpression(EMethod.SLASH_EQUAL)
+        < SlashEqual > DoubleBarExpression(EMethod.SLASH_EQUAL)
       )
     |
       (
-        "%=" DoubleBarExpression(EMethod.PERCENT_EQUAL)
+        < PercentEqual > DoubleBarExpression(EMethod.PERCENT_EQUAL)
       )
     |
       (
-        "<<=" DoubleBarExpression(EMethod.DOUBLE_ANGLE_OPEN_EQUAL)
+        < DoubleAngleOpenEqual > DoubleBarExpression(EMethod.DOUBLE_ANGLE_OPEN_EQUAL)
       )
     |
       (
-        ">>=" DoubleBarExpression(EMethod.DOUBLE_ANGLE_CLOSE_EQUAL)
+        < DoubleAngleCloseEqual > DoubleBarExpression(EMethod.DOUBLE_ANGLE_CLOSE_EQUAL)
       )
     |
       (
-        "&&=" DoubleBarExpression(EMethod.DOUBLE_AMPERSAND_EQUAL)
+        < DoubleAmpersandEqual > DoubleBarExpression(EMethod.DOUBLE_AMPERSAND_EQUAL)
       )
     |
       (
-        "||=" DoubleBarExpression(EMethod.DOUBLE_BAR_EQUAL)
+        < DoubleBarEqual > DoubleBarExpression(EMethod.DOUBLE_BAR_EQUAL)
       )
     |
       (
-        "&=" DoubleBarExpression(EMethod.AMPERSAND_EQUAL)
+        < AmpersandEqual > DoubleBarExpression(EMethod.AMPERSAND_EQUAL)
       )
     |
       (
-        "^=" DoubleBarExpression(EMethod.CIRCUMFLEX_EQUAL)
+        < CircumflexEqual > DoubleBarExpression(EMethod.CIRCUMFLEX_EQUAL)
       )
     |
       (
-        "|=" DoubleBarExpression(EMethod.BAR_EQUAL)
+        < BarEqual > DoubleBarExpression(EMethod.BAR_EQUAL)
       )
     )*
   )
@@ -520,13 +781,14 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
 void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     DoubleAmpersandExpression(method)
     (
-      "||" DoubleAmpersandExpression(EMethod.DOUBLE_BAR)
+      < DoubleBar >
+      DoubleAmpersandExpression(EMethod.DOUBLE_BAR)
     )*
   )
   {
@@ -538,13 +800,14 @@ void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
 void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     BarExpression(method)
     (
-      "&&" BarExpression(EMethod.DOUBLE_AMPERSAND)
+      < DoubleAmpersand >
+      BarExpression(EMethod.DOUBLE_AMPERSAND)
     )*
   )
   {
@@ -556,13 +819,14 @@ void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtr
 void BarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     CircumflexExpression(method)
     (
-      "|" CircumflexExpression(EMethod.BAR)
+      < Bar >
+      CircumflexExpression(EMethod.BAR)
     )*
   )
   {
@@ -574,13 +838,14 @@ void BarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity
 void CircumflexExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     AmpersandExpression(method)
     (
-      "^" AmpersandExpression(EMethod.CIRCUMFLEX)
+      < Circumflex >
+      AmpersandExpression(EMethod.CIRCUMFLEX)
     )*
   )
   {
@@ -592,13 +857,14 @@ void CircumflexExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
 void AmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     DoubleEqualTypeExpression(method)
     (
-      "&" DoubleEqualTypeExpression(EMethod.AMPERSAND)
+      < Ampersand >
+      DoubleEqualTypeExpression(EMethod.AMPERSAND)
     )*
   )
   {
@@ -610,26 +876,27 @@ void AmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
 void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     AngleTypeExpression(method)
     (
       (
-        "===" AngleTypeExpression(EMethod.TRIPLE_EQUAL)
+        < TripleEqual >
+        AngleTypeExpression(EMethod.TRIPLE_EQUAL)
       )
     |
       (
-        "==" AngleTypeExpression(EMethod.DOUBLE_EQUAL)
+        < DoubleEqual > AngleTypeExpression(EMethod.DOUBLE_EQUAL)
       )
     |
       (
-        "!=" AngleTypeExpression(EMethod.EXCLAMATION_EQUAL)
+        < ExclamationEqual > AngleTypeExpression(EMethod.EXCLAMATION_EQUAL)
       )
     |
       (
-        "!==" AngleTypeExpression(EMethod.EXCLAMATION_DOUBLE_EQUAL)
+        < ExclamationDoubleEqual > AngleTypeExpression(EMethod.EXCLAMATION_DOUBLE_EQUAL)
       )
     )*
   )
@@ -642,26 +909,27 @@ void DoubleEqualTypeExpression(EMethod method) #ExpressionNode(createNode = jjtr
 void AngleTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     PlusLikeExpression(method)
     (
       (
-        "<" PlusLikeExpression(EMethod.ANGLE_OPEN)
+        < AngleOpen >
+        PlusLikeExpression(EMethod.ANGLE_OPEN)
       )
     |
       (
-        ">" PlusLikeExpression(EMethod.ANGLE_CLOSE)
+        < AngleClose > PlusLikeExpression(EMethod.ANGLE_CLOSE)
       )
     |
       (
-        "<=" PlusLikeExpression(EMethod.ANGLE_OPEN_EQUAL)
+        < AngleOpenEqual > PlusLikeExpression(EMethod.ANGLE_OPEN_EQUAL)
       )
     |
       (
-        ">=" PlusLikeExpression(EMethod.ANGLE_CLOSE_EQUAL)
+        < AngleCloseEqual > PlusLikeExpression(EMethod.ANGLE_CLOSE_EQUAL)
       )
     )*
   )
@@ -674,18 +942,19 @@ void AngleTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
 void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     StarLikeExpression(method)
     (
       (
-        "+" StarLikeExpression(EMethod.PLUS)
+        < Plus >
+        StarLikeExpression(EMethod.PLUS)
       )
     |
       (
-        "-" StarLikeExpression(EMethod.DASH)
+        < Dash > StarLikeExpression(EMethod.DASH)
       )
     )*
   )
@@ -698,22 +967,23 @@ void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
 void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   DoubleStarExpression(method)
   (
     (
       (
-        "*" DoubleStarExpression(EMethod.STAR)
+        < Star >
+        DoubleStarExpression(EMethod.STAR)
       )
     |
       (
-        "/" DoubleStarExpression(EMethod.SLASH)
+        < Slash > DoubleStarExpression(EMethod.SLASH)
       )
     |
       (
-        "%" DoubleStarExpression(EMethod.PERCENT)
+        < Percent > DoubleStarExpression(EMethod.PERCENT)
       )
     )*
   )
@@ -726,13 +996,14 @@ void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
 void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    UnaryExpression(method)
-    [
-      "**" DoubleStarExpression(EMethod.DOUBLE_STAR)
+    UnaryExpression(method) 
+    [ 
+    < DoubleStar >
+    DoubleStarExpression(EMethod.DOUBLE_STAR) 
     ]
   )
   {
@@ -744,45 +1015,46 @@ void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
 void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
 {
   EMethod unaryMethod = null;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     (
-      "++" UnaryExpression(method)
+      < DoublePlus >
+      UnaryExpression(method)
       {
         unaryMethod = EMethod.DOUBLE_PLUS_PREFIX;
       }
     )
   |
     (
-      "--" UnaryExpression(method)
+      < DoubleDash > UnaryExpression(method)
       {
         unaryMethod = EMethod.DOUBLE_DASH_PREFIX;
       }
     )
   |
     (
-      "+" UnaryExpression(method)
+      < Plus > UnaryExpression(method)
       {
         unaryMethod = EMethod.PLUS_UNARY;
       }
     )
   |
     (
-      "-" UnaryExpression(method)
+      < Dash > UnaryExpression(method)
       {
         unaryMethod = EMethod.DASH_UNARY;
       }
     )
   |
     (
-      "!" UnaryExpression(method)
+      < Exclamation > UnaryExpression(method)
       {
         unaryMethod = EMethod.EXCLAMATION;
       }
     )
-  |
+  | 
     PropertyExpression(method)
   )
   {
@@ -794,15 +1066,16 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
 void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjtree.nodeArity() > 1) :
 {
   boolean createNode = true;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     FunctionTypeUnaryExpression(method)
     (
-      "." IdentifierName(EMethod.DOT)
-    | "[" Expression(EMethod.BRACKET) "]"
-    | "(" FunctionArgumentList(EMethod.PARENTHESIS) ")"
+      < Dot >
+      IdentifierName(EMethod.DOT)
+    | < BracketOpen > Expression(EMethod.BRACKET) < BracketClose >
+    | < ParenOpen > FunctionArgumentList(EMethod.PARENTHESIS) < ParenClose >
     )*
   )
   {
@@ -814,10 +1087,11 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
 void IdentifierName(EMethod method) #IdentifierNameNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
-  (    t = < Identifier >
+  (
+  t = < Identifier >
   )
   {
     jjtThis.init(method, t.image);
@@ -827,13 +1101,13 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
 
 void FunctionArgumentList(EMethod method) #ArrayNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     [ Expression(null) ]
     (
-      "," Expression(null)
+      < Comma > Expression(null)
     )*
   )
   {
@@ -854,7 +1128,7 @@ void FunctionTypeUnaryExpression(EMethod method) #void :
       VariableWithOptionalScope(method)
     |
       (
-        "(" Expression(method) ")"
+        < ParenOpen > Expression(method) < ParenClose >
       )
     )
   )
@@ -866,17 +1140,17 @@ void VariableWithOptionalScope(EMethod method) #VariableNode :
 {
   Token part1;
   Token part2 = null;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    part1 = < Identifier > ["::" part2 = < Identifier >]
+  part1 = < Identifier > [ < ScopeSeparator > part2 = < Identifier > ]
   )
   {
-    if (part2 ==null)
-      jjtThis.init(method, null, part1.image);
-    else
-      jjtThis.init(method, part1.image, part2.image);
+    if (part2 == null) 
+    jjtThis.init(method, null, part1.image);
+    else 
+    jjtThis.init(method, part1.image, part2.image);
     jjtThis.setEndPosition(token);
   }
 }
@@ -885,7 +1159,7 @@ void Number(EMethod method) #NumberNode :
 {
   Token t;
   boolean isInt;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
@@ -909,7 +1183,7 @@ void String(EMethod method) #StringNode :
 {
   Token t;
   char delimiter;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
@@ -931,20 +1205,20 @@ void String(EMethod method) #StringNode :
 
 void Array(EMethod method) #ArrayNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    "["
+    < BracketOpen >
     (
-      "]"
+      < BracketClose >
     |
       (
         Expression(null)
         (
-          "," Expression(null)
+          < Comma > Expression(null)
         )*
-        "]"
+        < BracketClose >
       )
     )
   )
@@ -956,20 +1230,20 @@ void Array(EMethod method) #ArrayNode :
 
 void Hash(EMethod method) #HashNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    "{"
+    < BracesOpen >
     (
-      "}"
+      < BracesClose >
     |
       (
         HashEntry(null)
         (
-          "," HashEntry(null)
+          < Comma > HashEntry(null)
         )*
-        "}"
+        < BracesClose >
       )
     )
   )
@@ -983,12 +1257,12 @@ void HashEntry(EMethod method) #void :
 {
 }
 {
-  Literal(null) ":" Expression(null)
+  Literal(null) < Colon > Expression(null)
 }
 
 void Null(EMethod method) #NullNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   < Null >
@@ -1003,7 +1277,7 @@ void Null(EMethod method) #NullNode :
 void Boolean(EMethod method) #BooleanNode :
 {
   boolean b;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
@@ -1026,29 +1300,29 @@ void Boolean(EMethod method) #BooleanNode :
 void Log(EMethod method) #LogNode :
 {
   ELogLevel logLevel;
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
     (
-      "\u00a7loginfo"
+      < LogInfo >
       {
         logLevel = ELogLevel.INFO;
       }
-    | "\u00a7logerror"
+    | < LogError >
       {
         logLevel = ELogLevel.ERROR;
       }
-    | "\u00a7logdebug"
+    | < LogDebug >
       {
         logLevel = ELogLevel.DEBUG;
       }
-    | "\u00a7logwarn"
+    | < LogWarn >
       {
         logLevel = ELogLevel.WARN;
       }
     )
-    "(" Expression(null) ")"
+    < ParenOpen > Expression(null) < ParenClose >
   )
   {
     jjtThis.init(method, logLevel);
@@ -1058,10 +1332,11 @@ void Log(EMethod method) #LogNode :
 
 void Exception(EMethod method) #ExceptionNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
-  (    < Exception > "(" Expression(null) ")"
+  (
+    < Exception > < ParenOpen > Expression(null) < ParenClose >
   )
   {
     jjtThis.init(method);
@@ -1071,18 +1346,18 @@ void Exception(EMethod method) #ExceptionNode :
 
 void Function(EMethod method) #FunctionNode :
 {
-  jjtThis.setStartPosition(token);  
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    "->" "("
+    < LambdaArrow > < ParenOpen >
     (
       [ IdentifierName(null) ]
       (
-        "," IdentifierName(null)
+        < Comma > IdentifierName(null)
       )*
     )
-    ")"
+    < ParenClose >
     (
       Block(null)
     )
@@ -1125,4 +1400,3 @@ void Literal(EMethod method) #void :
 | Function(method)
 | Exception(method)
 }
-

@@ -226,6 +226,19 @@ public class NumberLangObject extends ALangObject {
 		return NumberLangObject.create(value*operand.value);
 	}
 
+	public boolean smaller(final NumberLangObject other) {
+		return value < other.value;
+	}
+	public boolean greater(final NumberLangObject other) {
+		return value > other.value;
+	}
+	public boolean smallerOrEqual(final NumberLangObject other) {
+		return value <= other.value;
+	}
+	public boolean greaterOrEqual(final NumberLangObject other) {
+		return value >= other.value;
+	}
+
 	/**
 	 * @param operand
 	 *            Number to divide by.
@@ -238,15 +251,15 @@ public class NumberLangObject extends ALangObject {
 	public boolean isNaN() {
 		return value != value;
 	}
-	
+
 	public boolean isInfinite() {
 		return value == Double.POSITIVE_INFINITY || value == Double.NEGATIVE_INFINITY;
 	}
-	
+
 	public boolean isFinite() {
 		return value <= 0.0d ? -value <= Double.MAX_VALUE : value <= Double.MAX_VALUE;
 	}
-	
+
 	public NumberLangObject abs() {
 		return NumberLangObject.create(value < 0.0d ? -value : value);
 	}

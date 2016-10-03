@@ -15,31 +15,31 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	/**
 	 * @return {@link NumberLangObject} This number.
 	 */
-	PLUS_UNARY(EMethod.PLUS_UNARY, Impl.PLUS_UNARY),
+	PLUS_UNARY(EMethod.PLUS_UNARY, Impl.IDENTITY),
 	/**
 	 * @return {@link NumberLangObject}. The additive inverse of this number.
 	 */
-	DASH_UNARY(EMethod.DASH_UNARY, Impl.DASH_UNARY),
+	DASH_UNARY(EMethod.DASH_UNARY, Impl.NEGATE),
 	/**
 	 * @param summand {@link NumberLangObject} The number to be added to this number.
 	 * @return {@link NumberLangObject}. The arithmetic sum of this number and the argument.
 	 */
-	PLUS(EMethod.PLUS, Impl.PLUS),
+	PLUS(EMethod.PLUS, Impl.ADD),
 	/**
 	 * @param subtrahend {@link NumberLangObject} The number to be subtracted to this number.
 	 * @return {@link NumberLangObject}. The arithmetic difference of this number and the argument.
 	 */
-	DASH(EMethod.DASH, Impl.DASH),
+	DASH(EMethod.DASH, Impl.SUBTRACT),
 	/**
 	 * @param multiplicand {@link NumberLangObject}. The number to be multiplied to this number.
 	 * @return The arithmetic product of this number and the argument.
 	 */
-	STAR(EMethod.STAR, Impl.STAR),
+	STAR(EMethod.STAR, Impl.MULTIPLY),
 	/**
 	 * @param dividend {@link NumberLangObject}. The number to through which to divide this number.
 	 * @return The ration of this number divided by the argument.
 	 */
-	SLASH(EMethod.SLASH, Impl.SLASH),
+	SLASH(EMethod.SLASH, Impl.DIVIDE),
 	/**
 	 * @param comparand {@link ALangObject}. Object to compare this object to.
 	 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
@@ -50,6 +50,37 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 * @return {@link BooleanLangObject}. True iff this number is numerically equivalent to the argument.
 	 */
 	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.EQUALITY),
+	/**
+	 * @param comparand {@link ALangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. False iff this object is of the same {@link Type} as the argument and is logically equivalent.
+	 */
+	EXCLAMATION_EQUAL(EMethod.EXCLAMATION_EQUAL, Impl.INEQUALITY),
+	/**
+	 * @param comparand {@link ALangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. False iff this object is of the same {@link Type} as the argument and is logically equivalent.
+	 */
+	EXCLAMATION_DOUBLE_EQUAL(EMethod.EXCLAMATION_DOUBLE_EQUAL, Impl.INEQUALITY),
+	/**
+	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this number is smaller than the argument number.
+	 */
+	ANGLE_OPEN(EMethod.ANGLE_OPEN, Impl.SMALLER),
+	/**
+	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this number is smaller than or equal to the argument number.
+	 */
+	ANGLE_OPEN_EQUAL(EMethod.ANGLE_OPEN_EQUAL, Impl.SMALLER_OR_EQUAL),
+	/**
+	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this number is greater than the argument number.
+	 */
+	ANGLE_CLOSE(EMethod.ANGLE_CLOSE, Impl.GREATER),
+	/**
+	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this number is greater than or equal to the argument number.
+	 */
+	ANGLE_CLOSE_EQUAL(EMethod.ANGLE_CLOSE_EQUAL, Impl.GREATER_OR_EQUAL),
+
 	;
 	private final EMethod method;
 	private final IFunction<NumberLangObject> function;
@@ -68,42 +99,42 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	}
 
 	private static enum Impl implements IFunction<NumberLangObject> {
-		PLUS_UNARY(null) {
+		IDENTITY(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext;
 			}
 		},
-		PLUS(null, "summand") {
+		ADD(null, "summand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
 		},
-		DASH(null, "subtrahend") {
+		SUBTRACT(null, "subtrahend") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(args[0].coerceNumber(ec));
 			}
 		},
-		DASH_UNARY(null) {
+		NEGATE(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, NumberLangObject thisContext, ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext.negate();
 			}
 		},
-		STAR(null, "multiplicand") {
+		MULTIPLY(null, "multiplicand") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 		},
-		SLASH(null, "dividend") {
+		DIVIDE(null, "dividend") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -115,7 +146,43 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return BooleanLangObject.create(thisContext.equals(args[0]));
-			}},
+			}
+		},
+		INEQUALITY(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(!thisContext.equals(args[0]));
+			}
+		},
+		SMALLER(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.smaller(args[0].coerceNumber(ec)));
+			}
+		},
+		SMALLER_OR_EQUAL(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.smallerOrEqual(args[0].coerceNumber(ec)));
+			}
+		},
+		GREATER(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.greater(args[0].coerceNumber(ec)));
+			}
+		},
+		GREATER_OR_EQUAL(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return BooleanLangObject.create(thisContext.greaterOrEqual(args[0].coerceNumber(ec)));
+			}
+		},
 		;
 
 		private final String[] argList;
