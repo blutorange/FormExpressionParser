@@ -3,17 +3,20 @@ package de.xima.fc.form.expression.node;
 import java.io.Serializable;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
    between nodes. */
 
-public interface INode extends Serializable {
+public interface INode extends Serializable, ITraceElement {
 
 	/**
 	 * This method is called after the node has been made the current node. It
@@ -56,6 +59,17 @@ public interface INode extends Serializable {
 	 * @throws ParseException When any child cannot be cast to the specified type.
 	 */
 	public <T extends INode> T[] getChildArrayAs(final Class<T> clazz, int start) throws ParseException;
+
+	/**
+	 * @param <T> The class to which to cast the child nodes.
+	 * @param clazz Class to which all nodes will be casted.
+	 * @param start The returned array will contain all children starting at this index.
+	 * @param end The returned array will contain all children up to this index (inclusive).
+	 * @return The array of children, cast to the specified type.
+	 * @throws ParseException When any child cannot be cast to the specified type.
+	 */
+	public <T extends INode> T[] getChildArrayAs(final Class<T> clazz, int start, int end) throws ParseException;
+
 
 	/**
 	 * @param clazz
@@ -112,8 +126,8 @@ public interface INode extends Serializable {
 	 * @return The return value of the visitor.
 	 */
 	@NotNull
-	public <R, T> R jjtAccept(@NotNull final IFormExpressionParserVisitor<R, T> visitor, @NotNull final T data)
-			throws EvaluationException;
+	public <R, T, E extends Throwable> R jjtAccept(@NotNull final IFormExpressionParserVisitor<R, T, E> visitor, @NotNull final T data)
+			throws E;
 
 	public int getId();
 
@@ -122,6 +136,20 @@ public interface INode extends Serializable {
 	 */
 	public EMethod getSiblingMethod();
 
-	INode[] getChildArray();
+	public INode[] getChildArray();
+
+	@Nullable
+	public INode getLastChild();
+	@Nullable
+	public INode getFirstChild();
+
+	public void setStartPosition(Token token);
+	public void setEndPosition(Token token);
+
+	/**
+	 * @return The id of this node.
+	 * @see FormExpressionParserTreeConstants
+	 */
+	public int jjtGetNodeId();
 
 }

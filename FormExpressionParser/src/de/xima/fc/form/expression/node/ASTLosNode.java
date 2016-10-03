@@ -39,14 +39,19 @@ public class ASTLosNode extends SimpleNode {
 		return hasClose;
 	}
 
+	public boolean isHasText() {
+		return text != null;
+	}
+
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append(embedmentType).append(',').append(hasClose).append(',').append(text).append(',');
 	}
 
 	@Override
-	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
 		return visitor.visit(this, data);
 	}
+
 
 }

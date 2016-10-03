@@ -95,7 +95,7 @@ public final class TestUtil {
 	}
 
 	private static ALangObject evaluate(final Node node) throws EvaluationException {
-		return EvaluateVisitor.evaluateProgram(node, GenericEvaluationContext.getNewBasicEvaluationContext());
+		return EvaluateVisitor.evaluateCode(node, GenericEvaluationContext.getNewBasicEvaluationContext());
 	}
 
 	private static Node parse(final String code, final ETestType type) throws ParseException {

@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 /* All AST nodes must implement this interface.  It provides basic
@@ -124,8 +123,8 @@ public interface Node extends Serializable, ITraceElement {
 	 * @return The return value of the visitor.
 	 */
 	@NotNull
-	public <R, T> R jjtAccept(@NotNull final IFormExpressionParserVisitor<R, T> visitor, @NotNull final T data)
-			throws EvaluationException;
+	public <R, T, E extends Throwable> R jjtAccept(@NotNull final IFormExpressionParserVisitor<R, T, E> visitor, @NotNull final T data)
+			throws E;
 
 	public int getId();
 

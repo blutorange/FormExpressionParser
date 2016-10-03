@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.impl.embedment;
 
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.EvaluationException;
 
 /**
  * A dummy embedment that simply prints any data to stdout.
@@ -18,10 +19,10 @@ public enum DummyEmbedment implements IEmbedment {
 	}
 
 	@Override
-	public void beginEmbedment(final String name) {
+	public void beginEmbedment(String name, IEvaluationContext ec) throws EvaluationException {
 	}
 
 	@Override
-	public void endEmbedment() {
+	public void endEmbedment(IEvaluationContext ec) throws EvaluationException {		
 	}
 }

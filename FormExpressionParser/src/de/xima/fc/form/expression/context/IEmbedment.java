@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.context;
 
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 
 public interface IEmbedment {
 	/**
@@ -13,12 +14,13 @@ public interface IEmbedment {
 	 *            Name of the embedment type, eg. <code>[%%</code> or
 	 *            <code>[%%@</code>.
 	 */
-	public void beginEmbedment(String name);
+	public void beginEmbedment(String name, IEvaluationContext ec) throws EvaluationException;
 
 	/**
 	 * Called once for each call to {@link #beginEmbedment(String)}.
+	 * @param ec 
 	 */
-	public void endEmbedment();
+	public void endEmbedment(IEvaluationContext ec) throws EvaluationException;
 
 	/**
 	 * Writes the given data with the current type to the output document, file, or stream etc.

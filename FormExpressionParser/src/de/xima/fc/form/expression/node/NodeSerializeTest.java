@@ -1,8 +1,9 @@
 package de.xima.fc.form.expression.node;
 
+import java.io.IOException;
+
 import org.apache.commons.lang3.SerializationUtils;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.FormExpressionParseFactory;
@@ -31,7 +32,7 @@ public final class NodeSerializeTest {
 		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms");
 		try {
 			n.jjtAccept(DumpVisitor.getSystemOutDumper(), "");
-		} catch (final EvaluationException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

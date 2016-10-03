@@ -10,9 +10,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.VisitorException;
 
-public class DumpVisitor extends GenericDepthFirstVisitor<String, String> {
+public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOException> {
 	private static class InstanceHolder {
 		public final static DumpVisitor SYSTEM_OUT_DUMPER = new DumpVisitor(System.out);
 		public final static DumpVisitor SYSTEM_ERR_DUMPER = new DumpVisitor(System.err);
@@ -40,15 +39,13 @@ public class DumpVisitor extends GenericDepthFirstVisitor<String, String> {
 	 * @return The result of visiting the given node, as a string.
 	 * @throws EvaluationException
 	 */
-	public static String toString(final de.xima.fc.form.expression.grammar.Node node, final String data, final String lineSeparator) throws EvaluationException {
+	public static String toString(final de.xima.fc.form.expression.grammar.Node node, final String data, final String lineSeparator) throws IOException {
 		DumpVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			final Charset charset = Charset.defaultCharset();
 			v = new DumpVisitor(baos, charset, lineSeparator);
 			node.jjtAccept(v, data);
 			return new String(baos.toByteArray(), charset);
-		} catch (final IOException e) {
-			throw new VisitorException(v, node, data, e);
 		}
 	}
 
@@ -111,14 +108,10 @@ public class DumpVisitor extends GenericDepthFirstVisitor<String, String> {
 	}
 	
 	@Override
-	protected String visitNode(final Node node, final String prefix) throws EvaluationException {
-		try {
-			outputStream.write(prefix.getBytes(charset));
-			outputStream.write(node.toString().getBytes(charset));
-			outputStream.write(lineSeparator);
-		} catch (final IOException e) {
-			throw new VisitorException(this, node, prefix, e);
-		}
+	protected String visitNode(final Node node, final String prefix) throws IOException {
+		outputStream.write(prefix.getBytes(charset));
+		outputStream.write(node.toString().getBytes(charset));
+		outputStream.write(lineSeparator);
 		return prefix;
 	}
 }

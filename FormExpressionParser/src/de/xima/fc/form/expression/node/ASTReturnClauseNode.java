@@ -12,7 +12,7 @@ public class ASTReturnClauseNode extends SimpleNode {
 	}
 
 	@Override
-	public <R, T> R jjtAccept(final IFormExpressionParserVisitor<R, T> visitor, final T data) throws EvaluationException {
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
 		return visitor.visit(this, data);
 	}
 

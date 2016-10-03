@@ -1,8 +1,11 @@
 package de.xima.fc.form.expression;
 
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +20,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.impl.GenericEmbedment;
 import de.xima.fc.form.expression.impl.GenericScope;
 import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 import de.xima.fc.form.expression.impl.scope.FormFieldScope;
@@ -29,8 +33,15 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
+/**
+ * todo
+ * - check scope for embedded blocks when used with with-clauses, are they ended properly, correct order???
+ * - unparse
+ */
 public class FormExpressionDemo {
 
+	private static Writer writer;
+	
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
 
@@ -41,6 +52,8 @@ public class FormExpressionDemo {
 		final Node rootNode = showParseTree(code);
 
 		showEvaluatedResult(rootNode);
+		
+		IOUtils.closeQuietly(getWriter());
 	}
 
 	private static String readArgs(final String[] args) {
@@ -59,6 +72,19 @@ public class FormExpressionDemo {
 		}
 	}
 
+	private static Writer getWriter() {
+		if (writer == null) {
+			try {
+				writer = new FileWriter("/tmp/fep_embed_out.html");
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				writer = new OutputStreamWriter(System.out);
+			}
+		}
+		return writer;
+	}
+	
 	private static void showInputCode(final String code) {
 		System.out.println("===Input code===");
 		System.out.println(code);
@@ -107,10 +133,10 @@ public class FormExpressionDemo {
 		System.out.println("\n===Parse tree===");
 		try {
 			rootNode.jjtAccept(DumpVisitor.getSystemOutDumper(), StringUtils.EMPTY);
-		} catch (final EvaluationException e) {
-			// System.out probably will not throw an IOException,
-			// System.out.println just catches it anyways.
+		} catch (final IOException e) {
 			e.printStackTrace();
+			System.exit(-1);
+			return null;
 		}
 		System.out.println();
 		return rootNode;
@@ -129,9 +155,11 @@ public class FormExpressionDemo {
 		try {
 			//final EvaluateProcessor processor = new EvaluateProcessor(getEc());
 			final long t1 = System.nanoTime();
-			result = EvaluateVisitor.evaluateProgram(rootNode, getEc());
+			result = EvaluateVisitor.evaluateCode(rootNode, getEc());
 			//final ALangObject result = processor.process(rootNode);
 			final long t2 = System.nanoTime();
+			writer.write("\n");
+			writer.flush();
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 
 		}
@@ -165,6 +193,7 @@ public class FormExpressionDemo {
 		final ITracer<Node> tracer = new GenericTracer();
 		final Builder builder = new Builder();
 		final IScope scope = getScope();
+		builder.setEmbedment(GenericEmbedment.getNewGenericEmbedment(getWriter()));
 		builder.setBinding(binding);
 		builder.setScope(scope);
 		builder.setTracer(tracer);

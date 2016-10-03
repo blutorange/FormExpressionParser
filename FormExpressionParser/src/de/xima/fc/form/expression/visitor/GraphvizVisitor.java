@@ -10,9 +10,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.VisitorException;
 
-public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[]> {
+public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IOException> {
 	private static class InstanceHolder {
 		public final static GraphvizVisitor SYSTEM_OUT_GRAPHVIZ = new GraphvizVisitor(System.out);
 		public final static GraphvizVisitor SYSTEM_ERR_GRAPHVIZ = new GraphvizVisitor(System.err);
@@ -55,7 +54,7 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[]> {
 	 * @throws EvaluationException
 	 */
 	public static String toString(final de.xima.fc.form.expression.grammar.Node node, final String lineSeparator, final String[] headerAndFooter,
-			final int footerBegin) throws EvaluationException {
+			final int footerBegin) throws IOException {
 		GraphvizVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			final Charset charset = Charset.defaultCharset();
@@ -70,13 +69,11 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[]> {
 				baos.write(headerAndFooter[i].getBytes(charset));
 			// Return result as string
 			return new String(baos.toByteArray(), charset);
-		} catch (final IOException e) {
-			throw new VisitorException(v, node, null, e);
 		}
 	}
 
 	public static String withHeaderAndFooter(final de.xima.fc.form.expression.grammar.Node node, final String title, final String lineSeparator)
-			throws EvaluationException {
+			throws IOException {
 		final String[] headerAndFooter = new String[11];
 
 		headerAndFooter[0] = "digraph G {";
@@ -154,25 +151,21 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[]> {
 	}
 
 	@Override
-	protected byte[] visitNode(final Node node, byte[] parentId) throws EvaluationException {
+	protected byte[] visitNode(final Node node, byte[] parentId) throws IOException {
 		final String label = StringEscapeUtils.escapeHtml4(node.toString());
 		final byte[] nodeId = String.valueOf(node.getId()).getBytes(charset);
-		try {
+		outputStream.write(nodeId);
+		outputStream.write(bytesLabelOpen);
+		outputStream.write(label.getBytes(charset));
+		outputStream.write(bytesLabelClose);
+		
+		outputStream.write(lineSeparator);
+		
+		if (parentId != null) {
+			outputStream.write(parentId);
+			outputStream.write(bytesArrow);
 			outputStream.write(nodeId);
-			outputStream.write(bytesLabelOpen);
-			outputStream.write(label.getBytes(charset));
-			outputStream.write(bytesLabelClose);
-			
 			outputStream.write(lineSeparator);
-			
-			if (parentId != null) {
-				outputStream.write(parentId);
-				outputStream.write(bytesArrow);
-				outputStream.write(nodeId);
-				outputStream.write(lineSeparator);
-			}
-		} catch (final IOException e) {
-			throw new VisitorException(this, node, null, e);
 		}
 		return nodeId;
 	}

@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.FormExpressionParseFactory;
@@ -36,7 +35,7 @@ public class VisualizeTreeGraphviz {
 		String graphviz;
 		try {
 			graphviz = GraphvizVisitor.withHeaderAndFooter(rootNode, expression, System.lineSeparator());
-		} catch (final EvaluationException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 			graphviz = StringUtils.EMPTY;
 		}

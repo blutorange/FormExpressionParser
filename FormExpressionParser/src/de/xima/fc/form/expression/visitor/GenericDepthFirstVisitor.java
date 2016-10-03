@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.visitor;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -34,7 +33,7 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
-public abstract class GenericDepthFirstVisitor<R, T> implements IFormExpressionParserVisitor<R, T> {
+public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implements IFormExpressionParserVisitor<R, T, E> {
 
 	protected static class Node {
 		private de.xima.fc.form.expression.grammar.Node node;
@@ -84,7 +83,7 @@ public abstract class GenericDepthFirstVisitor<R, T> implements IFormExpressionP
 	 * @param data
 	 * @return
 	 */
-	protected abstract R visitNode(Node node, T data);
+	protected abstract R visitNode(Node node, T data) throws E;
 
 	/**
 	 * Reduces the return values from the parent node and its children.
@@ -100,7 +99,7 @@ public abstract class GenericDepthFirstVisitor<R, T> implements IFormExpressionP
 		return value;
 	}
 
-	private R processNode(final de.xima.fc.form.expression.grammar.Node node, final T data) {
+	private R processNode(final de.xima.fc.form.expression.grammar.Node node, final T data) throws E {
 		wrapper.node = node;
 		final T childData = map(data);
 		R reduced = visitNode(wrapper, data);
@@ -112,155 +111,155 @@ public abstract class GenericDepthFirstVisitor<R, T> implements IFormExpressionP
 	}
 
 	@Override
-	public final R visit(final ASTExpressionNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTExpressionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTAssignmentExpressionNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTAssignmentExpressionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTNumberNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTNumberNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTArrayNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTArrayNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTHashNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTHashNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTNullNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTNullNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTBooleanNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTBooleanNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTVariableNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTVariableNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTStringNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTStringNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTStatementListNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTStatementListNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTIfClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTIfClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTForLoopNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTForLoopNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTWhileLoopNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTWhileLoopNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTTryClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTTryClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTSwitchClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTSwitchClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTDoWhileLoopNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTDoWhileLoopNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTExceptionNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTExceptionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTThrowClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTThrowClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTBreakClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTBreakClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTContinueClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTContinueClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTReturnClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTReturnClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTLogNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTLogNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTFunctionNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTFunctionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTUnaryExpressionNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTUnaryExpressionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTPropertyExpressionNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTPropertyExpressionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTIdentifierNameNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTIdentifierNameNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public final R visit(final ASTWithClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTWithClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 	@Override
-	public final R visit(final ASTFunctionClauseNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTFunctionClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 	@Override
-	public final R visit(final ASTEmptyNode node, final T data) throws EvaluationException {
-		return processNode(node, data);
-	}
-
-	@Override
-	public R visit(final ASTLosNode node, final T data) throws EvaluationException {
+	public final R visit(final ASTEmptyNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 
 	@Override
-	public R visit(final ASTTemplateNode node, final T data) throws EvaluationException {
+	public R visit(final ASTLosNode node, final T data) throws E {
+		return processNode(node, data);
+	}
+
+	@Override
+	public R visit(final ASTTemplateNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 }

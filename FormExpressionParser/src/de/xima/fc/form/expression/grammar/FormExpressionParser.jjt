@@ -242,6 +242,8 @@ Node Template(EMethod method) #TemplateNode :
     < EOF >
   )
   {
+    if (token_source.curLexState == FormExpressionParserConstants.CODE)
+      throw new ParseException("Final code block in templates must be closed.");
     jjtThis.init(method);
     jjtThis.setEndPosition(token);
     return jjtThis;

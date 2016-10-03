@@ -1,42 +1,34 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 
-public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed<Writer> {
-	SILENT("[%%"),
-	VERBOSE("[%%="),
+public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
+	SILENT("[%%", false),
+	VERBOSE("[%%=", true),
 	;
 
-	private String name;
-	private EmbedmentHandlerBundleGeneral(final String name) {
+	private final String name;
+	private final boolean doOutput;
+	private EmbedmentHandlerBundleGeneral(final String name, final boolean doOutput) {
 		this.name = name;
+		this.doOutput = doOutput;
 	}
 
 	@Override
-	public void beginEmbedment() {
+	public void beginEmbedment(IEvaluationContext ec) {
 	}
 
 	@Override
-	public void endEmbedment() {
-	}
-
-	@Override
-	public void output(final String data, final Writer writer, final IEvaluationContext ec) throws EmbedmentOutputException {
-		try {
-			writer.write(data);
-		}
-		catch (final IOException e) {
-			throw new EmbedmentOutputException(e, ec);
-		}
+	public void endEmbedment(IEvaluationContext ec) {
 	}
 
 	@Override
 	public String getEmbedmentName() {
 		return name;
+	}
+	@Override
+	public boolean isDoOutput() {
+		return doOutput;
 	}
 }

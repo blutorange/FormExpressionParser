@@ -34,7 +34,7 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
-public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext>{
+public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext, EvaluationException>{
 
 	@Override
 	public Void visit(final ASTExpressionNode node, final IEvaluationContext data) throws EvaluationException {

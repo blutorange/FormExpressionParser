@@ -60,7 +60,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
-public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext> {
+public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
 
 	/**
 	 * Evaluates the given node as a complete program with the given context.
@@ -73,13 +73,14 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	 * @return The evaluated result.
 	 * @throws EvaluationException When the code cannot be evaluated.
 	 */
-	public static ALangObject evaluateProgram(final Node node, final IEvaluationContext ec) throws EvaluationException {
+	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res = node.jjtAccept(v, ec);
 		v.assertNoJumps(ec);
 		return res;
 	}
 
+	private ALangObject currentResult;
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
@@ -89,6 +90,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 
 	public void reinit() throws EvaluationException {
+		currentResult = NullLangObject.getInstance();
 		mustJump = false;
 		jumpType = null;
 		jumpLabel = null;
@@ -112,7 +114,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	private ALangObject jjtAccept(final Node parentNode, final Node node, final IEvaluationContext ec) {
 		ec.getTracer().setCurrentlyProcessed(node);
 		try {
-			return node.jjtAccept(this, ec);
+			return currentResult = node.jjtAccept(this, ec);
 		}
 		finally {
 			ec.getTracer().setCurrentlyProcessed(parentNode);
@@ -702,7 +704,14 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTLosNode node, final IEvaluationContext ec) throws EvaluationException {
-		ec.getEmbedment().output(node.getText(), ec);
+		if (node.isHasClose()) {
+			ec.getEmbedment().output(currentResult.coerceString(ec).stringValue(), ec);
+			ec.getEmbedment().endEmbedment(ec);
+		}
+		if (node.isHasText()) ec.getEmbedment().output(node.getText(), ec);
+		if (node.isHasOpen()) {
+			ec.getEmbedment().beginEmbedment(node.getEmbedmentType(), ec);
+		}
 		return NullLangObject.getInstance();
 	}
 

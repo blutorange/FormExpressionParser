@@ -16,7 +16,7 @@ enum SyntaxFailure implements ITestCase {
 	TEST008("^|n};","Encountered \" \"^\" \"^ \"\" at line 1, column 1."),
 	TEST009("with (foo bar) foobar;","Encountered \" <Identifier> \"bar \"\" at line 1, column 11."),
 	TEST010("<foo>[% i = %]</foo> [% 42; %]", ETestType.TEMPLATE,"Encountered \" \"%]\" \"%] \"\" at line 1, column 13."),
-	TEST011("<foo>[% i = 0;", ETestType.TEMPLATE),
+	TEST011("<foo>[% i = 0;", ETestType.TEMPLATE,"Final code block in templates must be closed."),
 	TEST012("<foo> [% foo(); <bar>", ETestType.TEMPLATE,"Encountered \" \"<\" \"< \"\" at line 1, column 17."),
 	;
 	private final String code;

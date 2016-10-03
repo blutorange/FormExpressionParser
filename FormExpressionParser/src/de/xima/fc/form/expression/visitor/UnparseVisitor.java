@@ -37,7 +37,7 @@ import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class UnparseVisitor implements IFormExpressionParserVisitor<StringBuilder, Integer>{
+public class UnparseVisitor implements IFormExpressionParserVisitor<StringBuilder, Integer, EvaluationException>{
 
 	private StringBuilder sb;
 	private final String indentPrefix;

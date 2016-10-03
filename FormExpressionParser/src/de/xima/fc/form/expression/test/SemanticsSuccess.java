@@ -65,6 +65,9 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN002("50-8;", Tests.N42),
 	EMETHODBIN003("2*21;", Tests.N42),
 	EMETHODBIN004("168/4;", Tests.N42),
+	
+	//General
+	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)) // Fibonacci
 	;
 
 	private final String code;

@@ -1,1 +1,13 @@
-<foo>[% i = %]</foo> [% 42; %]
+<html>
+  <head></head>
+  <h1>Form Expression Language Test</h1>
+  <p>I hope you recognize these...
+  <body>
+    <ul>
+      [%% a=-(b=1); %]
+      [%% for (i : 20) { %]
+        <li>[%%= b=a+(a=b); %]</li>
+      [%% } %]
+    </ul>
+  </body>
+</html>
