@@ -2,8 +2,9 @@ package de.xima.fc.form.expression.context;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.IReset;
 
-public interface IScope {
+public interface IScope extends IReset<Void> {
 	/**
 	 * @param scope Name of the scope.
 	 * @param name Name of the scoped variable.

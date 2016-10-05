@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.context;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -21,14 +21,14 @@ public interface IFunction<T extends ALangObject> {
 	 * @return The name of this function. The empty string <code>""</code> when
 	 *         anonymous.
 	 */
-	@NotNull
+	@Nonnull
 	public String getDeclaredName();
 
 	/**
 	 * @return A list of the argument names as declared. Empty array when there
 	 *         are no arguments.
 	 */
-	@NotNull
+	@Nonnull
 	public String[] getDeclaredArgumentList();
 
 	@Nullable
@@ -48,13 +48,13 @@ public interface IFunction<T extends ALangObject> {
 	 * @return Result of the function.
 	 * @throws EvaluationException
 	 */
-	@NotNull
+	@Nonnull
 	public ALangObject evaluate(IEvaluationContext ec, T thisContext, ALangObject... args) throws EvaluationException;
 
 	/**
 	 * @return Such that {@link Type#clazz} equals the type parameter T.
 	 */
-	@NotNull
+	@Nonnull
 	public ALangObject.Type getThisContextType();
 
 	/**

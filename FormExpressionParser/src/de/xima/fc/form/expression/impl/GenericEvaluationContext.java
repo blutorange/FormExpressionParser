@@ -8,15 +8,15 @@ import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext.Builder;
 import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
-import de.xima.fc.form.expression.impl.scope.ReadScopedEvaluationContext.Builder;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
 	private IBinding binding;
 	private final INamespace namespace;
 	private final ILogger logger;
-	final ITracer<Node> tracer;
+	private final ITracer<Node> tracer;
 	private final IScope scope;
 	private final IEmbedment embedment;
 
@@ -87,6 +87,15 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 		return tracer;
 	}
 
+	@Override
+	public Void reset() {
+		binding = binding.reset();
+		scope.reset();
+		embedment.reset();
+		tracer.reset();
+		return null;
+	}
+	
 	/**
 	 * To help you get started, use this method to acquire a new
 	 * basic evaluation context. Details are subject to change,

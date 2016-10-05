@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.grammar;
 
 import java.io.Serializable;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.enums.EMethod;
@@ -122,8 +122,8 @@ public interface Node extends Serializable, ITraceElement {
 	 *            Data for the visitor.
 	 * @return The return value of the visitor.
 	 */
-	@NotNull
-	public <R, T, E extends Throwable> R jjtAccept(@NotNull final IFormExpressionParserVisitor<R, T, E> visitor, @NotNull final T data)
+	@Nonnull
+	public <R, T, E extends Throwable> R jjtAccept(@Nonnull final IFormExpressionParserVisitor<R, T, E> visitor, @Nonnull final T data)
 			throws E;
 
 	public int getId();

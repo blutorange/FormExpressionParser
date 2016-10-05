@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.ITraceElement;
@@ -38,7 +39,7 @@ public class EvaluationException extends RuntimeException {
 		super(msg, throwable);
 		ec = null;
 	}
-
+	
 	public EvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
 		super(msgWithContext(msg, ec), throwable);
 		this.ec = ec;

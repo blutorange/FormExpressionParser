@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.object;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
@@ -301,7 +301,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		return id;
 	}
 
-	@NotNull
+	@Nonnull
 	protected final <T extends ALangObject> ALangObject evaluateExpressionMethod(final T thisContext,
 			final IFunction<T> function, final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws NoSuchMethodException, EvaluationException {
@@ -310,7 +310,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		return ALangObject.create(function.evaluate(ec, thisContext, args));
 	}
 
-	@NotNull
+	@Nonnull
 	protected final <T extends ALangObject> ALangObject evaluateAttrAccessor(final T thisContext,
 			final IFunction<T> function, final ALangObject accessor, final boolean accessedViaDot, final IEvaluationContext ec)
 					throws NoSuchAttrAccessorException, EvaluationException {
@@ -319,7 +319,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		return function.evaluate(ec, thisContext, accessor, BooleanLangObject.create(accessedViaDot));
 	}
 
-	@NotNull
+	@Nonnull
 	protected final <T extends ALangObject> void executeAttrAssigner(final T thisContext, final IFunction<T> function,
 			final ALangObject accessor, final boolean accessedViaDot, final ALangObject value,
 			final IEvaluationContext ec) throws NoSuchAttrAccessorException, EvaluationException {
@@ -347,7 +347,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 
 	/** @deprecated Use {@link #getIterable(IEvaluationContext)}. */
 	@Override
-	@NotNull
+	@Nonnull
 	@Deprecated
 	public Iterator<ALangObject> iterator() throws EvaluationException, UnsupportedOperationException {
 		throw new UnsupportedOperationException("Don't iterate directly, use getIterable(IEvaluationContext).");

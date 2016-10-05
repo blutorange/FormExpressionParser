@@ -41,6 +41,16 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 	}
 
 	@Override
+	public IBinding reset() {
+		for (int i = 0; i < mapArray.length; ++i) {
+			if (mapArray[i] == null) break;
+			mapArray[i].clear();
+		}
+		currentDepth = 0;
+		return this;
+	}
+	
+	@Override
 	public IBinding nest(final IEvaluationContext ec) {
 		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth+1, ec);
 		++currentDepth;

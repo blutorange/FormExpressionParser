@@ -4,8 +4,9 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.IReset;
 
-public interface IEvaluationContext {
+public interface IEvaluationContext extends IReset<Void> {
 
 	public IScope getScope();
 	public IBinding getBinding();

@@ -1,7 +1,10 @@
 package de.xima.fc.form.expression.impl.embedment;
 
+import java.io.Writer;
+
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 
 /**
@@ -24,5 +27,18 @@ public enum DummyEmbedment implements IEmbedment {
 
 	@Override
 	public void endEmbedment(IEvaluationContext ec) throws EvaluationException {		
+	}
+
+	@Override
+	public Void reset() {
+		return null;
+	}
+
+	@Override
+	public void setWriter(Writer writer) {
+	}
+
+	@Override
+	public void flushWriter(IEvaluationContext ec) throws EmbedmentOutputException {
 	}
 }

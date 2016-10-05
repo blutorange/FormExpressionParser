@@ -33,4 +33,9 @@ public enum DummyTracer implements ITracer<Node> {
 	public Node[] getStackTrace() {
 		return EMPTY_NODE_ARRAY;
 	}
+
+	@Override
+	public Void reset() {
+		return null;
+	}
 }

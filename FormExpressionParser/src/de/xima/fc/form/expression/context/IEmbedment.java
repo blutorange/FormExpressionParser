@@ -1,9 +1,14 @@
 package de.xima.fc.form.expression.context;
 
+import java.io.Writer;
+
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.IReset;
 
-public interface IEmbedment {
+public interface IEmbedment extends IReset<Void> {
 	/**
 	 * Must not throw when the name does not exist, but simply do nothing. The
 	 * name always begins with <code>[%</code>, followed by any number of the
@@ -28,4 +33,9 @@ public interface IEmbedment {
 	 * @throws EmbedmentOutputException When an error occured and data could not be written.
 	 */
 	public void output(String data, IEvaluationContext ec) throws EmbedmentOutputException;
+	
+	public void setWriter(@Nullable Writer writer);
+
+	void flushWriter(IEvaluationContext ec) throws EmbedmentOutputException;
+
 }

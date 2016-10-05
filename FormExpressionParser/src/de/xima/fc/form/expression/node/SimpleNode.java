@@ -4,7 +4,7 @@ package de.xima.fc.form.expression.node;
 import java.lang.reflect.Array;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;

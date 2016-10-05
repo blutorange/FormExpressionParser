@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,33 +11,22 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.context.IBinding;
-import de.xima.fc.form.expression.context.ICustomScope;
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IScope;
-import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
-import de.xima.fc.form.expression.impl.GenericEmbedment;
-import de.xima.fc.form.expression.impl.GenericScope;
-import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
-import de.xima.fc.form.expression.impl.scope.FormFieldScope;
-import de.xima.fc.form.expression.impl.scope.FormFieldScope.FormVersion;
-import de.xima.fc.form.expression.impl.scope.ReadScopedEvaluationContext.Builder;
-import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
 import de.xima.fc.form.expression.util.FormExpressionParseFactory;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
-import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 /**
  * todo
  * - check scope for embedded blocks when used with with-clauses, are they ended properly, correct order???
  * - unparse
+ * - resetting iEmbedment implementations
  */
 public class FormExpressionDemo {
 
@@ -53,7 +43,15 @@ public class FormExpressionDemo {
 
 		showEvaluatedResult(rootNode);
 		
-		IOUtils.closeQuietly(getWriter());
+		if (writer != null)
+			try {
+				writer.write("\n");
+				writer.flush();
+				writer.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 
 	private static String readArgs(final String[] args) {
@@ -70,19 +68,6 @@ public class FormExpressionDemo {
 			System.exit(-1);
 			return null;
 		}
-	}
-
-	private static Writer getWriter() {
-		if (writer == null) {
-			try {
-				writer = new FileWriter("/tmp/fep_embed_out.html");
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				writer = new OutputStreamWriter(System.out);
-			}
-		}
-		return writer;
 	}
 	
 	private static void showInputCode(final String code) {
@@ -153,15 +138,15 @@ public class FormExpressionDemo {
 	private static void showEvaluatedResult(final Node rootNode) {
 		final ALangObject result;
 		try {
-			//final EvaluateProcessor processor = new EvaluateProcessor(getEc());
-			final long t1 = System.nanoTime();
-			result = EvaluateVisitor.evaluateCode(rootNode, getEc());
-			//final ALangObject result = processor.process(rootNode);
-			final long t2 = System.nanoTime();
-			writer.write("\n");
-			writer.flush();
-			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
+			// Do it once so we don't measure setup times.
+			FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getWriter());
 
+			// Measure how long it takes in practice.
+			final long t1 = System.nanoTime();
+			result = FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getWriter());
+			final long t2 = System.nanoTime();
+			
+			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 		}
 		catch (final EvaluationException e) {
 			System.err.println("Failed to evaluate expression.");
@@ -181,22 +166,15 @@ public class FormExpressionDemo {
 
 	}
 
-	private static IScope getScope() {
-		final ICustomScope formFieldScope = new FormFieldScope(new FormVersion());
-		final GenericScope.Builder builder = new GenericScope.Builder();
-		builder.addCustomScope(formFieldScope);
-		return builder.build();
+	private static Writer getWriter() {
+		if (writer != null) return writer;
+		try {
+			writer = new FileWriter(new File("/tmp/fep_embed_out.html"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			writer = new OutputStreamWriter(System.out);
+		}
+		return writer;
 	}
 
-	private static IEvaluationContext getEc() {
-		final IBinding binding = new OnDemandLookUpBinding();
-		final ITracer<Node> tracer = new GenericTracer();
-		final Builder builder = new Builder();
-		final IScope scope = getScope();
-		builder.setEmbedment(GenericEmbedment.getNewGenericEmbedment(getWriter()));
-		builder.setBinding(binding);
-		builder.setScope(scope);
-		builder.setTracer(tracer);
-		return builder.build();
-	}
 }

@@ -41,6 +41,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 */
 	SLASH(EMethod.SLASH, Impl.DIVIDE),
 	/**
+	 * @param operand Number for the modulo division.
+	 * @return The modulo of this number by the argument, eg. 5%3=2 or -3%5=2.
+	 */
+	PERCENT(EMethod.PERCENT, Impl.MODULO),
+	/**
 	 * @param comparand {@link ALangObject}. Object to compare this object to.
 	 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
 	 */
@@ -139,6 +144,13 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.divide(args[0].coerceNumber(ec));
+			}
+		},
+		MODULO(null,"operand"){
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.modulo(args[0].coerceNumber(ec));
 			}
 		},
 		EQUALITY(null, "comparand"){

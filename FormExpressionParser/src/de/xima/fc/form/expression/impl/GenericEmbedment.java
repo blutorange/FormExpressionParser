@@ -3,8 +3,11 @@ package de.xima.fc.form.expression.impl;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -22,32 +25,42 @@ import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleG
  * @param  Type of the argument passed to {@link IEmbedmentHandler#output(String, Object)}.
  */
 public class GenericEmbedment implements IEmbedment {
-	private final Map<String, IEmbedmentHandler> map;
+	@Nonnull
+	private final ImmutableMap<String, IEmbedmentHandler> map;
+	@Nullable
 	private IEmbedmentHandler handler;
-	private final Writer writer;
+	@Nullable
+	private Writer writer;
    
-	private GenericEmbedment(final Map<String, IEmbedmentHandler> map, final Writer object) throws IllegalArgumentException {
+	private GenericEmbedment(final ImmutableMap<String, IEmbedmentHandler> map) throws IllegalArgumentException {
+		this(map, null);
+	}
+	private GenericEmbedment(final ImmutableMap<String, IEmbedmentHandler> map, final Writer writer) throws IllegalArgumentException {
+		if (map == null) throw new IllegalArgumentException("map must not be null");
 		this.map = map;
-		this.writer = object;
+		this.writer = writer;
 	}
 
 	public final static class Builder {
-		private Writer object;
-		private Map<String, IEmbedmentHandler> map;
-		public Builder(final Writer object) {
+		private Writer writer;
+		private com.google.common.collect.ImmutableMap.Builder<String, IEmbedmentHandler> map;
+		public Builder() {
 			reinit();
-			setObject(object);
+		}
+		public Builder(final Writer writer) {
+			reinit();
+			setWriter(writer);
 		}
 		private void reinit() {
 			map = null;
-			object = null;
+			writer = null;
 		}
-		private Map<String, IEmbedmentHandler> getMap() {
-			if (map == null) map = new HashMap<>();
+		private com.google.common.collect.ImmutableMap.Builder<String, IEmbedmentHandler> getMap() {
+			if (map == null) map = new com.google.common.collect.ImmutableMap.Builder<>();
 			return map;
 		}
-		public Builder setObject(final Writer object) {
-			if (object != null)	this.object = object;
+		public Builder setWriter(final Writer writer) {
+			if (writer != null)	this.writer = writer;
 			return this;
 		}
 		public Builder addHandler(final String name, final IEmbedmentHandler handler) {
@@ -72,9 +85,8 @@ public class GenericEmbedment implements IEmbedment {
 					getMap().put(handler.getEmbedmentName(), handler);
 			return this;
 		}
-		public GenericEmbedment build() throws IllegalStateException {
-			if (object == null) throw new IllegalStateException("Object cannot be null.");
-			final GenericEmbedment embedment = new GenericEmbedment(getMap(), object);
+		public GenericEmbedment build() {
+			final GenericEmbedment embedment = new GenericEmbedment(getMap().build(), writer);
 			reinit();
 			return embedment;
 		}
@@ -88,7 +100,7 @@ public class GenericEmbedment implements IEmbedment {
 
 	@Override
 	public void output(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
-		if (handler != null && !handler.isDoOutput()) return;
+		if (writer == null || (handler != null && !handler.isDoOutput())) return;
 		try {
 			writer.write(data);
 		}
@@ -126,5 +138,25 @@ public class GenericEmbedment implements IEmbedment {
 		builder.addHandler(EmbedmentHandlerBundleGeneral.values());
 		builder.addHandler(EmbedmentHandlerBundleFormcycle.values());
 		return builder.build();
+	}
+
+	@Override
+	public void setWriter(final Writer writer) {
+		this.writer = writer;
+	}
+	
+	@Override
+	public Void reset() {
+		this.writer = null;
+		return null;
+	}
+	@Override
+	public void flushWriter(IEvaluationContext ec) throws EmbedmentOutputException {
+		if (writer != null) try {
+			writer.flush();
+		}
+		catch (IOException e) {
+			throw new EmbedmentOutputException(e, ec);
+		}
 	}
 }

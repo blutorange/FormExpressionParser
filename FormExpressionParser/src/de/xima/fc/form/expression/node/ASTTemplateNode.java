@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTTemplateNode extends SimpleNode {

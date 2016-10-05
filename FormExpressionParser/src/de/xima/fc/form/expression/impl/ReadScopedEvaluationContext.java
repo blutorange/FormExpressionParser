@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl.scope;
+package de.xima.fc.form.expression.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +13,6 @@ import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.impl.GenericEmbedment;
-import de.xima.fc.form.expression.impl.GenericEvaluationContext;
-import de.xima.fc.form.expression.impl.GenericNamespace;
 import de.xima.fc.form.expression.impl.logger.SystemLogger;
 import de.xima.fc.form.expression.impl.tracer.DummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;

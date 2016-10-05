@@ -17,6 +17,7 @@ public class StringLangObject extends ALangObject {
 	private final static String TRUE = "true";
 	private final static String FALSE = "false";
 
+	
 	private final String value;
 
 	private static class InstanceHolder {
@@ -181,11 +182,11 @@ public class StringLangObject extends ALangObject {
 	}
 
 	public static StringLangObject create(final float value) {
-		return StringLangObject.create(String.valueOf(value));
+		return StringLangObject.create(NumberLangObject.NUMBER_FORMAT.get().format(value));
 	}
 
 	public static StringLangObject create(final double value) {
-		return StringLangObject.create(String.valueOf(value));
+		return StringLangObject.create(NumberLangObject.NUMBER_FORMAT.get().format(value));
 	}
 
 	public static StringLangObject create(final boolean value) {

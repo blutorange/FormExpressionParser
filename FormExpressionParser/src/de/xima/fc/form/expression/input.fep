@@ -1,0 +1,13 @@
+<html>
+  <head></head>
+  <h1>Form Expression Language Test</h1>
+  <p>1.0</p>
+  <body>
+    <span>
+      [%% if (false) { %]
+        true
+      [%% } else { %]
+        false
+      [%% } %]
+  </body>
+</html>

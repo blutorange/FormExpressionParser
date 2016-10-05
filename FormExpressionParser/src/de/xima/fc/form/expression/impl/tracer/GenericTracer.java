@@ -21,18 +21,6 @@ public class GenericTracer implements ITracer<Node> {
 		pos = -1;
 	}
 
-	public GenericTracer(Node start) {
-		this(start, 16);
-	}
-
-	public GenericTracer(Node start, int initialSize) {
-		if (initialSize < 1)
-			initialSize = 1;
-		stackTrace = new Node[initialSize];
-		stackTrace[0] = start;
-		pos = 0;
-	}
-
 	@Override
 	public void setCurrentlyProcessed(Node object) {
 		processed = object;
@@ -62,4 +50,10 @@ public class GenericTracer implements ITracer<Node> {
 			newArray[pos-i] = stackTrace[i];
 		return newArray;
 	}
+
+	@Override
+	public Void reset() {
+		pos = -1;
+		return null;
+	}	
 }
