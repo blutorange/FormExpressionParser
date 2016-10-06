@@ -1,11 +1,27 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.util.IReset;
 
+/**
+ * An evaluation context is made up of the following parts:
+ * <ul>
+ *   <li>{@link IBinding} The binding is responsible for keeping track of local variables and handle nesting (for-loop, function, etc).</li>
+ *   <li>{@link IScope} The scope is responsible for handling queries to qualified variables from a scope, eg. <code>fields::alias</code>.
+ *   <li>{@link INamespace} The namespace contains methods and attribute accessors/assigners for all the different language object. Instance methods are attributes of the type {@link FunctionLangObject}.</li>
+ *   <li>{@link ILogger} The logger is an object that knows how to log messages logged by the interpreted program. It is not for logging messages of the interpreter itself.</li>
+ *   <li>{@link ITracer} The tracer keeps track of the current position in the program and is used to build stack traces when exception occur.</li>
+ *   <li>{@link IEmbedment} The embedment contains information on how to handle different embedment contexts such as <code>[%%$]...[%]</code>.
+ *   <li>{@link IExternalContext} The external context provides several hooks that can be used to alter how certain expressions are evaluated.</li>
+ * </ul>
+ * @author mad_gaksha
+ */
 public interface IEvaluationContext extends IReset<Void> {
 
 	public IScope getScope();
@@ -14,8 +30,10 @@ public interface IEvaluationContext extends IReset<Void> {
 	public ILogger getLogger();
 	public ITracer<Node> getTracer();
 	public IEmbedment getEmbedment();
+	@Nullable
+	public IExternalContext getExternalContext();
 
-	public void setBinding(IBinding binding);
+	public void setExternalContext(@Nullable IExternalContext externalContext);
 
 	/**
 	 * When reading an unqualified variable, this method must resolve

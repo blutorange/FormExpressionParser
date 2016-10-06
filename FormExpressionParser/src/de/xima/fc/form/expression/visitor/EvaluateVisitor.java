@@ -73,7 +73,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	 * @return The evaluated result.
 	 * @throws EvaluationException When the code cannot be evaluated.
 	 */
-	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
+	public static  ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res = node.jjtAccept(v, ec);
 		v.assertNoJumps(ec);
@@ -119,18 +119,6 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		finally {
 			ec.getTracer().setCurrentlyProcessed(parentNode);
 		}
-	}
-
-	private void nestLocal(final IEvaluationContext ec) {
-		ec.setBinding(ec.getBinding().nestLocal(ec));
-	}
-
-	private void nest(final IEvaluationContext ec) {
-		ec.setBinding(ec.getBinding().nest(ec));
-	}
-
-	private void unnest(final IEvaluationContext ec) {
-		ec.setBinding(ec.getBinding().unnest(ec));
 	}
 
 	private ALangObject setVariable(final ASTVariableNode var, final ALangObject val, final IEvaluationContext ec) {
@@ -180,7 +168,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				if (func.getThisContextType() != Type.NULL && func.getThisContextType() != thisContext.getType())
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
 
-				nestLocal(ec);
+				ec.getBinding().nestLocal(ec);
 				ec.getTracer().descend(parentNode);
 				try {
 					// Evaluate function
@@ -189,7 +177,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				}
 				finally {
 					ec.getTracer().ascend();
-					unnest(ec);
+					ec.getBinding().unnest(ec);
 				}
 				// Check for disallowed break / continue clauses.
 				if (mustJump) {
@@ -306,7 +294,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTVariableNode node, final IEvaluationContext ec) throws EvaluationException {
 		final String scope = node.getScope();
 		if (scope != null) {
-			final ALangObject value = ec.getScope().getVariable(scope, node.getName());
+			final ALangObject value = ec.getScope().getVariable(scope, node.getName(), ec);
 			if (value == null)
 				throw new VariableNotDefinedException(scope, node.getName(), ec);
 			return value;
@@ -328,7 +316,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTIfClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
-		nest(ec);
+		ec.getBinding().nest(ec);
 		try {
 			// If branch, no explicit check for mustJump as it returns
 			// immediately anyway
@@ -343,7 +331,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				return NullLangObject.getInstance();
 		}
 		finally {
-			unnest(ec);
+			ec.getBinding().unnest(ec);
 		}
 	}
 
@@ -352,7 +340,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final String variableName = node.getIteratingLoopVariable();
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
-		nest(ec);
+		ec.getBinding().nest(ec);
 		try {
 			if (variableName == null) {
 				// Plain for loop
@@ -387,7 +375,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			}
 		}
 		finally {
-			unnest(ec);
+			ec.getBinding().unnest(ec);
 		}
 		return res;
 	}
@@ -396,7 +384,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
-		nest(ec);
+		ec.getBinding().nest(ec);
 		try {
 			whileloop: while (jjtAccept(node, children[0], ec).coerceBoolean(ec).booleanValue()) {
 				res = jjtAccept(node, children[1], ec);
@@ -411,7 +399,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			}
 		}
 		finally {
-			unnest(ec);
+			ec.getBinding().unnest(ec);
 		}
 		return res;
 	}
@@ -420,7 +408,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTDoWhileLoopNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
-		nest(ec);
+		ec.getBinding().nest(ec);
 		try {
 			doloop: do {
 				res = jjtAccept(node, children[1], ec);
@@ -436,7 +424,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			while (jjtAccept(node, children[0], ec).coerceBoolean(ec).booleanValue());
 		}
 		finally {
-			unnest(ec);
+			ec.getBinding().unnest(ec);
 		}
 		return res;
 	}
@@ -446,7 +434,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		CatchableEvaluationException exception = null;
-		nest(ec);
+		ec.getBinding().nest(ec);
 		try {
 			// Try branch, no explicit check for mustJump as it returns
 			// immediately anyway
@@ -456,12 +444,12 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			exception = e;
 		}
 		finally {
-			unnest(ec);
+			ec.getBinding().unnest(ec);
 		}
 		// If mustJump is true, break/continue/return was the last statement
 		// evaluated and no exception could have been thrown.
 		if (exception != null) {
-			nest(ec);
+			ec.getBinding().nest(ec);
 			try {
 				final ALangObject e = ExceptionLangObject.create(exception);
 				ec.getBinding().setVariable(node.getErrorVariableName(), e);
@@ -470,7 +458,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 				res = jjtAccept(node, children[1], ec);
 			}
 			finally {
-				unnest(ec);
+				ec.getBinding().unnest(ec);
 			}
 		}
 		return res;
@@ -482,7 +470,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		boolean matchingCase = false;
-		nest(ec);
+		ec.getBinding().nest(ec);
 		try {
 			final ALangObject switchValue = jjtAccept(node, children[0], ec);
 			forloop : for (int i = 1; i < children.length; ++i) {
@@ -525,7 +513,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			}
 		}
 		finally {
-			unnest(ec);
+			ec.getBinding().unnest(ec);
 		}
 		return res;
 	}

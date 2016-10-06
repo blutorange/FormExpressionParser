@@ -1,9 +1,5 @@
 package de.xima.fc.form.expression.context;
 
-import java.io.Writer;
-
-import javax.annotation.Nullable;
-
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.util.IReset;
@@ -30,12 +26,7 @@ public interface IEmbedment extends IReset<Void> {
 	/**
 	 * Writes the given data with the current type to the output document, file, or stream etc.
 	 * @param data Data to output.
-	 * @throws EmbedmentOutputException When an error occured and data could not be written.
+	 * @throws EmbedmentOutputException When an error occurred and data could not be written.
 	 */
 	public void output(String data, IEvaluationContext ec) throws EmbedmentOutputException;
-	
-	public void setWriter(@Nullable Writer writer);
-
-	void flushWriter(IEvaluationContext ec) throws EmbedmentOutputException;
-
 }

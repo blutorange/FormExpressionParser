@@ -54,11 +54,11 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public IBinding reset() {
+	public Void reset() {
 		for (int i = 0; i < mapArray.length; ++i)
 			mapArray[i].clear();
 		currentDepth = 0;
-		return this;
+		return null;
 	}
 
 	@Override
@@ -84,28 +84,26 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public IBinding nest(final IEvaluationContext ec) {
+	public void nest(final IEvaluationContext ec) {
 		if (currentDepth >= mapArray.length - 1)
 			throw new NestingLevelTooDeepException(currentDepth+1, ec);
 		++currentDepth;
 		mapArray[currentDepth].clear();
-		return this;
 	}
 
 	@Override
-	public IBinding unnest(final IEvaluationContext ec) {
+	public void unnest(final IEvaluationContext ec) {
 		if (currentDepth <= 0)
 			throw new UncatchableEvaluationException(ec,
 					"Cannot unnest global binding. This may be an error in the parser. Contact support.");
 		--currentDepth;
 		breakpointArray[currentDepth] = false;
-		return this;
 	}
 
 	@Override
-	public IBinding nestLocal(final IEvaluationContext ec) {
+	public void nestLocal(final IEvaluationContext ec) {
 		breakpointArray[currentDepth] = true;
-		return nest(ec);
+		nest(ec);
 	}
 
 	@Override

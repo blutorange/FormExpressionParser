@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl;
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.context.IScope;
@@ -13,13 +14,14 @@ import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
-	private IBinding binding;
+	private final IBinding binding;
 	private final INamespace namespace;
 	private final ILogger logger;
 	private final ITracer<Node> tracer;
 	private final IScope scope;
 	private final IEmbedment embedment;
-
+	private IExternalContext externalContext;
+	
 	/**
 	 * Creates a new evaluation context.
 	 *
@@ -37,14 +39,6 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 		this.tracer = tracer;
 		this.logger = logger;
 		this.embedment = embedment;
-	}
-
-	public void nestBinding() {
-		setBinding(getBinding().nest(this));
-	}
-
-	public void unnestBinding() {
-		setBinding(getBinding().unnest(this));
 	}
 
 	@Override
@@ -73,11 +67,6 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	}
 
 	@Override
-	public void setBinding(final IBinding binding) {
-		this.binding = binding;
-	}
-
-	@Override
 	public IScope getScope() {
 		return scope;
 	}
@@ -89,10 +78,12 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 
 	@Override
 	public Void reset() {
-		binding = binding.reset();
+		binding.reset();
 		scope.reset();
 		embedment.reset();
 		tracer.reset();
+		externalContext.flushWriter();
+		externalContext = null;
 		return null;
 	}
 	
@@ -102,10 +93,20 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	 * so this should only be used for testing purposes.
 	 * @return Some evaluation context.
 	 */
-	public static IEvaluationContext getNewBasicEvaluationContext() {
+	public static  IEvaluationContext getNewBasicEvaluationContext() {
 		final Builder b = new Builder();
 		b.setBinding(new OnDemandLookUpBinding());
 		b.setScope(GenericScope.getNewEmptyScope());
 		return b.build();
+	}
+	
+	@Override
+	public void setExternalContext(IExternalContext externalContext) {
+		this.externalContext = externalContext;
+	}
+
+	@Override
+	public IExternalContext getExternalContext() {
+		return externalContext;
 	}
 }

@@ -70,7 +70,7 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		if (loc != null)
 			return loc;
 		for (int i = defaultScopeList.size() - 1; i >= 0; --i) {
-			final ALangObject scp = getScope().getVariable(defaultScopeList.get(i), name);
+			final ALangObject scp = getScope().getVariable(defaultScopeList.get(i), name, this);
 			if (scp != null)
 				return scp;
 		}
@@ -153,7 +153,7 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 			if (binding == null) throw new IllegalStateException("Binding not set.");
 			if (scope == null) throw new IllegalStateException("Scope not set.");
 			if (logger == null)	logger = SystemLogger.getInfoLogger();
-			if (embedment == null) embedment = GenericEmbedment.getSystemOutGenericEmbedment();
+			if (embedment == null) embedment = GenericEmbedment.getGenericEmbedment();
 			if (tracer == null) tracer = DummyTracer.INSTANCE;
 			if (namespace == null) namespace = GenericNamespace.getGenericNamespaceInstance();
 			final IEvaluationContext retVal = new ReadScopedEvaluationContext(binding, scope, namespace, tracer,

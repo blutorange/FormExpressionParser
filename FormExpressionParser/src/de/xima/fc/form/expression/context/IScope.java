@@ -12,6 +12,6 @@ public interface IScope extends IReset<Void> {
 	 * @throws EvaluationException When the variable cannot be retrieved for
 	 * any reason other than that it does not exist.
 	 */
-	public ALangObject getVariable(String scope, String name) throws EvaluationException;
+	public ALangObject getVariable(String scope, String name, IEvaluationContext ec) throws EvaluationException;
 	public void setVariable(String scope, String name, ALangObject value) throws EvaluationException;
 }

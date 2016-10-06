@@ -1,11 +1,8 @@
 package de.xima.fc.form.expression;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
@@ -16,6 +13,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
 import de.xima.fc.form.expression.util.FormExpressionParseFactory;
@@ -134,16 +132,15 @@ public class FormExpressionDemo {
 		System.out.println();
 	}
 
-
 	private static void showEvaluatedResult(final Node rootNode) {
 		final ALangObject result;
 		try {
 			// Do it once so we don't measure setup times.
-			FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getWriter());
+			FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getFec());
 
 			// Measure how long it takes in practice.
 			final long t1 = System.nanoTime();
-			result = FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getWriter());
+			result = FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getFec());
 			final long t2 = System.nanoTime();
 			
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
@@ -166,15 +163,8 @@ public class FormExpressionDemo {
 
 	}
 
-	private static Writer getWriter() {
-		if (writer != null) return writer;
-		try {
-			writer = new FileWriter(new File("/tmp/fep_embed_out.html"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			writer = new OutputStreamWriter(System.out);
-		}
-		return writer;
+	private static FormcycleExternalContext getFec() {
+		return new FormcycleExternalContext();
 	}
 
 }

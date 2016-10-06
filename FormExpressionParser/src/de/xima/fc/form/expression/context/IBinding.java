@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.IReset;
 
-public interface IBinding extends IReset<IBinding> {
+public interface IBinding extends IReset<Void> {
 
 	/**
 	 * Resets this binding and all children, if any, created by {@link #nest()}.
@@ -14,7 +14,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * binding at nesting depth 0.
 	 */
 	@Override
-	public IBinding reset();
+	public Void reset();
 
 	/**
 	 * Must return the same object every time it is called with equivalent
@@ -57,7 +57,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * @return An {@link IBinding} that keeps the current variables and can be unnested to
 	 * the current binding undoing all changes made to the nested binding.
 	 */
-	public IBinding nest(IEvaluationContext ec) throws NestingLevelTooDeepException;
+	public void nest(IEvaluationContext ec) throws NestingLevelTooDeepException;
 
 	/**
 	 * Same as {@link #nest()}, but without falling back to the parent binding.
@@ -65,7 +65,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * return the previous binding (a binding equivalent to this one).
 	 * @return
 	 */
-	public IBinding nestLocal(IEvaluationContext ec);
+	public void nestLocal(IEvaluationContext ec);
 
 	/**
 	 * Gets the previous binding from which this binding was derived.
@@ -73,7 +73,7 @@ public interface IBinding extends IReset<IBinding> {
 	 * must be undone.
 	 * @return The parent binding. Undefined behaviour when there is no such binding.
 	 */
-	public IBinding unnest(IEvaluationContext ec);
+	public void unnest(IEvaluationContext ec);
 
 	/**
 	 * The limit on nesting. Each if-clause, loop, try-clause, switch,

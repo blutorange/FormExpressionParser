@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.ITraceElement;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -14,20 +15,24 @@ public class EvaluationException extends RuntimeException {
 		super(exception);
 		if (exception != null) {
 			ec = exception.ec;
+			externalContext = ec.getExternalContext();
 		}
 		else {
 			ec = null;
+			externalContext = null;
 		}
 	}
 
 	public EvaluationException(final IEvaluationContext ec) {
 		super(msgWithContext(StringUtils.EMPTY, ec));
 		this.ec = ec;
+		externalContext = ec == null ? null : ec.getExternalContext();
 	}
 
 	public EvaluationException(final IEvaluationContext ec, final String msg) {
 		super(msgWithContext(msg, ec));
 		this.ec = ec;
+		externalContext = ec == null ? null : ec.getExternalContext();
 	}
 
 	/**
@@ -38,11 +43,19 @@ public class EvaluationException extends RuntimeException {
 	protected EvaluationException(final String msg, final Throwable throwable) {
 		super(msg, throwable);
 		ec = null;
+		externalContext = null;
+	}
+	
+	protected EvaluationException(IExternalContext externalContext, final String msg, final Throwable throwable) {
+		super(msg, throwable);
+		ec = null;
+		this.externalContext = externalContext;
 	}
 	
 	public EvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
 		super(msgWithContext(msg, ec), throwable);
 		this.ec = ec;
+		externalContext = ec == null ? null : ec.getExternalContext();
 	}
 
 	/**
@@ -64,9 +77,13 @@ public class EvaluationException extends RuntimeException {
 				appendTraceElement(sb, el);
 			}
 		}
-		sb.append(System.lineSeparator());
-		sb.append("Evaluation context is ");
-		sb.append(ec);
+		sb.append(System.lineSeparator())
+			.append("Evaluation context is ")
+			.append(ec);
+		if (ec != null)
+			sb.append(System.lineSeparator())
+				.append("External context is ")
+				.append(ec.getExternalContext());
 		return sb.toString();
 	}
 
@@ -88,5 +105,8 @@ public class EvaluationException extends RuntimeException {
 	 * access to the context.
 	 */
 	@Nullable
-	public final IEvaluationContext ec;
+	public final IEvaluationContext ec;	
+	
+	@Nullable
+	public final IExternalContext externalContext;
 }

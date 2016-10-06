@@ -7,7 +7,7 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
 import de.xima.fc.form.expression.context.IBinding;
-import de.xima.fc.form.expression.context.ICustomScope;
+import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.context.ITracer;
@@ -16,13 +16,12 @@ import de.xima.fc.form.expression.impl.GenericEmbedment;
 import de.xima.fc.form.expression.impl.GenericScope;
 import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext.Builder;
 import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
-import de.xima.fc.form.expression.impl.scope.MathScope;
 import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 
-public class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
+public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
 
 	private final static class InstanceHolder {
-		public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new FormcycleEcFactory());
+		public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new GenericEcFactory());
 	}	
 	
 	@Override
@@ -41,23 +40,17 @@ public class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationConte
 		return new DefaultPooledObject<IEvaluationContext>(ec);
 	}
 
-	private static IScope makeScope() {
-		final ICustomScope mathScope = MathScope.INSTANCE;
-		return new GenericScope.Builder()
-				.addCustomScope(mathScope)
-				.build();
-	}
-
 	private static IEvaluationContext makeEc() {
 		final IBinding binding = new OnDemandLookUpBinding();
 		final ITracer<Node> tracer = new GenericTracer();
-		final Builder builder = new Builder();
-		final IScope scope = makeScope();
-		builder.setEmbedment(GenericEmbedment.getFormcycleEmbedment());
-		builder.setBinding(binding);
-		builder.setScope(scope);
-		builder.setTracer(tracer);
-		return builder.build();
+		final IEmbedment embedment = GenericEmbedment.getGenericEmbedment();
+		final IScope scope = GenericScope.getNewEmptyScope();
+		return new Builder()
+			.setEmbedment(embedment)
+			.setBinding(binding)
+			.setScope(scope)
+			.setTracer(tracer)
+			.build();
 	}
 
 	public static ObjectPool<IEvaluationContext> getPoolInstance() {

@@ -3,7 +3,6 @@ package de.xima.fc.form.expression.impl.binding;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -41,21 +40,20 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 	}
 
 	@Override
-	public IBinding reset() {
+	public Void reset() {
 		for (int i = 0; i < mapArray.length; ++i) {
 			if (mapArray[i] == null) break;
 			mapArray[i].clear();
 		}
 		currentDepth = 0;
-		return this;
+		return null;
 	}
 	
 	@Override
-	public IBinding nest(final IEvaluationContext ec) {
+	public void nest(final IEvaluationContext ec) {
 		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth+1, ec);
 		++currentDepth;
 		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<String, ALangObject>();
 		else mapArray[currentDepth].clear();
-		return this;
 	}
 }
