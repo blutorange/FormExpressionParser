@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -23,15 +22,8 @@ public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 	}
 
 	@Override
-	public void beginEmbedment(final IEvaluationContext ec) {
-		// TODO Auto-generated method stub
-		for (String scope : scopeList) ec.beginDefaultScope(scope);
-	}
-
-	@Override
-	public void endEmbedment(final IEvaluationContext ec) {
-		// TODO Auto-generated method stub
-		for (int i = scopeList.length; i-->0;) ec.endDefaultScope();
+	public String[] getScopeList() {
+		return scopeList;
 	}
 
 	@Override

@@ -113,6 +113,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	}
 	private ALangObject jjtAccept(final Node parentNode, final Node node, final IEvaluationContext ec) {
 		ec.getTracer().setCurrentlyProcessed(node);
+		ec.getEmbedment().setCurrentEmbedment(node.getEmbedment());
 		try {
 			return currentResult = node.jjtAccept(this, ec);
 		}
@@ -692,14 +693,12 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 
 	@Override
 	public ALangObject visit(final ASTLosNode node, final IEvaluationContext ec) throws EvaluationException {
-		if (node.isHasClose()) {
-			ec.getEmbedment().output(currentResult.coerceString(ec).stringValue(), ec);
-			ec.getEmbedment().endEmbedment(ec);
-		}
-		if (node.isHasText()) ec.getEmbedment().output(node.getText(), ec);
-		if (node.isHasOpen()) {
-			ec.getEmbedment().beginEmbedment(node.getEmbedmentType(), ec);
-		}
+		if (node.isHasClose())
+			ec.getEmbedment().outputCode(currentResult.coerceString(ec).stringValue(), ec);
+		if (node.isHasText()) 
+			ec.getEmbedment().outputText(node.getText(), ec);
+//		if (node.isHasOpen()) {
+//		}
 		return NullLangObject.getInstance();
 	}
 

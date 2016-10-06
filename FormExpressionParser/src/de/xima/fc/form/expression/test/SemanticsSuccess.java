@@ -8,6 +8,7 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
@@ -44,6 +45,10 @@ enum SemanticsSuccess implements ITestCase {
 			NumberLangObject.getOneInstance()
 			)),
 	LITERALS015("->(x){x;}(42);", Tests.N42),
+	LITERALS016("{foo:'bar'};", HashLangObject.create(
+			StringLangObject.create("foo"),
+			StringLangObject.create("bar")
+			)),
 
 	// Variables and scopes.
 	SCOPE001("k=42;k;", Tests.N42), // local variables
@@ -58,6 +63,11 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE010("foo::k=42;with(foo){k=0;foo::k;}", Tests.N42), // can still access explicitly
 	SCOPE011("k=42;foo::k=0;with(foo){k;}", Tests.N42), // first global, then default scope
 
+	//Property expressions
+	PROP001("'Ab3'.toUpperCase().toLowerCase();", StringLangObject.create("ab3")),
+	PROP002("s='Ab3';f=s.toLowerCase;f.call(s);", StringLangObject.create("ab3")),
+	PROP003("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
+		
 	// Expression methods number.
 	EMETHODUN001("-(-42);", Tests.N42),
 	EMETHODUN002("+42;", Tests.N42),
@@ -65,21 +75,43 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN002("50-8;", Tests.N42),
 	EMETHODBIN003("2*21;", Tests.N42),
 	EMETHODBIN004("168/4;", Tests.N42),
+	EMETHODBIN005("42==42.0;", Tests.TRUE),
+	EMETHODBIN006("[1,2]==[1,2];", Tests.TRUE),
+	EMETHODBIN007("[1,2]===[1,2];", Tests.FALSE),
+	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
 	
 	//General
-	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)) // Fibonacci
+	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
+	
+	// Embedment
+	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),
 	;
 
 	private final String code;
 	private final ALangObject expectedResult;
+	private final ETestType type;
+	private final EContextType context;
 	private SemanticsSuccess(final String code, final ALangObject expectedResult) {
+		this(code, EContextType.GENERIC, expectedResult);
+	}
+	private SemanticsSuccess(final String code, final EContextType context, final ALangObject expectedResult) {
+		this(code, ETestType.PROGRAM, context, expectedResult);
+	}
+	private SemanticsSuccess(final String code, final ETestType type, final EContextType context, final ALangObject expectedResult) {
 		this.code = code;
 		this.expectedResult = expectedResult;
+		this.context = context;
+		this.type = type;
 	}
 
 	@Override
 	public ETestType getTestType() {
-		return ETestType.PROGRAM;
+		return type;
+	}
+
+	@Override
+	public EContextType getContextType() {
+		return context;
 	}
 
 	@Override

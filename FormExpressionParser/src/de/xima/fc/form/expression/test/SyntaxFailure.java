@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.test;
 
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
@@ -15,12 +16,15 @@ enum SyntaxFailure implements ITestCase {
 	TEST007("a()9;","Encountered \" <Integer> \"9 \"\" at line 1, column 4."),
 	TEST008("^|n};","Encountered \" \"^\" \"^ \"\" at line 1, column 1."),
 	TEST009("with (foo bar) foobar;","Encountered \" <Identifier> \"bar \"\" at line 1, column 11."),
-	TEST010("<foo>[% i = %]</foo> [% 42; %]", ETestType.TEMPLATE,"Encountered \" \"%]\" \"%] \"\" at line 1, column 13."),
-	TEST011("<foo>[% i = 0;", ETestType.TEMPLATE,"Final code block in templates must be closed."),
-	TEST012("<foo> [% foo(); <bar>", ETestType.TEMPLATE,"Encountered \" \"<\" \"< \"\" at line 1, column 17."),
+	TEST010("foo()%]", "Embedded blocks are not allowed."),
+
+	TEMPLATE001("<foo>[% i = %]</foo> [% 42; %]", ETestType.TEMPLATE,"Encountered \" \"%]\" \"%] \"\" at line 1, column 13."),
+	TEMPLATE002("<foo>[% i = 0;", ETestType.TEMPLATE,"Final code block in templates must be closed."),
+	TEMPLATE003("<foo> [% foo(); <bar>", ETestType.TEMPLATE,"Encountered \" \"<\" \"< \"\" at line 1, column 17."),
 	;
 	private final String code;
 	private final ETestType type;
+	private final EContextType context;
 	private final String errorBegin;
 
 	private SyntaxFailure(final String code) {
@@ -33,9 +37,13 @@ enum SyntaxFailure implements ITestCase {
 		this(code, type, null);
 	}
 	private SyntaxFailure(final String code, final ETestType type, final String errorBegin) {
+		this(code, type, errorBegin, EContextType.GENERIC);
+	}
+	private SyntaxFailure(final String code, final ETestType type, final String errorBegin, final EContextType context) {
 		this.code = code;
 		this.type = type;
 		this.errorBegin = errorBegin;
+		this.context = context;
 	}
 
 	@Override
@@ -46,6 +54,11 @@ enum SyntaxFailure implements ITestCase {
 	@Override
 	public ETestType getTestType() {
 		return type;
+	}
+	
+	@Override
+	public EContextType getContextType() {
+		return context;
 	}
 
 	@Override

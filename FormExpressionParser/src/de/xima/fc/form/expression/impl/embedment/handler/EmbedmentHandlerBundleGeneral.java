@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import org.apache.commons.lang3.ArrayUtils;
+
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 
 public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
@@ -16,11 +17,8 @@ public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
 	}
 
 	@Override
-	public void beginEmbedment(IEvaluationContext ec) {
-	}
-
-	@Override
-	public void endEmbedment(IEvaluationContext ec) {
+	public String[] getScopeList() {
+		return ArrayUtils.EMPTY_STRING_ARRAY;
 	}
 
 	@Override

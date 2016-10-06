@@ -26,6 +26,7 @@ public abstract class SimpleNode implements Node {
 	protected final int uniqueId;
 
 	private transient Token startToken;
+	protected String embedment;
 	protected int nodeId;
 	protected Node parent;
 	protected Node[] children = EMPTY_NODE_ARRAY;
@@ -101,18 +102,20 @@ public abstract class SimpleNode implements Node {
 	@Override
 	public final String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(nodeName());
-		sb.append("(");
-		sb.append(siblingMethod);
-		sb.append(",");
-		sb.append(startLine);
-		sb.append(":");
-		sb.append(startColumn);
-		sb.append("-");
-		sb.append(endLine);
-		sb.append(":");
-		sb.append(endColumn);
-		sb.append(",");
+		sb.append(nodeName())
+			.append('(')
+			.append(embedment)
+			.append(',')
+			.append(siblingMethod)
+			.append(',')
+			.append(startLine)
+			.append(':')
+			.append(startColumn)
+			.append('-')
+			.append(endLine)
+			.append(':')
+			.append(endColumn)
+			.append(',');
 		additionalToStringFields(sb);
 		sb.setLength(sb.length()-1);
 		sb.append(")");
@@ -213,6 +216,7 @@ public abstract class SimpleNode implements Node {
 
 	@Override
 	public final void setStartPosition(final Token t) {
+		embedment = t.getEmbedmentContext();
 		startLine = t.beginLine;
 		startColumn = t.beginColumn;
 		startToken = t;
@@ -256,6 +260,12 @@ public abstract class SimpleNode implements Node {
 		return parent == null ? CmnCnst.TRACER_POSITION_NAME_GLOBAL : parent.getMethodName();
 	}
 
+	@Override
+	@Nullable
+	public final String getEmbedment() {
+		return embedment;
+	}
+	
 	/**
 	 * Subclasses may add additional info for {@link #toString()}.
 	 * @param sb String builder to use.

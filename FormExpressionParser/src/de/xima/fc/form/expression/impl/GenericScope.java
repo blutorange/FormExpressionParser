@@ -30,11 +30,13 @@ public class GenericScope implements IScope {
 
 	@Override
 	public ALangObject getVariable(final String scope, final String name, IEvaluationContext ec) throws EvaluationException {
-		final ALangObject value = map.get(scope, name);
-		if (custom == null || value != null) return value;
-		final ICustomScope customScope = custom.get(scope);
-		if (customScope != null) return customScope.fetch(name);
-		return ec.getExternalContext() != null ? ec.getExternalContext().fetchScopedVariable(scope, name, ec) : null;
+		ALangObject value = map.get(scope, name);
+		if (value != null) return value;
+		if (custom != null) {
+			final ICustomScope customScope = custom.get(scope);
+			value = customScope != null ? customScope.fetch(name) : null;
+		}
+		return value != null ? value : ec.getExternalContext() != null ? ec.getExternalContext().fetchScopedVariable(scope, name, ec) : null;
 	}
 
 	@Override

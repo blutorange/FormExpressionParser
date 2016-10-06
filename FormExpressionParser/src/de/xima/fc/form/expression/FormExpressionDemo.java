@@ -16,15 +16,13 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
-import de.xima.fc.form.expression.util.FormExpressionParseFactory;
+import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 /**
  * todo
- * - check scope for embedded blocks when used with with-clauses, are they ended properly, correct order???
  * - unparse
- * - resetting iEmbedment implementations
  */
 public class FormExpressionDemo {
 
@@ -77,7 +75,7 @@ public class FormExpressionDemo {
 		final Token[] tokenList;
 		try {
 			final long t1 = System.nanoTime();
-			tokenList = FormExpressionParseFactory.Template.asTokenStream(code);
+			tokenList = FormExpressionParsingUtil.Template.asTokenStream(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final TokenMgrError e) {
@@ -104,7 +102,7 @@ public class FormExpressionDemo {
 		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = FormExpressionParseFactory.Template.parse(code);
+			rootNode = FormExpressionParsingUtil.Template.parse(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final ParseException e) {
@@ -160,7 +158,6 @@ public class FormExpressionDemo {
 		System.out.println("===Evaluated result===");
 		System.out.println("toString: " + result.toString());
 		System.out.println("inspect: " + result.inspect());
-
 	}
 
 	private static FormcycleExternalContext getFec() {

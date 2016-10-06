@@ -2,21 +2,31 @@ package de.xima.fc.form.expression.test;
 
 import static org.junit.Assert.fail;
 
+import java.io.Writer;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.impl.GenericEvaluationContext;
+import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
+import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
+import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
+import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.FormExpressionParseFactory;
-import de.xima.fc.form.expression.visitor.EvaluateVisitor;
+import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
+import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 
 public final class TestUtil {
 	private TestUtil() {}
 	public static enum ETestType {
 		PROGRAM,
 		TEMPLATE;
+	}
+	public static enum EContextType {
+		GENERIC,
+		FORMCYCLE;
 	}
 	public static interface ITestCase {
 		public String getCode();
@@ -28,6 +38,8 @@ public final class TestUtil {
 		public Class<? extends Throwable> getExpectedException();
 
 		public ETestType getTestType();
+		
+		public EContextType getContextType();
 
 		public String getErrorBegin();
 	}
@@ -40,7 +52,7 @@ public final class TestUtil {
 			ALangObject res = null;
 			try {
 				final Node node = parse(test.getCode(), test.getTestType());
-				if (test.isPerformEvaluation()) res = evaluate(node);
+				if (test.isPerformEvaluation()) res = evaluate(node, test.getContextType(), test.getTestType());
 			} catch (final ParseException e) {
 				exception = e;
 			} catch (final EvaluationException e) {
@@ -94,16 +106,41 @@ public final class TestUtil {
 		}
 	}
 
-	private static ALangObject evaluate(final Node node) throws EvaluationException {
-		return EvaluateVisitor.evaluateCode(node, GenericEvaluationContext.getNewBasicEvaluationContext());
+	private static ALangObject evaluate(final Node node, final EContextType context, final ETestType type) throws EvaluationException {
+		switch(context) {
+		case GENERIC:
+			switch (type) {
+			case PROGRAM:
+				return FormExpressionEvaluationUtil.Generic.eval(node, DummyExternalContext.INSTANCE);
+			case TEMPLATE:
+				final WriterOnlyExternalContext woec = new WriterOnlyExternalContext(new StringBuilderWriter());
+				FormExpressionEvaluationUtil.Generic.eval(node, woec);
+				return StringLangObject.create(woec.toString());
+			default:
+				throw new RuntimeException("Unkown enum: " + type);
+			}
+		case FORMCYCLE:
+			switch (type) {
+			case PROGRAM:
+				return FormExpressionEvaluationUtil.Formcycle.eval(node, new FormcycleExternalContext());
+			case TEMPLATE:
+				final Writer sbw = new StringBuilderWriter();
+				FormExpressionEvaluationUtil.Formcycle.eval(node, new FormcycleExternalContext(sbw));
+				return StringLangObject.create(sbw.toString());
+			default:
+				throw new RuntimeException("Unkown enum: " + type);
+			}
+		default:
+			throw new RuntimeException("Unknown enum: " + type);
+		}
 	}
 
 	private static Node parse(final String code, final ETestType type) throws ParseException {
 		switch (type) {
 		case PROGRAM:
-			return FormExpressionParseFactory.Program.parse(code);
+			return FormExpressionParsingUtil.Program.parse(code);
 		case TEMPLATE:
-			return FormExpressionParseFactory.Template.parse(code);
+			return FormExpressionParsingUtil.Template.parse(code);
 		default:
 			throw new ParseException("Unkown enum: " + type);
 		}

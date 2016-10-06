@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.context.IEmbedment;
@@ -27,9 +29,14 @@ public class GenericEmbedment implements IEmbedment {
 	private final ImmutableMap<String, IEmbedmentHandler> map;
 	@Nullable
 	private IEmbedmentHandler handler;
+	@Nullable
+	private String currentEmbedment;
+	@Nullable
+	private String handlerEmbedment;
    
 	private final static class InstanceHolder {
-		public final static GenericEmbedment GENERIC = new Builder().addHandler(EmbedmentHandlerBundleGeneral.values())
+		public final static GenericEmbedment GENERIC = new Builder()
+				.addHandler(EmbedmentHandlerBundleGeneral.values())
 				.build();
 		public final static GenericEmbedment FORMCYCLE = new Builder()
 				.addHandler(EmbedmentHandlerBundleGeneral.values()).addHandler(EmbedmentHandlerBundleFormcycle.values())
@@ -83,14 +90,17 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	@Override
-	public void beginEmbedment(final String name, final IEvaluationContext ec) throws EvaluationException {
-		handler = map.get(name);
-		if (handler != null) handler.beginEmbedment(ec);
+	public void setCurrentEmbedment(final String embedment) throws EvaluationException {
+		currentEmbedment = embedment;
+	}
+	
+	private IEmbedmentHandler getHandler() {
+		if (currentEmbedment == null) return null;
+		if (currentEmbedment.equals(handlerEmbedment)) return handler;
+		return handler = map.get(handlerEmbedment = currentEmbedment);
 	}
 
-	@Override
-	public void output(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
-		if ((handler != null && !handler.isDoOutput())) return;
+	private void output(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
 		if (ec.getExternalContext() == null || ec.getExternalContext().getWriter()==null) return;
 		try {
 			ec.getExternalContext().getWriter().write(data);
@@ -98,12 +108,19 @@ public class GenericEmbedment implements IEmbedment {
 		catch (IOException e) {
 			throw new EmbedmentOutputException(e, ec);
 		}
-	}
 
+	}
+	
 	@Override
-	public void endEmbedment(final IEvaluationContext ec) throws EvaluationException{
-		if (handler != null) handler.endEmbedment(ec);
-		handler = null;
+	public void outputText(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
+		output(data, ec);
+	}
+	
+	@Override
+	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
+		final IEmbedmentHandler handler = getHandler();
+		if ((handler != null && !handler.isDoOutput())) return;
+		output(data, ec);
 	}
 
 	public static IEmbedment getGenericEmbedment() {
@@ -117,6 +134,14 @@ public class GenericEmbedment implements IEmbedment {
 
 	@Override
 	public Void reset() {
+		currentEmbedment = handlerEmbedment = null;
+		handler = null;
 		return null;
+	}
+
+	@Override
+	public String[] getScopeList() {
+		final IEmbedmentHandler handler = getHandler();
+		return handler != null ? handler.getScopeList() : ArrayUtils.EMPTY_STRING_ARRAY;
 	}		
 }

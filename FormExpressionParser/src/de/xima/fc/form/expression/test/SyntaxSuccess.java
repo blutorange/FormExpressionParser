@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.test;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
@@ -48,19 +49,26 @@ enum SyntaxSuccess implements ITestCase {
 	TEST040("<foo>[% a+b;%]", ETestType.TEMPLATE),
 	TEST041("[% a+b;%]", ETestType.TEMPLATE),
 	TEST042("<foo>[% for(i:10) { %]</foo>[% k+1;%]<bar/>[% } %]", ETestType.TEMPLATE),
-	TEST044("<foo>[%i=0;%][%j=0;%]</foo>", ETestType.TEMPLATE),
+	TEST043("<foo>[%i=0;%][%j=0;%]</foo>", ETestType.TEMPLATE),
+	TEST044("<foo>[%42%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
+	TEST045("<foo>[%42;%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
+	TEST046("<foo>[%{4:5}.b.c[0].d()%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
 	;
 	private final String code;
 	private final ETestType type;
+	private final EContextType context;
 
 	private SyntaxSuccess(final String code) {
-		this.code = code;
-		this.type = ETestType.PROGRAM;
+		this(code, ETestType.PROGRAM);
 	}
 
 	private SyntaxSuccess(final String code, final ETestType type) {
+		this(code, type, EContextType.GENERIC);
+	}
+	private SyntaxSuccess(final String code, final ETestType type, EContextType context) {
 		this.code = code;
 		this.type = type;
+		this.context = context;
 	}
 
 	@Override
@@ -68,6 +76,12 @@ enum SyntaxSuccess implements ITestCase {
 		return type;
 	}
 
+	@Override
+	public EContextType getContextType() {
+		return context;
+	}
+
+	
 	@Override
 	public String getCode() {
 		return code;

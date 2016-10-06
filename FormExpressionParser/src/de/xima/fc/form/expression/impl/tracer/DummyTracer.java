@@ -4,7 +4,8 @@ import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
 
 /**
- * Thread-safe instance.
+ * A tracer that is not tracing anything. Use this when you
+ * do not need tracing functionality.
  * 
  * @author mad_gaksha
  *

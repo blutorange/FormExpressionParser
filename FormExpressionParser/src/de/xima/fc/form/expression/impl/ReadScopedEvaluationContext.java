@@ -69,8 +69,17 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		final ALangObject loc = getBinding().getVariable(name);
 		if (loc != null)
 			return loc;
+		// with() {} is deprecated, so this should not do much performance-wise
 		for (int i = defaultScopeList.size() - 1; i >= 0; --i) {
 			final ALangObject scp = getScope().getVariable(defaultScopeList.get(i), name, this);
+			if (scp != null)
+				return scp;
+		}
+		// embedded blocks with scopes should only
+		// be used for basic access like [%tf1%]
+		String[] embedmentScopeList = embedment.getScopeList();
+		for (int i = embedmentScopeList.length - 1; i >= 0; --i) {
+			final ALangObject scp = getScope().getVariable(embedmentScopeList[i], name, this);
 			if (scp != null)
 				return scp;
 		}

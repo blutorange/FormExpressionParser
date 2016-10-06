@@ -6,7 +6,7 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.FormExpressionParseFactory;
+import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 public final class NodeSerializeTest {
@@ -17,7 +17,7 @@ public final class NodeSerializeTest {
 		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = FormExpressionParseFactory.Program.parse(string);
+			rootNode = FormExpressionParsingUtil.Program.parse(string);
 			final long t2 = System.nanoTime();
 			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms");
 		} catch (final ParseException e) {

@@ -33,13 +33,13 @@ public final class FormExpressionEvaluationUtil {
 
 		public static ALangObject evalProgram(final String code, @Nullable final IExternalContext externalContext)
 				throws ParseException, EvaluationException {
-			final Node node = FormExpressionParseFactory.Program.parse(code);
+			final Node node = FormExpressionParsingUtil.Program.parse(code);
 			return eval(node, externalContext);
 		}
 
 		public static ALangObject evalTemplate(final String code, @Nullable final IExternalContext externalContext)
 				throws ParseException, EvaluationException {
-			final Node node = FormExpressionParseFactory.Template.parse(code);
+			final Node node = FormExpressionParsingUtil.Template.parse(code);
 			return eval(node, externalContext);
 		}
 
@@ -57,13 +57,13 @@ public final class FormExpressionEvaluationUtil {
 
 		public static ALangObject evalProgram(final String code, @Nonnull final FormcycleExternalContext formcycle)
 				throws ParseException, EvaluationException {
-			final Node node = FormExpressionParseFactory.Program.parse(code);
+			final Node node = FormExpressionParsingUtil.Program.parse(code);
 			return eval(node, formcycle);
 		}
 
 		public static ALangObject evalTemplate(final String code, @Nonnull final FormcycleExternalContext formcycle)
 				throws ParseException, EvaluationException {
-			final Node node = FormExpressionParseFactory.Template.parse(code);
+			final Node node = FormExpressionParsingUtil.Template.parse(code);
 			return eval(node, formcycle);
 		}
 

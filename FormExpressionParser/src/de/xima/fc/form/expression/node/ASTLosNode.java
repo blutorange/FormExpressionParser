@@ -7,18 +7,18 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTLosNode extends SimpleNode {
 
 	private String text;
-	private String embedmentType;
+	private boolean hasOpen;
 	private boolean hasClose;
 
 	public ASTLosNode(final int nodeId) {
 		super(nodeId);
 	}
 
-	public void init(final EMethod method, final String embedmentType, final String text, final boolean hasClose) throws ParseException {
+	public void init(final EMethod method, final String text, final boolean hasOpen, final boolean hasClose) throws ParseException {
 		assertChildrenExactly(0);
 		siblingMethod = method;
 		this.text = text;
-		this.embedmentType = embedmentType;
+		this.hasOpen = hasOpen;
 		this.hasClose = hasClose;
 	}
 
@@ -26,12 +26,8 @@ public class ASTLosNode extends SimpleNode {
 		return text;
 	}
 
-	public String getEmbedmentType() {
-		return embedmentType;
-	}
-
 	public boolean isHasOpen() {
-		return embedmentType != null;
+		return hasOpen;
 	}
 
 	public boolean isHasClose() {
@@ -44,7 +40,11 @@ public class ASTLosNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(embedmentType).append(',').append(hasClose).append(',').append(text).append(',');
+		sb.append(hasOpen)
+		.append(',')
+		.append(hasClose)
+		.append(',')
+		.append(text);
 	}
 
 	@Override

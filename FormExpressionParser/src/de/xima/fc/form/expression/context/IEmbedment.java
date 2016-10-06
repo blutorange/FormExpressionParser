@@ -1,32 +1,40 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.util.IReset;
 
 public interface IEmbedment extends IReset<Void> {
 	/**
-	 * Must not throw when the name does not exist, but simply do nothing. The
-	 * name always begins with <code>[%</code>, followed by any number of the
-	 * following characters: <code>%</code>, <code>$</code>, <code>@</code>,
-	 * <code>=</code>
-	 *
 	 * @param name
-	 *            Name of the embedment type, eg. <code>[%%</code> or
-	 *            <code>[%%@</code>.
+	 *            <code>null</code> means no embedment.
 	 */
-	public void beginEmbedment(String name, IEvaluationContext ec) throws EvaluationException;
+	public void setCurrentEmbedment(@Nullable String name);
+
+	@Nonnull
+	public String[] getScopeList();
 
 	/**
-	 * Called once for each call to {@link #beginEmbedment(String)}.
-	 * @param ec 
+	 * Writes the output of an embedded code block with the current type to the
+	 * output document, file, or stream etc.
+	 * 
+	 * @param data
+	 *            Data to output.
+	 * @throws EmbedmentOutputException
+	 *             When an error occurred and data could not be written.
 	 */
-	public void endEmbedment(IEvaluationContext ec) throws EvaluationException;
+	public void outputCode(String data, IEvaluationContext ec) throws EmbedmentOutputException;
 
 	/**
-	 * Writes the given data with the current type to the output document, file, or stream etc.
-	 * @param data Data to output.
-	 * @throws EmbedmentOutputException When an error occurred and data could not be written.
+	 * Writes the output of a plain text block (between code blocks) with the
+	 * current type to the output document, file, or stream etc.
+	 * 
+	 * @param data
+	 *            Data to output.
+	 * @throws EmbedmentOutputException
+	 *             When an error occurred and data could not be written.
 	 */
-	public void output(String data, IEvaluationContext ec) throws EmbedmentOutputException;
+	public void outputText(String data, IEvaluationContext ec) throws EmbedmentOutputException;
 }

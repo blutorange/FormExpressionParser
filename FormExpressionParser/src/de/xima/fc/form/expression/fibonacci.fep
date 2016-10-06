@@ -1,14 +1,14 @@
 <html>
-  <head></head>
+  <head>
+    [%% colors = ["red","green","blue","orange"]%]
+  </head>
   <h1>Form Expression Language Test</h1>
   <p>I hope you recognize these...</p>
-  <p>Test: [%%= 5.67598; %]</p>
   <body>
     <ul>
       [%% a=-(b=1); %]
-      [%% colors = ["red","green","blue","orange"]; %]
       [%% for (i : 25) { %]
-        <li style="color:[%%=colors[i%4];%];">[%%= b=a+(a=b); %]</li>
+        <li style="color: [%%= colors[i%4] %];">[%%= b=a+(a=b) %]</li>
       [%% } %]
     </ul>
   </body>

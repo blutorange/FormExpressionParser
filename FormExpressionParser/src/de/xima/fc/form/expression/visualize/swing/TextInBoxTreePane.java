@@ -31,6 +31,7 @@ package de.xima.fc.form.expression.visualize.swing;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
@@ -136,6 +137,8 @@ public class TextInBoxTreePane extends JComponent {
 	@Override
 	public void paint(final Graphics g) {
 		super.paint(g);
+
+		g.setFont(g.getFont().deriveFont(Font.PLAIN, 12));
 
 		paintEdges(g, getTree().getRoot());
 

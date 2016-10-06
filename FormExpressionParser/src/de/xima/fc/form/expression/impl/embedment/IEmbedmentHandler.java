@@ -1,9 +1,9 @@
 package de.xima.fc.form.expression.impl.embedment;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import javax.annotation.Nonnull;
 
 public interface IEmbedmentHandler {
-	public void beginEmbedment(IEvaluationContext ec);
-	public void endEmbedment(IEvaluationContext ec);
+	@Nonnull
+	public String[] getScopeList();
 	public boolean isDoOutput();
 }

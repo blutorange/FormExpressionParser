@@ -20,7 +20,15 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	 *            English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The upper-case version of the string.
 	 */
-	upcase(Impl.upcase),
+	toUpperCase(Impl.toLowerCase),
+	/**
+	 * @param locale
+	 *            {@link StringLangObject} (optional). The (IETF BCP 47) name of
+	 *            the locale to be used for the conversion. Defaults to the
+	 *            English-like {@link Locale#ROOT}.
+	 * @return {@link StringLangObject} The lower-case version of the string.
+	 */
+	toLowerCase(Impl.toLowerCase),	
 	/**
 	 * @return {@link NumberLangObject}. The length of this string, >=0.
 	 */
@@ -72,7 +80,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	}
 
 	private static enum Impl implements IFunction<StringLangObject> {
-		upcase(null, "locale") {
+		toUpperCase(null, "locale") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -80,6 +88,14 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
 		},
+		toLowerCase(null, "locale") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.toLowerCase(
+						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+			}
+		},		
 		length(null) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,

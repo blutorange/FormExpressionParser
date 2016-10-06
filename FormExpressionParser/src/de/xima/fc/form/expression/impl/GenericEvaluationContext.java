@@ -14,13 +14,13 @@ import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
-	private final IBinding binding;
-	private final INamespace namespace;
-	private final ILogger logger;
-	private final ITracer<Node> tracer;
-	private final IScope scope;
-	private final IEmbedment embedment;
-	private IExternalContext externalContext;
+	protected final IBinding binding;
+	protected final INamespace namespace;
+	protected final ILogger logger;
+	protected final ITracer<Node> tracer;
+	protected final IScope scope;
+	protected final IEmbedment embedment;
+	protected IExternalContext externalContext;
 	
 	/**
 	 * Creates a new evaluation context.

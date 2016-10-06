@@ -149,4 +149,5 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public int jjtGetNodeId();
 
+	public String getEmbedment();
 }

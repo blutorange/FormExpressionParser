@@ -18,14 +18,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 public class FormcycleExternalContext implements IExternalContext {
 	private Writer writer;
 	
-	/**
-	 * @param customObject For demonstration purposes. Replace this with the
-	 * datatype you need. 
-	 */
-	public FormcycleExternalContext(Object customObject) {
-		// this.customObject = customObject;
-	}
-	
+
 	// For demonstration purposes only. Replace with access to actual form elements.
 	private static final ImmutableMap<String, String> nameMap;
 	private static final ImmutableMap<String, String> aliasMap;
@@ -51,6 +44,17 @@ public class FormcycleExternalContext implements IExternalContext {
 	public FormcycleExternalContext() {
 
 	}
+
+	public FormcycleExternalContext(final Writer writer) {
+		this.writer = writer;
+	}
+	
+	
+	/*
+	public FormcycleExternalContext(Object customObject) {
+		// this.customObject = customObject;
+	}
+	*/
 	
 	public String getFieldValueByName(String name) {
 		return nameMap.get(name);
@@ -63,7 +67,7 @@ public class FormcycleExternalContext implements IExternalContext {
 	public Writer getWriter() {
 		if (writer != null) return writer;
 		try {
-			writer = new FileWriter("/tmp/fep.out");
+			writer = new FileWriter("/tmp/fep.out.html");
 		}
 		catch (IOException e) {
 			writer = DummyWriter.getInstance();
@@ -86,13 +90,13 @@ public class FormcycleExternalContext implements IExternalContext {
 	private static enum ScopeImpl {
 		FORM_FIELD {
 			@Override
-			public ALangObject fetch(String name, IEvaluationContext ec) {
+			public ALangObject fetch(String name, Object myObject) {
 				final String value = aliasMap.get(name);
 				if (value != null) return StringLangObject.create(value);
 				return StringLangObject.create(nameMap.get(name));
 			}
 		};
-		public abstract ALangObject fetch(String name, IEvaluationContext ec);
+		public abstract ALangObject fetch(String name, Object myObject);
 	}
 	static {
 		scopeMap = new Builder<String, ScopeImpl>()
@@ -103,6 +107,6 @@ public class FormcycleExternalContext implements IExternalContext {
 	@Override
 	public ALangObject fetchScopedVariable(String scope, String name, IEvaluationContext ec) {
 		final ScopeImpl s = scopeMap.get(scope);
-		return s != null ? s.fetch(name, ec) : null;
+		return s != null ? s.fetch(name, null) : null;
 	}
 }
