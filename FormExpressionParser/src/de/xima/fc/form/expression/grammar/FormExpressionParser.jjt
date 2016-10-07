@@ -38,7 +38,7 @@ TOKEN :
 < MULTI_LINE_COMMENT >
 SKIP :
 {
-  "*/" : CODE
+  < MultiCommentEnd : "*/" > : CODE
 }
 
 < MULTI_LINE_COMMENT >

@@ -31,6 +31,11 @@ public class StringBuilderWriter extends Writer {
 	}
 
 	@Override
+	public void write(int c) {
+		sb.append((char)c);
+	}
+	
+	@Override
 	public void write(String s, int off, int len) {
 		if (len == 0)
 			return;

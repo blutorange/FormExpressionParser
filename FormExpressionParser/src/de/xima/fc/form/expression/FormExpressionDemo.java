@@ -13,16 +13,21 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
+import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 /**
  * todo
- * - unparse
+ * - unparse / format
+ * - regex literal
+ * - more operators, <<  >> etc.
+ * - suffix ++ --
  */
 public class FormExpressionDemo {
 
@@ -31,6 +36,17 @@ public class FormExpressionDemo {
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
 
+		try {
+			System.out.println(FormExpressionHighlightingUtil.Template.highlightHtml(code,
+					HighlightThemeEclipse.getInstance(), null));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		System.exit(0);
+		
 		showInputCode(code);
 
 		showTokenStream(code);

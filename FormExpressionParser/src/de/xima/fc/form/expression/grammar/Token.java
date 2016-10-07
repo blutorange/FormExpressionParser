@@ -98,6 +98,16 @@ public class Token implements java.io.Serializable {
 		this.image = image;
 	}
 
+	public Token(int kind, String image, int beginLine, int beginColumn, int endLine,
+			int endColumn) {
+		this.kind = kind;
+		this.image = image;
+		this.beginColumn = beginColumn;
+		this.beginLine = beginLine;
+		this.endColumn = endColumn;
+		this.endLine = endLine;
+	}
+
 	/**
 	 * Returns the image.
 	 */

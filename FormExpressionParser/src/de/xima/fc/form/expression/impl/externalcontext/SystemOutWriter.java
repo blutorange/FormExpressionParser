@@ -40,6 +40,10 @@ public final class SystemOutWriter extends Writer {
 		System.out.print(buffer);
 	}
 	@Override
+	public void write(int c) {
+		System.out.print((char)c);
+	}
+	@Override
 	public void close() throws IOException {
 		// We will not close stdout.
 		flush();
