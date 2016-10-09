@@ -33,7 +33,7 @@ import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.FormExpressionParsingUtil.Program;
+import de.xima.fc.form.expression.util.FormExpressionParsingUtil.Template;
 
 /**
  * Creates "Sample" trees, e.g. to be used in demonstrations.
@@ -47,7 +47,7 @@ public class FormExpressionTreeFactory {
 		final DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(
 				root);
 
-		final Node rootNode = Program.parse(expression);
+		final Node rootNode = Template.parse(expression);
 		addNodes(tree, rootNode, root);
 		return tree;
 	}

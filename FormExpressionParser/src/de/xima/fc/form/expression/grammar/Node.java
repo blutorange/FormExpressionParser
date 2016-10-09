@@ -96,6 +96,7 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public void assertChildrenExactly(final int count) throws ParseException;
 
+	public void assertChildrenExactlyOneOf(int count1, int count2) throws ParseException;
 
 	/**
 	 * @param count The number of children this node must have at least.
@@ -150,4 +151,5 @@ public interface Node extends Serializable, ITraceElement {
 	public int jjtGetNodeId();
 
 	public String getEmbedment();
+
 }

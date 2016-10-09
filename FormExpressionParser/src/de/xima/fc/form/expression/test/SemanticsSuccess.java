@@ -50,7 +50,7 @@ enum SemanticsSuccess implements ITestCase {
 			StringLangObject.create("bar")
 			)),
 	LITERALS017("#^\\#$#.matches('#');", Tests.TRUE),
-	
+
 	// Variables and scopes.
 	SCOPE001("k=42;k;", Tests.N42), // local variables
 	SCOPE002("k=0;if(true)k=42;k;", Tests.N42), // can access parent when nesting
@@ -68,7 +68,7 @@ enum SemanticsSuccess implements ITestCase {
 	PROP001("'Ab3'.toUpperCase().toLowerCase();", StringLangObject.create("ab3")),
 	PROP002("s='Ab3';f=s.toLowerCase;f.call(s);", StringLangObject.create("ab3")),
 	PROP003("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
-		
+
 	// Expression methods number.
 	EMETHODUN001("-(-42);", Tests.N42),
 	EMETHODUN002("+42;", Tests.N42),
@@ -80,10 +80,12 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN006("[1,2]==[1,2];", Tests.TRUE),
 	EMETHODBIN007("[1,2]===[1,2];", Tests.FALSE),
 	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
-	
+
 	//General
 	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
-	
+	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
+	GENERAL003("true ? 42 : 0;", Tests.N42), // Ternary
+
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),
 	;

@@ -106,8 +106,8 @@ public abstract class SimpleNode implements Node {
 	public final String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(nodeName()).append('(').append(embedment).append(',').append(siblingMethod).append(',')
-				.append(startLine).append(':').append(startColumn).append('-').append(endLine).append(':')
-				.append(endColumn).append(',');
+		.append(startLine).append(':').append(startColumn).append('-').append(endLine).append(':')
+		.append(endColumn).append(',');
 		additionalToStringFields(sb);
 		sb.setLength(sb.length() - 1);
 		sb.append(")");
@@ -154,7 +154,7 @@ public abstract class SimpleNode implements Node {
 		final Node n = children[0];
 		if (!clazz.isAssignableFrom(n.getClass()))
 			throw new ParseException("Node not the correct type: " + n.getClass()
-					+ ". This is likely an error with the parser. Contact support.");
+			+ ". This is likely an error with the parser. Contact support.");
 		return clazz.cast(n);
 	}
 
@@ -191,8 +191,16 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenExactly(final int count) throws ParseException {
 		if (children.length != count)
 			throw new ParseException(String.format(
-					"Node must have exactly %d, not %d.  This is likely an error with the parser, contact support.",
+					"Node must have exactly %d children, not %d.  This is likely an error with the parser, contact support.",
 					new Integer(count), new Integer(children.length)));
+	}
+
+	@Override
+	public void assertChildrenExactlyOneOf(final int count1, final int count2) throws ParseException {
+		if (children.length != count1 && children.length != count2)
+			throw new ParseException(String.format(
+					"Node must have exactly %d or %d children, not %d.  This is likely an error with the parser, contact support.",
+					new Integer(count1), new Integer(count2), new Integer(children.length)));
 	}
 
 	@Override
@@ -285,7 +293,7 @@ public abstract class SimpleNode implements Node {
 
 	/**
 	 * Subclasses may add additional info for {@link #toString()}.
-	 * 
+	 *
 	 * @param sb
 	 *            String builder to use.
 	 */

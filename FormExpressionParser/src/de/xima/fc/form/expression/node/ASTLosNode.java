@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTLosNode extends SimpleNode {
 
 	private String text;
-	private boolean hasOpen;
+	private String open;
 	private boolean hasClose;
 
 	public ASTLosNode(final int nodeId) {
@@ -18,9 +18,8 @@ public class ASTLosNode extends SimpleNode {
 		assertChildrenExactly(0);
 		siblingMethod = method;
 		this.text = text;
-		this.hasOpen = open != null;
+		this.open = open;
 		this.hasClose = hasClose;
-		if (open != null) this.embedment = open;
 	}
 
 	public String getText() {
@@ -28,7 +27,7 @@ public class ASTLosNode extends SimpleNode {
 	}
 
 	public boolean isHasOpen() {
-		return hasOpen;
+		return open != null;
 	}
 
 	public boolean isHasClose() {
@@ -39,9 +38,13 @@ public class ASTLosNode extends SimpleNode {
 		return text != null;
 	}
 
+	public String getOpen() {
+		return open;
+	}
+
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(hasOpen)
+		sb.append(open)
 		.append(',')
 		.append(hasClose)
 		.append(',')

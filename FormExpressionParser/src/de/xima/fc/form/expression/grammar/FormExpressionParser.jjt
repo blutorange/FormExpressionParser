@@ -76,7 +76,9 @@ TOKEN :
   < AngleClose : ">" >
 | 
   < Ampersand : "&" >
-| 
+|
+  < QuestionMark : "?" >
+|  
   < Plus : "+" >
 | 
   < Dash : "-" >
@@ -756,69 +758,86 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
 }
 {
   (
-    DoubleBarExpression(method)
+    TernaryExpression(method)
     (
       (
         < Equal >
-        DoubleBarExpression(EMethod.EQUAL)
+        TernaryExpression(EMethod.EQUAL)
       )
     |
       (
-        < PlusEqual > DoubleBarExpression(EMethod.PLUS_EQUAL)
+        < PlusEqual > TernaryExpression(EMethod.PLUS_EQUAL)
       )
     |
       (
-        < DashEqual > DoubleBarExpression(EMethod.DASH_EQUAL)
+        < DashEqual > TernaryExpression(EMethod.DASH_EQUAL)
       )
     |
       (
-        < DoubleStarEqual > DoubleBarExpression(EMethod.DOUBLE_STAR_EQUAL)
+        < DoubleStarEqual > TernaryExpression(EMethod.DOUBLE_STAR_EQUAL)
       )
     |
       (
-        < StarEqual > DoubleBarExpression(EMethod.STAR_EQUAL)
+        < StarEqual > TernaryExpression(EMethod.STAR_EQUAL)
       )
     |
       (
-        < SlashEqual > DoubleBarExpression(EMethod.SLASH_EQUAL)
+        < SlashEqual > TernaryExpression(EMethod.SLASH_EQUAL)
       )
     |
       (
-        < PercentEqual > DoubleBarExpression(EMethod.PERCENT_EQUAL)
+        < PercentEqual > TernaryExpression(EMethod.PERCENT_EQUAL)
       )
     |
       (
-        < DoubleAngleOpenEqual > DoubleBarExpression(EMethod.DOUBLE_ANGLE_OPEN_EQUAL)
+        < DoubleAngleOpenEqual > TernaryExpression(EMethod.DOUBLE_ANGLE_OPEN_EQUAL)
       )
     |
       (
-        < DoubleAngleCloseEqual > DoubleBarExpression(EMethod.DOUBLE_ANGLE_CLOSE_EQUAL)
+        < DoubleAngleCloseEqual > TernaryExpression(EMethod.DOUBLE_ANGLE_CLOSE_EQUAL)
       )
     |
       (
-        < DoubleAmpersandEqual > DoubleBarExpression(EMethod.DOUBLE_AMPERSAND_EQUAL)
+        < DoubleAmpersandEqual > TernaryExpression(EMethod.DOUBLE_AMPERSAND_EQUAL)
       )
     |
       (
-        < DoubleBarEqual > DoubleBarExpression(EMethod.DOUBLE_BAR_EQUAL)
+        < DoubleBarEqual > TernaryExpression(EMethod.DOUBLE_BAR_EQUAL)
       )
     |
       (
-        < AmpersandEqual > DoubleBarExpression(EMethod.AMPERSAND_EQUAL)
+        < AmpersandEqual > TernaryExpression(EMethod.AMPERSAND_EQUAL)
       )
     |
       (
-        < CircumflexEqual > DoubleBarExpression(EMethod.CIRCUMFLEX_EQUAL)
+        < CircumflexEqual > TernaryExpression(EMethod.CIRCUMFLEX_EQUAL)
       )
     |
       (
-        < BarEqual > DoubleBarExpression(EMethod.BAR_EQUAL)
+        < BarEqual > TernaryExpression(EMethod.BAR_EQUAL)
       )
     )*
   )
   {
     jjtThis.setEndPosition(token);
     if (createNode) jjtThis.init(method);
+  }
+}
+
+void TernaryExpression(EMethod method) #TernaryExpressionNode(createNode = jjtree.nodeArity() != 1) :
+{
+  boolean createNode;
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    DoubleBarExpression(method) [
+      < QuestionMark > DoubleBarExpression(method) < Colon > DoubleBarExpression(method)
+    ]
+  )
+  {
+    if (createNode) jjtThis.init(method);
+    jjtThis.setEndPosition(token);
   }
 }
 
@@ -1176,9 +1195,10 @@ void FunctionArgumentList(EMethod method) #ArrayNode :
   }
 }
 
-void FunctionTypeUnaryExpression(EMethod method) #void :
+void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(createNode) :
 {
-  boolean createNode;
+  boolean createNode = false;
+  jjtThis.setStartPosition(token);
 }
 {
   (
@@ -1188,11 +1208,15 @@ void FunctionTypeUnaryExpression(EMethod method) #void :
       VariableWithOptionalScope(method)
     |
       (
-        < ParenOpen > Expression(method) < ParenClose >
+        < ParenOpen > Expression(null) < ParenClose > { createNode = true; }
       )
     )
   )
   {
+    if (createNode) { 
+      jjtThis.setEndPosition(token);
+      jjtThis.init(method);
+    }
   }
 }
 

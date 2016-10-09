@@ -1,28 +1,8 @@
-switch    (
-                             true)
-                             
-                             
-        {
-
-
-
-                     case 1:break;
-      case
-                 2
-     :
-     
-     
-     
-     break
-     
-     
-     ;
-     
-     
-     
-     
-     
-  default                                                    :
-                     break
-      ;
-   }
+<html>
+<head>
+</head>
+[%% for(i:10) {%]
+<h1>[% tf1 %] ([%%=i%])</h1>
+[%% } %]
+</body>
+</html>

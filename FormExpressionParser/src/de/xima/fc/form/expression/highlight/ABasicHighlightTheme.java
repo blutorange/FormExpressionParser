@@ -67,6 +67,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.P
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PercentEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Plus;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PlusEqual;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.QuestionMark;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Regex;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
@@ -92,9 +93,9 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.W
  * @author mad_gaksha
  */
 public abstract class ABasicHighlightTheme implements IHighlightTheme {
-	
+
 	@Override
-	public Style getStyleForToken(int tokenType) {
+	public Style getStyleForToken(final int tokenType) {
 		switch (tokenType) {
 
 		case Break:
@@ -105,128 +106,129 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case Default:
 		case Else:
 		case For:
-		case Function: 
+		case Function:
 		case If:
 		case Return:
-		case Switch: 
-		case Throw: 
+		case Switch:
+		case Throw:
 		case Try:
 		case While:
 		case With:
-		// These are like keywords.	
+			// These are like keywords.
 		case LogDebug:
 		case LogError:
 		case LogInfo:
 		case LogWarn:
 		case Exception:
 			return getStyleKeyword();
-		
+
 		case Identifier:
 			return getStyleIdentifier();
-			
+
 		case IdentifierAfterDot:
 			return getStyleAttributeIdentifier();
-			
+
 		case False:
-		case True:			
+		case True:
 			return getStyleBooleanLiteral();
 
-		case Null: 
+		case Null:
 			return getStyleNullLiteral();
 
-		case Float: 
-		case Integer: 
+		case Float:
+		case Integer:
 			return getStyleNumberLiteral();
-			
-			
-		case LambdaArrow: 
+
+
+		case LambdaArrow:
 			return getStyleLambdaLiteral();
 
 		case Regex:
-			return getStyleRegexLiteral();			
-			
-		case DoubleQuotedString: 
-		case SingleQuotedString: 
+			return getStyleRegexLiteral();
+
+		case DoubleQuotedString:
+		case SingleQuotedString:
 			return getStyleStringLiteral();
-			
-		case BracesClose: 
-		case BracesOpen: 
+
+		case BracesClose:
+		case BracesOpen:
 			return getStyleBraces();
-		case BracketClose: 
-		case BracketOpen: 
+		case BracketClose:
+		case BracketOpen:
 			return getStyleBracket();
-		case ParenClose: 
-		case ParenOpen: 
+		case ParenClose:
+		case ParenOpen:
 			return getStyleParenthesis();
-			
-		case Ampersand: 
-		case AngleClose: 
-		case AngleOpen: 
-		case Bar: 
-		case Circumflex: 
-		case Dash: 
-		case DoubleAmpersand: 
+
+		case Ampersand:
+		case AngleClose:
+		case AngleOpen:
+		case Bar:
+		case Circumflex:
+		case Dash:
+		case DoubleAmpersand:
 		case DoubleBar:
-		case DoubleDash: 
-		case DoublePlus: 
-		case DoubleStar: 
-		case Exclamation: 
-		case Percent: 
-		case Plus: 
-		case Slash: 
-		case Star: 
+		case DoubleDash:
+		case DoublePlus:
+		case DoubleStar:
+		case Exclamation:
+		case Percent:
+		case Plus:
+		case Slash:
+		case Star:
 			return getStyleOperator();
 
-		case AmpersandEqual: 
-		case AngleCloseEqual: 
-		case AngleOpenEqual: 
-		case BarEqual: 
-		case CircumflexEqual: 
-		case DashEqual: 
-		case DoubleAmpersandEqual: 
-		case DoubleAngleCloseEqual: 
-		case DoubleAngleOpenEqual: 
-		case Equal: 
-		case DoubleBarEqual: 
-		case DoubleStarEqual: 
-		case ExclamationDoubleEqual: 
-		case ExclamationEqual: 
-		case PercentEqual: 
-		case PlusEqual: 
-		case SlashEqual: 
-		case StarEqual: 
-		case TripleEqual: 
+		case AmpersandEqual:
+		case AngleCloseEqual:
+		case AngleOpenEqual:
+		case BarEqual:
+		case CircumflexEqual:
+		case DashEqual:
+		case DoubleAmpersandEqual:
+		case DoubleAngleCloseEqual:
+		case DoubleAngleOpenEqual:
+		case Equal:
+		case DoubleBarEqual:
+		case DoubleStarEqual:
+		case ExclamationDoubleEqual:
+		case ExclamationEqual:
+		case PercentEqual:
+		case PlusEqual:
+		case SlashEqual:
+		case StarEqual:
+		case TripleEqual:
 			return getStyleOperatorEqual();
-			
-		case Dot: 
-		case SemiColon: 
-		case Colon: 
-		case Comma: 
+
+		case QuestionMark:
+		case Dot:
+		case SemiColon:
+		case Colon:
+		case Comma:
 		case ScopeSeparator:
-			return getStyleDotColonComma();
-					
-		case LosChar: 
+			return getStylePunctuation();
+
+		case LosChar:
 			return getStyleLosBody();
 
-		case LosBodyClose: 
-		case LosOpen: 
+		case LosBodyClose:
+		case LosOpen:
 			return getStyleLosSeparator();
-						
+
 		case MultilineCommentOpen:
-		case CommentChar: 
+		case CommentChar:
 		case MultilineCommentClose:
 			return getStyleComment();
-						
+
 		default:
-			return null; 
+			return null;
 		}
 	}
-	
+
 	protected abstract Style getStyleKeyword();
 	protected abstract Style getStyleIdentifier();
 	/** @return Style for identifiers after a dot, eg. <code>myVar.someAttribute()</code>.*/
 	protected abstract Style getStyleAttributeIdentifier();
-	
+
 	protected abstract Style getStyleBooleanLiteral();
 	protected abstract Style getStyleNullLiteral();
 	protected abstract Style getStyleNumberLiteral();
@@ -234,17 +236,18 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 	protected abstract Style getStyleRegexLiteral();
 	/** @return Style for the lambda arrow <code>-></code>. */
 	protected abstract Style getStyleLambdaLiteral();
-	
+
 	protected abstract Style getStyleBracket();
 	protected abstract Style getStyleBraces();
 	protected abstract Style getStyleParenthesis();
-	
+
 	protected abstract Style getStyleOperator();
 	protected abstract Style getStyleOperatorEqual();
-	
+
 	protected abstract Style getStyleLosBody();
 	protected abstract Style getStyleLosSeparator();
-	
-	protected abstract Style getStyleDotColonComma();
+
+	/** @return Style for colon, dot, comma, semicolon, question mark. */
+	protected abstract Style getStylePunctuation();
 	protected abstract Style getStyleComment();
 }

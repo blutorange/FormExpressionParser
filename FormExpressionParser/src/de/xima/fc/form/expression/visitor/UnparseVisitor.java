@@ -27,12 +27,14 @@ import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
+import de.xima.fc.form.expression.node.ASTParenthesisExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
@@ -92,10 +94,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		case FormExpressionParserTreeConstants.JJTLOGNODE:
 		case FormExpressionParserTreeConstants.JJTNULLNODE:
 		case FormExpressionParserTreeConstants.JJTNUMBERNODE:
+		case FormExpressionParserTreeConstants.JJTPARENTHESISEXPRESSIONNODE:
 		case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
 		case FormExpressionParserTreeConstants.JJTREGEXNODE:
 		case FormExpressionParserTreeConstants.JJTRETURNCLAUSENODE:
 		case FormExpressionParserTreeConstants.JJTSTRINGNODE:
+		case FormExpressionParserTreeConstants.JJTTERNARYEXPRESSIONNODE:
 		case FormExpressionParserTreeConstants.JJTTHROWCLAUSENODE:
 		case FormExpressionParserTreeConstants.JJTUNARYEXPRESSIONNODE:
 		case FormExpressionParserTreeConstants.JJTVARIABLENODE:
@@ -111,7 +115,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			writer.write(StringUtils.SPACE);
 			writer.write(node.jjtGetChild(i).getSiblingMethod().methodName);
 			writer.write(StringUtils.SPACE);
-			node.jjtGetChild(1).jjtAccept(this, prefix);
+			node.jjtGetChild(i).jjtAccept(this, prefix);
 		}
 		return null;
 	}
@@ -634,7 +638,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			writer.write(node.getText());
 		}
 		if (node.isHasOpen()) {
-			writer.write(node.getEmbedment());
+			writer.write(node.getOpen());
 			writer.write(StringUtils.SPACE);
 		}
 		return null;
@@ -646,4 +650,25 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		return null;
 	}
 
+	@Override
+	public Void visit(final ASTTernaryExpressionNode node, final String prefix) throws IOException {
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_QUESTION_MARK);
+		writer.write(StringUtils.SPACE);
+		node.jjtGetChild(1).jjtAccept(this, prefix);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_COLON);
+		writer.write(StringUtils.SPACE);
+		node.jjtGetChild(2).jjtAccept(this, prefix);
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTParenthesisExpressionNode node, final String prefix) throws IOException {
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.getFirstChild().jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		return null;
+	}
 }

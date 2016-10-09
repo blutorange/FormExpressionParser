@@ -64,7 +64,7 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 		return new Style(new Color(0x7F7F9FFF), Weight.BOLDER);
 	}
 	@Override
-	protected Style getStyleDotColonComma() {
+	protected Style getStylePunctuation() {
 		return new Style(Color.BLACK);
 	}
 	@Override

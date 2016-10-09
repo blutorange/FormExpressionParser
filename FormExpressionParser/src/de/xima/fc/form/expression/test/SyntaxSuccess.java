@@ -57,6 +57,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST048("#regex#;"),
 	TEST049("#regex#i;"),
 	TEST050("#regex#msii;"),
+	TEST051("foo ? bar : baz;"), // Ternary
 	;
 	private final String code;
 	private final ETestType type;
@@ -69,7 +70,7 @@ enum SyntaxSuccess implements ITestCase {
 	private SyntaxSuccess(final String code, final ETestType type) {
 		this(code, type, EContextType.GENERIC);
 	}
-	private SyntaxSuccess(final String code, final ETestType type, EContextType context) {
+	private SyntaxSuccess(final String code, final ETestType type, final EContextType context) {
 		this.code = code;
 		this.type = type;
 		this.context = context;
@@ -85,7 +86,7 @@ enum SyntaxSuccess implements ITestCase {
 		return context;
 	}
 
-	
+
 	@Override
 	public String getCode() {
 		return code;

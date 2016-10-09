@@ -37,12 +37,14 @@ import de.xima.fc.form.expression.node.ASTLogNode;
 import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
+import de.xima.fc.form.expression.node.ASTParenthesisExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
+import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
@@ -61,7 +63,8 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
-public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
+public class EvaluateVisitor
+implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
 
 	/**
 	 * Evaluates the given node as a complete program with the given context.
@@ -69,12 +72,16 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	 * evaluation context passed require external synchronization. This is
 	 * because usually you would create a new evaluation context for each
 	 * evaluation; and {@link Node} (should) be immutable after parsing.
-	 * @param node Node to evaluate.
-	 * @param ec Evaluation context to use.
+	 *
+	 * @param node
+	 *            Node to evaluate.
+	 * @param ec
+	 *            Evaluation context to use.
 	 * @return The evaluated result.
-	 * @throws EvaluationException When the code cannot be evaluated.
+	 * @throws EvaluationException
+	 *             When the code cannot be evaluated.
 	 */
-	public static  ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
+	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res = node.jjtAccept(v, ec);
 		v.assertNoJumps(ec);
@@ -112,6 +119,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 			}
 		}
 	}
+
 	private ALangObject jjtAccept(final Node parentNode, final Node node, final IEvaluationContext ec) {
 		ec.getTracer().setCurrentlyProcessed(node);
 		ec.getEmbedment().setCurrentEmbedment(node.getEmbedment());
@@ -475,7 +483,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		ec.getBinding().nest(ec);
 		try {
 			final ALangObject switchValue = jjtAccept(node, children[0], ec);
-			forloop : for (int i = 1; i < children.length; ++i) {
+			forloop: for (int i = 1; i < children.length; ++i) {
 				switch (children[i].getSiblingMethod()) {
 				case SWITCHCASE:
 					// Case contains an expression and may not contain break,
@@ -594,7 +602,7 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	@Override
 	public ALangObject visit(final ASTFunctionClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final ALangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec));
-		return setVariable((ASTVariableNode)node.getFirstChild(), func, ec);
+		return setVariable((ASTVariableNode) node.getFirstChild(), func, ec);
 	}
 
 	@Override
@@ -627,7 +635,8 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTAssignmentExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		final Node[] children = node.getChildArray();
-		// Iterate from the end of each assignment pair and assign the rvalue to the lvalue.
+		// Iterate from the end of each assignment pair and assign the rvalue to
+		// the lvalue.
 		// Child must be an expression and cannot contain break/continue/return.
 		ALangObject assignee = jjtAccept(node, children[children.length - 1], ec);
 		for (int i = children.length - 2; i >= 0; --i) {
@@ -696,16 +705,30 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 	public ALangObject visit(final ASTLosNode node, final IEvaluationContext ec) throws EvaluationException {
 		if (node.isHasClose())
 			ec.getEmbedment().outputCode(currentResult.coerceString(ec).stringValue(), ec);
-		if (node.isHasText()) 
+		if (node.isHasText())
 			ec.getEmbedment().outputText(node.getText(), ec);
-//		if (node.isHasOpen()) {
-//		}
+		// if (node.isHasOpen()) {
+		// }
 		return NullLangObject.getInstance();
 	}
 
+	@Override
+	public ALangObject visit(final ASTRegexNode node, final IEvaluationContext ec) throws EvaluationException {
+		return RegexLangObject.create(node.getPattern());
+	}
 
 	@Override
-	public ALangObject visit(ASTRegexNode node, IEvaluationContext ec) throws EvaluationException {
-		return RegexLangObject.create(node.getPattern());
+	public ALangObject visit(final ASTTernaryExpressionNode node, final IEvaluationContext ec)
+			throws EvaluationException {
+		if (jjtAccept(node, node.jjtGetChild(0), ec).coerceBoolean(ec).booleanValue()) {
+			return jjtAccept(node, node.jjtGetChild(1), ec);
+		}
+		return jjtAccept(node, node.jjtGetChild(2), ec);
+	}
+
+	@Override
+	public ALangObject visit(final ASTParenthesisExpressionNode node, final IEvaluationContext ec)
+			throws EvaluationException {
+		return jjtAccept(node, node.getFirstChild(), ec);
 	}
 }

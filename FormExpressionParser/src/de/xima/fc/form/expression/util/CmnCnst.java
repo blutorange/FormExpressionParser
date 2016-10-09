@@ -58,6 +58,7 @@ public final class CmnCnst {
 	public static final String SYNTAX_PAREN_CLOSE = ")";
 	public static final String SYNTAX_BRACKET_OPEN = "[";
 	public static final String SYNTAX_BRACKET_CLOSE = "]";
+	public static final String SYNTAX_QUESTION_MARK = "?";
 	public static final String SYNTAX_DOT = ".";
 	public static final String SYNTAX_COMMA = ",";
 	public static final String SYNTAX_COLON = ":";
