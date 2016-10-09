@@ -5,56 +5,57 @@ import java.io.Writer;
 
 public class StringBuilderWriter extends Writer {
 	private final StringBuilder sb;
-	
+
 	public StringBuilderWriter() {
 		sb = new StringBuilder();
 	}
 
 	@Override
-	public void write(char[] str, int offset, int len) throws IOException {
+	public void write(final char[] str, final int offset, final int len) throws IOException {
 		sb.append(str, offset, len);
 	}
 
 	@Override
-	public void flush() throws IOException {
+	public void flush() {
 	}
 
 	@Override
-	public Writer append(CharSequence seq, int start, int end) {
+	public Writer append(final CharSequence seq, final int start, final int end) {
 		sb.append(seq, start, end);
 		return this;
 	}
 
 	@Override
-	public void write(String s) {
+	public void write(final String s) {
 		sb.append(s);
 	}
 
 	@Override
-	public void write(int c) {
+	public void write(final int c) {
 		sb.append((char)c);
 	}
-	
+
 	@Override
-	public void write(String s, int off, int len) {
+	public void write(final String s, final int off, final int len) {
 		if (len == 0)
 			return;
 		sb.append(s, off, off + len - 1);
 	}
 
 	@Override
-	public Writer append(CharSequence seq) {
+	public Writer append(final CharSequence seq) {
 		sb.append(seq);
 		return this;
 	}
 
 	@Override
-	public void write(char[] buffer) {
+	public void write(final char[] buffer) {
 		sb.append(buffer);
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
+		flush();
 		// StringBuilder does not need to be closed.
 	}
 

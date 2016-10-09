@@ -30,14 +30,14 @@ public class NumberLangObject extends ALangObject {
 	private final double value;
 
 	final static ThreadLocal<NumberFormat> NUMBER_FORMAT = new ThreadLocal<NumberFormat>(){
-        @Override protected NumberFormat initialValue() {
+		@Override protected NumberFormat initialValue() {
 			final NumberFormat nf = new DecimalFormat("#0.#########", DecimalFormatSymbols.getInstance(Locale.ROOT));
-            nf.setGroupingUsed(false);
-            return nf;
-        }
+			nf.setGroupingUsed(false);
+			return nf;
+		}
 	};
 
-	
+
 	private static class InstanceHolder {
 		public final static NumberLangObject ZERO = NumberLangObject.create(0);
 		public final static NumberLangObject ONE = NumberLangObject.create(1);
@@ -196,7 +196,11 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(NUMBER_FORMAT.get().format(value));
+		builder.append(toExpression(value));
+	}
+
+	public static String toExpression(final double value) {
+		return NUMBER_FORMAT.get().format(value);
 	}
 
 	@Override
@@ -306,14 +310,14 @@ public class NumberLangObject extends ALangObject {
 		return NumberLangObject.create(-value);
 	}
 
-	public NumberLangObject modulo(NumberLangObject other) {
+	public NumberLangObject modulo(final NumberLangObject other) {
 		return NumberLangObject.create(Math.IEEEremainder(value, other.value));
 	}
-	
-	public NumberLangObject remainder(NumberLangObject other) {
+
+	public NumberLangObject remainder(final NumberLangObject other) {
 		return NumberLangObject.create(value % other.value);
 	}
-	
+
 	public NumberLangObject pow(final NumberLangObject operand) throws MathException {
 		return NumberLangObject.create(Math.pow(value, operand.value));
 	}

@@ -144,7 +144,7 @@ public interface Node extends Serializable, ITraceElement {
 	public void setEndPosition(Token token);
 
 	/**
-	 * @return The id of this node.
+	 * @return The id for this TYPE of node.
 	 * @see FormExpressionParserTreeConstants
 	 */
 	public int jjtGetNodeId();

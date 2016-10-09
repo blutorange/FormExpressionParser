@@ -7,12 +7,12 @@ package de.xima.fc.form.expression.grammar;
 public class Token implements java.io.Serializable {
 
 	private String embedmentContext;
-	
+
 	public String getEmbedmentContext() {
 		return embedmentContext;
 	}
 
-	void setEmbedmentContext(String embedmentContext) {
+	void setEmbedmentContext(final String embedmentContext) {
 		this.embedmentContext = embedmentContext;
 	}
 
@@ -86,20 +86,20 @@ public class Token implements java.io.Serializable {
 	/**
 	 * Constructs a new token for the specified Image.
 	 */
-	public Token(int kind) {
+	public Token(final int kind) {
 		this(kind, null);
 	}
 
 	/**
 	 * Constructs a new token for the specified Image and Kind.
 	 */
-	public Token(int kind, String image) {
+	public Token(final int kind, final String image) {
 		this.kind = kind;
 		this.image = image;
 	}
 
-	public Token(int kind, String image, int beginLine, int beginColumn, int endLine,
-			int endColumn) {
+	public Token(final int kind, final String image, final int beginLine, final int beginColumn, final int endLine,
+			final int endColumn) {
 		this.kind = kind;
 		this.image = image;
 		this.beginColumn = beginColumn;
@@ -128,15 +128,19 @@ public class Token implements java.io.Serializable {
 	 * to the following switch statement. Then you can cast matchedToken
 	 * variable to the appropriate type and use sit in your lexical actions.
 	 */
-	public static Token newToken(int ofKind, String image) {
+	public static Token newToken(final int ofKind, final String image) {
 		switch (ofKind) {
 		default:
 			return new Token(ofKind, image);
 		}
 	}
 
-	public static Token newToken(int ofKind) {
+	public static Token newToken(final int ofKind) {
 		return newToken(ofKind, null);
+	}
+
+	public boolean isEof() {
+		return kind == FormExpressionParserConstants.EOF;
 	}
 
 }

@@ -14,12 +14,12 @@ import com.google.common.collect.Maps;
 public enum EMethod {
 	PLUS("+"), // +
 	PLUS_UNARY("-"), // +
-	DOUBLE_PLUS_PREFIX("++p"), // ++i
-	DOUBLE_PLUS_SUFFIX("++s"), // i++
+	DOUBLE_PLUS_PREFIX("++"), // ++i
+	DOUBLE_PLUS_SUFFIX("++"), // i++
 	DASH("-"), // -
 	DASH_UNARY("-"), // -
-	DOUBLE_DASH_PREFIX("--p"), // --i
-	DOUBLE_DASH_SUFFIX("--s"), // i--
+	DOUBLE_DASH_PREFIX("--"), // --i
+	DOUBLE_DASH_SUFFIX("--"), // i--
 
 	STAR("*"), // *
 	DOUBLE_STAR("**"), // **

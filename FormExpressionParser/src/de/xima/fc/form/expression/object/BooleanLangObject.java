@@ -111,7 +111,11 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(value ? "true" : "false");
+		builder.append(toExpression(value));
+	}
+
+	public static String toExpression(final boolean value) {
+		return value ? "true" : "false";
 	}
 
 	public static BooleanLangObject create(final boolean b) {

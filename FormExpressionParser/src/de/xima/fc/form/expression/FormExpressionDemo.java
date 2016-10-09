@@ -24,37 +24,38 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 /**
  * todo
- * - unparse / format
- * - regex literal
+ * - allow    i = if (true) 1; else 0;  etc.
  * - more operators, <<  >> etc.
  * - suffix ++ --
  */
 public class FormExpressionDemo {
 
 	private static Writer writer;
-	
+
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
-		
+
 		showInputCode(code);
 
-		Token[] tokenArray = showTokenStream(code);
+		final Token[] tokenArray = showTokenStream(code);
 
 		showHighlighting(tokenArray);
-		
+
 		final Node rootNode = showParseTree(code);
 
+		showUnparsed(rootNode); System.exit(0);
+
 		showEvaluatedResult(rootNode);
-		
+
 		if (writer != null)
 			try {
 				writer.write("\n");
 				writer.flush();
 				writer.close();
 			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
+		catch (final IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static String readArgs(final String[] args) {
@@ -72,7 +73,7 @@ public class FormExpressionDemo {
 			return null;
 		}
 	}
-	
+
 	private static void showInputCode(final String code) {
 		System.out.println("===Input code===");
 		System.out.println(code);
@@ -93,7 +94,7 @@ public class FormExpressionDemo {
 
 		System.out.println("===Token stream===");
 		int charsWithoutLf = 0;
-		for (Token token : tokenArray) {
+		for (final Token token : tokenArray) {
 			final String s = token.image.replaceAll("[ \n\r\t]", "") + " ";
 			System.out.print(s);
 			charsWithoutLf += s.length();
@@ -112,12 +113,12 @@ public class FormExpressionDemo {
 		try {
 			System.out.println(FormExpressionHighlightingUtil.highlightHtml(tokenArray,
 					HighlightThemeEclipse.getInstance(), null, true));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println();
 	}
-	
+
 	private static Node showParseTree(final String code) {
 		final Node rootNode;
 		try {
@@ -143,10 +144,17 @@ public class FormExpressionDemo {
 		return rootNode;
 	}
 
-	private static void showUnparsed(final Node rootNode) {
-		final UnparseVisitor unparse = new UnparseVisitor();
-		System.out.println("Unparse:");
-		System.out.println(rootNode.jjtAccept(unparse, new Integer(0)).toString());
+	private static void showUnparsed(final Node node) {
+		final String unparse;
+		try {
+			unparse = UnparseVisitor.unparse(node, "  ", null);
+		}
+		catch (final IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		System.out.println("===Unparse===");
+		System.out.println(unparse);
 		System.out.println();
 	}
 
@@ -160,7 +168,7 @@ public class FormExpressionDemo {
 			final long t1 = System.nanoTime();
 			result = FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getFec());
 			final long t2 = System.nanoTime();
-			
+
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n");
 		}
 		catch (final EvaluationException e) {

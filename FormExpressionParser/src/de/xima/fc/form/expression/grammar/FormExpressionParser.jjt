@@ -300,7 +300,7 @@ void LosChars(EMethod method) #LosNode :
     )+
   )
   {
-    jjtThis.init(method, sb.toString(), false, false);
+    jjtThis.init(method, sb.toString(), null, false);
     jjtThis.setEndPosition(token);
   }
 }
@@ -317,7 +317,7 @@ void LosOpen(EMethod method) #LosNode :
   {
     if (!_customLosAllowed) throw new ParseException(
       String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
-    jjtThis.init(method, StringUtils.EMPTY, true, false);
+    jjtThis.init(method, StringUtils.EMPTY, t.image, false);
     jjtThis.setEndPosition(token);
   }
 }
@@ -344,7 +344,7 @@ void LosBody(EMethod method) #LosNode :
   {
     if (!_customLosAllowed) throw new ParseException(
       String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
-    jjtThis.init(method, sb.toString(), p != null, true);
+    jjtThis.init(method, sb.toString(), p != null ? p.image : null, true);
     jjtThis.setEndPosition(token);
   }
 }
@@ -439,7 +439,7 @@ void WithClause(EMethod method) #WithClauseNode :
 }
 {
   (
-    < With > < ParenOpen > [ IdentifierName(null) ]
+    < With > < ParenOpen > IdentifierName(null)
     (
       < Comma > IdentifierName(null)
     )*

@@ -80,8 +80,6 @@ public class LookUpBindingAlternative implements IBinding {
 	@Override
 	public void nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
 		++currentDepth;
-		for (final ALangObject[] values : map.values())
-			if (currentDepth < values.length) values[currentDepth] = null;
 		if (currentDepth >= breakpoints.length)
 			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth);
 	}
@@ -96,6 +94,8 @@ public class LookUpBindingAlternative implements IBinding {
 
 	@Override
 	public void unnest(final IEvaluationContext ec) {
+		for (final ALangObject[] values : map.values())
+			if (currentDepth < values.length) values[currentDepth] = null;
 		if (currentDepth <= 0) throw new UncatchableEvaluationException(ec, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
 		--currentDepth;
 		breakpoints[currentDepth] = false;

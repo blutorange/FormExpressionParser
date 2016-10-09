@@ -1,9 +1,13 @@
 package de.xima.fc.form.expression.visitor;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -35,243 +39,610 @@ import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
+import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.object.NullLangObject;
+import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
+import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class UnparseVisitor implements IFormExpressionParserVisitor<StringBuilder, Integer, EvaluationException>{
+public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String, IOException>{
 
-	private StringBuilder sb;
+	private final Writer writer;
 	private final String indentPrefix;
+	private final String linefeed;
 
-	public UnparseVisitor() {
-		this(2);
+
+	public static void unparse(final Writer writer, final Node node, final String indentPrefix, final String linefeed) throws IOException {
+		final UnparseVisitor unparser = new UnparseVisitor(writer, indentPrefix, linefeed);
+		node.jjtAccept(unparser, StringUtils.EMPTY);
+		writer.flush();
 	}
 
-	public UnparseVisitor(final int indentationLevel) {
-		this.indentPrefix = StringUtils.repeat(' ', indentationLevel);
-		reinit();
+	public static String unparse(final Node node, final String indentPrefix, final String linefeed) throws IOException {
+		final Writer writer = new StringBuilderWriter();
+		final UnparseVisitor unparser = new UnparseVisitor(writer, indentPrefix, linefeed);
+		node.jjtAccept(unparser, StringUtils.EMPTY);
+		writer.close();
+		return writer.toString();
 	}
 
-	public void reinit() {
-		sb = new StringBuilder();
+	private UnparseVisitor(final Writer writer, String indentPrefix, String linefeed) {
+		if (writer == null) throw new IllegalArgumentException("writer must not be null");
+		if (indentPrefix == null) indentPrefix = StringUtils.SPACE;
+		if (linefeed == null) linefeed = StringUtils.LF;
+		this.indentPrefix = indentPrefix;
+		this.writer = writer;
+		this.linefeed = linefeed;
 	}
 
-	@Override
-	public StringBuilder visit(final ASTExpressionNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTNumberNode node, final Integer level) throws EvaluationException {
-		sb.append(node.getDoubleValue());
-		return sb;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTArrayNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTHashNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTNullNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTBooleanNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTVariableNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTStringNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTStatementListNode node, final Integer level) throws EvaluationException {
-		for (final Node n : node.getChildArray()) {
-			indent(level);
-			n.jjtAccept(this, level);
-			sb.append(CmnCnst.SYNTAX_SEMI_COLON).append(StringUtils.LF);
+	private Void blockOrClause(final Node node, final String prefix) throws IOException {
+		node.jjtAccept(this, prefix);
+		switch (node.jjtGetNodeId()) {
+		case FormExpressionParserTreeConstants.JJTARRAYNODE:
+		case FormExpressionParserTreeConstants.JJTASSIGNMENTEXPRESSIONNODE:
+		case FormExpressionParserTreeConstants.JJTBOOLEANNODE:
+		case FormExpressionParserTreeConstants.JJTBREAKCLAUSENODE:
+		case FormExpressionParserTreeConstants.JJTCONTINUECLAUSENODE:
+		case FormExpressionParserTreeConstants.JJTEXCEPTIONNODE:
+		case FormExpressionParserTreeConstants.JJTEXPRESSIONNODE:
+		case FormExpressionParserTreeConstants.JJTFUNCTIONNODE:
+		case FormExpressionParserTreeConstants.JJTHASHNODE:
+		case FormExpressionParserTreeConstants.JJTIDENTIFIERNAMENODE:
+		case FormExpressionParserTreeConstants.JJTLOGNODE:
+		case FormExpressionParserTreeConstants.JJTNULLNODE:
+		case FormExpressionParserTreeConstants.JJTNUMBERNODE:
+		case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
+		case FormExpressionParserTreeConstants.JJTREGEXNODE:
+		case FormExpressionParserTreeConstants.JJTRETURNCLAUSENODE:
+		case FormExpressionParserTreeConstants.JJTSTRINGNODE:
+		case FormExpressionParserTreeConstants.JJTTHROWCLAUSENODE:
+		case FormExpressionParserTreeConstants.JJTUNARYEXPRESSIONNODE:
+		case FormExpressionParserTreeConstants.JJTVARIABLENODE:
+			writer.write(CmnCnst.SYNTAX_SEMI_COLON);
+			break;
 		}
-		return sb;
+		return null;
 	}
 
-	private void indent(final Integer level) {
-		for (int i = level; i --> 0;) sb.append(indentPrefix);
+	private Void expressionNode(final Node node, final String prefix) throws IOException {
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
+			writer.write(StringUtils.SPACE);
+			writer.write(node.jjtGetChild(i).getSiblingMethod().methodName);
+			writer.write(StringUtils.SPACE);
+			node.jjtGetChild(1).jjtAccept(this, prefix);
+		}
+		return null;
 	}
 
-	private void blockOrClause(final Node node, final Integer level) {
-		if (node.jjtGetNumChildren() > 1) {
-			sb.append(CmnCnst.SYNTAX_BRACE_OPEN).append(StringUtils.LF);
-			node.jjtAccept(this, level).append(StringUtils.LF);
-			sb.append(CmnCnst.SYNTAX_BRACE_CLOSE);
+	@Override
+	public Void visit(final ASTExpressionNode node, final String prefix) throws IOException {
+		return expressionNode(node, prefix);
+	}
+
+	@Override
+	public Void visit(final ASTAssignmentExpressionNode node, final String prefix) throws IOException {
+		return expressionNode(node, prefix);
+	}
+
+	@Override
+	public Void visit(final ASTNumberNode node, final String prefix) throws IOException {
+		writer.write(NumberLangObject.toExpression(node.getDoubleValue()));
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTArrayNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		writer.write(CmnCnst.SYNTAX_BRACKET_OPEN);
+		for (int i = 0; i < len; ++i) {
+			node.jjtGetChild(i).jjtAccept(this, prefix);
+			if (len != 1 && i < len - 1) {
+				writer.write(CmnCnst.SYNTAX_COMMA);
+				writer.write(StringUtils.SPACE);
+			}
+		}
+		writer.write(CmnCnst.SYNTAX_BRACKET_CLOSE);
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTHashNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		for (int i = 0; i < len; i+=2) {
+			if (node.jjtGetChild(i).jjtGetNodeId() == FormExpressionParserTreeConstants.JJTIDENTIFIERNAMENODE) {
+				StringLangObject.toExpression(((ASTIdentifierNameNode)node.jjtGetChild(i)).getName(), writer);
+			}
+			else node.jjtGetChild(i).jjtAccept(this, prefix);
+			writer.write(CmnCnst.SYNTAX_COLON);
+			writer.write(StringUtils.SPACE);
+			node.jjtGetChild(i+1).jjtAccept(this, prefix);
+			if (len != 1 && i < len - 2) {
+				writer.write(CmnCnst.SYNTAX_COMMA);
+				writer.write(StringUtils.SPACE);
+			}
+		}
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTNullNode node, final String prefix) throws IOException {
+		writer.write(NullLangObject.toExpression());
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTBooleanNode node, final String prefix) throws IOException {
+		writer.write(BooleanLangObject.toExpression(node.getBooleanValue()));
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTVariableNode node, final String prefix) throws IOException {
+		if (node.hasScope()) {
+			writer.write(node.getScope());
+			writer.write(CmnCnst.SYNTAX_SCOPE_SEPARATOR);
+		}
+		writer.write(node.getName());
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTStringNode node, final String prefix) throws IOException {
+		StringLangObject.toExpression(node.getStringValue(), writer);
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTStatementListNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		for (int i = 0; i != len; ++i) {
+			blockOrClause(node.jjtGetChild(i), prefix);
+			if (len != 1 && i < len - 1) {
+				writer.write(linefeed);
+				writer.write(prefix);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTIfClauseNode node, final String prefix) throws IOException {
+		final String next = prefix + indentPrefix;
+		// if-header
+		writer.write(CmnCnst.SYNTAX_IF);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		// if-body
+		writer.write(next);
+		blockOrClause(node.jjtGetChild(1), next);
+		writer.write(linefeed);
+		// if-footer
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		// else-header
+		if (node.jjtGetNumChildren() > 2) {
+			writer.write(CmnCnst.SYNTAX_ELSE);
+			writer.write(StringUtils.SPACE);
+			writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+			writer.write(linefeed);
+			node.jjtGetChild(1).jjtAccept(this, next);
+			writer.write(linefeed);
+			// else-body
+			writer.write(next);
+			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+			writer.write(linefeed);
+			// else-footer
+			writer.write(prefix);
+			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTForLoopNode node, final String prefix) throws IOException {
+		final String next = prefix + indentPrefix;
+		writer.write(CmnCnst.SYNTAX_FOR);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		if (node.getIteratingLoopVariable() == null) {
+			// plain loop
+			// header for (i = 0; i != 10; ++i) {
+			node.jjtGetChild(0).jjtAccept(this, prefix);
+			writer.write(CmnCnst.SYNTAX_SEMI_COLON);
+			writer.write(StringUtils.SPACE);
+			node.jjtGetChild(1).jjtAccept(this, prefix);
+			writer.write(CmnCnst.SYNTAX_SEMI_COLON);
+			writer.write(StringUtils.SPACE);
+			node.jjtGetChild(2).jjtAccept(this, prefix);
+			writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+			writer.write(StringUtils.SPACE);
+			writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+			writer.write(linefeed);
+			// body
+			writer.write(next);
+			blockOrClause(node.jjtGetChild(3), next);
+			writer.write(linefeed);
+			// footer
+			writer.write(prefix);
+			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		}
 		else {
-			node.jjtAccept(this, level);
+			// enhanced loop
+			// header  for (i : 10) {
+			writer.write(node.getIteratingLoopVariable());
+			writer.write(StringUtils.SPACE);
+			writer.write(CmnCnst.SYNTAX_ENHANCED_FOR_LOOP_SEPARATOR);
+			writer.write(StringUtils.SPACE);
+			node.jjtGetChild(0).jjtAccept(this, prefix);
+			writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+			writer.write(StringUtils.SPACE);
+			writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+			writer.write(linefeed);
+			// body
+			writer.write(next);
+			blockOrClause(node.jjtGetChild(1), next);
+			writer.write(linefeed);
+			// footer
+			writer.write(prefix);
+			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		}
+		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTIfClauseNode node, final Integer level) throws EvaluationException {
-		final Integer next = level+1;
-		// <if (>
-		indent(level);
-		sb.append(CmnCnst.SYNTAX_IF).append(StringUtils.EMPTY).append(CmnCnst.SYNTAX_PAREN_OPEN);
-		// <...>
-		node.jjtGetChild(0).jjtAccept(this, next);
-		// <) >
-		sb.append(CmnCnst.SYNTAX_PAREN_CLOSE).append(StringUtils.SPACE);
-		// blockOrClause
+	public Void visit(final ASTWhileLoopNode node, final String prefix) throws IOException {
+		final String next = prefix + indentPrefix;
+		// header while(foobar) {
+		writer.write(CmnCnst.SYNTAX_WHILE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		// body
+		writer.write(next);
 		blockOrClause(node.jjtGetChild(1), next);
-		if (node.jjtGetNumChildren() > 2) {
-			sb.append(StringUtils.LF);
-			indent(level);
-			sb.append(CmnCnst.SYNTAX_ELSE).append(StringUtils.LF);
-			node.jjtGetChild(2).jjtAccept(this, next);
+		writer.write(linefeed);
+		// footer
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTTryClauseNode node, final String prefix) throws IOException {
+		final String next = prefix + indentPrefix;
+		// try
+		writer.write(CmnCnst.SYNTAX_TRY);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		writer.write(next);
+		blockOrClause(node.jjtGetChild(0), next);
+		writer.write(linefeed);
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		writer.write(linefeed);
+		// catch
+		writer.write(CmnCnst.SYNTAX_CATCH);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		writer.write(node.getErrorVariableName());
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		writer.write(next);
+		node.jjtGetChild(1).jjtAccept(this, next);
+		writer.write(linefeed);
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		writer.write(linefeed);
+		return null;
+	}
+
+	@Override
+	public Void visit(final ASTSwitchClauseNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		final String next = prefix + indentPrefix;
+		final String next2 = next + indentPrefix;
+		// header switch(foobar) {
+		writer.write(CmnCnst.SYNTAX_SWITCH);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.getFirstChild().jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		// cases
+		for (int i = 1; i < len; ++i) {
+			switch (node.jjtGetChild(i).getSiblingMethod()) {
+			case SWITCHCASE:
+				writer.write(next);
+				writer.write(CmnCnst.SYNTAX_CASE);
+				writer.write(StringUtils.SPACE);
+				node.jjtGetChild(i).jjtAccept(this, next);
+				writer.write(CmnCnst.SYNTAX_COLON);
+				writer.write(linefeed);
+				break;
+			case SWITCHCLAUSE:
+				writer.write(next2);
+				blockOrClause(node.jjtGetChild(i), next2);
+				writer.write(linefeed);
+				break;
+			case SWITCHDEFAULT:
+				writer.write(next);
+				writer.write(CmnCnst.SYNTAX_DEFAULT);
+				writer.write(CmnCnst.SYNTAX_COLON);
+				writer.write(linefeed);
+				writer.write(next2);
+				blockOrClause(node.jjtGetChild(i), next2);
+				writer.write(linefeed);
+				break;
+				//$CASES-OMITTED$
+			default:
+				throw new RuntimeException(String.format("Illegal enum %s. This is likely an error with the parser. Contact support.", node.jjtGetChild(i).getSiblingMethod()));
+			}
 		}
-		return sb;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTForLoopNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+		// footer }
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		//blockOrClause
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTWhileLoopNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTDoWhileLoopNode node, final String prefix) throws IOException {
+		final String next = prefix + indentPrefix;
+		// header do {
+		writer.write(CmnCnst.SYNTAX_DO);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		// body
+		writer.write(next);
+		blockOrClause(node.jjtGetChild(1), next);
+		writer.write(linefeed);
+		// footer } while(foobar)
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_WHILE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(CmnCnst.SYNTAX_SEMI_COLON);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTTryClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTExceptionNode node, final String prefix) throws IOException {
+		writer.write(CmnCnst.SYNTAX_EXCEPTION);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTSwitchClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTThrowClauseNode node, final String prefix) throws IOException {
+		writer.write(CmnCnst.SYNTAX_THROW);
+		writer.write(StringUtils.SPACE);
+		node.jjtGetChild(0).jjtAccept(this, prefix);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTDoWhileLoopNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTBreakClauseNode node, final String prefix) throws IOException {
+		writer.write(CmnCnst.SYNTAX_BREAK);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTAssignmentExpressionNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTContinueClauseNode node, final String prefix) throws IOException {
+		writer.write(CmnCnst.SYNTAX_CONTINUE);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTExceptionNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTReturnClauseNode node, final String prefix) throws IOException {
+		writer.write(CmnCnst.SYNTAX_RETURN);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTThrowClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTLogNode node, final String prefix) throws IOException {
+		switch (node.getLogLevel()) {
+		case DEBUG:
+			writer.write(CmnCnst.SYNTAX_LOG_DEBUG);
+			break;
+		case ERROR:
+			writer.write(CmnCnst.SYNTAX_LOG_ERROR);
+			break;
+		case INFO:
+			writer.write(CmnCnst.SYNTAX_LOG_INFO);
+			break;
+		case WARN:
+			writer.write(CmnCnst.SYNTAX_LOG_WARN);
+			break;
+		default:
+			throw new RuntimeException("Unknown enum: " + node.getLogLevel());
+		}
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTBreakClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTFunctionNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		final String next = prefix + indentPrefix;
+		writer.write(CmnCnst.SYNTAX_LAMBDA_ARROW);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		for (int i = 0; i < len - 1; ++i) {
+			node.jjtGetChild(i).jjtAccept(this, prefix);
+			if (len != 2 && i < len - 2) {
+				writer.write(CmnCnst.SYNTAX_COMMA);
+				writer.write(StringUtils.SPACE);
+			}
+		}
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		writer.write(next);
+		node.getLastChild().jjtAccept(this, next);
+		writer.write(linefeed);
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTContinueClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTUnaryExpressionNode node, final String prefix) throws IOException {
+		writer.write(node.getUnaryMethod().methodName);
+		return node.jjtGetChild(0).jjtAccept(this, prefix);
+	}
+
+	@Override
+	public Void visit(final ASTPropertyExpressionNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		node.jjtGetChild(0).jjtAccept(this, prefix);
+		for (int i = 1; i < len; ++i) {
+			final Node n = node.jjtGetChild(i);
+			switch (n.getSiblingMethod()) {
+			case DOT:
+				writer.write(CmnCnst.SYNTAX_DOT);
+				n.jjtAccept(this, prefix);
+				break;
+			case BRACKET:
+				writer.write(CmnCnst.SYNTAX_BRACKET_OPEN);
+				n.jjtAccept(this, prefix);
+				writer.write(CmnCnst.SYNTAX_BRACKET_CLOSE);
+				break;
+			case PARENTHESIS:
+				final int len2 = n.jjtGetNumChildren();
+				writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+				for (final int j = 0; i < len2; ++i) {
+					n.jjtGetChild(j).jjtAccept(this, prefix);
+					if (len != 1 && i < len -1) {
+						writer.write(CmnCnst.SYNTAX_COMMA);
+						writer.write(StringUtils.SPACE);
+					}
+				}
+				writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+				break;
+				//$CASES-OMITTED$
+			default:
+				throw new RuntimeException(String.format("Unexpected enum %s. This is likely an error with the parser. Contact support.", node.jjtGetChild(i).getSiblingMethod()));
+			}
+		}
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTReturnClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTIdentifierNameNode node, final String prefix) throws IOException {
+		writer.write(node.getName());
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTLogNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTWithClauseNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		final String next = prefix + indentPrefix;
+		// header with(foo,bar) {
+		writer.write(CmnCnst.SYNTAX_WITH);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		for (int i = 0; i < len - 1; ++i) {
+			node.jjtGetChild(i).jjtAccept(this, prefix);
+			if (len != 2 && i < len - 2) {
+				writer.write(CmnCnst.SYNTAX_COMMA);
+				writer.write(StringUtils.SPACE);
+			}
+		}
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		// body
+		writer.write(next);
+		blockOrClause(node.getLastChild(), prefix);
+		writer.write(linefeed);
+		// footer
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTFunctionNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTFunctionClauseNode node, final String prefix) throws IOException {
+		final int len = node.jjtGetNumChildren();
+		final String next = prefix+indentPrefix;
+		// header function foo(bar) {
+		writer.write(CmnCnst.SYNTAX_FUNCTION);
+		writer.write(StringUtils.SPACE);
+		node.getFirstChild().jjtAccept(this, prefix);
+		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
+		for (int i = 1; i < len - 2; ++i) {
+			node.jjtGetChild(i).jjtAccept(this, prefix);
+			if (i != len -3) {
+				writer.write(CmnCnst.SYNTAX_COMMA);
+				writer.write(StringUtils.SPACE);
+			}
+		}
+		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
+		writer.write(StringUtils.SPACE);
+		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+		writer.write(linefeed);
+		// body
+		writer.write(next);
+		blockOrClause(node.getLastChild(), next);
+		writer.write(linefeed);
+		// footer
+		writer.write(prefix);
+		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+		return null;
+
+	}
+
+	@Override
+	public Void visit(final ASTEmptyNode node, final String prefix) throws IOException {
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTUnaryExpressionNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTLosNode node, final String prefix) throws IOException {
+		if (node.isHasClose()) {
+			writer.write(StringUtils.SPACE);
+			writer.write(CmnCnst.SYNTAX_LOS_CLOSE);
+		}
+		if (node.isHasText()) {
+			writer.write(node.getText());
+		}
+		if (node.isHasOpen()) {
+			writer.write(node.getEmbedment());
+			writer.write(StringUtils.SPACE);
+		}
 		return null;
 	}
 
 	@Override
-	public StringBuilder visit(final ASTPropertyExpressionNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTIdentifierNameNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTWithClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTFunctionClauseNode node, final Integer level) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTEmptyNode node, final Integer data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(final ASTLosNode node, final Integer data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuilder visit(ASTRegexNode node, Integer data) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Void visit(final ASTRegexNode node, final String prefix) throws IOException {
+		RegexLangObject.toExpression(node.getPattern(), writer);
 		return null;
 	}
 

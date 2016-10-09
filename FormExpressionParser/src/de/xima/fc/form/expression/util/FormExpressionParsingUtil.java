@@ -38,27 +38,33 @@ public final class FormExpressionParsingUtil {
 		 */
 		public static Node parse(final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				return new FormExpressionParser(tokenManagerForState(reader, FormExpressionParserTokenManager.CODE))
-						.CompleteProgram(null);
+				return new FormExpressionParser(asTokenManager(reader)).CompleteProgram(null);
 			}
 		}
 
 		/**
-		 * @param code Code to parse.
-		 * @return An object that, for convenience, is both a {@link Iterable} and {@link Iterator} and can only be iterated once, even when calling {@link Iterable#iterator()} more than once.
+		 * @param reader Reader to read from.
+		 * @return A token manager for tokenizing the stream.
+		 */
+		public static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
+			return tokenManagerForState(reader,	FormExpressionParserTokenManager.CODE);
+		}
+
+		/**
+		 * @param code
+		 *            Code to parse.
+		 * @return An object that, for convenience, is both a {@link Iterable}
+		 *         and {@link Iterator} and can only be iterated once, even when
+		 *         calling {@link Iterable#iterator()} more than once.
 		 * @throws TokenMgrError
 		 */
 		public static TokenIterator asTokenStream(final Reader reader) throws TokenMgrError {
-			final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
-					FormExpressionParserTokenManager.CODE);
-			return new TokenIterator(tm);
-	}
-		
+			return new TokenIterator(asTokenManager(reader));
+		}
+
 		public static Token[] asTokenArray(final String code) throws TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
-						FormExpressionParserTokenManager.CODE);
-				return tokenManagerToArray(tm);
+				return tokenManagerToArray(asTokenManager(reader));
 			}
 		}
 	}
@@ -106,62 +112,68 @@ public final class FormExpressionParsingUtil {
 
 		public static Node parse(final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				final FormExpressionParser parser = new FormExpressionParser(
-						tokenManagerForState(reader, FormExpressionParserTokenManager.LOS));
+				final FormExpressionParser parser = new FormExpressionParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
 				return parser.Template(null);
 			}
 		}
 
 		public static TokenIterator asTokenStream(final Reader reader) throws TokenMgrError {
-			final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
-					FormExpressionParserTokenManager.LOS);
-			return new TokenIterator(tm);
+			return new TokenIterator(asTokenManager(reader));
 		}
-		
+
 		public static Token[] asTokenArray(final String code) throws TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
-						FormExpressionParserTokenManager.LOS);
-				return tokenManagerToArray(tm);
+				return tokenManagerToArray(asTokenManager(reader));
 			}
+		}
+
+		public static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
+			return tokenManagerForState(reader,	FormExpressionParserTokenManager.LOS);
 		}
 	}
 
 	private final static class TokenIterator implements Iterator<Token>, Iterable<Token> {
 		private boolean hasNext = true;
 		private final FormExpressionParserTokenManager tm;
-		public TokenIterator(FormExpressionParserTokenManager tm) {
+
+		public TokenIterator(final FormExpressionParserTokenManager tm) {
 			this.tm = tm;
 		}
+
 		@Override
 		public boolean hasNext() {
 			return hasNext;
 		}
+
 		@Override
 		public Token next() {
 			final Token t = tm.getNextToken();
 			hasNext = t.kind != FormExpressionParserConstants.EOF;
 			return t;
 		}
+
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException("Token iterator does not support removal.");
 		}
+
 		@Override
 		public Iterator<Token> iterator() {
 			return this;
-		}		
-	}	
+		}
+	}
 
-	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state) throws TokenMgrError {
+	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state)
+			throws TokenMgrError {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
 		return new FormExpressionParserTokenManager(stream, state);
 	}
-	
-	private static Token[] tokenManagerToArray(FormExpressionParserTokenManager tm) throws TokenMgrError {
+
+	private static Token[] tokenManagerToArray(final FormExpressionParserTokenManager tm) throws TokenMgrError {
 		final List<Token> list = new ArrayList<>();
-		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm.getNextToken())
+		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm
+				.getNextToken())
 			list.add(token);
 		return list.toArray(new Token[list.size()]);
 	}

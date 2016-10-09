@@ -88,11 +88,11 @@ public class LookUpBinding implements IBinding {
 		if (currentDepth >= mapArray.length - 1)
 			throw new NestingLevelTooDeepException(currentDepth+1, ec);
 		++currentDepth;
-		mapArray[currentDepth].clear();
 	}
 
 	@Override
 	public void unnest(final IEvaluationContext ec) {
+		mapArray[currentDepth].clear();
 		if (currentDepth <= 0)
 			throw new UncatchableEvaluationException(ec,
 					"Cannot unnest global binding. This may be an error in the parser. Contact support.");

@@ -23,12 +23,12 @@ public class HtmlHighlighter extends AHighlighter {
 	private String cssClassPrefix;
 	private boolean basicStyling = true;
 	private StringBuilder currentLine;
-	private HtmlHighlighter(IHighlightTheme theme) throws IllegalArgumentException {
+	private HtmlHighlighter(final IHighlightTheme theme) throws IllegalArgumentException {
 		super(theme);
 	}
 
 	@Override
-	protected void writeSpace(int numberOfSpaces) throws IOException {
+	protected void writeSpace(final int numberOfSpaces) throws IOException {
 		if (currentLine == null) return;
 		currentLine.append("<span>");
 		for (int i = numberOfSpaces; i-->0;) currentLine.append("&nbsp;");
@@ -36,19 +36,22 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	@Override
-	protected void writeNewline(int numberOfNewlines) throws IOException {		
-		if (html == null || css == null) return;
+	protected void writeNewline(final int numberOfNewlines) throws IOException {
+		if (html == null || css == null || numberOfNewlines < 1) return;
+		// Write one newline.
 		if (currentLine.length() == 0) html.write("<br>");
 		else {
 			html.write("<p>");
 			html.write(currentLine.toString());
 			html.write("</p>");
 		}
+		// Write more new lines.
+		for (int i = numberOfNewlines-1; i-->0;) html.write("<br>");
 		currentLine.setLength(0);
 	}
-	
+
 	@Override
-	protected void writeStyledText(String text, Style style) throws IOException {
+	protected void writeStyledText(final String text, final Style style) throws IOException {
 		if (currentLine == null) return;
 		final String line = StringEscapeUtils.escapeHtml4(text).replaceAll(" ", "&nbsp;");
 		currentLine.append("<span class=\"");
@@ -59,7 +62,7 @@ public class HtmlHighlighter extends AHighlighter {
 		currentLine.append(line);
 		currentLine.append("</span>");
 	}
-	
+
 	@Override
 	protected void prepareProcessing(final Color backgroundColor) throws IOException {
 		if (html == null || css == null) return;
@@ -73,7 +76,7 @@ public class HtmlHighlighter extends AHighlighter {
 		html.write(cssClassPrefix);
 		html.write("\">");
 	}
-	
+
 	@Override
 	protected void finishProcessing(final Color backgroundColor) throws IOException {
 		if (html == null || css == null) return;
@@ -95,11 +98,11 @@ public class HtmlHighlighter extends AHighlighter {
 		cssClassPrefix = null;
 	}
 
-	public final void process(final Iterable<Token> tokenStream, Writer html, Writer css) throws IOException {
+	public final void process(final Iterable<Token> tokenStream, final Writer html, final Writer css) throws IOException {
 		process(tokenStream, null, true, html, css);
 	}
 
-	public final void process(final Token[] tokenArray, String cssClassPrefix, boolean basicStyling, Writer html, Writer css) throws IOException {
+	public final void process(final Token[] tokenArray, final String cssClassPrefix, final boolean basicStyling, final Writer html, final Writer css) throws IOException {
 		this.html = html;
 		this.css = css;
 		this.cssClassPrefix = sanitizeCssClassPrefix(cssClassPrefix);
@@ -107,15 +110,15 @@ public class HtmlHighlighter extends AHighlighter {
 		super.process(tokenArray);
 	}
 
-	public final void process(final Iterable<Token> tokenStream, String cssClassPrefix, boolean basicStyling, Writer html, Writer css) throws IOException {
+	public final void process(final Iterable<Token> tokenStream, final String cssClassPrefix, final boolean basicStyling, final Writer html, final Writer css) throws IOException {
 		this.html = html;
 		this.css = css;
 		this.cssClassPrefix = sanitizeCssClassPrefix(cssClassPrefix);
 		this.basicStyling = basicStyling;
 		super.process(tokenStream);
 	}
-	
-	private void styleCssClasses(Style style) throws IOException {
+
+	private void styleCssClasses(final Style style) throws IOException {
 		// Color
 		if (colorSet != null) colorSet.add(style.color);
 		currentLine.append(cssClassPrefix);
@@ -136,16 +139,16 @@ public class HtmlHighlighter extends AHighlighter {
 			currentLine.append(style.size.name());
 		}
 		// Features
-		for (Feature feature : style.featureSet) {
+		for (final Feature feature : style.featureSet) {
 			currentLine.append(StringUtils.SPACE);
 			currentLine.append(cssClassPrefix);
 			currentLine.append("-ft");
 			currentLine.append(feature.name());
 		}
 	}
-	
+
 	private void cssWeight() throws IOException {
-		for (Weight weight : Weight.values()) {
+		for (final Weight weight : Weight.values()) {
 			css.write(".");
 			css.write(cssClassPrefix);
 			css.write("-wt");
@@ -173,9 +176,9 @@ public class HtmlHighlighter extends AHighlighter {
 			css.write("}");
 		}
 	}
-	
+
 	private void cssSize() throws IOException {
-		for (Size size: Size.values()) {
+		for (final Size size: Size.values()) {
 			css.write(".");
 			css.write(cssClassPrefix);
 			css.write("-sz");
@@ -205,7 +208,7 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	private void cssFeature() throws IOException {
-		for (Feature feature: Feature.values()) {
+		for (final Feature feature: Feature.values()) {
 			css.write(".");
 			css.write(cssClassPrefix);
 			css.write("-ft");
@@ -230,7 +233,7 @@ public class HtmlHighlighter extends AHighlighter {
 
 	private void cssColor() throws IOException {
 		if (colorSet == null) return;
-		for (Color color: colorSet) {
+		for (final Color color: colorSet) {
 			final String hexString = color.getHexStringRgb();
 			css.write(".");
 			css.write(cssClassPrefix);
@@ -243,27 +246,27 @@ public class HtmlHighlighter extends AHighlighter {
 		}
 	}
 
-	private void cssColor(Writer css, Color color, String attribute) throws IOException {
-			css.write(attribute);
-			css.write(":rgb(");
-			css.write(Integer.toString(color.getByteR(), 10));
-			css.write(',');
-			css.write(Integer.toString(color.getByteG(), 10));
-			css.write(',');
-			css.write(Integer.toString(color.getByteB(), 10));
-			css.write(");");
-			css.write(attribute);
-			css.write(":rgba(");
-			css.write(Integer.toString(color.getByteR(), 10));
-			css.write(',');
-			css.write(Integer.toString(color.getByteG(), 10));
-			css.write(',');
-			css.write(Integer.toString(color.getByteB(), 10));
-			css.write(',');
-			css.write(Integer.toString(color.getByteA(), 10));
-			css.write(");");
+	private void cssColor(final Writer css, final Color color, final String attribute) throws IOException {
+		css.write(attribute);
+		css.write(":rgb(");
+		css.write(Integer.toString(color.getByteR(), 10));
+		css.write(',');
+		css.write(Integer.toString(color.getByteG(), 10));
+		css.write(',');
+		css.write(Integer.toString(color.getByteB(), 10));
+		css.write(");");
+		css.write(attribute);
+		css.write(":rgba(");
+		css.write(Integer.toString(color.getByteR(), 10));
+		css.write(',');
+		css.write(Integer.toString(color.getByteG(), 10));
+		css.write(',');
+		css.write(Integer.toString(color.getByteB(), 10));
+		css.write(',');
+		css.write(Integer.toString(color.getByteA(), 10));
+		css.write(");");
 	}
-	
+
 	private void cssGeneral(final Color backgroundColor) throws IOException {
 		if (!backgroundColor.isFullyTransparent()) {
 			css.write("div.");
@@ -282,11 +285,11 @@ public class HtmlHighlighter extends AHighlighter {
 			css.write("{font-family:monospace;white-space:nowrap;overflow-x: scroll;}");
 		}
 	}
-	
-	public static HtmlHighlighter getFor(IHighlightTheme theme) {
+
+	public static HtmlHighlighter getFor(final IHighlightTheme theme) {
 		return new HtmlHighlighter(theme);
 	}
-	
+
 	public static String sanitizeCssClassPrefix(String cssClassPrefix) {
 		if (cssClassPrefix == null) cssClassPrefix = StringUtils.EMPTY;
 		cssClassPrefix = cssClassPrefix.replaceAll("[^-a-zA-Z0-9_]", StringUtils.EMPTY);

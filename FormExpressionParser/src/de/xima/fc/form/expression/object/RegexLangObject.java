@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.object;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +14,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.InvalidRegexPatternException;
 
 public class RegexLangObject extends ALangObject {
-	
+
 	private final Pattern value;
 
 	private RegexLangObject(final Pattern value) {
@@ -93,10 +95,22 @@ public class RegexLangObject extends ALangObject {
 		builder.append('#').append(value.pattern()).append('#');
 		if ((value.flags() & Pattern.CASE_INSENSITIVE) != 0)
 			builder.append('i');
-		if ((value.flags() & Pattern.DOTALL) != 0)
-			builder.append('s');
 		if ((value.flags() & Pattern.MULTILINE) != 0)
 			builder.append('m');
+		if ((value.flags() & Pattern.DOTALL) != 0)
+			builder.append('s');
+	}
+
+	public static void toExpression(final Pattern value, final Writer writer) throws IOException {
+		writer.write('#');
+		writer.write(value.pattern());
+		writer.write('#');
+		if ((value.flags() & Pattern.CASE_INSENSITIVE) != 0)
+			writer.write('i');
+		if ((value.flags() & Pattern.MULTILINE) != 0)
+			writer.write('m');
+		if ((value.flags() & Pattern.DOTALL) != 0)
+			writer.write('s');
 	}
 
 	// Coercion
@@ -114,16 +128,16 @@ public class RegexLangObject extends ALangObject {
 		return new RegexLangObject(value);
 	}
 
-	public static RegexLangObject create(String value, IEvaluationContext ec) throws InvalidRegexPatternException {
+	public static RegexLangObject create(final String value, final IEvaluationContext ec) throws InvalidRegexPatternException {
 		return create(value, 0, ec);
 	}
-	
-	public static RegexLangObject create(String value, int flags, IEvaluationContext ec) throws InvalidRegexPatternException {
+
+	public static RegexLangObject create(final String value, final int flags, final IEvaluationContext ec) throws InvalidRegexPatternException {
 		Pattern pattern;
 		try {
 			pattern = Pattern.compile(value, flags);
 		}
-		catch (IllegalArgumentException e) {
+		catch (final IllegalArgumentException e) {
 			throw new InvalidRegexPatternException(value, flags, ec);
 		}
 		return new RegexLangObject(pattern);

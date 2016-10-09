@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.object;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Locale;
@@ -17,7 +19,7 @@ public class StringLangObject extends ALangObject {
 	private final static String TRUE = "true";
 	private final static String FALSE = "false";
 
-	
+
 	private final String value;
 
 	private static class InstanceHolder {
@@ -102,6 +104,12 @@ public class StringLangObject extends ALangObject {
 
 	public static void toExpression(final String value, final StringBuilder builder) {
 		builder.append('"').append(StringEscapeUtils.escapeJava(value)).append('"');
+	}
+
+	public static void toExpression(final String value, final Writer writer) throws IOException {
+		writer.write('"');
+		writer.write(StringEscapeUtils.escapeJava(value));
+		writer.write('"');
 	}
 
 	// Coercion

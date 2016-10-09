@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  */
 public class CloneBinding implements IBinding {
 	private Impl impl;
-	
+
 	public CloneBinding() {
 		impl = new Impl();
 	}
@@ -28,7 +28,7 @@ public class CloneBinding implements IBinding {
 	public int getNestingLimit() {
 		return -1;
 	}
-	
+
 	@Override
 	public Void reset() {
 		impl.reset();
@@ -36,30 +36,30 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public ALangObject getVariable(String name) throws EvaluationException {
+	public ALangObject getVariable(final String name) throws EvaluationException {
 		return impl.getVariable(name);
 	}
 
 	@Override
-	public void setVariable(String name, ALangObject value) throws EvaluationException {
+	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
 		impl.setVariable(name, value);
 	}
 
 	@Override
-	public void nest(IEvaluationContext ec) throws NestingLevelTooDeepException {
+	public void nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
 		impl = impl.nest();
 	}
 
 	@Override
-	public void nestLocal(IEvaluationContext ec) {
+	public void nestLocal(final IEvaluationContext ec) {
 		impl = impl.nestLocal();
 	}
 
 	@Override
-	public void unnest(IEvaluationContext ec) {
+	public void unnest(final IEvaluationContext ec) {
 		impl = impl.unnest(ec);
 	}
-	
+
 	private class Impl {
 		private final Map<String, ALangObject> map;
 		private final Impl parent;
@@ -120,6 +120,7 @@ public class CloneBinding implements IBinding {
 			if (parent == null)
 				throw new UncatchableEvaluationException(ec,
 						"Cannot unnest global binding. This may be an error in the parser. Contact support.");
+			map.clear();
 			return parent;
 		}
 

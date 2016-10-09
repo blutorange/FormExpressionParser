@@ -14,12 +14,13 @@ public class ASTLosNode extends SimpleNode {
 		super(nodeId);
 	}
 
-	public void init(final EMethod method, final String text, final boolean hasOpen, final boolean hasClose) throws ParseException {
+	public void init(final EMethod method, final String text, final String open, final boolean hasClose) throws ParseException {
 		assertChildrenExactly(0);
 		siblingMethod = method;
 		this.text = text;
-		this.hasOpen = hasOpen;
+		this.hasOpen = open != null;
 		this.hasClose = hasClose;
+		if (open != null) this.embedment = open;
 	}
 
 	public String getText() {

@@ -98,6 +98,10 @@ public class NullLangObject extends ALangObject {
 		builder.append("null");
 	}
 
+	public static String toExpression() {
+		return "null";
+	}
+
 	// Coercion
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) {
