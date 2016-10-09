@@ -38,11 +38,11 @@ import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
+import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
-import de.xima.fc.form.expression.node.ASTTemplateNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
@@ -58,6 +58,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
 public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
@@ -702,13 +703,9 @@ public class EvaluateVisitor implements IFormExpressionParserVisitor<ALangObject
 		return NullLangObject.getInstance();
 	}
 
+
 	@Override
-	public ALangObject visit(final ASTTemplateNode node, final IEvaluationContext ec) throws EvaluationException {
-		ALangObject res = NullLangObject.getInstance();
-		for (final Node n : node.getChildArray()) {
-			res = n.jjtAccept(this, ec);
-			if (mustJump) break;
-		}
-		return res;
+	public ALangObject visit(ASTRegexNode node, IEvaluationContext ec) throws EvaluationException {
+		return RegexLangObject.create(node.getPattern());
 	}
 }

@@ -53,6 +53,10 @@ enum SyntaxSuccess implements ITestCase {
 	TEST044("<foo>[%42%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
 	TEST045("<foo>[%42;%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
 	TEST046("<foo>[%{4:5}.b.c[0].d()%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
+	TEST047("foo=bar;/*+&*/bar=foo;"),
+	TEST048("#regex#;"),
+	TEST049("#regex#i;"),
+	TEST050("#regex#msii;"),
 	;
 	private final String code;
 	private final ETestType type;

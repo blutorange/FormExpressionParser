@@ -35,22 +35,13 @@ public class FormExpressionDemo {
 	
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
-
-		try {
-			System.out.println(FormExpressionHighlightingUtil.Template.highlightHtml(code,
-					HighlightThemeEclipse.getInstance(), null));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		
-		System.exit(0);
 		
 		showInputCode(code);
 
-		showTokenStream(code);
+		Token[] tokenArray = showTokenStream(code);
 
+		showHighlighting(tokenArray);
+		
 		final Node rootNode = showParseTree(code);
 
 		showEvaluatedResult(rootNode);
@@ -87,22 +78,22 @@ public class FormExpressionDemo {
 		System.out.println(code);
 	}
 
-	private static void showTokenStream(final String code) {
-		final Token[] tokenList;
+	private static Token[] showTokenStream(final String code) {
+		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
-			tokenList = FormExpressionParsingUtil.Template.asTokenStream(code);
+			tokenArray = FormExpressionParsingUtil.Program.asTokenArray(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final TokenMgrError e) {
 			e.printStackTrace();
 			System.exit(-1);
-			return;
+			return new Token[0];
 		}
 
 		System.out.println("===Token stream===");
 		int charsWithoutLf = 0;
-		for (final Token token : tokenList) {
+		for (Token token : tokenArray) {
 			final String s = token.image.replaceAll("[ \n\r\t]", "") + " ";
 			System.out.print(s);
 			charsWithoutLf += s.length();
@@ -112,13 +103,26 @@ public class FormExpressionDemo {
 			}
 		}
 		if (charsWithoutLf > 0) System.out.println();
+		System.out.println();
+		return tokenArray;
 	}
 
+	private static void showHighlighting(final Token[] tokenArray) {
+		System.out.println("===Syntax highlighted HTML===");
+		try {
+			System.out.println(FormExpressionHighlightingUtil.highlightHtml(tokenArray,
+					HighlightThemeEclipse.getInstance(), null, true));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println();
+	}
+	
 	private static Node showParseTree(final String code) {
 		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = FormExpressionParsingUtil.Template.parse(code);
+			rootNode = FormExpressionParsingUtil.Program.parse(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final ParseException e) {
@@ -142,7 +146,7 @@ public class FormExpressionDemo {
 	private static void showUnparsed(final Node rootNode) {
 		final UnparseVisitor unparse = new UnparseVisitor();
 		System.out.println("Unparse:");
-		System.out.println(rootNode.jjtAccept(unparse, 0).toString());
+		System.out.println(rootNode.jjtAccept(unparse, new Integer(0)).toString());
 		System.out.println();
 	}
 

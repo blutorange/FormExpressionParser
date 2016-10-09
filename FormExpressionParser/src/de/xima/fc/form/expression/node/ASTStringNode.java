@@ -18,8 +18,6 @@ public class ASTStringNode extends SimpleNode {
 	 *            Character which delimits the string. " or '
 	 */
 	public void init(final EMethod method, final String value, final char delimiter) throws ParseException {
-		if (value == null)
-			throw new ParseException("value is null");
 		siblingMethod = method;
 		final String s = parseString(value);
 		stringValue = s;
@@ -27,10 +25,16 @@ public class ASTStringNode extends SimpleNode {
 
 	public String parseString(final String literal) throws ParseException {
 		if (literal == null)
-			throw new ParseException("string is null");
+			throw new ParseException("String is null. This is likely an error with the parser, contact support.");
 		if (literal.length() < 2)
-			throw new ParseException("string not terminated properly: " + literal);
-		return StringEscapeUtils.unescapeJava(literal.substring(1, literal.length() - 1));
+			throw new ParseException(String.format("String <%s> not terminated properly.  This is likely an error with the parser, contact support.", literal));
+		try {
+			return StringEscapeUtils.unescapeJava(literal.substring(1, literal.length() - 1));
+		}
+		catch (IllegalArgumentException e) {
+			throw new ParseException(String.format("Encountered invalid string at line %d, column %d: %s",
+					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
+		}
 	}
 
 	@Override

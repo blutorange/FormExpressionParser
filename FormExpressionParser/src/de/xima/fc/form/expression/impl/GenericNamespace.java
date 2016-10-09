@@ -18,6 +18,7 @@ import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorFunction;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
+import de.xima.fc.form.expression.impl.function.EAttrAccessorRegex;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerArray;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerBoolean;
@@ -25,6 +26,7 @@ import de.xima.fc.form.expression.impl.function.EAttrAssignerException;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerFunction;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerHash;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerNumber;
+import de.xima.fc.form.expression.impl.function.EAttrAssignerRegex;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerString;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
@@ -32,6 +34,7 @@ import de.xima.fc.form.expression.impl.function.EExpressionMethodException;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodFunction;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
+import de.xima.fc.form.expression.impl.function.EExpressionMethodRegex;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
 import de.xima.fc.form.expression.impl.function.GenericAttrAccessor;
 import de.xima.fc.form.expression.impl.function.GenericAttrAssigner;
@@ -42,6 +45,7 @@ import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
 /**
@@ -71,6 +75,7 @@ public class GenericNamespace implements INamespace {
 	private final ImmutableMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
 	private final ImmutableMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
 	private final ImmutableMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
+	private final ImmutableMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex;
 
 	private final ImmutableMap<StringLangObject, IFunction<StringLangObject>> attrAccessorString;
 	private final ImmutableMap<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray;
@@ -79,6 +84,7 @@ public class GenericNamespace implements INamespace {
 	private final ImmutableMap<StringLangObject, IFunction<HashLangObject>> attrAccessorHash;
 	private final ImmutableMap<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException;
 	private final ImmutableMap<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction;
+	private final ImmutableMap<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex;
 
 	private final ImmutableMap<StringLangObject, IFunction<StringLangObject>> attrAssignerString;
 	private final ImmutableMap<StringLangObject, IFunction<ArrayLangObject>> attrAssignerArray;
@@ -87,6 +93,7 @@ public class GenericNamespace implements INamespace {
 	private final ImmutableMap<StringLangObject, IFunction<HashLangObject>> attrAssignerHash;
 	private final ImmutableMap<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException;
 	private final ImmutableMap<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction;
+	private final ImmutableMap<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex;
 
 	private final IFunction<StringLangObject> genericAttrAccessorString;
 	private final IFunction<NumberLangObject> genericAttrAccessorNumber;
@@ -95,6 +102,7 @@ public class GenericNamespace implements INamespace {
 	private final IFunction<HashLangObject> genericAttrAccessorHash;
 	private final IFunction<FunctionLangObject> genericAttrAccessorFunction;
 	private final IFunction<ExceptionLangObject> genericAttrAccessorException;
+	private final IFunction<RegexLangObject> genericAttrAccessorRegex;
 
 	private final IFunction<StringLangObject> genericAttrAssignerString;
 	private final IFunction<NumberLangObject> genericAttrAssignerNumber;
@@ -103,9 +111,10 @@ public class GenericNamespace implements INamespace {
 	private final IFunction<HashLangObject> genericAttrAssignerHash;
 	private final IFunction<FunctionLangObject> genericAttrAssignerFunction;
 	private final IFunction<ExceptionLangObject> genericAttrAssignerException;
+	private final IFunction<RegexLangObject> genericAttrAssignerRegex;
 
 	public static class Builder {
-		private final static int FIELDS_TO_FILL = 5*7;
+		private final static int FIELDS_TO_FILL = 5*8;
 		private EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString;
 		private EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray;
 		private EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
@@ -113,6 +122,7 @@ public class GenericNamespace implements INamespace {
 		private EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash;
 		private EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
 		private EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
+		private EnumMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex;
 
 		private Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString;
 		private Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray;
@@ -121,6 +131,7 @@ public class GenericNamespace implements INamespace {
 		private Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash;
 		private Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException;
 		private Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction;
+		private Map<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex;
 
 		private Map<StringLangObject, IFunction<StringLangObject>> attrAssignerString;
 		private Map<StringLangObject, IFunction<ArrayLangObject>> attrAssignerArray;
@@ -129,6 +140,7 @@ public class GenericNamespace implements INamespace {
 		private Map<StringLangObject, IFunction<HashLangObject>> attrAssignerHash;
 		private Map<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException;
 		private Map<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction;
+		private Map<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex;
 
 		private IFunction<StringLangObject> genericAttrAccessorString;
 		private IFunction<NumberLangObject> genericAttrAccessorNumber;
@@ -137,6 +149,7 @@ public class GenericNamespace implements INamespace {
 		private IFunction<HashLangObject> genericAttrAccessorHash;
 		private IFunction<FunctionLangObject> genericAttrAccessorFunction;
 		private IFunction<ExceptionLangObject> genericAttrAccessorException;
+		private IFunction<RegexLangObject> genericAttrAccessorRegex;
 
 		private IFunction<StringLangObject> genericAttrAssignerString;
 		private IFunction<NumberLangObject> genericAttrAssignerNumber;
@@ -145,6 +158,7 @@ public class GenericNamespace implements INamespace {
 		private IFunction<HashLangObject> genericAttrAssignerHash;
 		private IFunction<FunctionLangObject> genericAttrAssignerFunction;
 		private IFunction<ExceptionLangObject> genericAttrAssignerException;
+		private IFunction<RegexLangObject> genericAttrAssignerRegex;
 
 		private int count = 0;
 
@@ -210,6 +224,10 @@ public class GenericNamespace implements INamespace {
 			expressionMethodFunction = addExpressionMethod(m, expressionMethodFunction);
 			return this;
 		}
+		public final Builder addExpressionMethodRegex(final IMethod2Function<RegexLangObject>[] m) {
+			expressionMethodRegex = addExpressionMethod(m, expressionMethodRegex);
+			return this;
+		}
 
 		public final Builder addAttrAccessorString(final IFunction<StringLangObject>[] m) {
 			attrAccessorString = addAttrAccessor(m, attrAccessorString);
@@ -239,6 +257,10 @@ public class GenericNamespace implements INamespace {
 			attrAccessorException = addAttrAccessor(m, attrAccessorException);
 			return this;
 		}
+		public final Builder addAttrAccessorRegex(final IFunction<RegexLangObject>[] m) {
+			attrAccessorRegex = addAttrAccessor(m, attrAccessorRegex);
+			return this;
+		}
 
 		public final Builder addAttrAssignerString(final IFunction<StringLangObject>[] m) {
 			attrAssignerString = addAttrAssigner(m, attrAssignerString);
@@ -266,6 +288,10 @@ public class GenericNamespace implements INamespace {
 		}
 		public final Builder addAttrAssignerException(final IFunction<ExceptionLangObject>[] m) {
 			attrAssignerException = addAttrAssigner(m, attrAssignerException);
+			return this;
+		}
+		public final Builder addAttrAssignerRegex(final IFunction<RegexLangObject>[] m) {
+			attrAssignerRegex = addAttrAssigner(m, attrAssignerRegex);
 			return this;
 		}
 
@@ -311,7 +337,13 @@ public class GenericNamespace implements INamespace {
 			genericAttrAccessorFunction = func;
 			return this;
 		}
-
+		public final Builder setGenericAttrAccessorRegex(final IFunction<RegexLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAccessorRegex == null) ++ count;
+			genericAttrAccessorRegex = func;
+			return this;
+		}
+		
 		public final Builder setGenericAttrAssignerString(final IFunction<StringLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerString == null) ++ count;
@@ -354,6 +386,12 @@ public class GenericNamespace implements INamespace {
 			genericAttrAssignerFunction = func;
 			return this;
 		}
+		public final Builder setGenericAttrAssignerRegex(final IFunction<RegexLangObject> func) {
+			if (func == null) return this;
+			if (genericAttrAssignerRegex == null) ++ count;
+			genericAttrAssignerRegex = func;
+			return this;
+		}
 
 		private void init() {
 			count = 0;
@@ -364,6 +402,7 @@ public class GenericNamespace implements INamespace {
 			genericAttrAccessorHash = null;
 			genericAttrAccessorNumber = null;
 			genericAttrAccessorString = null;
+			genericAttrAccessorRegex = null;
 			genericAttrAssignerArray = null;
 			genericAttrAssignerBoolean = null;
 			genericAttrAssignerException = null;
@@ -371,6 +410,7 @@ public class GenericNamespace implements INamespace {
 			genericAttrAssignerHash = null;
 			genericAttrAssignerNumber = null;
 			genericAttrAssignerString = null;
+			genericAttrAssignerRegex = null;
 			expressionMethodArray = null;
 			expressionMethodBoolean = null;
 			expressionMethodException = null;
@@ -378,6 +418,7 @@ public class GenericNamespace implements INamespace {
 			expressionMethodHash = null;
 			expressionMethodNumber = null;
 			expressionMethodString = null;
+			expressionMethodRegex = null;
 			attrAccessorArray = null;
 			attrAccessorBoolean = null;
 			attrAccessorException = null;
@@ -385,6 +426,7 @@ public class GenericNamespace implements INamespace {
 			attrAccessorHash = null;
 			attrAccessorNumber = null;
 			attrAccessorString = null;
+			attrAccessorRegex = null;
 			attrAssignerArray = null;
 			attrAssignerBoolean = null;
 			attrAssignerException = null;
@@ -392,6 +434,7 @@ public class GenericNamespace implements INamespace {
 			attrAssignerHash = null;
 			attrAssignerNumber = null;
 			attrAssignerString = null;
+			attrAssignerRegex = null;
 		}
 
 		public final INamespace build() throws IllegalStateException {
@@ -406,6 +449,7 @@ public class GenericNamespace implements INamespace {
 					expressionMethodHash,
 					expressionMethodException,
 					expressionMethodFunction,
+					expressionMethodRegex,
 
 					attrAccessorBoolean,
 					attrAccessorNumber,
@@ -414,6 +458,7 @@ public class GenericNamespace implements INamespace {
 					attrAccessorHash,
 					attrAccessorException,
 					attrAccessorFunction,
+					attrAccessorRegex,
 
 					attrAssignerBoolean,
 					attrAssignerNumber,
@@ -422,6 +467,7 @@ public class GenericNamespace implements INamespace {
 					attrAssignerHash,
 					attrAssignerException,
 					attrAssignerFunction,
+					attrAssignerRegex,
 
 					genericAttrAccessorBoolean,
 					genericAttrAccessorNumber,
@@ -430,6 +476,7 @@ public class GenericNamespace implements INamespace {
 					genericAttrAccessorHash,
 					genericAttrAccessorException,
 					genericAttrAccessorFunction,
+					genericAttrAccessorRegex,
 
 					genericAttrAssignerBoolean,
 					genericAttrAssignerNumber,
@@ -437,7 +484,8 @@ public class GenericNamespace implements INamespace {
 					genericAttrAssignerArray,
 					genericAttrAssignerHash,
 					genericAttrAssignerException,
-					genericAttrAssignerFunction);
+					genericAttrAssignerFunction,
+					genericAttrAssignerRegex);
 			init();
 			return retVal;
 		}
@@ -451,6 +499,7 @@ public class GenericNamespace implements INamespace {
 			final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash,
 			final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException,
 			final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction,
+			final EnumMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex,
 
 			final Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean,
 			final Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber,
@@ -459,6 +508,7 @@ public class GenericNamespace implements INamespace {
 			final Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash,
 			final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException,
 			final Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction,
+			final Map<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex,
 
 			final Map<StringLangObject, IFunction<BooleanLangObject>> attrAssignerBoolean,
 			final Map<StringLangObject, IFunction<NumberLangObject>> attrAssignerNumber,
@@ -467,6 +517,7 @@ public class GenericNamespace implements INamespace {
 			final Map<StringLangObject, IFunction<HashLangObject>> attrAssignerHash,
 			final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException,
 			final Map<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction,
+			final Map<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex,
 
 			final IFunction<BooleanLangObject> genericAttrAccessorBoolean,
 			final IFunction<NumberLangObject> genericAttrAccessorNumber,
@@ -475,6 +526,7 @@ public class GenericNamespace implements INamespace {
 			final IFunction<HashLangObject> genericAttrAccessorHash,
 			final IFunction<ExceptionLangObject> genericAttrAccessorExcepton,
 			final IFunction<FunctionLangObject> genericAttrAccessorFunction,
+			final IFunction<RegexLangObject> genericAttrAccessorRegex,
 
 			final IFunction<BooleanLangObject> genericAttrAssignerBoolean,
 			final IFunction<NumberLangObject> genericAttrAssignerNumber,
@@ -482,7 +534,8 @@ public class GenericNamespace implements INamespace {
 			final IFunction<ArrayLangObject> genericAttrAssignerArray,
 			final IFunction<HashLangObject> genericAttrAssignerHash,
 			final IFunction<ExceptionLangObject> genericAttrAssignerExcepton,
-			final IFunction<FunctionLangObject> genericAttrAssignerFunction) {
+			final IFunction<FunctionLangObject> genericAttrAssignerFunction,
+			final IFunction<RegexLangObject> genericAttrAssignerRegex) {
 
 		this.expressionMethodBoolean = Maps.immutableEnumMap(expressionMethodBoolean);
 		this.expressionMethodNumber = Maps.immutableEnumMap(expressionMethodNumber);
@@ -491,6 +544,7 @@ public class GenericNamespace implements INamespace {
 		this.expressionMethodHash = Maps.immutableEnumMap(expressionMethodHash);
 		this.expressionMethodException = Maps.immutableEnumMap(expressionMethodException);
 		this.expressionMethodFunction = Maps.immutableEnumMap(expressionMethodFunction);
+		this.expressionMethodRegex = Maps.immutableEnumMap(expressionMethodRegex);
 
 		this.attrAccessorBoolean = ImmutableMap.copyOf(attrAccessorBoolean);
 		this.attrAccessorNumber = ImmutableMap.copyOf(attrAccessorNumber);
@@ -499,6 +553,7 @@ public class GenericNamespace implements INamespace {
 		this.attrAccessorHash = ImmutableMap.copyOf(attrAccessorHash);
 		this.attrAccessorException = ImmutableMap.copyOf(attrAccessorException);
 		this.attrAccessorFunction = ImmutableMap.copyOf(attrAccessorFunction);
+		this.attrAccessorRegex = ImmutableMap.copyOf(attrAccessorRegex);
 
 		this.attrAssignerBoolean = ImmutableMap.copyOf(attrAssignerBoolean);
 		this.attrAssignerNumber = ImmutableMap.copyOf(attrAssignerNumber);
@@ -507,6 +562,7 @@ public class GenericNamespace implements INamespace {
 		this.attrAssignerHash = ImmutableMap.copyOf(attrAssignerHash);
 		this.attrAssignerException = ImmutableMap.copyOf(attrAssignerException);
 		this.attrAssignerFunction = ImmutableMap.copyOf(attrAssignerFunction);
+		this.attrAssignerRegex = ImmutableMap.copyOf(attrAssignerRegex);
 
 		this.genericAttrAccessorArray = genericAttrAccessorArray;
 		this.genericAttrAccessorBoolean = genericAttrAccessorBoolean;
@@ -515,6 +571,7 @@ public class GenericNamespace implements INamespace {
 		this.genericAttrAccessorHash = genericAttrAccessorHash;
 		this.genericAttrAccessorNumber = genericAttrAccessorNumber;
 		this.genericAttrAccessorString = genericAttrAccessorString;
+		this.genericAttrAccessorRegex = genericAttrAccessorRegex;
 
 		this.genericAttrAssignerArray = genericAttrAssignerArray;
 		this.genericAttrAssignerBoolean = genericAttrAssignerBoolean;
@@ -523,6 +580,7 @@ public class GenericNamespace implements INamespace {
 		this.genericAttrAssignerHash = genericAttrAssignerHash;
 		this.genericAttrAssignerNumber = genericAttrAssignerNumber;
 		this.genericAttrAssignerString = genericAttrAssignerString;
+		this.genericAttrAssignerRegex = genericAttrAssignerRegex;
 	}
 
 	@Override
@@ -553,7 +611,11 @@ public class GenericNamespace implements INamespace {
 	public IFunction<FunctionLangObject> expressionMethodFunction(final EMethod method) throws EvaluationException {
 		return expressionMethodFunction.get(method);
 	}
-
+	@Override
+	public IFunction<RegexLangObject> expressionMethodRegex(final EMethod method) throws EvaluationException {
+		return expressionMethodRegex.get(method);
+	}
+	
 	@Override
 	public IFunction<StringLangObject> attrAccessorString(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -598,7 +660,12 @@ public class GenericNamespace implements INamespace {
 		final IFunction<FunctionLangObject> func = attrAccessorFunction.get(name);
 		return func != null ? func : genericAttrAccessorFunction;
 	}
-
+	@Override
+	public IFunction<RegexLangObject> attrAccessorRegex(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<RegexLangObject> func = attrAccessorRegex.get(name);
+		return func != null ? func : genericAttrAccessorRegex;
+	}
 	@Override
 	public IFunction<StringLangObject> attrAssignerString(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -643,6 +710,12 @@ public class GenericNamespace implements INamespace {
 		final IFunction<FunctionLangObject> func = attrAssignerFunction.get(name);
 		return func != null ? func : genericAttrAssignerFunction;
 	}
+	@Override
+	public IFunction<RegexLangObject> attrAssignerRegex(final ALangObject name, final boolean accessedViaDot)
+			throws EvaluationException {
+		final IFunction<RegexLangObject> func = attrAssignerRegex.get(name);
+		return func != null ? func : genericAttrAssignerRegex;
+	}
 
 	public static INamespace getGenericNamespaceInstance() {
 		return InstanceHolder.GENERIC;
@@ -660,6 +733,7 @@ public class GenericNamespace implements INamespace {
 			builder.addExpressionMethodHash(EExpressionMethodHash.values());
 			builder.addExpressionMethodException(EExpressionMethodException.values());
 			builder.addExpressionMethodFunction(EExpressionMethodFunction.values());
+			builder.addExpressionMethodRegex(EExpressionMethodRegex.values());
 
 			builder.addAttrAccessorBoolean(EAttrAccessorBoolean.values());
 			builder.addAttrAccessorNumber(EAttrAccessorNumber.values());
@@ -668,6 +742,7 @@ public class GenericNamespace implements INamespace {
 			builder.addAttrAccessorHash(EAttrAccessorHash.values());
 			builder.addAttrAccessorException(EAttrAccessorException.values());
 			builder.addAttrAccessorFunction(EAttrAccessorFunction.values());
+			builder.addAttrAccessorRegex(EAttrAccessorRegex.values());
 
 			builder.addAttrAssignerBoolean(EAttrAssignerBoolean.values());
 			builder.addAttrAssignerNumber(EAttrAssignerNumber.values());
@@ -676,6 +751,7 @@ public class GenericNamespace implements INamespace {
 			builder.addAttrAssignerHash(EAttrAssignerHash.values());
 			builder.addAttrAssignerException(EAttrAssignerException.values());
 			builder.addAttrAssignerFunction(EAttrAssignerFunction.values());
+			builder.addAttrAssignerRegex(EAttrAssignerRegex.values());
 
 			builder.setGenericAttrAccessorArray(GenericAttrAccessor.ARRAY);
 			builder.setGenericAttrAccessorBoolean(GenericAttrAccessor.BOOLEAN);
@@ -684,6 +760,7 @@ public class GenericNamespace implements INamespace {
 			builder.setGenericAttrAccessorHash(GenericAttrAccessor.HASH);
 			builder.setGenericAttrAccessorNumber(GenericAttrAccessor.NUMBER);
 			builder.setGenericAttrAccessorString(GenericAttrAccessor.STRING);
+			builder.setGenericAttrAccessorRegex(GenericAttrAccessor.REGEX);
 
 			builder.setGenericAttrAssignerArray(GenericAttrAssigner.ARRAY);
 			builder.setGenericAttrAssignerBoolean(GenericAttrAssigner.BOOLEAN);
@@ -692,6 +769,7 @@ public class GenericNamespace implements INamespace {
 			builder.setGenericAttrAssignerHash(GenericAttrAssigner.HASH);
 			builder.setGenericAttrAssignerNumber(GenericAttrAssigner.NUMBER);
 			builder.setGenericAttrAssignerString(GenericAttrAssigner.STRING);
+			builder.setGenericAttrAssignerRegex(GenericAttrAssigner.REGEX);
 
 			GENERIC = builder.build();
 		}

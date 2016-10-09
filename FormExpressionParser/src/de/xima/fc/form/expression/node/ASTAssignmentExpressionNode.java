@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -12,7 +11,7 @@ public class ASTAssignmentExpressionNode extends SimpleNode {
 		super(id);
 	}
 
-	public void init(final EMethod method, final FormExpressionParser parser) throws ParseException {
+	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
 		final Node[] children = getChildArray();
 		for (int i = children.length-2; i != -1; --i) {
@@ -24,13 +23,13 @@ public class ASTAssignmentExpressionNode extends SimpleNode {
 				if (n.getLastChild().getSiblingMethod() == EMethod.PARENTHESIS) {
 					// Cannot do assignment a.foobar() = 42;
 					@SuppressWarnings("boxing")
-					final String msg = String.format("Illegal LVALUE (function call) %s for assignment at line %s, column %s.", children[i], parser.token.beginLine, parser.token.beginColumn);
+					final String msg = String.format("Encountered illegal LVALUE (function call) %s for assignment at line %s, column %s.", children[i], getStartLine(), getStartColumn());
 					throw new ParseException(msg);
 				}
 				break;
 			default:
 				@SuppressWarnings("boxing")
-				final String msg = String.format("Illegal LVALUE %s for assignment at line %s, column %s.", children[i], parser.token.beginLine, parser.token.beginColumn);
+				final String msg = String.format("Encountered illegal LVALUE %s for assignment at line %s, column %s.", children[i].getClass().getSimpleName(), getStartLine(), getStartColumn());
 				throw new ParseException(msg);
 			}
 		}

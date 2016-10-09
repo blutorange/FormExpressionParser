@@ -137,7 +137,8 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		NULL(NullLangObject.class),
 		BOOLEAN(BooleanLangObject.class),
 		FUNCTION(FunctionLangObject.class),
-		EXCEPTION(ExceptionLangObject.class);
+		EXCEPTION(ExceptionLangObject.class),
+		REGEX(RegexLangObject.class);
 
 		public final Class<? extends ALangObject> clazz;
 
@@ -231,7 +232,12 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		throw new CoercionException(this, Type.FUNCTION, ec);
 	}
 
-
+	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
+		if (getType() == Type.REGEX)
+			return (RegexLangObject) this;
+		throw new CoercionException(this, Type.REGEX, ec);
+	}
+	
 	/**
 	 * Convenience method when the caller does not need the result of the
 	 * correct class.
@@ -268,6 +274,8 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			return (T)coerceException(ec);
 		case FUNCTION:
 			return (T)coerceFunction(ec);
+		case REGEX:
+			return (T)coerceRegex(ec);
 		default:
 			// Try to coerce object with the special coerce method, when defined.
 			LOG.info("Enum might not be implemented: " + type);

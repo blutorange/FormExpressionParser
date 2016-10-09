@@ -23,29 +23,31 @@ public final class FormExpressionHighlightingUtil {
 		/**
 		 * @param code Code to highlight.
 		 * @param theme Theme to use.
+		 * @param cssClassPrefix Prefix for css classes. When null, some default is used. Must not be empty, all characters other than letter, number, dashes, and underscores are ignored.
+		 * @param basicStyling Whether some basic styling such as <code>font-family:monospace;</code> or <code>overflow-x:scroll;</code> should be added.
 		 * @param html Writer to which to write the html.
 		 * @param css Writer to which to write the css.
-		 * @param cssClassPrefix Prefix for css classes. When null, some default is used. Must not be empty, all characters other than letter, number, dashes, and underscores are ignored.
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static void highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix, Writer html, Writer css) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionParsingUtil.Program.asTokenStream(code);
+		public static void highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix, boolean basicStyling, Writer html, Writer css) throws IOException, ParseException {
+			final Token[] tokenList = FormExpressionParsingUtil.Program.asTokenArray(code);
 			final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
-			highlighter.process(tokenList, cssClassPrefix, html, css);			
+			highlighter.process(tokenList, cssClassPrefix, basicStyling, html, css);
 		}
 		
 		/**
 		 * @param code Code to highlight.
 		 * @param theme Theme to use.
 		 * @param cssClassPrefix Prefix for css classes. When null, some default is used. Must not be empty, all characters other than letter, number, dashes, and underscores are ignored.
+		 * @param basicStyling Whether some basic styling such as <code>font-family:monospace;</code> or <code>overflow-x:scroll;</code> should be added.
 		 * @return A string representing an HTML section tag containing the highlighted code; and a style tag with the attribute scoped set.
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static String highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionParsingUtil.Program.asTokenStream(code);
-			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix);
+		public static String highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix, boolean basicStyling) throws IOException, ParseException {
+			final Token[] tokenList = FormExpressionParsingUtil.Program.asTokenArray(code);
+			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix, basicStyling);
 		}
 	}
 	
@@ -58,34 +60,36 @@ public final class FormExpressionHighlightingUtil {
 		/**
 		 * @param code Code to highlight.
 		 * @param theme Theme to use.
+		 * @param cssClassPrefix Prefix for css classes. When null, some default is used. Must not be empty, all characters other than letter, number, dashes, and underscores are ignored.
+		 * @param basicStyling Whether some basic styling such as <code>font-family:monospace;</code> or <code>overflow-x:scroll;</code> should be added.
 		 * @param html Writer to which to write the html.
 		 * @param css Writer to which to write the css.
-		 * @param cssClassPrefix Prefix for css classes. When null, some default is used. Must not be empty, all characters other than letter, number, dashes, and underscores are ignored.
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static void highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix, Writer html, Writer css) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionParsingUtil.Template.asTokenStream(code);
+		public static void highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix, boolean basicStyling, Writer html, Writer css) throws IOException, ParseException {
+			final Token[] tokenList = FormExpressionParsingUtil.Template.asTokenArray(code);
 			final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
-			highlighter.process(tokenList, cssClassPrefix, html, css);			
+			highlighter.process(tokenList, cssClassPrefix, basicStyling, html, css);			
 		}
 		
 		/**
 		 * @param code Code to highlight.
 		 * @param theme Theme to use.
 		 * @param cssClassPrefix Prefix for css classes. When null, some default is used. Must not be empty, all characters other than letter, number, dashes, and underscores are ignored.
+		 * @param basicStyling Whether some basic styling such as <code>font-family:monospace;</code> or <code>overflow-x:scroll;</code> should be added.
 		 * @return A string representing an HTML section tag containing the highlighted code; and a style tag with the attribute scoped set.
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static String highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionParsingUtil.Template.asTokenStream(code);
-			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix);
+		public static String highlightHtml(String code, IHighlightTheme theme, String cssClassPrefix, boolean basicStyling) throws IOException, ParseException {
+			final Token[] tokenList = FormExpressionParsingUtil.Template.asTokenArray(code);
+			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix, basicStyling);
 		}		
 	}	
 	
 	
-	private static String highlightHtml(Token[] tokenList, IHighlightTheme theme, String cssClassPrefix) throws IOException {
+	public static String highlightHtml(Token[] tokenArray, IHighlightTheme theme, String cssClassPrefix, boolean basicStyling) throws IOException {
 		cssClassPrefix = HtmlHighlighter.sanitizeCssClassPrefix(cssClassPrefix);
 		final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
 		try(final StringBuilderWriter html = new StringBuilderWriter();
@@ -93,7 +97,7 @@ public final class FormExpressionHighlightingUtil {
 			html.write("<section class=\"");
 			html.write(cssClassPrefix);
 			html.write("\">");
-			highlighter.process(tokenList, cssClassPrefix, html, css);
+			highlighter.process(tokenArray, cssClassPrefix, basicStyling, html, css);
 			html.write("<style type=\"text/css\" scoped>");
 			html.write(css.toString());
 			html.write("</style>");

@@ -18,6 +18,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.C
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.CircumflexEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Colon;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Comma;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.CommentChar;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Continue;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Dash;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DashEqual;
@@ -46,6 +47,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.F
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.For;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Function;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Identifier;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.IdentifierAfterDot;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.If;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Integer;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LambdaArrow;
@@ -56,8 +58,8 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.L
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosBodyClose;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosChar;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiCommentBegin;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiCommentEnd;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultilineCommentClose;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultilineCommentOpen;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Null;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenClose;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenOpen;
@@ -65,6 +67,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.P
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PercentEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Plus;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PlusEqual;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Regex;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SemiColon;
@@ -81,6 +84,13 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.T
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.While;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.With;
 
+/**
+ * Groups several similar tokens and allows you to specify a style
+ * for each group. All methods will only be called once when processing
+ * a text and applying syntactical highlighting, so you may create new
+ * {@link Style} / {@link Color} objects.
+ * @author mad_gaksha
+ */
 public abstract class ABasicHighlightTheme implements IHighlightTheme {
 	
 	@Override
@@ -114,6 +124,9 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case Identifier:
 			return getStyleIdentifier();
 			
+		case IdentifierAfterDot:
+			return getStyleAttributeIdentifier();
+			
 		case False:
 		case True:			
 			return getStyleBooleanLiteral();
@@ -124,6 +137,13 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case Float: 
 		case Integer: 
 			return getStyleNumberLiteral();
+			
+			
+		case LambdaArrow: 
+			return getStyleLambdaLiteral();
+
+		case Regex:
+			return getStyleRegexLiteral();			
 			
 		case DoubleQuotedString: 
 		case SingleQuotedString: 
@@ -191,10 +211,10 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LosBodyClose: 
 		case LosOpen: 
 			return getStyleLosSeparator();
-			
-		case LambdaArrow: 
-		case MultiCommentBegin: 
-		case MultiCommentEnd: 
+						
+		case MultilineCommentOpen:
+		case CommentChar: 
+		case MultilineCommentClose:
 			return getStyleComment();
 						
 		default:
@@ -204,12 +224,17 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 	
 	protected abstract Style getStyleKeyword();
 	protected abstract Style getStyleIdentifier();
-
+	/** @return Style for identifiers after a dot, eg. <code>myVar.someAttribute()</code>.*/
+	protected abstract Style getStyleAttributeIdentifier();
+	
 	protected abstract Style getStyleBooleanLiteral();
 	protected abstract Style getStyleNullLiteral();
 	protected abstract Style getStyleNumberLiteral();
 	protected abstract Style getStyleStringLiteral();
-
+	protected abstract Style getStyleRegexLiteral();
+	/** @return Style for the lambda arrow <code>-></code>. */
+	protected abstract Style getStyleLambdaLiteral();
+	
 	protected abstract Style getStyleBracket();
 	protected abstract Style getStyleBraces();
 	protected abstract Style getStyleParenthesis();

@@ -32,6 +32,10 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 		return new Style(new Color(0x2A00FFFF));
 	}
 	@Override
+	protected Style getStyleRegexLiteral() {
+		return new Style(new Color(0x8A2BE2FF));
+	}
+	@Override
 	protected Style getStyleBracket() {
 		return new Style(Color.BLACK);
 	}
@@ -72,11 +76,18 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 		return new Style(new Color(0x0000C0FF));
 	}
 	@Override
-	public Style getStyleForBackground() {
-		return new Style(Color.WHITE);
+	protected Style getStyleAttributeIdentifier() {
+		return new Style(Color.BLACK);
+	}
+	@Override
+	protected Style getStyleLambdaLiteral() {
+		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
+	}
+	@Override
+	public Color getColorForBackground() {
+		return Color.TRANSPARENT_WHITE;
 	}
 	public static IHighlightTheme getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
-
 }

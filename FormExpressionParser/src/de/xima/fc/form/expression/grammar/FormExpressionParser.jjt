@@ -36,15 +36,15 @@ TOKEN :
 }
 
 < MULTI_LINE_COMMENT >
-SKIP :
+SPECIAL_TOKEN :
 {
-  < MultiCommentEnd : "*/" > : CODE
+  < MultilineCommentClose: "*/" > : CODE
 }
 
 < MULTI_LINE_COMMENT >
 MORE :
 {
-  < ~[ ] >
+  < CommentChar : ~[ ] >
 }
 
 < CODE >
@@ -54,6 +54,18 @@ SKIP :
 | "\t"
 | "\n"
 | "\r"
+}
+
+< AFTER_DOT >
+TOKEN:
+{
+  < IdentifierAfterDot : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* > : CODE
+}
+
+< CODE >
+MORE:
+{ 
+  < MultilineCommentOpen: "/*" > : MULTI_LINE_COMMENT
 }
 
 < CODE >
@@ -95,7 +107,7 @@ TOKEN :
 | 
   < Colon : ":" >
 | 
-  < Dot : "." >
+  < Dot : "." > : AFTER_DOT
 | 
   < SemiColon : ";" >
 | 
@@ -104,8 +116,6 @@ TOKEN :
   < Percent : "%" >
 | 
   < LosBodyClose : "%]" > : LOS
-| 
-  < MultiCommentBegin : "/*" > : MULTI_LINE_COMMENT
 | 
   < ScopeSeparator : "::" >
 | 
@@ -234,9 +244,18 @@ TOKEN :
     | ~[ "\\", "'" ]
     )*
     "'" >
+|
+  < Regex :
+    "#"
+    (
+      ("\\" ~[ ])
+    | ~[ "\\", "#" ]
+    )*
+    "#"
+    ([ "i", "m", "s" ])* >
 }
 
-Node Template(EMethod method) #TemplateNode :
+Node Template(EMethod method) #StatementListNode :
 {
   jjtThis.setStartPosition(token);
 }
@@ -798,8 +817,8 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
     )*
   )
   {
-    if (createNode) jjtThis.init(method, this);
     jjtThis.setEndPosition(token);
+    if (createNode) jjtThis.init(method);
   }
 }
 
@@ -1098,7 +1117,7 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
     FunctionTypeUnaryExpression(method)
     (
       < Dot >
-      IdentifierName(EMethod.DOT)
+      IdentifierNameAfterDot(EMethod.DOT)
     | < BracketOpen > Expression(EMethod.BRACKET) < BracketClose >
     | < ParenOpen > FunctionArgumentList(EMethod.PARENTHESIS) < ParenClose >
     )*
@@ -1108,6 +1127,22 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
     jjtThis.setEndPosition(token);
   }
 }
+
+void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
+{
+  Token t;
+  jjtThis.setStartPosition(token);
+}
+{
+  (
+    t = < IdentifierAfterDot >
+  )
+  {
+    jjtThis.init(method, t.image);
+    jjtThis.setEndPosition(token);
+  }
+}
+
 
 void IdentifierName(EMethod method) #IdentifierNameNode :
 {
@@ -1199,8 +1234,8 @@ void Number(EMethod method) #NumberNode :
     }
   )
   {
-    jjtThis.init(method, t.image, isInt);
     jjtThis.setEndPosition(token);
+    jjtThis.init(method, t.image, isInt);
   }
 }
 
@@ -1223,8 +1258,8 @@ void String(EMethod method) #StringNode :
     }
   )
   {
-    jjtThis.init(method, t.image, delimiter);
     jjtThis.setEndPosition(token);
+    jjtThis.init(method, t.image, delimiter);
   }
 }
 
@@ -1401,20 +1436,19 @@ void Function(EMethod method) #FunctionNode :
 // i Pattern.CASE_INSENSITIVE
 // m Pattern.MULTILINE
 // s Pattern.DOTALL
-/*
 void Regex(EMethod method) #RegexNode :
 {
   Token t;
-  Token flags = null;
+  jjtThis.setStartPosition(token);
 }
 {
   (
-    t = < SlashQuotedString > [flags = < RegexFlags >]  )
+    t = < Regex >  )
   {
-    jjtThis.init(method, t.image, flags == null ? StringUtils.EMPTY : flags.image);
+    jjtThis.setEndPosition(token);
+    jjtThis.init(method, t.image);
   }
 }
-*/
 
 void Literal(EMethod method) #void :
 {
@@ -1423,6 +1457,7 @@ void Literal(EMethod method) #void :
   Array(method)
 | Hash(method)
 | String(method)
+| Regex(method)
 | Number(method)
 | Boolean(method)
 | Null(method)

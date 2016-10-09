@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
@@ -53,6 +54,8 @@ public final class TestUtil {
 			try {
 				final Node node = parse(test.getCode(), test.getTestType());
 				if (test.isPerformEvaluation()) res = evaluate(node, test.getContextType(), test.getTestType());
+			} catch (final TokenMgrError e) {
+				exception = e;
 			} catch (final ParseException e) {
 				exception = e;
 			} catch (final EvaluationException e) {
@@ -135,7 +138,7 @@ public final class TestUtil {
 		}
 	}
 
-	private static Node parse(final String code, final ETestType type) throws ParseException {
+	private static Node parse(final String code, final ETestType type) throws ParseException, TokenMgrError {
 		switch (type) {
 		case PROGRAM:
 			return FormExpressionParsingUtil.Program.parse(code);

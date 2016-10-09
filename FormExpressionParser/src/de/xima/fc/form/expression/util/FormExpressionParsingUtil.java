@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.util;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -42,11 +43,22 @@ public final class FormExpressionParsingUtil {
 			}
 		}
 
-		public static Token[] asTokenStream(final String code) throws TokenMgrError {
+		/**
+		 * @param code Code to parse.
+		 * @return An object that, for convenience, is both a {@link Iterable} and {@link Iterator} and can only be iterated once, even when calling {@link Iterable#iterator()} more than once.
+		 * @throws TokenMgrError
+		 */
+		public static TokenIterator asTokenStream(final Reader reader) throws TokenMgrError {
+			final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
+					FormExpressionParserTokenManager.CODE);
+			return new TokenIterator(tm);
+	}
+		
+		public static Token[] asTokenArray(final String code) throws TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
 						FormExpressionParserTokenManager.CODE);
-				return toTokenArray(tm);
+				return tokenManagerToArray(tm);
 			}
 		}
 	}
@@ -101,25 +113,56 @@ public final class FormExpressionParsingUtil {
 			}
 		}
 
-		public static Token[] asTokenStream(final String code) throws TokenMgrError {
+		public static TokenIterator asTokenStream(final Reader reader) throws TokenMgrError {
+			final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
+					FormExpressionParserTokenManager.LOS);
+			return new TokenIterator(tm);
+		}
+		
+		public static Token[] asTokenArray(final String code) throws TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParserTokenManager tm = tokenManagerForState(reader,
 						FormExpressionParserTokenManager.LOS);
-				return toTokenArray(tm);
+				return tokenManagerToArray(tm);
 			}
 		}
 	}
 
-	private static Token[] toTokenArray(final FormExpressionParserTokenManager tm) throws TokenMgrError {
-		final List<Token> list = new ArrayList<>();
-		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm.getNextToken())
-			list.add(token);
-		return list.toArray(new Token[list.size()]);
-	}
+	private final static class TokenIterator implements Iterator<Token>, Iterable<Token> {
+		private boolean hasNext = true;
+		private final FormExpressionParserTokenManager tm;
+		public TokenIterator(FormExpressionParserTokenManager tm) {
+			this.tm = tm;
+		}
+		@Override
+		public boolean hasNext() {
+			return hasNext;
+		}
+		@Override
+		public Token next() {
+			final Token t = tm.getNextToken();
+			hasNext = t.kind != FormExpressionParserConstants.EOF;
+			return t;
+		}
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("Token iterator does not support removal.");
+		}
+		@Override
+		public Iterator<Token> iterator() {
+			return this;
+		}		
+	}	
 
 	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state) throws TokenMgrError {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
 		return new FormExpressionParserTokenManager(stream, state);
 	}
-
+	
+	private static Token[] tokenManagerToArray(FormExpressionParserTokenManager tm) throws TokenMgrError {
+		final List<Token> list = new ArrayList<>();
+		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm.getNextToken())
+			list.add(token);
+		return list.toArray(new Token[list.size()]);
+	}
 }

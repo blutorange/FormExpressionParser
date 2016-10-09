@@ -14,5 +14,5 @@ public interface IHighlightTheme {
 	 */
 	public Style getStyleForToken(int tokenType);
 	
-	public Style getStyleForBackground();
+	public Color getColorForBackground();
 }

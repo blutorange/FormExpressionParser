@@ -101,7 +101,7 @@ public class StringLangObject extends ALangObject {
 	}
 
 	public static void toExpression(final String value, final StringBuilder builder) {
-		builder.append('"').append(StringEscapeUtils.escapeJava(value)).append('"').toString();
+		builder.append('"').append(StringEscapeUtils.escapeJava(value)).append('"');
 	}
 
 	// Coercion

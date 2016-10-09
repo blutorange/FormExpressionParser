@@ -1,15 +1,1 @@
-<html>
-  <head>
-    [%% colors = ["red","green","blue","orange"]%]
-  </head>
-  <h1>Form Expression Language Test</h1>
-  <p>I hope you recognize these...</p>
-  <body>
-    <ul>
-      [%% a=-(b=1); %]
-      [%% for (i : 25) { %]
-        <li style="color: [%%= colors[i%4] %];">[%%= b=a+(a=b) %]</li>
-      [%% } %]
-    </ul>
-  </body>
-</html>
+#^foobar$#.matches("foobars");

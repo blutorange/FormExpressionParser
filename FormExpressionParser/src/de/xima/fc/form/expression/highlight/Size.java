@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.highlight;
 public enum Size {
 	SMALLEST,
 	SMALLER,
-	NORMAL,
+	DEFAULT,
 	LARGER,
 	LARGEST;
 }

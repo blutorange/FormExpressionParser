@@ -49,7 +49,8 @@ enum SemanticsSuccess implements ITestCase {
 			StringLangObject.create("foo"),
 			StringLangObject.create("bar")
 			)),
-
+	LITERALS017("#^\\#$#.matches('#');", Tests.TRUE),
+	
 	// Variables and scopes.
 	SCOPE001("k=42;k;", Tests.N42), // local variables
 	SCOPE002("k=0;if(true)k=42;k;", Tests.N42), // can access parent when nesting

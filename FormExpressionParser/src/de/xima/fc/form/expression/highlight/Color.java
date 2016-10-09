@@ -25,12 +25,15 @@ public final class Color {
 		this(r,g,b,1f);
 	}
 	
+	/** 
+	 * @param rgba An integer with the four channels. <code>new Color(0xFF000005)</code> produces a red with an alpha value of 5.
+	 */
 	public Color(int rgba) {
-		this(
-			((rgba&0xFF000000)>>24)/255.0f,
-			((rgba&0x00FF0000)>>16)/255.0f,
-			((rgba&0x0000FF00)>>8)/255.0f,
-			((rgba&0x000000FF))/255.0f);
+		long val = (rgba < 0 ? rgba+0x100000000L : rgba);
+		r = clamp(((val&0xFF000000)>>24)/255.0f);
+		g =	clamp(((val&0x00FF0000)>>16)/255.0f);
+		b =	clamp(((val&0x0000FF00)>>8)/255.0f);
+		a = clamp(((val&0x000000FF))/255.0f);
 	}
 	
 	private float clamp(float x) {
@@ -49,6 +52,8 @@ public final class Color {
 	public final static Color GRAY50 = new Color(0.5f,0.5f,0.5f);
 
 	public final static Color MAGENTA_HAZE = new Color(0x9F4576FF);
+	public static final Color TRANSPARENT_WHITE = new Color(0xFFFFFF00);
+	public static final Color TRANSPARENT_BLACK = new Color(0x00000000);
 
 	public int getHexRgba() {
 		return (((int)(r*255f))<<24)|(((int)(g*255f))<<16)|(((int)(b*255f))<<8)|((int)(a*255f));
@@ -97,4 +102,32 @@ public final class Color {
 	public String getHexStringRgba() {
 		return StringUtils.leftPad(Integer.toHexString(getHexRgba()), 8, '0');
 	}	
+	
+	@Override
+	public String toString() {
+		return "Color("+getHexStringRgba()+")";
+	}
+
+	/** @return The r channel in the range [0,255]. */
+	public int getByteR() {
+		return (int)(r*255f);
+	}
+	/** @return The g channel in the range [0,255]. */
+	public int getByteG() {
+		return (int)(g*255f);
+	}	
+	/** @return The b channel in the range [0,255]. */
+	public int getByteB() {
+		return (int)(b*255f);
+	}
+	/** @return The a channel in the range [0,255]. */
+	public int getByteA() {
+		return (int)(a*255f);
+	}
+	public boolean isFullyTransparent() {
+		return a == 0.0f;
+	}
+	public boolean isFullyOpaque() {
+		return a != 1.0f;
+	}
 }

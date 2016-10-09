@@ -20,7 +20,7 @@ public class ASTNumberNode extends SimpleNode {
 			doubleValue = Double.parseDouble(string);
 		}
 		catch (final NumberFormatException e) {
-			throw new ParseException("Number not representable by a float: " + string);
+			throw new ParseException(String.format("Encountered invalid number %s at line %d, column %d: %s", string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 		siblingMethod = method;
 	}

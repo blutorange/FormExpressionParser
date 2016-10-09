@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
 /**
@@ -109,6 +110,20 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 		}
 	};
 
+	/**
+	 * @throws NoSuchAttrAssignerException.
+	 *             No generic attribute assigners.
+	 */
+	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAssigner<RegexLangObject>(
+			Type.REGEX, "genericAttrAssignerRegex", null) {
+		@Override
+		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
+	};
+	
 	/**
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
