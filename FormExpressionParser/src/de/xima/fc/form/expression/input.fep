@@ -1,8 +1,1 @@
-<html>
-<head>
-</head>
-[%% for(i:10) {%]
-<h1>[% tf1 %] ([%%=i%])</h1>
-[%% } %]
-</body>
-</html>
+if (true) 9; else if(false) 10;

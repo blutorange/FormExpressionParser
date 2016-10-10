@@ -234,15 +234,17 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		// else-header
 		if (node.jjtGetNumChildren() > 2) {
+			final boolean joinedIf = node.jjtGetChild(2).jjtGetNodeId() == FormExpressionParserTreeConstants.JJTIFCLAUSENODE;
+			writer.write(StringUtils.SPACE);
 			writer.write(CmnCnst.SYNTAX_ELSE);
 			writer.write(StringUtils.SPACE);
-			writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-			writer.write(linefeed);
-			node.jjtGetChild(1).jjtAccept(this, next);
-			writer.write(linefeed);
+			if (!joinedIf) {
+				writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
+				writer.write(linefeed);
+				writer.write(next);
+			}
 			// else-body
-			writer.write(next);
-			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
+			blockOrClause(node.jjtGetChild(2), next);
 			writer.write(linefeed);
 			// else-footer
 			writer.write(prefix);

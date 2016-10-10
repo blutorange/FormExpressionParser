@@ -17,14 +17,14 @@ import de.xima.fc.form.expression.util.CmnCnst;
 // Dummy for illustration, remove this and use the real FORMCYCLE class FormVersion.
 public class FormcycleExternalContext implements IExternalContext {
 	private Writer writer;
-	
+
 
 	// For demonstration purposes only. Replace with access to actual form elements.
 	private static final ImmutableMap<String, String> nameMap;
 	private static final ImmutableMap<String, String> aliasMap;
 	static {
-		Builder<String, String> builderName = new Builder<String, String>();
-		Builder<String, String> builderAlias = new Builder<String, String>();			
+		final Builder<String, String> builderName = new Builder<String, String>();
+		final Builder<String, String> builderAlias = new Builder<String, String>();
 		// Elements by name
 		builderName.put("tf1", "Hello");
 		builderName.put("tf2", "World");
@@ -40,26 +40,25 @@ public class FormcycleExternalContext implements IExternalContext {
 		nameMap = builderName.build();
 		aliasMap = builderAlias.build();
 	}
-	
-	public FormcycleExternalContext() {
 
+	public FormcycleExternalContext() {
 	}
 
 	public FormcycleExternalContext(final Writer writer) {
 		this.writer = writer;
 	}
-	
-	
+
+
 	/*
 	public FormcycleExternalContext(Object customObject) {
 		// this.customObject = customObject;
 	}
-	*/
-	
-	public String getFieldValueByName(String name) {
+	 */
+
+	public String getFieldValueByName(final String name) {
 		return nameMap.get(name);
 	}
-	public String getFieldValueByAlias(String name) {
+	public String getFieldValueByAlias(final String name) {
 		return aliasMap.get(name);
 	}
 
@@ -69,7 +68,7 @@ public class FormcycleExternalContext implements IExternalContext {
 		try {
 			writer = new FileWriter("/tmp/fep.out.html");
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			writer = DummyWriter.getInstance();
 		}
 		return writer;
@@ -78,19 +77,19 @@ public class FormcycleExternalContext implements IExternalContext {
 	@Override
 	public void flushWriter() throws EmbedmentOutputException {
 		if (writer != null)
-		try {
-			writer.flush();
-		}
-		catch (IOException e) {
+			try {
+				writer.flush();
+			}
+		catch (final IOException e) {
 			throw new EmbedmentOutputException(e, this);
 		}
 	}
-	
+
 	private final static ImmutableMap<String, ScopeImpl> scopeMap;
 	private static enum ScopeImpl {
 		FORM_FIELD {
 			@Override
-			public ALangObject fetch(String name, Object myObject) {
+			public ALangObject fetch(final String name, final Object myObject) {
 				final String value = aliasMap.get(name);
 				if (value != null) return StringLangObject.create(value);
 				return StringLangObject.create(nameMap.get(name));
@@ -103,9 +102,9 @@ public class FormcycleExternalContext implements IExternalContext {
 				.put(CmnCnst.CUSTOM_SCOPE_FORM_FIELD, ScopeImpl.FORM_FIELD)
 				.build();
 	}
-	
+
 	@Override
-	public ALangObject fetchScopedVariable(String scope, String name, IEvaluationContext ec) {
+	public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec) {
 		final ScopeImpl s = scopeMap.get(scope);
 		return s != null ? s.fetch(name, null) : null;
 	}

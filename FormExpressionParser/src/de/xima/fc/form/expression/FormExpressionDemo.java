@@ -83,7 +83,7 @@ public class FormExpressionDemo {
 		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
-			tokenArray = FormExpressionParsingUtil.Template.asTokenArray(code);
+			tokenArray = FormExpressionParsingUtil.Program.asTokenArray(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final TokenMgrError e) {
@@ -123,7 +123,7 @@ public class FormExpressionDemo {
 		final Node rootNode;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = FormExpressionParsingUtil.Template.parse(code);
+			rootNode = FormExpressionParsingUtil.Program.parse(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n");
 		} catch (final ParseException e) {
