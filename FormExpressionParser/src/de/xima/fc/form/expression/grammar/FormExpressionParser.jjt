@@ -72,23 +72,23 @@ MORE:
 TOKEN :
 {
   < AngleOpen : "<" >
-| 
+|
   < AngleClose : ">" >
-| 
+|
   < Ampersand : "&" >
 |
   < QuestionMark : "?" >
-|  
+|
   < Plus : "+" >
-| 
+|
   < Dash : "-" >
-| 
+|
   < Star : "*" >
-| 
+|
   < Slash : "/" >
-| 
+|
   < Circumflex : "^" >
-| 
+|
   < Bar : "|" >
 | 
   < Equal : "=" >
@@ -96,61 +96,61 @@ TOKEN :
   < ParenOpen : "(" >
 | 
   < ParenClose : ")" >
-| 
+|
   < BracesOpen : "{" >
-| 
+|
   < BracesClose : "}" >
-| 
+|
   < BracketOpen : "[" >
-| 
+|
   < BracketClose : "]" >
-| 
+|
   < Comma : "," >
-| 
+|
   < Colon : ":" >
-| 
+|
   < Dot : "." > : AFTER_DOT
-| 
+|
   < SemiColon : ";" >
-| 
+|
   < Exclamation : "!" >
-| 
+|
   < Percent : "%" >
-| 
+|
   < LosBodyClose : "%]" > : LOS
-| 
+|
   < ScopeSeparator : "::" >
-| 
+|
   < LambdaArrow : "->" >
-| 
+|
   < DoublePlus : "++" >
-| 
+|
   < DoubleDash : "--" >
-| 
+|
   < PlusEqual : "+=" >
-| 
+|
   < DashEqual : "-=" >
-| 
+|
   < StarEqual : "*=" >
-| 
+|
   < SlashEqual : "/=" >
-| 
+|
   < PercentEqual : "%=" >
-| 
+|
   < DoubleAmpersand : "&&" >
-| 
+|
   < DoubleBar : "||" >
-| 
+|
   < AmpersandEqual : "&=" >
-| 
+|
   < AngleOpenEqual : "<=" >
-| 
+|
   < AngleCloseEqual : ">=" >
-| 
+|
   < BarEqual : "|=" >
-| 
+|
   < CircumflexEqual : "^=" >
-| 
+|
   < DoubleStar : "**" >
 | 
   < DoubleEqual : "==" >
@@ -160,6 +160,10 @@ TOKEN :
   < Do : "do" >
 | 
   < ExclamationEqual : "!=" >
+|
+  < DoubleAngleOpen : "<<" > 
+|
+  < DoubleAngleClose : ">>" > 
 | 
   < DoubleStarEqual : "**=" >
 | 

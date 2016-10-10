@@ -32,7 +32,6 @@ public enum EMethod {
 	BAR("|"), // |
 	DOUBLE_BAR("||"), // ||
 
-
 	CIRCUMFLEX("^"), // ^
 
 	TILDE("~"), // ~

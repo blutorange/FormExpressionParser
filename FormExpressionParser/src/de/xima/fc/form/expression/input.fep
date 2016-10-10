@@ -1,1 +1,1 @@
-if (true) 9; else if(false) 10;
+++(a+b);

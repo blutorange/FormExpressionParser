@@ -221,9 +221,16 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	@Override
 	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
-		// Child must be an expression and cannot be break/continue/return.
+		// Child must be an expression and cannot be a break/continue/return node.
 		final ALangObject res = jjtAccept(node, node.jjtGetChild(0), ec);
-		return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
+		switch (node.getUnaryMethod()) {
+		case DOUBLE_PLUS_PREFIX:
+		case DOUBLE_PLUS_SUFFIX:
+			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
+			//$CASES-OMITTED$// Only ++ and -- need to be treated specially.
+		default:
+			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);			
+		}
 	}
 
 	@Override
