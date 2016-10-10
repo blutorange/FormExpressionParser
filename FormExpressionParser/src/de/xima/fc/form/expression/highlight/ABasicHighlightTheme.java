@@ -18,7 +18,6 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.C
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.CircumflexEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Colon;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Comma;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.CommentChar;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Continue;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Dash;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DashEqual;
@@ -58,8 +57,9 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.L
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosBodyClose;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosChar;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultilineCommentClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultilineCommentOpen;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineCommentChar;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineCommentClose;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineCommentOpen;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Null;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenClose;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenOpen;
@@ -72,6 +72,9 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.R
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SemiColon;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineCommentChar;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineCommentClose;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineCommentOpen;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleQuotedString;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Slash;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SlashEqual;
@@ -214,9 +217,12 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LosOpen:
 			return getStyleLosSeparator();
 
-		case MultilineCommentOpen:
-		case CommentChar:
-		case MultilineCommentClose:
+		case SingleLineCommentOpen:
+		case SingleLineCommentChar:
+		case SingleLineCommentClose:
+		case MultiLineCommentOpen:
+		case MultiLineCommentChar:
+		case MultiLineCommentClose:
 			return getStyleComment();
 
 		default:

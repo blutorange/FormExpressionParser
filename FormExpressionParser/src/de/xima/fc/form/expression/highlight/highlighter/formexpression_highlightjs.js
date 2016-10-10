@@ -47,6 +47,7 @@ function(hljs) {
         contains: [
           VARIABLE,
           hljs.C_BLOCK_COMMENT_MODE,
+          hljs.C_LINE_COMMENT_MODE,
         ]
       }
     ]
@@ -67,6 +68,7 @@ function(hljs) {
       hljs.APOS_STRING_MODE,
       hljs.QUOTE_STRING_MODE,
       hljs.C_BLOCK_COMMENT_MODE,
+      hljs.C_LINE_COMMENT_MODE,
       FUNCTION,
       SCOPED_VARIABLE,
       REGEXP,

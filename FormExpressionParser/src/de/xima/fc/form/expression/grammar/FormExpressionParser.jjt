@@ -38,13 +38,25 @@ TOKEN :
 < MULTI_LINE_COMMENT >
 SPECIAL_TOKEN :
 {
-  < MultilineCommentClose: "*/" > : CODE
+  < MultiLineCommentClose: "*/" > : CODE
 }
 
 < MULTI_LINE_COMMENT >
 MORE :
 {
-  < CommentChar : ~[ ] >
+  < MultiLineCommentChar : ~[ ] >
+}
+
+< SINGLE_LINE_COMMENT >
+SPECIAL_TOKEN :
+{
+  < SingleLineCommentClose: "\n" > : CODE
+}
+
+< SINGLE_LINE_COMMENT >
+MORE :
+{
+  < SingleLineCommentChar : ~["\n"] >
 }
 
 < CODE >
@@ -65,7 +77,9 @@ TOKEN:
 < CODE >
 MORE:
 { 
-  < MultilineCommentOpen: "/*" > : MULTI_LINE_COMMENT
+  < MultiLineCommentOpen: "/*" > : MULTI_LINE_COMMENT
+| 
+  < SingleLineCommentOpen: "//" > : SINGLE_LINE_COMMENT
 }
 
 < CODE >
