@@ -111,7 +111,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 				throws EvaluationException {
 			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, args[1].coerceBoolean(ec).booleanValue(), ec);		}
 	};
-	
+
 	/**
 	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
 	 */
@@ -127,7 +127,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
 	 */
 	public final static IFunction<NumberLangObject> NUMBER = new GenericAttrAccessor<NumberLangObject>(Type.NUMBER,
-			"genericAttrAccessorFunction", null) {
+			"genericAttrAccessorNumber", null) {
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 				throws EvaluationException {

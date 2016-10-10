@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTBreakClauseNode extends SimpleNode {
 	private String label;
-	
+
 	public ASTBreakClauseNode(final int id) {
 		super(id);
 	}
@@ -21,7 +21,13 @@ public class ASTBreakClauseNode extends SimpleNode {
 		siblingMethod = method;
 		this.label = label;
 	}
-	
+
+	@Override
+	protected void additionalToStringFields(final StringBuilder sb) {
+		sb.append(label).append(',');
+	}
+
+
 	public String getLabel() {
 		return label;
 	}

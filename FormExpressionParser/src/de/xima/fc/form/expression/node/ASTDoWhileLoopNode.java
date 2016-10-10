@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTDoWhileLoopNode extends SimpleNode {
 
 	private String label;
-	
+
 	public ASTDoWhileLoopNode(final int nodeId) {
 		super(nodeId);
 	}
@@ -17,11 +17,17 @@ public class ASTDoWhileLoopNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final EMethod method) throws ParseException {
+	@Override
+	protected void additionalToStringFields(final StringBuilder sb) {
+		sb.append(label).append(',');
+	}
+
+	public void init(final EMethod method, final String label) throws ParseException {
 		assertChildrenExactly(2);
 		siblingMethod = method;
+		this.label = label;
 	}
-	
+
 	public String getLabel() {
 		return label;
 	}

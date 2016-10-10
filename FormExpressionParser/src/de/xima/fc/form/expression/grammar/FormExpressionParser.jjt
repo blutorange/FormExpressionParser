@@ -530,11 +530,12 @@ void ThrowClause(EMethod method) #ThrowClauseNode :
 
 void SwitchClause(EMethod method) #SwitchClauseNode :
 {
+  Token label = null;
   jjtThis.setStartPosition(token);
 }
 {
   (
-    < Switch > < ParenOpen > Expression(null) < ParenClose > < BracesOpen >
+    < Switch > [< AngleOpen > label = < Identifier > < AngleClose >] < ParenOpen > Expression(null) < ParenClose > < BracesOpen >
     (
       SwitchCase()
     )*
@@ -544,7 +545,7 @@ void SwitchClause(EMethod method) #SwitchClauseNode :
     < BracesClose >
   )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, label != null ? label.image : null);
     jjtThis.setEndPosition(token);
   }
 }
@@ -599,42 +600,45 @@ void TryClause(EMethod method) #TryClauseNode :
 
 void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 {
+  Token label = null;
   jjtThis.setStartPosition(token);
 }
 {
   (
-    < Do > 
+    < Do > [< AngleOpen > label = < Identifier > < AngleClose >]
     BlockOrClause(null) 
     < While > < ParenOpen > Expression(null) < ParenClose > < SemiColon >
   )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, label != null ? label.image : null);
   }
 }
 
 void WhileLoop(EMethod method) #WhileLoopNode :
 {
+  Token label = null;
   jjtThis.setStartPosition(token);
 }
 {
   (
-    < While > < ParenOpen > Expression(null) < ParenClose > 
+    < While > [< AngleOpen > label = < Identifier > < AngleClose >] < ParenOpen > Expression(null) < ParenClose > 
     BlockOrClause(null)
   )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, label != null ? label.image : null);
     jjtThis.setEndPosition(token);
   }
 }
 
 void ForLoop(EMethod method) #ForLoopNode :
 {
+  Token label = null;
   Token iteratingLoopVariable = null;
   jjtThis.setStartPosition(token);
 }
 {
   (
-    < For > < ParenOpen >
+    < For > [< AngleOpen > label = < Identifier > < AngleClose >] < ParenOpen >
     (
       LOOKAHEAD(< Identifier > < Colon >)
       (
@@ -649,7 +653,7 @@ void ForLoop(EMethod method) #ForLoopNode :
     BlockOrClause(null)
   )
   {
-    jjtThis.init(method, iteratingLoopVariable != null ? iteratingLoopVariable.image : null);
+    jjtThis.init(method, iteratingLoopVariable != null ? iteratingLoopVariable.image : null, label != null ? label.image : null);
     jjtThis.setEndPosition(token);
   }
 }

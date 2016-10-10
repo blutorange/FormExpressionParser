@@ -9,10 +9,9 @@ public class ASTForLoopNode extends SimpleNode {
 	private String iteratingLoopVariable;
 
 	private String label;
-	
+
 	public ASTForLoopNode(final int nodeId) {
 		super(nodeId);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -20,10 +19,11 @@ public class ASTForLoopNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final EMethod method, final String iteratingLoopVariable) throws ParseException {
+	public void init(final EMethod method, final String iteratingLoopVariable, final String label) throws ParseException {
 		assertChildrenExactly(iteratingLoopVariable != null ? 2 : 4);
 		siblingMethod = method;
 		this.iteratingLoopVariable = iteratingLoopVariable;
+		this.label = label;
 	}
 
 	public String getIteratingLoopVariable() {
@@ -31,15 +31,15 @@ public class ASTForLoopNode extends SimpleNode {
 	}
 
 	@Override
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 		if (iteratingLoopVariable != null) sb.append(iteratingLoopVariable).append(",");
 	}
-	
+
 	@Override
 	protected String nodeName() {
 		return iteratingLoopVariable != null ? "ForIteratingLoopNode" : "ForPlainLoopNode";
 	}
-	
+
 	public String getLabel() {
 		return label;
 	}

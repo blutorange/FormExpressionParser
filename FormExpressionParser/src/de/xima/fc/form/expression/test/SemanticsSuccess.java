@@ -85,6 +85,7 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
 	GENERAL003("true ? 42 : 0;", Tests.N42), // Ternary
+	GENERAL004("function foo(){return 42;};foo();", Tests.N42), // Function return
 
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),

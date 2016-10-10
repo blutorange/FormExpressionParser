@@ -20,7 +20,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	 *            English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The upper-case version of the string.
 	 */
-	toUpperCase(Impl.toLowerCase),
+	toUpperCase(Impl.toUpperCase),
 	/**
 	 * @param locale
 	 *            {@link StringLangObject} (optional). The (IETF BCP 47) name of
@@ -28,7 +28,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	 *            English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The lower-case version of the string.
 	 */
-	toLowerCase(Impl.toLowerCase),	
+	toLowerCase(Impl.toLowerCase),
 	/**
 	 * @return {@link NumberLangObject}. The length of this string, >=0.
 	 */
@@ -95,7 +95,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 				return thisContext.toLowerCase(
 						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
-		},		
+		},
 		length(null) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,

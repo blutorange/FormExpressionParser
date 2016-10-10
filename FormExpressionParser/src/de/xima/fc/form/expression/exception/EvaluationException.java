@@ -45,13 +45,13 @@ public class EvaluationException extends RuntimeException {
 		ec = null;
 		externalContext = null;
 	}
-	
-	protected EvaluationException(IExternalContext externalContext, final String msg, final Throwable throwable) {
+
+	protected EvaluationException(final IExternalContext externalContext, final String msg, final Throwable throwable) {
 		super(msg, throwable);
 		ec = null;
 		this.externalContext = externalContext;
 	}
-	
+
 	public EvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
 		super(msgWithContext(msg, ec), throwable);
 		this.ec = ec;
@@ -78,12 +78,21 @@ public class EvaluationException extends RuntimeException {
 			}
 		}
 		sb.append(System.lineSeparator())
-			.append("Evaluation context is ")
-			.append(ec);
-		if (ec != null)
-			sb.append(System.lineSeparator())
-				.append("External context is ")
-				.append(ec.getExternalContext());
+		.append("Evaluation context is ")
+		.append(ec);
+		if (ec != null) {
+			sb.append('(')
+			.append(ec.getClass().getCanonicalName())
+			.append(')')
+			.append(System.lineSeparator())
+			.append("External context is ")
+			.append(ec.getExternalContext());
+			if (ec.getExternalContext() != null) {
+				sb.append('(')
+				.append(ec.getExternalContext().getClass().getCanonicalName())
+				.append(')');
+			}
+		}
 		return sb.toString();
 	}
 
@@ -105,8 +114,8 @@ public class EvaluationException extends RuntimeException {
 	 * access to the context.
 	 */
 	@Nullable
-	public final IEvaluationContext ec;	
-	
+	public final IEvaluationContext ec;
+
 	@Nullable
 	public final IExternalContext externalContext;
 }

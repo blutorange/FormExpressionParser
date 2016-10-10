@@ -12,9 +12,25 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
 public enum EExpressionMethodString implements IMethod2Function<StringLangObject> {
+	/**
+	 * @param stringToJoin {@link StringLangObject} The string to be concatenated to this string.
+	 * @return {@link StringLangObject} The concatenation between this string and the argument.
+	 */
 	PLUS(EMethod.PLUS, Impl.PLUS),
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),
+	ANGLE_OPEN(EMethod.ANGLE_OPEN, Impl.LESSER),
+	ANGLE_CLOSE(EMethod.ANGLE_CLOSE, Impl.GREATER),
+	ANGLE_OPEN_EQUAL(EMethod.ANGLE_OPEN_EQUAL, Impl.LESSER_OR_EQUAL),
+	ANGLE_CLOSE_EQUAL(EMethod.ANGLE_CLOSE_EQUAL, Impl.GREATER_OR_EQUAL),
+	/**
+	 * @param comparand {@link ALangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
+	 */
+	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.LOGICAL_IDENTITY),
+	/**
+	 * @param comparand {@link ALangObject}. Object to compare this object to.
+	 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
+	 */
+	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.OBJECT_IDENTITY),
 
 	;
 	private final EMethod method;
@@ -33,32 +49,48 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 	}
 
 	private static enum Impl implements IFunction<StringLangObject> {
-		/**
-		 * @param stringToJoin {@link StringLangObject} The string to be concatenated to this string.
-		 * @return {@link StringLangObject} The concatenation between this string and the argument.
-		 */
 		PLUS(null, "stringToJoin") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				return thisContext.coerceString(ec).concat(args[0].coerceString(ec));
+				return thisContext.concat(args[0].coerceString(ec));
 			}
 		},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-		 */
-		DOUBLE_EQUAL(null, "comparand"){
+		LESSER(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return BooleanLangObject.create(thisContext.stringValue().compareTo(args[0].coerceString(ec).stringValue())<0);
+			}
+		},
+		LESSER_OR_EQUAL(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return BooleanLangObject.create(thisContext.stringValue().compareTo(args[0].coerceString(ec).stringValue())<=0);
+			}
+		},
+		GREATER(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return BooleanLangObject.create(thisContext.stringValue().compareTo(args[0].coerceString(ec).stringValue())>0);
+			}
+		},
+		GREATER_OR_EQUAL(null, "comparand") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return BooleanLangObject.create(thisContext.stringValue().compareTo(args[0].coerceString(ec).stringValue())>=0);
+			}
+		},
+		LOGICAL_IDENTITY(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return BooleanLangObject.create(thisContext.equals(args[0]));
 			}},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
-		 */
-		TRIPLE_EQUAL(null, "comparand"){
+		OBJECT_IDENTITY(null, "comparand"){
 				@Override
 				public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 						throws EvaluationException {

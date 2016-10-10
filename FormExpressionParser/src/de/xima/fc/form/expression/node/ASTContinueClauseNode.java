@@ -21,7 +21,12 @@ public class ASTContinueClauseNode extends SimpleNode {
 		siblingMethod = method;
 		this.label = label;
 	}
-	
+
+	@Override
+	protected void additionalToStringFields(final StringBuilder sb) {
+		sb.append(label).append(',');
+	}
+
 	public String getLabel() {
 		return label;
 	}

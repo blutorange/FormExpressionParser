@@ -229,7 +229,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
 			//$CASES-OMITTED$// Only ++ and -- need to be treated specially.
 		default:
-			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);			
+			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
 		}
 	}
 
@@ -504,7 +504,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 						res = jjtAccept(node, children[i], ec);
 						// Handle continue, break, return.
 						if (mustJump) {
-							if (jumpType == EJump.RETURN || (jumpLabel != null))
+							if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
 								return res;
 							mustJump = false;
 							if (jumpType == EJump.BREAK)
@@ -516,7 +516,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 					res = jjtAccept(node, children[i], ec);
 					// Handle continue, break, return.
 					if (mustJump) {
-						if (jumpType == EJump.RETURN || (jumpLabel != null))
+						if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
 							return res;
 						mustJump = false;
 						if (jumpType == EJump.BREAK)

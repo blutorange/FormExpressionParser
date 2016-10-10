@@ -11,8 +11,8 @@ public class CustomRuntimeException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 
-	public CustomRuntimeException(final String message, IEvaluationContext ec) {
-		super(ec, message);
+	public CustomRuntimeException(final String message, final IEvaluationContext ec) {
+		super(ec, String.format("Custom Exception: %s",message));
 		this.message = message;
 	}
 
