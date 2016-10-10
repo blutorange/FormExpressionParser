@@ -8,6 +8,7 @@ CodeMirror.defineSimpleMode("formexpression", {
     {regex: /#(?:[^\\]|\\.)*?(?:#|$)[msi]*/, token: "regexp"},
     // You can match multiple tokens at once. Note that the captured
     // groups must span the whole string in this case
+    {regex: /([a-zA-Z_][a-zA-Z0-9_]*)(::)([a-zA-Z_][a-zA-Z0-9_]*)/, token: ["class", null, "variable-1"]},
     {regex: /(function)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)/, token: ["keyword", null, "variable-2"]},
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
