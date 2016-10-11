@@ -1,0 +1,16 @@
+function arraySort(array) {
+  len = array.length;
+  for (i = 0; i < len; i+=1) {
+    for (j=i+1; j<len; j+=1) {
+      tmp1 = array[i];
+      tmp2 = array[j];
+      if (tmp1 > tmp2) {
+        array[i] = tmp2;
+        array[j] = tmp1;
+      }
+    }
+  }
+  array;
+}
+
+arraySort(["Anton","Alfred","Andre","Abigel"]);

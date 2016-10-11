@@ -1,0 +1,7 @@
+<html>
+<head>
+</head>
+<body>
+<h1>Form field variables (placeholder)</h1>
+<p>[%tf1%], [%tfVorname.toLowerCase()%] [%tfNachname.toUpperCase()%]</p>
+</body>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="js/script.js"></script>
+<script src="js/codemirror.js"></script>
+<script src="js/codemirror_simple.js"></script>
+<script src="js/codemirror_formexpression_template.js"></script>
+<script src="js/codemirror_formexpression_program.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css"/>
+<link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
+<link rel="stylesheet" type="text/css" href="css/allThemes.css"/>
+<title>Insert title here</title>
+</head>
+<body>
+    <h1>Input</h1>
+	<form id="codeForm" method="POST">
+		<textarea id="code" name="code" rows="16" placeholder="Enter code..."></textarea>
+<!-- 		<textarea style="display:none;" id="code" name="code"></textarea> -->
+		<select name="type" id="type">
+		  <option value="program">Program</option>
+		  <option value="template">Template</option>
+		</select>
+		<select name="context" id="context">
+          <option value="generic">Generic</option>
+          <option value="formcycle">Formcycle</option>
+        </select>
+        <select id="theme"></select>
+        <label for="radio">Interpret output as HTML</label>
+        <label for="asHtmlYes">Yes</label>
+        <input type="radio" name="asHtml" id="asHtmlYes"/>
+        <label for="asHtmlNo">No</label>
+        <input type="radio" name="asHtml" id="asHtmlNo" checked/>
+		<input type="hidden" name="prefix" value="hglt"></input>
+		<button id="buttonHighlight" value="asd" type="button">Highlight</button>
+		<button id="buttonFormat" type="button">Format</button>
+		<button id="buttonEvaluate" type="button">Evaluate</button>
+	</form>
+	<h1>Examples</h1>
+	<h2>Templates</h2>
+	<ul>
+	   <li data-file="fibonacci" data-template data-generic data-as-html-yes class="codeExample"><a href="javascript:void(0);">Fibonacci</a></li>
+	   <li data-file="formField" data-template data-formcycle data-as-html-yes class="codeExample"><a href="javascript:void(0);">Accessing form fields</a></li>
+    </ul>
+    <h2>Plain code</h2>
+    <ul>
+      <li data-file="arrayMax" data-program data-generic data-as-html-no class="codeExample"><a href="javascript:void(0);">Maximum of array</a></li>
+      <li data-file="arraySort" data-program data-generic data-as-html-no class="codeExample"><a href="javascript:void(0);">Naive array sort</a></li>
+    </ul>  
+    <h1>Output</h1>
+	<section id="output">
+	  <p>No output yet, enter something above and click the button.</p>
+	</section>
+</body>
+</html>
