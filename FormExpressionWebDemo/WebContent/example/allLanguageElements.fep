@@ -1,0 +1,118 @@
+// Literals
+null;            // Null.
+true == !false;  // Booleans.
+1 == 1.0 == 1E1; // All numbers are doubles. Doubles have got 52 bits to represent integers exactly.
+"asd" == 'asd';  // No difference between the two types of quoting. I might add inline expressions, though.
+#^0x\d+$#i;      // Regexp with the case-insensitive flag.
+
+// Compound literals.
+[1,false,"asd",[10]];   // Arrays can contain any object.
+{"foo": 1, true: null}; // Hashes may contain any object.
+{foo: 1, bar: 2};       // Hash keys do not require string quotes.
+
+// Special objects.
+exception("myexception");       // Exception object, can the thrown.
+lambda = ->(foo){return foo;};  // Lamba object.
+lambda(42);                     // Calling a lambda object.
+lambda.call(null, 42);          // apply(this, arg1, arg2, ...)
+lambda.apply(null, [42]);       // call(this, argsArray)
+ 
+// Logging
+// A custom logger can be set when constructing an IEvaluationContext.
+loginfo("debug"); // Log message at log level debug.
+loginfo("info"); // Log message at log level info.
+loginfo("warn"); // Log message at log level warn.
+loginfo("error"); // Log message at log level error.
+
+// Variables
+variable = 1; // default global scope
+myScope::variable = 2; // custom scope
+variable + myScope::variable; // => 3
+
+// Operators
+(1 + 2) * 3;      // Operators work as expected.
+"anne" > "andre"; // Operator predence is like javascript.
+"string";       // True.
+true ? 42 : 0;    // Ternary if-else operator.
+
+// Control structures.
+
+// Plain for loop. i++ will be implemented soon.
+for (i = 0; i < 10; i+=1) {
+  loginfo(i);
+}
+
+// Enhanced for loop.
+for (i : [1,2,3]) loginfo(i); // => 1 2 3
+for (i : 3) loginfo(i);       // => 1 2 3
+for (i : "123") loginfo(i);   // => 1 2 3
+for (key : {1:null,2:null,3:null})
+  loginfo(key);              // => 1 2 3
+
+// While loop, Do-While loop
+while (false) doSomething();
+do 1+2; while (false);
+
+// Switch
+name = "tom";
+switch (name) {
+  case "max":
+  case "tom":
+  case "julia":
+    "known name";
+    break;
+  default:
+    throw exception("unknown name");
+}
+
+// Labels
+// Supported, but remember good coding styles!
+while<outer> (true) {
+  for<inner> (i : 10) {
+    if (i > 5) break outer;
+    continue inner;
+  }
+}
+
+// Error handling.
+try {
+  nonExistingVariable;
+}
+catch (e) {
+  logerror(e);
+}
+
+// Functions
+function foo(bar, baz) {
+  arguments; // => An array with the arguments actually passed to the function.
+  baz; // May be null when only 1 argument has been given.
+  return arguments.length == 2 ? bar + baz : null; // Return is optional. Functions return the last evaluated statement.
+}
+foo(1,2);      // => 3
+foo("1", "2"); // => "12"
+foo();         // => null
+
+// With block
+/*
+ * Default scopes need to be supported for
+ * accessing unqualified form fields, but
+ * I recommend you always use qualified names.
+ */
+someScope::someVar = 0;
+anotherScope::someVar = 1;
+with (someScope, anotherScope) {
+  someVar; // => 1  Resolves to anotherScope::someVar
+}
+with (anotherScope, someScope) {
+  someVar; // => 0  Resolves to someScope::someVar
+}
+with (someScope) {
+  someVar = 2;        // Sets a new local variable.
+  someVar;            // => 2 
+  someScope::someVar; // => 0 The scoped variable is unaffected.
+}
+
+// Comments
+// Single line comment
+19 + /* Block comments
+can be used as well*/ 23;

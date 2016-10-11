@@ -16,6 +16,7 @@ public class Token implements java.io.Serializable {
 		this.embedmentContext = embedmentContext;
 	}
 
+
 	/**
 	 * The version identifier for this Serializable class. Increment only if the
 	 * <i>serialized</i> form of the class changes.

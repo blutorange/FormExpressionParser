@@ -287,11 +287,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTForLoopNode node, final String prefix) throws IOException {
 		final String next = prefix + indentPrefix;
-		if (node.getLabel() != null) {
-			writer.write(node.getLabel());
-			writer.write(CmnCnst.SYNTAX_COLON);
-		}
 		writer.write(CmnCnst.SYNTAX_FOR);
+		if (node.getLabel() != null) {
+			writer.write(CmnCnst.SYNTAX_ANGLE_OPEN);
+			writer.write(node.getLabel());
+			writer.write(CmnCnst.SYNTAX_ANGLE_CLOSE);
+		}
 		writer.write(optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		if (node.getIteratingLoopVariable() == null) {
@@ -343,11 +344,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTWhileLoopNode node, final String prefix) throws IOException {
 		final String next = prefix + indentPrefix;
 		// header while(foobar) {
-		if (node.getLabel() != null) {
-			writer.write(node.getLabel());
-			writer.write(CmnCnst.SYNTAX_COLON);
-		}
 		writer.write(CmnCnst.SYNTAX_WHILE);
+		if (node.getLabel() != null) {
+			writer.write(CmnCnst.SYNTAX_ANGLE_OPEN);
+			writer.write(node.getLabel());
+			writer.write(CmnCnst.SYNTAX_ANGLE_CLOSE);
+		}
 		writer.write(optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		node.jjtGetChild(0).jjtAccept(this, prefix);
@@ -393,7 +395,6 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(linefeed);
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
-		writer.write(linefeed);
 		return null;
 	}
 
@@ -456,25 +457,27 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTDoWhileLoopNode node, final String prefix) throws IOException {
 		final String next = prefix + indentPrefix;
 		// header do {
-		if (node.getLabel() != null) {
-			writer.write(node.getLabel());
-			writer.write(CmnCnst.SYNTAX_COLON);
-		}
 		writer.write(CmnCnst.SYNTAX_DO);
+		if (node.getLabel() != null) {
+			writer.write(CmnCnst.SYNTAX_ANGLE_OPEN);
+			writer.write(node.getLabel());
+			writer.write(CmnCnst.SYNTAX_ANGLE_CLOSE);
+		}
 		writer.write(optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
 		writer.write(linefeed);
 		// body
 		writer.write(next);
-		blockOrClause(node.jjtGetChild(1), next);
+		blockOrClause(node.jjtGetChild(0), next);
 		writer.write(linefeed);
 		// footer } while(foobar)
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		writer.write(optionalSpace);
 		writer.write(CmnCnst.SYNTAX_WHILE);
+		writer.write(optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		node.jjtGetChild(1).jjtAccept(this, prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		writer.write(CmnCnst.SYNTAX_SEMI_COLON);
 		return null;

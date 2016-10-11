@@ -429,7 +429,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		ec.getBinding().nest(ec);
 		try {
 			doloop: do {
-				res = jjtAccept(node, children[1], ec);
+				res = jjtAccept(node, children[0], ec);
 				// Handle break, continue, return.
 				if (mustJump) {
 					if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
@@ -439,7 +439,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 						break doloop;
 				}
 			}
-			while (jjtAccept(node, children[0], ec).coerceBoolean(ec).booleanValue());
+			while (jjtAccept(node, children[1], ec).coerceBoolean(ec).booleanValue());
 		}
 		finally {
 			ec.getBinding().unnest(ec);

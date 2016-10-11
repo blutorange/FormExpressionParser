@@ -1,6 +1,8 @@
 PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
 import java.lang.StringBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import org.apache.commons.lang3.StringUtils;
@@ -289,7 +291,7 @@ TOKEN :
 
 Node Template(EMethod method) #StatementListNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -310,7 +312,7 @@ Node Template(EMethod method) #StatementListNode :
     if (token_source.curLexState == FormExpressionParserConstants.CODE)
       throw new ParseException("Final code block in templates must be closed.");
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     return jjtThis;
   }
 }
@@ -320,7 +322,7 @@ void LosChars(EMethod method) #LosNode :
 {
   Token t;
   final StringBuilder sb = new StringBuilder();
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -333,14 +335,14 @@ void LosChars(EMethod method) #LosNode :
   )
   {
     jjtThis.init(method, sb.toString(), null, false);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void LosOpen(EMethod method) #LosNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -350,7 +352,7 @@ void LosOpen(EMethod method) #LosNode :
     if (!_customLosAllowed) throw new ParseException(
       String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
     jjtThis.init(method, StringUtils.EMPTY, t.image, false);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -360,7 +362,7 @@ void LosBody(EMethod method) #LosNode :
   Token t = null;
   Token p = null;
   final StringBuilder sb = new StringBuilder();
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -377,13 +379,13 @@ void LosBody(EMethod method) #LosNode :
     if (!_customLosAllowed) throw new ParseException(
       String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
     jjtThis.init(method, sb.toString(), p != null ? p.image : null, true);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 Node CompleteProgram(EMethod method) #StatementListNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -397,14 +399,14 @@ Node CompleteProgram(EMethod method) #StatementListNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     return jjtThis;
   }
 }
 
 void TemplateProgram(EMethod method) #StatementListNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -415,7 +417,7 @@ void TemplateProgram(EMethod method) #StatementListNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -443,7 +445,7 @@ void ClauseOrStatement(EMethod method) #void :
 void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -461,13 +463,13 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void WithClause(EMethod method) #WithClauseNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -479,7 +481,7 @@ void WithClause(EMethod method) #WithClauseNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -493,14 +495,14 @@ void ContinueClause(EMethod method) #ContinueClauseNode :
   )
   {
     jjtThis.init(method, t == null ? null : t.image);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void BreakClause(EMethod method) #BreakClauseNode :
 {
   Token t = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -508,13 +510,13 @@ void BreakClause(EMethod method) #BreakClauseNode :
   )
   {
     jjtThis.init(method, t == null ? null : t.image);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void ReturnClause(EMethod method) #ReturnClauseNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -522,13 +524,13 @@ void ReturnClause(EMethod method) #ReturnClauseNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void ThrowClause(EMethod method) #ThrowClauseNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -536,14 +538,14 @@ void ThrowClause(EMethod method) #ThrowClauseNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void SwitchClause(EMethod method) #SwitchClauseNode :
 {
   Token label = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -558,7 +560,7 @@ void SwitchClause(EMethod method) #SwitchClauseNode :
   )
   {
     jjtThis.init(method, label != null ? label.image : null);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -591,7 +593,7 @@ void SwitchDefault() #void :
 void TryClause(EMethod method) #TryClauseNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -606,14 +608,14 @@ void TryClause(EMethod method) #TryClauseNode :
   )
   {
     jjtThis.init(method, t == null ? null : t.image);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 {
   Token label = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -629,7 +631,7 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 void WhileLoop(EMethod method) #WhileLoopNode :
 {
   Token label = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -638,7 +640,7 @@ void WhileLoop(EMethod method) #WhileLoopNode :
   )
   {
     jjtThis.init(method, label != null ? label.image : null);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -646,7 +648,7 @@ void ForLoop(EMethod method) #ForLoopNode :
 {
   Token label = null;
   Token iteratingLoopVariable = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -666,13 +668,13 @@ void ForLoop(EMethod method) #ForLoopNode :
   )
   {
     jjtThis.init(method, iteratingLoopVariable != null ? iteratingLoopVariable.image : null, label != null ? label.image : null);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void IfClause(EMethod method) #IfClauseNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -687,7 +689,7 @@ void IfClause(EMethod method) #IfClauseNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -703,7 +705,7 @@ void BlockOrClause(EMethod method) #void :
 void Block(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -719,14 +721,14 @@ void Block(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() !=
   {
     if (createNode) {
       jjtThis.init(method);
-      jjtThis.setEndPosition(token);
+      jjtThis.closeNodeScope(token);
     }
   }
 }
 
 void ExpressionListCommaSeparated(EMethod method) #StatementListNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -739,14 +741,14 @@ void ExpressionListCommaSeparated(EMethod method) #StatementListNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void Statement(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -758,14 +760,14 @@ void Statement(EMethod method) #StatementListNode(createNode = jjtree.nodeArity(
   {
     if (createNode) { 
       jjtThis.init(method);
-      jjtThis.setEndPosition(token);
+      jjtThis.closeNodeScope(token);
     }
   }
 }
 
 Node EmptyStatement(EMethod method) #EmptyNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -773,7 +775,7 @@ Node EmptyStatement(EMethod method) #EmptyNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     return jjtThis;
   }
 }
@@ -788,7 +790,7 @@ void Expression(EMethod method) #void :
 void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -861,7 +863,7 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
     )*
   )
   {
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     if (createNode) jjtThis.init(method);
   }
 }
@@ -869,7 +871,7 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
 void TernaryExpression(EMethod method) #TernaryExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -879,14 +881,14 @@ void TernaryExpression(EMethod method) #TernaryExpressionNode(createNode = jjtre
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -898,14 +900,14 @@ void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -917,14 +919,14 @@ void DoubleAmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtr
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void BarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -936,14 +938,14 @@ void BarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void CircumflexExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -955,14 +957,14 @@ void CircumflexExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void AmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -974,14 +976,14 @@ void AmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void DoubleEqualTypeExpression(EMethod method) #ComparisonExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1020,7 +1022,7 @@ void DoubleEqualTypeExpression(EMethod method) #ComparisonExpressionNode(createN
   )
   {
     if (createNode) {
-      jjtThis.setEndPosition(token);
+      jjtThis.closeNodeScope(token);
       jjtThis.init(method);
     }
   }
@@ -1029,7 +1031,7 @@ void DoubleEqualTypeExpression(EMethod method) #ComparisonExpressionNode(createN
 void AngleTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1054,14 +1056,14 @@ void AngleTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void MultiAngleExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1090,14 +1092,14 @@ void MultiAngleExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1115,14 +1117,14 @@ void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   DoubleStarExpression(method)
@@ -1144,14 +1146,14 @@ void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1163,14 +1165,14 @@ void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
 {
   EMethod unaryMethod = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1214,14 +1216,14 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
   )
   {
     if (unaryMethod != null) jjtThis.init(method, unaryMethod);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode = true;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1235,14 +1237,14 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
   )
   {
     if (createNode) jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1250,7 +1252,7 @@ void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
   )
   {
     jjtThis.init(method, t.image);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -1258,7 +1260,7 @@ void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
 void IdentifierName(EMethod method) #IdentifierNameNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1266,13 +1268,13 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
   )
   {
     jjtThis.init(method, t.image);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void FunctionArgumentList(EMethod method) #ArrayNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1283,14 +1285,14 @@ void FunctionArgumentList(EMethod method) #ArrayNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(createNode) :
 {
   boolean createNode = false;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1306,7 +1308,7 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
   )
   {
     if (createNode) { 
-      jjtThis.setEndPosition(token);
+      jjtThis.closeNodeScope(token);
       jjtThis.init(method);
     }
   }
@@ -1316,7 +1318,7 @@ void VariableWithOptionalScope(EMethod method) #VariableNode :
 {
   Token part1;
   Token part2 = null;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1327,7 +1329,7 @@ void VariableWithOptionalScope(EMethod method) #VariableNode :
     jjtThis.init(method, null, part1.image);
     else 
     jjtThis.init(method, part1.image, part2.image);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -1335,7 +1337,7 @@ void Number(EMethod method) #NumberNode :
 {
   Token t;
   boolean isInt;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1350,7 +1352,7 @@ void Number(EMethod method) #NumberNode :
     }
   )
   {
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     jjtThis.init(method, t.image, isInt);
   }
 }
@@ -1359,7 +1361,7 @@ void String(EMethod method) #StringNode :
 {
   Token t;
   char delimiter;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1374,14 +1376,14 @@ void String(EMethod method) #StringNode :
     }
   )
   {
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     jjtThis.init(method, t.image, delimiter);
   }
 }
 
 void Array(EMethod method) #ArrayNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1400,13 +1402,13 @@ void Array(EMethod method) #ArrayNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void Hash(EMethod method) #HashNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1425,7 +1427,7 @@ void Hash(EMethod method) #HashNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -1443,14 +1445,14 @@ void HashEntry(EMethod method) #void :
 
 void Null(EMethod method) #NullNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   < Null >
   {
     {
       jjtThis.init(method);
-      jjtThis.setEndPosition(token);
+      jjtThis.closeNodeScope(token);
     }
   }
 }
@@ -1458,7 +1460,7 @@ void Null(EMethod method) #NullNode :
 void Boolean(EMethod method) #BooleanNode :
 {
   boolean b;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1474,14 +1476,14 @@ void Boolean(EMethod method) #BooleanNode :
   )
   {
     jjtThis.init(method, b);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void Log(EMethod method) #LogNode :
 {
   ELogLevel logLevel;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1507,13 +1509,13 @@ void Log(EMethod method) #LogNode :
   )
   {
     jjtThis.init(method, logLevel);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void Exception(EMethod method) #ExceptionNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1521,13 +1523,13 @@ void Exception(EMethod method) #ExceptionNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
 void Function(EMethod method) #FunctionNode :
 {
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
@@ -1545,7 +1547,7 @@ void Function(EMethod method) #FunctionNode :
   )
   {
     jjtThis.init(method);
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
   }
 }
 
@@ -1555,13 +1557,13 @@ void Function(EMethod method) #FunctionNode :
 void Regex(EMethod method) #RegexNode :
 {
   Token t;
-  jjtThis.setStartPosition(token);
+  jjtThis.openNodeScope(token);
 }
 {
   (
     t = < Regex >  )
   {
-    jjtThis.setEndPosition(token);
+    jjtThis.closeNodeScope(token);
     jjtThis.init(method, t.image);
   }
 }

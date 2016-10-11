@@ -141,8 +141,8 @@ public interface Node extends Serializable, ITraceElement {
 	@Nullable
 	public Node getFirstChild();
 
-	public void setStartPosition(Token token);
-	public void setEndPosition(Token token);
+	public void openNodeScope(Token token);
+	public void closeNodeScope(Token token);
 
 	/**
 	 * @return The id for this TYPE of node.

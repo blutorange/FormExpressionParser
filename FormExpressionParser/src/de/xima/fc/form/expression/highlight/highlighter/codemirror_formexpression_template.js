@@ -17,7 +17,7 @@ CodeMirror.defineSimpleMode("formexpression-template", {
     {regex: /(function)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)/, token: ["keyword", null, "variable-2"]},
     {regex: /(?:function|with|return|throw|continue|break|if|for|while|else|do|try|catch|switch|case|default|loginfo|logwarn|logerror|logdebug)\b/, token: "keyword"},
     {regex: /true|false|null|exception/, token: "atom"},
-    {regex: /[\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number"},
+    {regex: /[-+]?(?:\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?/, token: "number"},
     // Single line comment
     {regex: /\/\/.*/, token: "comment"},
     // Multi line comment.

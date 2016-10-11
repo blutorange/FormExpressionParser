@@ -27,6 +27,8 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
  * - allow    i = if (true) 1; else 0;  etc.
  * - more operators, <<  >> etc.
  * - suffix ++ --
+ * - unparse: comments, los nicer
+ * - ALangObject Comparable
  */
 public class FormExpressionDemo {
 

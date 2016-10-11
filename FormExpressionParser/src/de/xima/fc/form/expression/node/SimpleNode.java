@@ -105,9 +105,20 @@ public abstract class SimpleNode implements Node {
 	@Override
 	public final String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(nodeName()).append('(').append(embedment).append(',').append(siblingMethod).append(',')
-		.append(startLine).append(':').append(startColumn).append('-').append(endLine).append(':')
-		.append(endColumn).append(',');
+		sb.append(nodeName())
+		.append('(')
+		.append(embedment)
+		.append(',')
+		.append(siblingMethod)
+		.append(',')
+		.append(startLine).append(':')
+		.append(startColumn)
+		.append('-')
+		.append(endLine)
+		.append(':')
+		.append(endColumn)
+		.append(',')
+		.append(',');
 		additionalToStringFields(sb);
 		sb.setLength(sb.length() - 1);
 		sb.append(")");
@@ -236,7 +247,7 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public final void setStartPosition(final Token t) {
+	public final void openNodeScope(final Token t) {
 		embedment = t.getEmbedmentContext();
 		startLine = t.beginLine;
 		startColumn = t.beginColumn;
@@ -244,7 +255,7 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public final void setEndPosition(final Token t) {
+	public final void closeNodeScope(final Token t) {
 		final Token next = startToken == null ? null : startToken.next;
 		if (next != null) {
 			startLine = next.beginLine;

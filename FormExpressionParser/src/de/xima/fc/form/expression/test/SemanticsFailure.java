@@ -16,7 +16,7 @@ enum SemanticsFailure implements ITestCase {
 	TEST001("k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
 	TEST002("break;", BreakClauseException.class,"Break used outside of loop or switch, or label does not match any loop or switch."),
 	TEST003("continue;", ContinueClauseException.class,"Continue used outside of loop or switch, or label does not match any loop or switch."),
-	TEST004("throw exception('HelloWorld');", CustomRuntimeException.class,"HelloWorld"),
+	TEST004("throw exception('HelloWorld');", CustomRuntimeException.class,"Custom Exception: HelloWorld"),
 	TEST005("if (true) k=0;k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
 	TEST006("for(i:2) k=0;k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
 	TEST007("try{k=0;}catch(e){k=0;};k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),

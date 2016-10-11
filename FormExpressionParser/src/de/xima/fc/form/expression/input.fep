@@ -1,1 +1,6 @@
-loginfo(89);
+// This is a test.
+// Another one.
+"StringNode";
+/* More comments.*/
+4;
+/* Final comment*/
