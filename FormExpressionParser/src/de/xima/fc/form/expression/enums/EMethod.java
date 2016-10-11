@@ -83,6 +83,10 @@ public enum EMethod {
 
 	public static EMethod equalMethod(final EMethod method) {
 		switch (method) {
+		case DOUBLE_PLUS_PREFIX: return EMethod.DOUBLE_PLUS_PREFIX;
+		case DOUBLE_DASH_PREFIX: return EMethod.DOUBLE_DASH_PREFIX;
+		case DOUBLE_PLUS_SUFFIX: return EMethod.DOUBLE_PLUS_SUFFIX;
+		case DOUBLE_DASH_SUFFIX: return EMethod.DOUBLE_DASH_SUFFIX;
 		case PLUS_EQUAL: return EMethod.PLUS;
 		case DASH_EQUAL: return EMethod.DASH;
 		case STAR_EQUAL: return EMethod.STAR;
@@ -120,6 +124,35 @@ public enum EMethod {
 		case EXCLAMATION_EQUAL:
 		case EXCLAMATION_DOUBLE_EQUAL:
 		case EXCLAMATION_TILDE:
+			return true;
+			//$CASES-OMITTED$
+		default:
+			return false;
+		}
+	}
+
+	public static boolean isAssigning(final EMethod method) {
+		switch (method) {
+		case EQUAL:
+		case DOUBLE_PLUS_PREFIX:
+		case DOUBLE_PLUS_SUFFIX:
+		case DOUBLE_DASH_PREFIX:
+		case DOUBLE_DASH_SUFFIX:
+		case PLUS_EQUAL:
+		case DASH_EQUAL:
+		case STAR_EQUAL:
+		case DOUBLE_STAR_EQUAL:
+		case SLASH_EQUAL:
+		case PERCENT_EQUAL:
+		case AMPERSAND_EQUAL:
+		case DOUBLE_AMPERSAND_EQUAL:
+		case BAR_EQUAL:
+		case DOUBLE_BAR_EQUAL:
+		case DOUBLE_ANGLE_OPEN_EQUAL:
+		case DOUBLE_ANGLE_CLOSE_EQUAL:
+		case TRIPLE_ANGLE_OPEN_EQUAL:
+		case TRIPLE_ANGLE_CLOSE_EQUAL:
+		case CIRCUMFLEX_EQUAL:
 			return true;
 			//$CASES-OMITTED$
 		default:

@@ -70,8 +70,17 @@ enum SemanticsSuccess implements ITestCase {
 	PROP003("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
 
 	// Expression methods number.
+	EMETHODUN000("-42;", NumberLangObject.create(-42)),
 	EMETHODUN001("-(-42);", Tests.N42),
 	EMETHODUN002("+42;", Tests.N42),
+	EMETHODUN003("!42;", BooleanLangObject.getFalseInstance()),
+	EMETHODUN004("!!42;", BooleanLangObject.getTrueInstance()),
+	EMETHODUN005("!'asd';", BooleanLangObject.getFalseInstance()),
+	EMETHODUN006("!#foo#;", BooleanLangObject.getFalseInstance()),
+	EMETHODUN007("!->(){};", BooleanLangObject.getFalseInstance()),
+	EMETHODUN008("!null;", BooleanLangObject.getTrueInstance()),
+	EMETHODUN009("!true;", BooleanLangObject.getFalseInstance()),
+	EMETHODUN010("!false;", BooleanLangObject.getTrueInstance()),
 	EMETHODBIN001("40+2;", Tests.N42),
 	EMETHODBIN002("50-8;", Tests.N42),
 	EMETHODBIN003("2*21;", Tests.N42),
@@ -80,6 +89,22 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN006("[1,2]==[1,2];", Tests.TRUE),
 	EMETHODBIN007("[1,2]===[1,2];", Tests.FALSE),
 	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
+
+	// Assigment
+	ASSIGNMENT001("a=0;b=23;c=19;a += b += c;",Tests.N42),
+	ASSIGNMENT002("a=[2,3,37];a[0]+=a[1]+=a[2];a;", ArrayLangObject.create(
+			NumberLangObject.create(42),
+			NumberLangObject.create(40),
+			NumberLangObject.create(37)
+			)),
+	ASSIGNMENT003("a={a:[2],b:[0,3],c:[0,0,37]};a.a[0]+=a.b[1]+=a.c[2];a;", HashLangObject.create(
+			StringLangObject.create("a"), ArrayLangObject.create(NumberLangObject.create(42)),
+			StringLangObject.create("b"), ArrayLangObject.create(Tests.N0,NumberLangObject.create(40)),
+			StringLangObject.create("c"), ArrayLangObject.create(Tests.N0, Tests.N0,NumberLangObject.create(37))
+			)),
+	ASSIGNMENT004("a=41;++a;++a;--a;a;",Tests.N42),
+
+
 
 	//General
 	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci

@@ -58,6 +58,8 @@ enum SyntaxSuccess implements ITestCase {
 	TEST049("#regex#i;"),
 	TEST050("#regex#msii;"),
 	TEST051("foo ? bar : baz;"), // Ternary
+	TEST052("++a.b['c'];"),
+	TEST053("++r;"),
 	;
 	private final String code;
 	private final ETestType type;

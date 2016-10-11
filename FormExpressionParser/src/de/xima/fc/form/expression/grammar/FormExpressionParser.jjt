@@ -1215,8 +1215,10 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
     PropertyExpression(method)
   )
   {
-    if (unaryMethod != null) jjtThis.init(method, unaryMethod);
-    jjtThis.closeNodeScope(token);
+    if (unaryMethod != null) {
+      jjtThis.closeNodeScope(token);
+      jjtThis.init(method, unaryMethod);
+    }
   }
 }
 

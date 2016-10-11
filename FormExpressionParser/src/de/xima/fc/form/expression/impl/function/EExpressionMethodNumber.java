@@ -26,11 +26,18 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 */
 	PLUS(EMethod.PLUS, Impl.ADD),
 	/**
+	 * @return {@link NumberLangObject}. This number increased by one.
+	 */
+	DOUBLE_PLUS(EMethod.DOUBLE_PLUS_PREFIX, Impl.INCREMENT),
+	/**
 	 * @param subtrahend {@link NumberLangObject} The number to be subtracted to this number.
 	 * @return {@link NumberLangObject}. The arithmetic difference of this number and the argument.
 	 */
 	DASH(EMethod.DASH, Impl.SUBTRACT),
 	/**
+	 * @return {@link NumberLangObject}. This number decreased by one.
+	 */
+	DOUBLE_DASH(EMethod.DOUBLE_DASH_PREFIX, Impl.DECREMENT),	/**
 	 * @param multiplicand {@link NumberLangObject}. The number to be multiplied to this number.
 	 * @return The arithmetic product of this number and the argument.
 	 */
@@ -123,6 +130,20 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(args[0].coerceNumber(ec));
+			}
+		},
+		INCREMENT(null) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.add(NumberLangObject.getOneInstance());
+			}
+		},
+		DECREMENT(null) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.subtract(NumberLangObject.getOneInstance());
 			}
 		},
 		NEGATE(null) {

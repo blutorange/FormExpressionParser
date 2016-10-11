@@ -52,7 +52,7 @@ public class TextInBox {
 		int w = lines[0].length();
 		for (int i = 1; i<lines.length; ++i)
 			w = Math.max(w, lines[i].length());
-		width = w*8;
-		height = Math.max(20, (lines.length-1)*24);
+		width = w*8+6;
+		height = Math.max(20, lines.length*16);
 	}
 }

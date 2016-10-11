@@ -314,4 +314,33 @@ public abstract class SimpleNode implements Node {
 	protected String nodeName() {
 		return getClass().getSimpleName();
 	}
+
+	/**
+	 * @param from Child where to start.
+	 * @param to Child where to end.
+	 * @param assignType Type of assignment, for the error message.
+	 * @throws ParseException When any children in the range [from,to) are not assignable.
+	 */
+	protected void assertChildrenAssignable(final int from, final int to, final String assignType) throws ParseException {
+		for (int i = from; i < to; ++i) {
+			switch (children[i].jjtGetNodeId()) {
+			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
+				break;
+			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
+				if (((ASTPropertyExpressionNode)children[i]).getLastChild().getSiblingMethod() == EMethod.PARENTHESIS) {
+					// Cannot do assignment a.foobar() = 42;
+					final String msg = String.format(
+							"Encountered illegal LVALUE (function call) %s in %s at line %s, column %s.", children[i],
+							assignType, new Integer(getStartLine()), new Integer(getStartColumn()));
+					throw new ParseException(msg);
+				}
+				break;
+			default:
+				final String msg = String.format("Encountered illegal LVALUE %s in %s at line %s, column %s.",
+						children[i].getClass().getSimpleName(), assignType, new Integer(getStartLine()),
+						new Integer(getStartColumn()));
+				throw new ParseException(msg);
+			}
+		}
+	}
 }

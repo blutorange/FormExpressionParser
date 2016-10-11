@@ -21,9 +21,12 @@ enum SyntaxFailure implements ITestCase {
 	TEST011("foo=bar;/*unclosed", "Lexical error at line 1, column 19.  Encountered: <EOF> after : \"\"", TokenMgrError.class),
 	TEST012("#foobar#q;", "Encountered \" <Identifier> \"q \"\" at line 1, column 9."),
 	TEST013("#(\\d+#", "Encountered invalid regex at line 1, column 1: Unclosed group near index 4"),
-	TEST014("42 = 42;", "Encountered illegal LVALUE ASTNumberNode for assignment at line 1, column 1."),
+	TEST014("42 = 42;", "Encountered illegal LVALUE ASTNumberNode in assignment at line 1, column 1."),
 	TEST015("\"\\\";", "Lexical error at line 1, column 5.  Encountered: <EOF> after : \"\\\"\\\\\\\";\"", TokenMgrError.class),
-	
+	TEST016("++(1+2);", "Encountered illegal LVALUE ASTParenthesisExpressionNode in prefix operation at line 1, column 1."),
+	TEST017("++a.b();", "Encountered illegal LVALUE (function call) ASTPropertyExpressionNode(null,null,1:3-1:7,) in prefix operation at line 1, column 1."),
+	TEST018("++--a;", "Encountered illegal LVALUE ASTUnaryExpressionNode in prefix operation at line 1, column 1."),
+
 	TEMPLATE001("<foo>[% i = %]</foo> [% 42; %]", ETestType.TEMPLATE,"Encountered \" \"%]\" \"%] \"\" at line 1, column 13."),
 	TEMPLATE002("<foo>[% i = 0;", ETestType.TEMPLATE,"Final code block in templates must be closed."),
 	TEMPLATE003("<foo> [% foo(); <bar>", ETestType.TEMPLATE,"Encountered \" \"<\" \"< \"\" at line 1, column 17."),
@@ -66,7 +69,7 @@ enum SyntaxFailure implements ITestCase {
 	public ETestType getTestType() {
 		return type;
 	}
-	
+
 	@Override
 	public EContextType getContextType() {
 		return context;

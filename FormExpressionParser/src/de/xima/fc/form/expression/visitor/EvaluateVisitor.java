@@ -219,19 +219,70 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		return res;
 	}
 
+	private ALangObject performAssignment(final Node node, final Node child, final EMethod method, ALangObject assignee, final IEvaluationContext ec) {
+		switch (child.jjtGetNodeId()) {
+		case FormExpressionParserTreeConstants.JJTVARIABLENODE:
+			final ASTVariableNode var = (ASTVariableNode)child;
+			// For compound assignments (+=, *= etc.), first we need to
+			// evaluate the left hand side.
+			if (method != EMethod.EQUAL)
+				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalMethod(method), ec,
+						assignee);
+			// Now we can set the variable to its new value.
+			setVariable(var, assignee, ec);
+			break;
+		case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
+			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode)child;
+			final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
+			final Node last = prop.getLastChild();
+			switch (last.getSiblingMethod()) {
+			case DOT:
+				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
+				// For compound assignments (+=, *= etc.), first we need to
+				// evaluate the left hand side.
+				if (method != EMethod.EQUAL)
+					assignee = res.evaluateAttrAccessor(attrDot, true, ec)
+					.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
+				// Now we can call the attribute assigner and assign the
+				// value.
+				res.executeAttrAssigner(attrDot, true, assignee, ec);
+				break;
+			case BRACKET:
+				final ALangObject attrBracket = jjtAccept(prop, last, ec);
+				// For compound assignments (+=, *= etc.), first we need to
+				// evaluate the left hand side.
+				if (method != EMethod.EQUAL)
+					assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
+					.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
+				res.executeAttrAssigner(attrBracket, false, assignee, ec);
+				break;
+				// $CASES-OMITTED$
+			default:
+				throw new UncatchableEvaluationException(ec,
+						String.format(
+								"Illegal enum constant %s at %s. This is likely a bug with the parser. Contact support.",
+								last.getSiblingMethod(), node.getClass().getSimpleName()));
+			}
+			break;
+			// $CASES-OMITTED$
+		default:
+			throw new UncatchableEvaluationException(ec,
+					String.format(
+							"Unknown assignment type %s at %s. This is likely a bug with the parser. Contact support.",
+							child.getSiblingMethod(), node.getClass().getSimpleName()));
+		}
+		return assignee;
+	}
+
 	@Override
 	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		// Child must be an expression and cannot be a break/continue/return node.
-		final ALangObject res = jjtAccept(node, node.jjtGetChild(0), ec);
-		switch (node.getUnaryMethod()) {
-		case DOUBLE_PLUS_PREFIX:
-		case DOUBLE_PLUS_SUFFIX:
-			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
-			//$CASES-OMITTED$// Only ++ and -- need to be treated specially.
-		default:
-			return res.evaluateExpressionMethod(node.getUnaryMethod(), ec);
-		}
+		if (EMethod.isAssigning(node.getUnaryMethod()))
+			return performAssignment(node, node.getFirstChild(), node.getUnaryMethod(), null, ec);
+		if (node.getUnaryMethod() == EMethod.EXCLAMATION)
+			return jjtAccept(node, node.getFirstChild(), ec).coerceBoolean(ec).not();
+		return jjtAccept(node, node.getFirstChild(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
 
 	@Override
@@ -649,57 +700,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		ALangObject assignee = jjtAccept(node, children[children.length - 1], ec);
 		for (int i = children.length - 2; i >= 0; --i) {
 			final EMethod method = children[i + 1].getSiblingMethod();
-			switch (children[i].jjtGetNodeId()) {
-			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
-				final ASTVariableNode var = (ASTVariableNode) children[i];
-				// For compound assignments (+=, *= etc.), first we need to
-				// evaluate the left hand side.
-				if (method != EMethod.EQUAL)
-					assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalMethod(method), ec,
-							assignee);
-				// Now we can set the variable to its new value.
-				setVariable(var, assignee, ec);
-				break;
-			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
-				final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode) children[i];
-				final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
-				final Node last = prop.getLastChild();
-				switch (last.getSiblingMethod()) {
-				case DOT:
-					final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
-					// For compound assignments (+=, *= etc.), first we need to
-					// evaluate the left hand side.
-					if (method != EMethod.EQUAL)
-						assignee = res.evaluateAttrAccessor(attrDot, true, ec)
-						.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
-					// Now we can call the attribute assigner and assign the
-					// value.
-					res.executeAttrAssigner(attrDot, true, assignee, ec);
-					break;
-				case BRACKET:
-					final ALangObject attrBracket = jjtAccept(prop, last, ec);
-					// For compound assignments (+=, *= etc.), first we need to
-					// evaluate the left hand side.
-					if (method != EMethod.EQUAL)
-						assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
-						.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
-					res.executeAttrAssigner(attrBracket, false, assignee, ec);
-					break;
-					// $CASES-OMITTED$
-				default:
-					throw new UncatchableEvaluationException(ec,
-							String.format(
-									"Illegal enum constant %s at ASTPropertyExpressionNode. This is likely a bug with the parser. Contact support.",
-									last.getSiblingMethod()));
-				}
-				break;
-				// $CASES-OMITTED$
-			default:
-				throw new UncatchableEvaluationException(ec,
-						String.format(
-								"Unknown assignment type %s. This is likely a bug with the parser. Contact support.",
-								children[i].getSiblingMethod()));
-			}
+			assignee = performAssignment(node, children[i], method, assignee, ec);
 		}
 		return assignee;
 	}
