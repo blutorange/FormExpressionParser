@@ -45,6 +45,10 @@ public class BooleanLangObject extends ALangObject {
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
 		return value ? NumberLangObject.getOneInstance() : NumberLangObject.getZeroInstance();
 	}
+	@Override
+	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
+		return value ? RegexLangObject.getAllMatchingInstance() : RegexLangObject.getUnmatchableInstance();
+	}
 
 	/**
 	 *  @return <code>this</code>, as only one object exists for true and false.

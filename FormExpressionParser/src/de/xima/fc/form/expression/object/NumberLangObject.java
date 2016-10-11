@@ -121,6 +121,11 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
+	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
+		return RegexLangObject.createForString(NumberLangObject.toExpression(value));
+	}
+
+	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
 		return this;
 	}

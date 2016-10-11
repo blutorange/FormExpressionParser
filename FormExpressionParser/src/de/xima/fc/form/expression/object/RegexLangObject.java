@@ -15,6 +15,11 @@ import de.xima.fc.form.expression.exception.InvalidRegexPatternException;
 
 public class RegexLangObject extends ALangObject {
 
+	private final static class InstanceHolder {
+		public final static RegexLangObject UNMATCHABLE = new RegexLangObject(Pattern.compile("(?!)"));
+		public final static RegexLangObject ALL_MATCHING = new RegexLangObject(Pattern.compile(""));
+	}
+
 	private final Pattern value;
 
 	private RegexLangObject(final Pattern value) {
@@ -128,6 +133,21 @@ public class RegexLangObject extends ALangObject {
 		return new RegexLangObject(value);
 	}
 
+	/**
+	 * @param string String to matches. When null, the empty string is used.
+	 * @return A regex that matches the literal characters of the given string, at any position.
+	 */
+	public static RegexLangObject createForString(String string) {
+		if (string == null) string = StringUtils.EMPTY;
+		return new RegexLangObject(Pattern.compile(Pattern.quote(string)));
+	}
+
+	/**
+	 * @param value The pattern for the regex.
+	 * @param ec Current evaluation context.
+	 * @return A regex with the given pattern.
+	 * @throws InvalidRegexPatternException When the pattern is invalid.
+	 */
 	public static RegexLangObject create(final String value, final IEvaluationContext ec) throws InvalidRegexPatternException {
 		return create(value, 0, ec);
 	}
@@ -141,5 +161,12 @@ public class RegexLangObject extends ALangObject {
 			throw new InvalidRegexPatternException(value, flags, ec);
 		}
 		return new RegexLangObject(pattern);
+	}
+
+	public static RegexLangObject getUnmatchableInstance() {
+		return InstanceHolder.UNMATCHABLE;
+	}
+	public static RegexLangObject getAllMatchingInstance() {
+		return InstanceHolder.ALL_MATCHING;
 	}
 }

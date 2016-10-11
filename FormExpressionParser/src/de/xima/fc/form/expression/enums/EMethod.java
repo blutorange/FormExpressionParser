@@ -1,10 +1,5 @@
 package de.xima.fc.form.expression.enums;
 
-import java.util.EnumMap;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
 /**
  * Method names for operators internal to the language.
  * <br><br>
@@ -34,9 +29,8 @@ public enum EMethod {
 
 	CIRCUMFLEX("^"), // ^
 
-	TILDE("~"), // ~
-	TILDE_EQUAL("~="), // ~=
 	EQUAL_TILDE("=~"), // =~
+	EXCLAMATION_TILDE("!~"), // !~
 
 	PLUS_EQUAL("+="), // +=
 	DASH_EQUAL("-="), // -=
@@ -46,7 +40,9 @@ public enum EMethod {
 	PERCENT_EQUAL("%="), // %=
 	AMPERSAND_EQUAL("&="), // &=
 	DOUBLE_ANGLE_OPEN_EQUAL("<<="), // <<=
+	TRIPLE_ANGLE_OPEN_EQUAL("<<<="), // <<<=
 	DOUBLE_ANGLE_CLOSE_EQUAL(">>="), // >>=
+	TRIPLE_ANGLE_CLOSE_EQUAL(">>>="), // >>>=
 	DOUBLE_AMPERSAND_EQUAL("&&="), // &&=
 	BAR_EQUAL("|="), // |=
 	DOUBLE_BAR_EQUAL("||="), // ||=
@@ -62,8 +58,10 @@ public enum EMethod {
 
 	ANGLE_OPEN("<"), // <
 	DOUBLE_ANGLE_OPEN("<<"), // <<
+	TRIPLE_ANGLE_OPEN("<<<"), // <<<
 	ANGLE_CLOSE(">"), // >
 	DOUBLE_ANGLE_CLOSE(">>"), // >>
+	TRIPLE_ANGLE_CLOSE(">>>"), // >>>
 	ANGLE_OPEN_EQUAL("<="),// <=
 	ANGLE_CLOSE_EQUAL(">="), // >=
 	COERCE("=>"),
@@ -83,25 +81,49 @@ public enum EMethod {
 		this.methodName = name;
 	}
 
-	/**
-	 * Maps between equal method and their plain methods, eg. <code>+=</code> to <code>+</code>.
-	 */
-	public final static ImmutableMap<EMethod, EMethod> equalTypeMap;
-	static {
-		final EnumMap<EMethod, EMethod> tmp = new EnumMap<>(EMethod.class);
-		tmp.put(PLUS_EQUAL, PLUS);
-		tmp.put(DASH_EQUAL, DASH);
-		tmp.put(STAR_EQUAL, STAR);
-		tmp.put(DOUBLE_STAR_EQUAL, DOUBLE_STAR);
-		tmp.put(SLASH_EQUAL, SLASH);
-		tmp.put(PERCENT_EQUAL, PERCENT);
-		tmp.put(AMPERSAND_EQUAL, AMPERSAND);
-		tmp.put(DOUBLE_AMPERSAND_EQUAL, DOUBLE_AMPERSAND);
-		tmp.put(BAR_EQUAL, BAR);
-		tmp.put(DOUBLE_BAR_EQUAL, DOUBLE_BAR);
-		tmp.put(DOUBLE_ANGLE_OPEN_EQUAL, DOUBLE_ANGLE_OPEN);
-		tmp.put(DOUBLE_ANGLE_CLOSE_EQUAL, DOUBLE_ANGLE_CLOSE);
-		tmp.put(CIRCUMFLEX, CIRCUMFLEX);
-		equalTypeMap = Maps.immutableEnumMap(tmp);
+	public static EMethod equalMethod(final EMethod method) {
+		switch (method) {
+		case PLUS_EQUAL: return EMethod.PLUS;
+		case DASH_EQUAL: return EMethod.DASH;
+		case STAR_EQUAL: return EMethod.STAR;
+		case DOUBLE_STAR_EQUAL: return EMethod.DOUBLE_STAR;
+		case SLASH_EQUAL: return EMethod.SLASH;
+		case PERCENT_EQUAL: return EMethod.PERCENT;
+		case AMPERSAND_EQUAL: return EMethod.AMPERSAND;
+		case DOUBLE_AMPERSAND_EQUAL: return EMethod.DOUBLE_AMPERSAND;
+		case BAR_EQUAL: return EMethod.BAR;
+		case DOUBLE_BAR_EQUAL: return EMethod.DOUBLE_BAR;
+		case DOUBLE_ANGLE_OPEN_EQUAL: return EMethod.DOUBLE_ANGLE_OPEN;
+		case DOUBLE_ANGLE_CLOSE_EQUAL: return EMethod.DOUBLE_ANGLE_CLOSE;
+		case TRIPLE_ANGLE_OPEN_EQUAL: return EMethod.TRIPLE_ANGLE_OPEN;
+		case TRIPLE_ANGLE_CLOSE_EQUAL: return EMethod.TRIPLE_ANGLE_CLOSE;
+		case CIRCUMFLEX_EQUAL: return EMethod.CIRCUMFLEX;
+		//$CASES-OMITTED$
+		default:
+			return null;
+		}
+	}
+
+	public static EMethod comparisonMethod(final EMethod method) {
+		switch (method) {
+		case EXCLAMATION_DOUBLE_EQUAL: return EMethod.TRIPLE_EQUAL;
+		case EXCLAMATION_EQUAL: return EMethod.DOUBLE_EQUAL;
+		case EXCLAMATION_TILDE: return EMethod.EQUAL_TILDE;
+		//$CASES-OMITTED$
+		default:
+			return null;
+		}
+	}
+
+	public static boolean isNegate(final EMethod method) {
+		switch (method) {
+		case EXCLAMATION_EQUAL:
+		case EXCLAMATION_DOUBLE_EQUAL:
+		case EXCLAMATION_TILDE:
+			return true;
+			//$CASES-OMITTED$
+		default:
+			return false;
+		}
 	}
 }

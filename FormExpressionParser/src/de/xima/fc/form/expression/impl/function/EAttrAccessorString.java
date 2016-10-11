@@ -32,7 +32,8 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	/**
 	 * @return {@link NumberLangObject}. The length of this string, >=0.
 	 */
-	length(Impl.length),;
+	length(Impl.length),
+	;
 
 	private final FunctionLangObject impl;
 	private final boolean evalImmediately;
@@ -102,7 +103,8 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 					final ALangObject... args) throws EvaluationException {
 				return NumberLangObject.create(thisContext.stringValue().length());
 			}
-		};
+		},
+		;
 
 		private String[] argList;
 		private String optionalArgumentsName;

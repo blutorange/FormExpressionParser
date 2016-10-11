@@ -1,16 +1,22 @@
 package de.xima.fc.form.expression.object;
 
+import java.io.IOException;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 public class FunctionLangObject extends ALangObject {
 
+	private final static Logger LOG = LoggerFactory.getLogger(FunctionLangObject.class);
 	private final IFunction<ALangObject> value;
 
 	private static class InstanceHolder {
@@ -64,15 +70,26 @@ public class FunctionLangObject extends ALangObject {
 	@Override
 	public void toExpression(final StringBuilder builder) {
 		builder.append("->(");
+		// Add arguments.
 		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(",");
 		// Remove final comma
 		if (builder.length()>3) builder.setLength(builder.length()-1);
-		builder.append(") {");
+		builder.append("){");
+		// Convert body.
 		final Node n = value.getNode();
 		if (n == null)
 			builder.append("'[native code]'");
-		else
-			builder.append("'[to be implemented]'");
+		else {
+			String unparse;
+			try {
+				unparse = UnparseVisitor.unparse(n, StringUtils.EMPTY, StringUtils.EMPTY, 0);
+			}
+			catch (final IOException e) {
+				LOG.error("Failed to unparse lambda", e);
+				unparse = "'[error during unparsing]'";
+			}
+			builder.append(unparse);
+		}
 		builder.append("};");
 	}
 

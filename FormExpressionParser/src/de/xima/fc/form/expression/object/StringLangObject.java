@@ -124,6 +124,11 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
+	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
+		return RegexLangObject.createForString(value);
+	}
+
+	@Override
 	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
@@ -201,11 +206,6 @@ public class StringLangObject extends ALangObject {
 		return StringLangObject.create(value ? TRUE : FALSE);
 	}
 
-	public static ALangObject best(final String value) {
-		if (value == null) return NullLangObject.getInstance();
-		return new StringLangObject(value);
-	}
-
 	public static StringLangObject getNullInstance() {
 		return InstanceHolder.NULL;
 	}
@@ -225,7 +225,6 @@ public class StringLangObject extends ALangObject {
 	public static StringLangObject getCarriageReturnInstance() {
 		return InstanceHolder.CR;
 	}
-
 
 	public static StringLangObject getTrueInstance() {
 		return InstanceHolder.TRUE;

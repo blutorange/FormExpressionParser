@@ -22,6 +22,7 @@ import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
+import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
@@ -654,7 +655,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// For compound assignments (+=, *= etc.), first we need to
 				// evaluate the left hand side.
 				if (method != EMethod.EQUAL)
-					assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalTypeMap.get(method), ec,
+					assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalMethod(method), ec,
 							assignee);
 				// Now we can set the variable to its new value.
 				setVariable(var, assignee, ec);
@@ -670,7 +671,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 					// evaluate the left hand side.
 					if (method != EMethod.EQUAL)
 						assignee = res.evaluateAttrAccessor(attrDot, true, ec)
-						.evaluateExpressionMethod(EMethod.equalTypeMap.get(method), ec, assignee);
+						.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
 					// Now we can call the attribute assigner and assign the
 					// value.
 					res.executeAttrAssigner(attrDot, true, assignee, ec);
@@ -681,7 +682,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 					// evaluate the left hand side.
 					if (method != EMethod.EQUAL)
 						assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
-						.evaluateExpressionMethod(EMethod.equalTypeMap.get(method), ec, assignee);
+						.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
 					res.executeAttrAssigner(attrBracket, false, assignee, ec);
 					break;
 					// $CASES-OMITTED$
@@ -737,5 +738,36 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	public ALangObject visit(final ASTParenthesisExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		return jjtAccept(node, node.getFirstChild(), ec);
+	}
+
+	@Override
+	public ALangObject visit(final ASTComparisonExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
+		// Arguments are expressions which cannot be clause/continue/return
+		// clauses
+		final Node[] childrenArray = node.getChildArray();
+
+		// Empty expression node.
+		if (childrenArray.length == 0)
+			return NullLangObject.getInstance();
+
+		// Binary expression node.
+		// Children are expressions and cannot contain break/clause/return
+		// clauses.
+		final ALangObject initial = jjtAccept(node, childrenArray[0], ec);
+		BooleanLangObject res = null;
+		for (int i = 1; i != childrenArray.length; ++i) {
+			// Children are expressions and cannot contain break/clause/return
+			// clauses.
+			if (EMethod.isNegate(childrenArray[i].getSiblingMethod())) {
+				res = initial.evaluateExpressionMethod(EMethod.comparisonMethod(childrenArray[i].getSiblingMethod()),
+						ec, jjtAccept(node, childrenArray[i], ec)).coerceBoolean(ec).not();
+			}
+			else {
+				res = initial.evaluateExpressionMethod(childrenArray[i].getSiblingMethod(), ec,
+						jjtAccept(node, childrenArray[i], ec)).coerceBoolean(ec);
+			}
+		}
+
+		return res == null ? initial : res;
 	}
 }

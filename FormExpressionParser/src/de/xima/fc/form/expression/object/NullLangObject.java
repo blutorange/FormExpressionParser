@@ -109,6 +109,11 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
+	public RegexLangObject coerceRegex(final IEvaluationContext ec) {
+		return RegexLangObject.getUnmatchableInstance();
+	}
+
+	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return StringLangObject.getEmptyInstance();
 	}

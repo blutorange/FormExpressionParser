@@ -32,7 +32,8 @@ public class ASTForLoopNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		if (iteratingLoopVariable != null) sb.append(iteratingLoopVariable).append(",");
+		sb.append(iteratingLoopVariable).append(",");
+		sb.append(label).append(',');
 	}
 
 	@Override

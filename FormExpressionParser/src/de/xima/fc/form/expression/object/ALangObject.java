@@ -25,6 +25,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>{@link BooleanLangObject}</td>
  *     <td>{@link NumberLangObject}</td>
  *     <td>{@link StringLangObject}</td>
+ *     <td>{@link RegexLangObject}</td>
  *     <td>{@link ArrayLangObject}</td>
  *     <td>{@link HashLangObject}</td>
  *     <td>{@link ExceptionLangObject}</td>
@@ -36,6 +37,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td><code>false</code></td>
  *     <td><code>0</code></td>
  *     <td><code>""</code></td>
+ *     <td><code>A regex that matches nothing.</code></td>
  *     <td><code>[]</code></td>
  *     <td><code>{}</code></td>
  *     <td><code>exception("")</code></td>
@@ -47,6 +49,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>-</td>
  *     <td><code>0</code> / <code>1</code></td>
  *     <td><code>false</code> / <code>true</code></td>
+ *     <td>A regex that matches nothing or everything.</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
@@ -57,6 +60,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>-</td>
  *     <td>true</td>
  *     <td>-</td>
+ *     <td>Regex that matches {@link NumberLangObject#toString()}</td>
  *     <td>Decimal representation of the number, eg <code>1.0</code>.</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
@@ -69,6 +73,19 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>true</td>
  *     <td>Interpreted as decimal; or <code>0</code> when not a valid decimal number.</td>
  *     <td>-</td>
+ *     <td>Regex that matches this string.</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
+ *   </tr>
+ *   <tr>
+ *     <td>{@link RegexLangObject}</td>
+ *     <td>-</td>
+ *     <td>true</td>
+ *     <td>{@link CoercionException}</td>
+ *     <td>As a regex literal, eg. <code>#0x\d+#i</code></td>
+ *     <td>-</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
@@ -80,6 +97,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>true</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link ArrayLangObject#toExpression(StringBuilder)}</td>
+ *     <td>{@link CoercionException}</td>
  *     <td>-</td>
  *     <td>Each pair is interpreted as a key-value pair. When it contains an odd number of entries, the last key will be mapped to <code>null</code>.</td>
  *     <td>{@link CoercionException}</td>
@@ -91,6 +109,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>true</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link HashLangObject#toExpression(StringBuilder)}</td>
+ *     <td>{@link CoercionException}</td>
  *     <td>An array twice the size of the hash, with each key as the <code>2n</code>-th entry and the corresponding value as the <code>2n+1</code>-th entry.</td>
  *     <td>-</td>
  *     <td>{@link CoercionException}</td>
@@ -104,6 +123,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>Message of the exception.</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
+ *     <td>{@link CoercionException}</td>
  *     <td>-</td>
  *     <td>{@link CoercionException}</td>
  *   </tr>
@@ -113,6 +133,7 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  *     <td>true</td>
  *     <td>{@link CoercionException}</td>
  *     <td>Declared name of the function. Empty string when anonymous function.</td>
+ *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
  *     <td>{@link CoercionException}</td>
@@ -237,7 +258,7 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 			return (RegexLangObject) this;
 		throw new CoercionException(this, Type.REGEX, ec);
 	}
-	
+
 	/**
 	 * Convenience method when the caller does not need the result of the
 	 * correct class.
