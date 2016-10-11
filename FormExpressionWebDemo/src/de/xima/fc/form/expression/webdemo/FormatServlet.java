@@ -45,7 +45,7 @@ public class FormatServlet extends HttpServlet {
 		final String indent = request.getParameter("indent");
 		final JSONObject json = new JSONObject();
 		if (code == null) {
-			response.setStatus(200, "Missing Parameter");
+			response.setStatus(200);
 			json.put("error", "Parameter code must be given.");
 		}
 		else {
@@ -61,7 +61,7 @@ public class FormatServlet extends HttpServlet {
 				json.put("text", format);
 			}
 			catch (ParseException | TokenMgrError | IOException e) {
-				response.setStatus(200, "Invalid Program");
+				response.setStatus(200);
 				json.put("error", "Could not parse code: " + e.getMessage());
 			}
 		}

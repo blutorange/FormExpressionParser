@@ -49,7 +49,7 @@ public class EvaluateServlet extends HttpServlet {
 		final String context = request.getParameter("context");
 		final JSONObject json = new JSONObject();
 		if (code == null) {
-			response.setStatus(200, "Missing Parameter");
+			response.setStatus(200);
 			json.put("error", "Parameter code must be given.");
 		}
 		else {
@@ -57,19 +57,23 @@ public class EvaluateServlet extends HttpServlet {
 				final String res;
 				if ("program".equalsIgnoreCase(type)) {
 					if ("formcycle".equalsIgnoreCase(context)) {
-						res = FormExpressionEvaluationUtil.Formcycle.evalProgram(code, new FormcycleExternalContext(DummyWriter.getInstance())).toString();
+						res = FormExpressionEvaluationUtil.Formcycle
+								.evalProgram(code, new FormcycleExternalContext(DummyWriter.getInstance())).toString();
 					}
 					else {
-						res = FormExpressionEvaluationUtil.Generic.evalProgram(code, DummyExternalContext.INSTANCE).toString();
+						res = FormExpressionEvaluationUtil.Generic.evalProgram(code, DummyExternalContext.INSTANCE)
+								.toString();
 					}
 				}
 				else {
 					try (final Writer writer = new StringBuilderWriter()) {
 						if ("formcycle".equalsIgnoreCase(context)) {
-							FormExpressionEvaluationUtil.Formcycle.evalTemplate(code, new FormcycleExternalContext(writer));
+							FormExpressionEvaluationUtil.Formcycle.evalTemplate(code,
+									new FormcycleExternalContext(writer));
 						}
 						else {
-							FormExpressionEvaluationUtil.Generic.evalTemplate(code, new WriterOnlyExternalContext(writer));
+							FormExpressionEvaluationUtil.Generic.evalTemplate(code,
+									new WriterOnlyExternalContext(writer));
 
 						}
 						res = writer.toString();
@@ -78,11 +82,11 @@ public class EvaluateServlet extends HttpServlet {
 				json.put("text", res.toString());
 			}
 			catch (ParseException | TokenMgrError | IOException e) {
-				response.setStatus(200, "Invalid Program");
+				response.setStatus(200);
 				json.put("error", "Could not parse code: " + e.getMessage());
 			}
 			catch (final EvaluationException e) {
-				response.setStatus(200, "Invalid Logic");
+				response.setStatus(200);
 				final StringBuilder sb = new StringBuilder();
 				sb.append("Could not evaluate code: ").append(e.getMessage()).append(StringUtils.LF);
 				for (final StackTraceElement el : e.getStackTrace()) {

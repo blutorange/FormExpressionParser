@@ -44,7 +44,7 @@ public class HighlightServlet extends HttpServlet {
 		final String type = request.getParameter("type");
 		final JSONObject json = new JSONObject();
 		if (code == null) {
-			response.setStatus(200, "Missing Parameter");
+			response.setStatus(200);
 			json.put("error", "Parameter code must be given.");
 		}
 		else {
@@ -62,7 +62,7 @@ public class HighlightServlet extends HttpServlet {
 
 			}
 			catch (ParseException | TokenMgrError | IOException e) {
-				response.setStatus(200, "Invalid Program");
+				response.setStatus(200);
 				json.put("error", "Could not parse code: " + e.getMessage());
 			}
 		}
