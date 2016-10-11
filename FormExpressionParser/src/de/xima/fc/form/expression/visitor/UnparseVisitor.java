@@ -371,7 +371,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
 		writer.write(linefeed);
 		writer.write(next);
-		node.jjtGetChild(1).jjtAccept(this, next);
+		blockOrClause(node.jjtGetChild(1), next);
 		writer.write(linefeed);
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
