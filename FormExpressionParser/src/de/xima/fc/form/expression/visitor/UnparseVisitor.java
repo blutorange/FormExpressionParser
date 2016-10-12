@@ -29,6 +29,7 @@ import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesisExpressionNode;
+import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
@@ -590,6 +591,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		return node.jjtGetChild(0).jjtAccept(this, prefix);
 	}
 
+	@Override
+	public Void visit(final ASTPostUnaryExpressionNode node, final String prefix) throws IOException {
+		writer.write(node.getUnaryMethod().methodName);
+		return node.jjtGetChild(0).jjtAccept(this, prefix);
+	}
+	
 	@Override
 	public Void visit(final ASTPropertyExpressionNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();

@@ -109,6 +109,8 @@ TOKEN :
 | 
   < Equal : "=" >
 | 
+  < Tilde : "~" >
+| 
   < ParenOpen : "(" >
 | 
   < ParenClose : ")" >
@@ -1206,13 +1208,20 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
     )
   |
     (
+      < Tilde > UnaryExpression(method)
+      {
+        unaryMethod = EMethod.TILDE;
+      }
+    )
+  |
+    (
       < Exclamation > UnaryExpression(method)
       {
         unaryMethod = EMethod.EXCLAMATION;
       }
     )
   | 
-    PropertyExpression(method)
+    PostUnaryExpression(method)
   )
   {
     if (unaryMethod != null) {
@@ -1222,10 +1231,32 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
   }
 }
 
+void PostUnaryExpression(EMethod method) #PostUnaryExpressionNode(unaryMethod != null) :
+{
+  EMethod unaryMethod = null;
+  jjtThis.openNodeScope(token);
+}
+{
+  (
+     PropertyExpression(method)
+    [
+      < DoublePlus > {  unaryMethod = EMethod.DOUBLE_PLUS_SUFFIX; }
+    | 
+      < DoubleDash > {  unaryMethod = EMethod.DOUBLE_DASH_SUFFIX; }
+    ]
+  )
+  {
+    if (unaryMethod != null) { 
+      jjtThis.closeNodeScope(token);
+      jjtThis.init(method, unaryMethod);
+    }
+  }
+}
+
 void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode = true;
-  jjtThis.openNodeScope(token);
+  jjtThis.openNodeScope(token);  
 }
 {
   (
@@ -1238,8 +1269,10 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
-    jjtThis.closeNodeScope(token);
+    if (createNode) {
+      jjtThis.closeNodeScope(token);
+      jjtThis.init(method);
+    }
   }
 }
 

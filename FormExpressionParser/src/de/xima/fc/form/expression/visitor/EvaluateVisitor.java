@@ -1,4 +1,6 @@
 package de.xima.fc.form.expression.visitor;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,6 @@ import de.xima.fc.form.expression.exception.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.ReturnClauseException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
-import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -39,6 +40,7 @@ import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesisExpressionNode;
+import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
@@ -221,25 +223,27 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 
 	private ALangObject performAssignment(final Node node, final Node child, final EMethod method, ALangObject assignee, final IEvaluationContext ec) {
 		switch (child.jjtGetNodeId()) {
-		case FormExpressionParserTreeConstants.JJTVARIABLENODE:
+		case JJTVARIABLENODE:
 			final ASTVariableNode var = (ASTVariableNode)child;
-			// For compound assignments (+=, *= etc.), first we need to
-			// evaluate the left hand side.
+			// Compound assignments (a+=b, etc.) are the same as a=a+b etc.
+			// First we need to evaluate the variable (a),
+			// then the expression method (+).
 			if (method != EMethod.EQUAL)
 				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalMethod(method), ec,
 						assignee);
 			// Now we can set the variable to its new value.
 			setVariable(var, assignee, ec);
 			break;
-		case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
+		case JJTPROPERTYEXPRESSIONNODE:
 			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode)child;
 			final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
 			final Node last = prop.getLastChild();
 			switch (last.getSiblingMethod()) {
 			case DOT:
 				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
-				// For compound assignments (+=, *= etc.), first we need to
-				// evaluate the left hand side.
+				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c etc.
+				// First we need to evaluate the last attribute accessor (a.b),
+				// then the expression method (+).
 				if (method != EMethod.EQUAL)
 					assignee = res.evaluateAttrAccessor(attrDot, true, ec)
 					.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
@@ -249,8 +253,9 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				break;
 			case BRACKET:
 				final ALangObject attrBracket = jjtAccept(prop, last, ec);
-				// For compound assignments (+=, *= etc.), first we need to
-				// evaluate the left hand side.
+				// Compound assignments (a[b]+=c etc.) are the same as a[b]=a[b]+c etc.
+				// First we need to evaluate the last attribute accessor (a[b]),
+				// then the expression method (+).
 				if (method != EMethod.EQUAL)
 					assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
 					.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
@@ -273,6 +278,61 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		}
 		return assignee;
 	}
+	
+	private ALangObject performPostUnaryAssignment(final Node node, final Node child, final EMethod method, final IEvaluationContext ec) {
+		final ALangObject res, tmp;
+		switch (child.jjtGetNodeId()) {
+		case JJTVARIABLENODE:
+			final ASTVariableNode var = (ASTVariableNode)child;
+			// Compound assignments (a+=b, etc.) are the same as a=a+b etc.
+			// First we need to evaluate the variable (a),
+			// then the expression method (+).
+			res = jjtAccept(node, var, ec);
+			// Now we can set the variable to its new value.
+			setVariable(var, res.evaluateExpressionMethod(EMethod.equalMethod(method), ec), ec);
+			break;
+		case JJTPROPERTYEXPRESSIONNODE:
+			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode)child;
+			tmp = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
+			final Node last = prop.getLastChild();
+			switch (last.getSiblingMethod()) {
+			case DOT:
+				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
+				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c etc.
+				// First we need to evaluate the last attribute accessor (a.b),
+				// then the expression method (+).
+				res = tmp.evaluateAttrAccessor(attrDot, true, ec);
+				// Now we can call the attribute assigner and assign the
+				// value.
+				res.executeAttrAssigner(attrDot, true, res.evaluateExpressionMethod(EMethod.equalMethod(method), ec),
+						ec);
+				break;
+			case BRACKET:
+				final ALangObject attrBracket = jjtAccept(prop, last, ec);
+				// Compound assignments (a[b]+=c etc.) are the same as a[b]=a[b]+c etc.
+				// First we need to evaluate the last attribute accessor (a[b]),
+				// then the expression method (+).
+				res = tmp.evaluateAttrAccessor(attrBracket, false, ec);
+				tmp.executeAttrAssigner(attrBracket, false,
+						res.evaluateExpressionMethod(EMethod.equalMethod(method), ec), ec);
+				break;
+				// $CASES-OMITTED$
+			default:
+				throw new UncatchableEvaluationException(ec,
+						String.format(
+								"Illegal enum constant %s at %s. This is likely a bug with the parser. Contact support.",
+								last.getSiblingMethod(), node.getClass().getSimpleName()));
+			}
+			break;
+			// $CASES-OMITTED$
+		default:
+			throw new UncatchableEvaluationException(ec,
+					String.format(
+							"Unknown assignment type %s at %s. This is likely a bug with the parser. Contact support.",
+							child.getSiblingMethod(), node.getClass().getSimpleName()));
+		}
+		return res;
+	}
 
 	@Override
 	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec)
@@ -285,6 +345,15 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		return jjtAccept(node, node.getFirstChild(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
 
+	@Override
+	public ALangObject visit(final ASTPostUnaryExpressionNode node, final IEvaluationContext ec)
+			throws EvaluationException {
+		// Child must be an expression and cannot be a break/continue/return node.
+		if (EMethod.isAssigning(node.getUnaryMethod()))
+			return performPostUnaryAssignment(node, node.getFirstChild(), node.getUnaryMethod(), ec);
+		return jjtAccept(node, node.getFirstChild(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
+	}
+	
 	@Override
 	public ALangObject visit(final ASTExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Arguments are expressions which cannot be clause/continue/return

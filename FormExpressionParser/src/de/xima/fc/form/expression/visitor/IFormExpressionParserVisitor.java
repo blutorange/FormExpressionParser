@@ -21,6 +21,7 @@ import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesisExpressionNode;
+import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
@@ -71,4 +72,5 @@ public interface IFormExpressionParserVisitor<R,T,E extends Throwable>
 	public R visit(ASTTernaryExpressionNode node, T data) throws E;
 	public R visit(ASTParenthesisExpressionNode node, T data) throws E;
 	public R visit(ASTComparisonExpressionNode node, T data) throws E;
+	public R visit(ASTPostUnaryExpressionNode node, T data) throws E;
 }

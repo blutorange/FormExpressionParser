@@ -10,10 +10,12 @@ public enum EMethod {
 	PLUS("+"), // +
 	PLUS_UNARY("-"), // +
 	DOUBLE_PLUS_PREFIX("++"), // ++i
+	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_PLUS_PREFIX} */
 	DOUBLE_PLUS_SUFFIX("++"), // i++
 	DASH("-"), // -
 	DASH_UNARY("-"), // -
 	DOUBLE_DASH_PREFIX("--"), // --i
+	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_DASH_PREFIX} */
 	DOUBLE_DASH_SUFFIX("--"), // i--
 
 	STAR("*"), // *
@@ -29,6 +31,7 @@ public enum EMethod {
 
 	CIRCUMFLEX("^"), // ^
 
+	TILDE("~"), // ~
 	EQUAL_TILDE("=~"), // =~
 	EXCLAMATION_TILDE("!~"), // !~
 
@@ -85,8 +88,8 @@ public enum EMethod {
 		switch (method) {
 		case DOUBLE_PLUS_PREFIX: return EMethod.DOUBLE_PLUS_PREFIX;
 		case DOUBLE_DASH_PREFIX: return EMethod.DOUBLE_DASH_PREFIX;
-		case DOUBLE_PLUS_SUFFIX: return EMethod.DOUBLE_PLUS_SUFFIX;
-		case DOUBLE_DASH_SUFFIX: return EMethod.DOUBLE_DASH_SUFFIX;
+		case DOUBLE_PLUS_SUFFIX: return EMethod.DOUBLE_PLUS_PREFIX;
+		case DOUBLE_DASH_SUFFIX: return EMethod.DOUBLE_DASH_PREFIX;
 		case PLUS_EQUAL: return EMethod.PLUS;
 		case DASH_EQUAL: return EMethod.DASH;
 		case STAR_EQUAL: return EMethod.STAR;
@@ -110,8 +113,11 @@ public enum EMethod {
 
 	public static EMethod comparisonMethod(final EMethod method) {
 		switch (method) {
+		case TRIPLE_EQUAL:
 		case EXCLAMATION_DOUBLE_EQUAL: return EMethod.TRIPLE_EQUAL;
+		case DOUBLE_EQUAL:
 		case EXCLAMATION_EQUAL: return EMethod.DOUBLE_EQUAL;
+		case EQUAL_TILDE:
 		case EXCLAMATION_TILDE: return EMethod.EQUAL_TILDE;
 		//$CASES-OMITTED$
 		default:

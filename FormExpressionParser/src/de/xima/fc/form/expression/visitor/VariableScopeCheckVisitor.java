@@ -23,6 +23,7 @@ import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTNumberNode;
 import de.xima.fc.form.expression.node.ASTParenthesisExpressionNode;
+import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
@@ -243,5 +244,9 @@ public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<V
 		throw new RuntimeException("TODO - not yet implemented");
 	}
 
-
+	@Override
+	public Void visit(ASTPostUnaryExpressionNode node, IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
