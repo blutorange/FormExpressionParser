@@ -1,12 +1,39 @@
 package de.xima.fc.form.expression.visitor;
 
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTARRAYNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTASSIGNMENTEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTBOOLEANNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTBREAKCLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTCOMPARISONEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTCONTINUECLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEXCEPTIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTFUNCTIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTHASHNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTIDENTIFIERNAMENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTIFCLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTLOGNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTNULLNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTNUMBERNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPARENTHESISEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPOSTUNARYEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTREGEXNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTRETURNCLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTSTRINGNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTTERNARYEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTTHROWCLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTUNARYEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
+
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -53,69 +80,121 @@ import de.xima.fc.form.expression.util.CmnCnst;
 public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String, IOException>{
 
 	private final Writer writer;
-	private final String indentPrefix;
-	private final String linefeed;
-	private final String optionalSpace;
-	private final String requiredSpace = " ";
+	private final UnparseVisitorConfig config;
+	private final List<Token> comments;
+	private Token commentToken;
+	private int commentPos;
 
-
-	public static void unparse(final Writer writer, final Node node, final String indentPrefix, final String linefeed) throws IOException {
-		unparse(writer, node, indentPrefix, linefeed, 1);
-	}
-	public static String unparse(final Node node, final String indentPrefix, final String linefeed) throws IOException {
-		return unparse(node, indentPrefix, linefeed, 1);
+	public static void unparse(final Writer writer, final Node node)
+			throws IOException {
+		unparse(writer, node, UnparseVisitorConfig.getDefaultConfig());
 	}
 
-	public static void unparse(final Writer writer, final Node node, final String indentPrefix, final String linefeed, final int numberOfOptionalSpaces) throws IOException {
-		final UnparseVisitor unparser = new UnparseVisitor(writer, indentPrefix, linefeed, numberOfOptionalSpaces);
+	public static String unparse(final Node node) throws IOException {
+		return unparse(node, UnparseVisitorConfig.getDefaultConfig());
+	}
+
+	public static String unparse(final Node node, final UnparseVisitorConfig config) throws IOException {
+		try (final Writer writer = new StringBuilderWriter()) {
+			unparse(writer, node, config);
+			return writer.toString();
+		}
+	}
+
+	public static void unparse(final Writer writer, final Node node, final UnparseVisitorConfig config) throws IOException {
+		final UnparseVisitor unparser = new UnparseVisitor(writer, node.getComments(), config);
 		unparser.blockOrClause(node, StringUtils.EMPTY);
+		unparser.writeRemainingComments();
 		writer.flush();
 	}
-
-	public static String unparse(final Node node, final String indentPrefix, final String linefeed, final int numberOfOptionalSpaces) throws IOException {
-		final Writer writer = new StringBuilderWriter();
-		final UnparseVisitor unparser = new UnparseVisitor(writer, indentPrefix, linefeed, numberOfOptionalSpaces);
-		unparser.blockOrClause(node, StringUtils.EMPTY);
-		writer.close();
-		return writer.toString();
+	
+	private UnparseVisitor(final Writer writer, List<Token> comments, UnparseVisitorConfig config) {
+		if (writer == null) throw new IllegalArgumentException("writer must not be null");
+		this.config = config;
+		this.writer = writer;
+		this.comments = comments;
+		this.commentPos = 0;
+		this.commentToken = (comments != null && commentPos < comments.size()) ? comments.get(commentPos) : null;
 	}
 
-	private UnparseVisitor(final Writer writer, String indentPrefix, String linefeed, final int numberOfOptionalSpaces) {
-		if (writer == null) throw new IllegalArgumentException("writer must not be null");
-		if (indentPrefix == null) indentPrefix = StringUtils.SPACE;
-		if (linefeed == null) linefeed = StringUtils.LF;
-		optionalSpace = StringUtils.repeat(' ', numberOfOptionalSpaces < 0 ? 0 : numberOfOptionalSpaces);
-		this.indentPrefix = indentPrefix;
-		this.writer = writer;
-		this.linefeed = linefeed;
+	private void writeComment(final String prefix, final boolean isBlock) throws IOException {
+		if (!config.keepComments)
+			return;
+		// Write the comment
+		writer.write(commentToken.image);
+		if (commentToken.image.charAt(1) == '/') {
+			// Single line comment ends with a newline (unless it is the last
+			// line)
+			// Add indentation.
+			if (commentToken.image.charAt(commentToken.image.length() - 1) == '\n')
+				writer.write(prefix);
+		} else {
+			// When a multiline comment appears before a block or
+			// statement, we add newline.
+			if (isBlock) {
+				writer.write(config.linefeed);
+				writer.write(prefix);
+			}
+			// Otherwise, it is an inline comment and we just add a space.
+			else {
+				writer.write(config.optionalSpace);
+			}
+		}
+		// Get the next comment
+		++commentPos;
+		commentToken = commentPos < comments.size() ? comments.get(commentPos) : null;
+	}
+
+	private void writeRemainingComments() throws IOException {
+		writer.write(config.linefeed);
+		while (commentToken != null) writeComment(StringUtils.EMPTY, true);
+	}
+	
+	private void writeCommentForNode(final Node node, final String prefix, final boolean isBlock) throws IOException {
+		if (!config.keepComments) return;
+		// We write the comment iff the node to be processed lies after the comment. 
+		// We check check for >= beginColumn to be safe, but the = case cannot happen
+		// as a comment token  cannot be at the same position as a non-comment node.
+		while (commentToken != null
+				&& (node.getStartLine() > commentToken.beginLine || node.getStartLine() == commentToken.beginLine
+						&& node.getStartColumn() >= commentToken.beginColumn)) {
+			writeComment(prefix, isBlock);
+		}
+	}
+	
+	private Void expression(final Node node, final String prefix) throws IOException {
+		writeCommentForNode(node, prefix, false);
+		return node.jjtAccept(this, prefix);
 	}
 
 	private Void blockOrClause(final Node node, final String prefix) throws IOException {
+		writeCommentForNode(node, prefix, true);
 		node.jjtAccept(this, prefix);
 		switch (node.jjtGetNodeId()) {
-		case FormExpressionParserTreeConstants.JJTARRAYNODE:
-		case FormExpressionParserTreeConstants.JJTASSIGNMENTEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTBOOLEANNODE:
-		case FormExpressionParserTreeConstants.JJTBREAKCLAUSENODE:
-		case FormExpressionParserTreeConstants.JJTCOMPARISONEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTCONTINUECLAUSENODE:
-		case FormExpressionParserTreeConstants.JJTEXCEPTIONNODE:
-		case FormExpressionParserTreeConstants.JJTEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTFUNCTIONNODE:
-		case FormExpressionParserTreeConstants.JJTHASHNODE:
-		case FormExpressionParserTreeConstants.JJTIDENTIFIERNAMENODE:
-		case FormExpressionParserTreeConstants.JJTLOGNODE:
-		case FormExpressionParserTreeConstants.JJTNULLNODE:
-		case FormExpressionParserTreeConstants.JJTNUMBERNODE:
-		case FormExpressionParserTreeConstants.JJTPARENTHESISEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTREGEXNODE:
-		case FormExpressionParserTreeConstants.JJTRETURNCLAUSENODE:
-		case FormExpressionParserTreeConstants.JJTSTRINGNODE:
-		case FormExpressionParserTreeConstants.JJTTERNARYEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTTHROWCLAUSENODE:
-		case FormExpressionParserTreeConstants.JJTUNARYEXPRESSIONNODE:
-		case FormExpressionParserTreeConstants.JJTVARIABLENODE:
+		case JJTARRAYNODE:
+		case JJTASSIGNMENTEXPRESSIONNODE:
+		case JJTBOOLEANNODE:
+		case JJTBREAKCLAUSENODE:
+		case JJTCOMPARISONEXPRESSIONNODE:
+		case JJTCONTINUECLAUSENODE:
+		case JJTEXCEPTIONNODE:
+		case JJTEXPRESSIONNODE:
+		case JJTFUNCTIONNODE:
+		case JJTHASHNODE:
+		case JJTIDENTIFIERNAMENODE:
+		case JJTLOGNODE:
+		case JJTNULLNODE:
+		case JJTNUMBERNODE:
+		case JJTPARENTHESISEXPRESSIONNODE:
+		case JJTPOSTUNARYEXPRESSIONNODE:
+		case JJTPROPERTYEXPRESSIONNODE:
+		case JJTREGEXNODE:
+		case JJTRETURNCLAUSENODE:
+		case JJTSTRINGNODE:
+		case JJTTERNARYEXPRESSIONNODE:
+		case JJTTHROWCLAUSENODE:
+		case JJTUNARYEXPRESSIONNODE:
+		case JJTVARIABLENODE:
 			writer.write(CmnCnst.SYNTAX_SEMI_COLON);
 			break;
 		}
@@ -123,12 +202,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	}
 
 	private Void expressionNode(final Node node, final String prefix) throws IOException {
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(0), prefix);
 		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			writer.write(node.jjtGetChild(i).getSiblingMethod().methodName);
-			writer.write(optionalSpace);
-			node.jjtGetChild(i).jjtAccept(this, prefix);
+			writer.write(config.optionalSpace);
+			expression(node.jjtGetChild(i), prefix);
 		}
 		return null;
 	}
@@ -136,10 +215,10 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	private void forHeaderExpression(final Node node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();
 		for (int i = 0; i < len; ++i) {
-			node.jjtGetChild(0).jjtAccept(this, prefix);
+			expression(node.jjtGetChild(0), prefix);
 			if (len != 1 && i < len -1) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 			}
 		}
 	}
@@ -170,10 +249,10 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		final int len = node.jjtGetNumChildren();
 		writer.write(CmnCnst.SYNTAX_BRACKET_OPEN);
 		for (int i = 0; i < len; ++i) {
-			node.jjtGetChild(i).jjtAccept(this, prefix);
+			expression(node.jjtGetChild(i), prefix);
 			if (len != 1 && i < len - 1) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 			}
 		}
 		writer.write(CmnCnst.SYNTAX_BRACKET_CLOSE);
@@ -185,16 +264,16 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		final int len = node.jjtGetNumChildren();
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
 		for (int i = 0; i < len; i+=2) {
-			if (node.jjtGetChild(i).jjtGetNodeId() == FormExpressionParserTreeConstants.JJTIDENTIFIERNAMENODE) {
+			if (node.jjtGetChild(i).jjtGetNodeId() == JJTIDENTIFIERNAMENODE) {
 				StringLangObject.toExpression(((ASTIdentifierNameNode)node.jjtGetChild(i)).getName(), writer);
 			}
-			else node.jjtGetChild(i).jjtAccept(this, prefix);
+			else expression(node.jjtGetChild(i), prefix);
 			writer.write(CmnCnst.SYNTAX_COLON);
-			writer.write(optionalSpace);
-			node.jjtGetChild(i+1).jjtAccept(this, prefix);
+			writer.write(config.optionalSpace);
+			expression(node.jjtGetChild(i+1), prefix);
 			if (len != 1 && i < len - 2) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 			}
 		}
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -235,7 +314,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		for (int i = 0; i != len; ++i) {
 			blockOrClause(node.jjtGetChild(i), prefix);
 			if (len != 1 && i < len - 1) {
-				writer.write(linefeed);
+				writer.write(config.linefeed);
 				writer.write(prefix);
 			}
 		}
@@ -244,40 +323,40 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTIfClauseNode node, final String prefix) throws IOException {
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// if-header
 		writer.write(CmnCnst.SYNTAX_IF);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(0), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// if-body
 		writer.write(next);
 		blockOrClause(node.jjtGetChild(1), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// if-footer
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		// else-header
 		if (node.jjtGetNumChildren() > 2) {
-			final boolean joinedIf = node.jjtGetChild(2).jjtGetNodeId() == FormExpressionParserTreeConstants.JJTIFCLAUSENODE;
-			writer.write(optionalSpace);
+			final boolean joinedIf = node.jjtGetChild(2).jjtGetNodeId() == JJTIFCLAUSENODE;
+			writer.write(config.optionalSpace);
 			writer.write(CmnCnst.SYNTAX_ELSE);
 			if (!joinedIf) {
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 				writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-				writer.write(linefeed);
+				writer.write(config.linefeed);
 				writer.write(next);
 			}
 			else {
-				writer.write(requiredSpace);
+				writer.write(config.requiredSpace);
 			}
 			// else-body
 			blockOrClause(node.jjtGetChild(2), next);
-			writer.write(linefeed);
+			writer.write(config.linefeed);
 			// else-footer
 			writer.write(prefix);
 			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -287,33 +366,33 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTForLoopNode node, final String prefix) throws IOException {
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		writer.write(CmnCnst.SYNTAX_FOR);
 		if (node.getLabel() != null) {
 			writer.write(CmnCnst.SYNTAX_ANGLE_OPEN);
 			writer.write(node.getLabel());
 			writer.write(CmnCnst.SYNTAX_ANGLE_CLOSE);
 		}
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		if (node.getIteratingLoopVariable() == null) {
 			// plain loop
 			// header for (i = 0; i != 10; ++i) {
 			forHeaderExpression(node.jjtGetChild(0), prefix);
 			writer.write(CmnCnst.SYNTAX_SEMI_COLON);
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			forHeaderExpression(node.jjtGetChild(1), prefix);
 			writer.write(CmnCnst.SYNTAX_SEMI_COLON);
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			forHeaderExpression(node.jjtGetChild(2), prefix);
 			writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-			writer.write(linefeed);
+			writer.write(config.linefeed);
 			// body
 			writer.write(next);
 			blockOrClause(node.jjtGetChild(3), next);
-			writer.write(linefeed);
+			writer.write(config.linefeed);
 			// footer
 			writer.write(prefix);
 			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -322,18 +401,18 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			// enhanced loop
 			// header  for (i : 10) {
 			writer.write(node.getIteratingLoopVariable());
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			writer.write(CmnCnst.SYNTAX_ENHANCED_FOR_LOOP_SEPARATOR);
-			writer.write(optionalSpace);
-			node.jjtGetChild(0).jjtAccept(this, prefix);
+			writer.write(config.optionalSpace);
+			expression(node.jjtGetChild(0), prefix);
 			writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-			writer.write(linefeed);
+			writer.write(config.linefeed);
 			// body
 			writer.write(next);
 			blockOrClause(node.jjtGetChild(1), next);
-			writer.write(linefeed);
+			writer.write(config.linefeed);
 			// footer
 			writer.write(prefix);
 			writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -343,7 +422,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTWhileLoopNode node, final String prefix) throws IOException {
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// header while(foobar) {
 		writer.write(CmnCnst.SYNTAX_WHILE);
 		if (node.getLabel() != null) {
@@ -351,17 +430,17 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			writer.write(node.getLabel());
 			writer.write(CmnCnst.SYNTAX_ANGLE_CLOSE);
 		}
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(0), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// body
 		writer.write(next);
 		blockOrClause(node.jjtGetChild(1), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// footer
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -370,30 +449,30 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTTryClauseNode node, final String prefix) throws IOException {
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// try
 		writer.write(CmnCnst.SYNTAX_TRY);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		writer.write(next);
 		blockOrClause(node.jjtGetChild(0), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// catch
 		writer.write(CmnCnst.SYNTAX_CATCH);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		writer.write(node.getErrorVariableName());
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		writer.write(next);
 		blockOrClause(node.jjtGetChild(1), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
 		return null;
@@ -402,45 +481,45 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTSwitchClauseNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();
-		final String next = prefix + indentPrefix;
-		final String next2 = next + indentPrefix;
+		final String next = prefix + config.indentPrefix;
+		final String next2 = next + config.indentPrefix;
 		// header switch(foobar) {
 		if (node.getLabel() != null) {
 			writer.write(node.getLabel());
 			writer.write(CmnCnst.SYNTAX_COLON);
 		}
 		writer.write(CmnCnst.SYNTAX_SWITCH);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.getFirstChild().jjtAccept(this, prefix);
+		expression(node.getFirstChild(), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// cases
 		for (int i = 1; i < len; ++i) {
 			switch (node.jjtGetChild(i).getSiblingMethod()) {
 			case SWITCHCASE:
 				writer.write(next);
 				writer.write(CmnCnst.SYNTAX_CASE);
-				writer.write(requiredSpace);
-				node.jjtGetChild(i).jjtAccept(this, next);
+				writer.write(config.requiredSpace);
+				expression(node.jjtGetChild(i), next);
 				writer.write(CmnCnst.SYNTAX_COLON);
-				writer.write(linefeed);
+				writer.write(config.linefeed);
 				break;
 			case SWITCHCLAUSE:
 				writer.write(next2);
 				blockOrClause(node.jjtGetChild(i), next2);
-				writer.write(linefeed);
+				writer.write(config.linefeed);
 				break;
 			case SWITCHDEFAULT:
 				writer.write(next);
 				writer.write(CmnCnst.SYNTAX_DEFAULT);
 				writer.write(CmnCnst.SYNTAX_COLON);
-				writer.write(linefeed);
+				writer.write(config.linefeed);
 				writer.write(next2);
 				blockOrClause(node.jjtGetChild(i), next2);
-				writer.write(linefeed);
+				writer.write(config.linefeed);
 				break;
 				//$CASES-OMITTED$
 			default:
@@ -456,7 +535,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTDoWhileLoopNode node, final String prefix) throws IOException {
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// header do {
 		writer.write(CmnCnst.SYNTAX_DO);
 		if (node.getLabel() != null) {
@@ -464,21 +543,21 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			writer.write(node.getLabel());
 			writer.write(CmnCnst.SYNTAX_ANGLE_CLOSE);
 		}
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// body
 		writer.write(next);
 		blockOrClause(node.jjtGetChild(0), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// footer } while(foobar)
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_WHILE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.jjtGetChild(1).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(1), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		writer.write(CmnCnst.SYNTAX_SEMI_COLON);
 		return null;
@@ -488,7 +567,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTExceptionNode node, final String prefix) throws IOException {
 		writer.write(CmnCnst.SYNTAX_EXCEPTION);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(0), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		return null;
 	}
@@ -496,8 +575,8 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTThrowClauseNode node, final String prefix) throws IOException {
 		writer.write(CmnCnst.SYNTAX_THROW);
-		writer.write(requiredSpace);
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		writer.write(config.requiredSpace);
+		expression(node.jjtGetChild(0), prefix);
 		return null;
 	}
 
@@ -505,7 +584,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTBreakClauseNode node, final String prefix) throws IOException {
 		writer.write(CmnCnst.SYNTAX_BREAK);
 		if (node.getLabel() != null) {
-			writer.write(requiredSpace);
+			writer.write(config.requiredSpace);
 			writer.write(node.getLabel());
 		}
 		return null;
@@ -515,7 +594,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTContinueClauseNode node, final String prefix) throws IOException {
 		writer.write(CmnCnst.SYNTAX_CONTINUE);
 		if (node.getLabel() != null) {
-			writer.write(requiredSpace);
+			writer.write(config.requiredSpace);
 			writer.write(node.getLabel());
 		}
 		return null;
@@ -525,8 +604,8 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTReturnClauseNode node, final String prefix) throws IOException {
 		writer.write(CmnCnst.SYNTAX_RETURN);
 		if (node.jjtGetNumChildren()>0) {
-			writer.write(requiredSpace);
-			node.jjtGetChild(0).jjtAccept(this, prefix);
+			writer.write(config.requiredSpace);
+			expression(node.jjtGetChild(0), prefix);
 		}
 		return null;
 	}
@@ -550,7 +629,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			throw new RuntimeException("Unknown enum: " + node.getLogLevel());
 		}
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(0), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		return null;
 	}
@@ -558,27 +637,27 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTFunctionNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// Function arrow ->
 		writer.write(CmnCnst.SYNTAX_LAMBDA_ARROW);
 		// Function argument (foo, bar)
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		for (int i = 0; i < len - 1; ++i) {
-			node.jjtGetChild(i).jjtAccept(this, prefix);
+			expression(node.jjtGetChild(i), prefix);
 			if (len != 2 && i < len - 2) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 			}
 		}
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		// Opening brace {
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// Function body ...
 		writer.write(next);
 		blockOrClause(node.getLastChild(), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// Closing brace }
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -588,39 +667,39 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTUnaryExpressionNode node, final String prefix) throws IOException {
 		writer.write(node.getUnaryMethod().methodName);
-		return node.jjtGetChild(0).jjtAccept(this, prefix);
+		return expression(node.jjtGetChild(0), prefix);
 	}
 
 	@Override
 	public Void visit(final ASTPostUnaryExpressionNode node, final String prefix) throws IOException {
 		writer.write(node.getUnaryMethod().methodName);
-		return node.jjtGetChild(0).jjtAccept(this, prefix);
+		return expression(node.jjtGetChild(0), prefix);
 	}
 	
 	@Override
 	public Void visit(final ASTPropertyExpressionNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();
-		node.jjtGetChild(0).jjtAccept(this, prefix);
+		expression(node.jjtGetChild(0), prefix);
 		for (int i = 1; i < len; ++i) {
 			final Node n = node.jjtGetChild(i);
 			switch (n.getSiblingMethod()) {
 			case DOT:
 				writer.write(CmnCnst.SYNTAX_DOT);
-				n.jjtAccept(this, prefix);
+				expression(n, prefix);
 				break;
 			case BRACKET:
 				writer.write(CmnCnst.SYNTAX_BRACKET_OPEN);
-				n.jjtAccept(this, prefix);
+				expression(n, prefix);
 				writer.write(CmnCnst.SYNTAX_BRACKET_CLOSE);
 				break;
 			case PARENTHESIS:
 				final int len2 = n.jjtGetNumChildren();
 				writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 				for (int j = 0; j < len2; ++j) {
-					n.jjtGetChild(j).jjtAccept(this, prefix);
+					expression(n.jjtGetChild(j), prefix);
 					if (len2 != 1 && j < len2 -1) {
 						writer.write(CmnCnst.SYNTAX_COMMA);
-						writer.write(optionalSpace);
+						writer.write(config.optionalSpace);
 					}
 				}
 				writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
@@ -642,26 +721,26 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTWithClauseNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();
-		final String next = prefix + indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// header with(foo,bar) {
 		writer.write(CmnCnst.SYNTAX_WITH);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		for (int i = 0; i < len - 1; ++i) {
-			node.jjtGetChild(i).jjtAccept(this, prefix);
+			expression(node.jjtGetChild(i), prefix);
 			if (len != 2 && i < len - 2) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 			}
 		}
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// body
 		writer.write(next);
 		blockOrClause(node.getLastChild(), prefix);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// footer
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
@@ -671,31 +750,31 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTFunctionClauseNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();
-		final String next = prefix+indentPrefix;
+		final String next = prefix + config.indentPrefix;
 		// header function foo(bar) {
 		writer.write(CmnCnst.SYNTAX_FUNCTION);
-		writer.write(requiredSpace);
-		node.getFirstChild().jjtAccept(this, prefix);
+		writer.write(config.requiredSpace);
+		expression(node.getFirstChild(), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
 		for (int i = 1; i < len - 1; ++i) {
-			node.jjtGetChild(i).jjtAccept(this, prefix);
+			expression(node.jjtGetChild(i), prefix);
 			if (len != 2 && i < len - 2) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
-				writer.write(optionalSpace);
+				writer.write(config.optionalSpace);
 			}
 		}
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_BRACE_OPEN);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// body
 		writer.write(next);
 		blockOrClause(node.getLastChild(), next);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		// footer
 		writer.write(prefix);
 		writer.write(CmnCnst.SYNTAX_BRACE_CLOSE);
-		writer.write(linefeed);
+		writer.write(config.linefeed);
 		return null;
 
 	}
@@ -708,7 +787,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	@Override
 	public Void visit(final ASTLosNode node, final String prefix) throws IOException {
 		if (node.isHasClose()) {
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 			writer.write(CmnCnst.SYNTAX_LOS_CLOSE);
 		}
 		if (node.isHasText()) {
@@ -716,7 +795,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		}
 		if (node.isHasOpen()) {
 			writer.write(node.getOpen());
-			writer.write(optionalSpace);
+			writer.write(config.optionalSpace);
 		}
 		return null;
 	}
@@ -729,24 +808,23 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTTernaryExpressionNode node, final String prefix) throws IOException {
-		node.jjtGetChild(0).jjtAccept(this, prefix);
-		writer.write(optionalSpace);
+		expression(node.jjtGetChild(0), prefix);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_QUESTION_MARK);
-		writer.write(optionalSpace);
-		node.jjtGetChild(1).jjtAccept(this, prefix);
-		writer.write(optionalSpace);
+		writer.write(config.optionalSpace);
+		expression(node.jjtGetChild(1), prefix);
+		writer.write(config.optionalSpace);
 		writer.write(CmnCnst.SYNTAX_COLON);
-		writer.write(optionalSpace);
-		node.jjtGetChild(2).jjtAccept(this, prefix);
+		writer.write(config.optionalSpace);
+		expression(node.jjtGetChild(2), prefix);
 		return null;
 	}
 
 	@Override
 	public Void visit(final ASTParenthesisExpressionNode node, final String prefix) throws IOException {
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		node.getFirstChild().jjtAccept(this, prefix);
+		expression(node.getFirstChild(), prefix);
 		writer.write(CmnCnst.SYNTAX_PAREN_CLOSE);
 		return null;
 	}
-
 }

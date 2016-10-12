@@ -60,6 +60,8 @@ enum SyntaxSuccess implements ITestCase {
 	TEST051("foo ? bar : baz;"), // Ternary
 	TEST052("++a.b['c'];"),
 	TEST053("++r;"),
+	TEST054("a+b;//comment"),
+	TEST055("a + /* comment \n end */ b;"),
 	;
 	private final String code;
 	private final ETestType type;

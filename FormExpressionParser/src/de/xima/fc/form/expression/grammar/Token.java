@@ -1,15 +1,29 @@
 package de.xima.fc.form.expression.grammar;
 
+import java.util.List;
+
 /**
  * Describes the input token stream.
  */
 
 public class Token implements java.io.Serializable {
 
+	/** A <b>reference</b> to the list of all comments in the program.
+	 * Only one list will be created.
+	 */
+	private List<Token> comments;
 	private String embedmentContext;
 
 	public String getEmbedmentContext() {
 		return embedmentContext;
+	}
+	
+	public List<Token> getComments() {
+		return comments;
+	}
+	
+	void setComments(List<Token> comments) {
+		this.comments = comments;
 	}
 
 	void setEmbedmentContext(final String embedmentContext) {

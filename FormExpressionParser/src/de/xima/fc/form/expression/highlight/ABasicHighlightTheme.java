@@ -72,9 +72,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.R
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SemiColon;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineCommentChar;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineCommentClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineCommentOpen;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineComment;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleQuotedString;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Slash;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SlashEqual;
@@ -217,9 +215,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LosOpen:
 			return getStyleLosSeparator();
 
-		case SingleLineCommentOpen:
-		case SingleLineCommentChar:
-		case SingleLineCommentClose:
+		case SingleLineComment:
 		case MultiLineCommentOpen:
 		case MultiLineCommentChar:
 		case MultiLineCommentClose:

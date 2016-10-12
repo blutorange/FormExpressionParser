@@ -8,7 +8,7 @@ package de.xima.fc.form.expression.enums;
  */
 public enum EMethod {
 	PLUS("+"), // +
-	PLUS_UNARY("-"), // +
+	PLUS_UNARY("+"), // +
 	DOUBLE_PLUS_PREFIX("++"), // ++i
 	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_PLUS_PREFIX} */
 	DOUBLE_PLUS_SUFFIX("++"), // i++

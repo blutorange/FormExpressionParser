@@ -20,8 +20,20 @@ PARSER_END(FormExpressionParser)
 TOKEN_MGR_DECLS :
 {
   private String currentEmbedmentContext;
+  // A list of all the comments occurring in the program.
+  private List<Token> comments = new ArrayList<Token>();
   void CommonTokenAction(final Token token) {
     token.setEmbedmentContext(currentEmbedmentContext);
+    token.setComments(comments);
+    // Retrieve all comments, if there are any.
+    Token special = token;
+    if (token.specialToken != null) { 
+      while (special.specialToken != null) special = special.specialToken;
+      while (special != null) {
+        comments.add(special);
+        special = special.next;
+      }
+    }
   }
 }
 
@@ -49,18 +61,6 @@ MORE :
   < MultiLineCommentChar : ~[ ] >
 }
 
-< SINGLE_LINE_COMMENT >
-SPECIAL_TOKEN :
-{
-  < SingleLineCommentClose: "\n" > : CODE
-}
-
-< SINGLE_LINE_COMMENT >
-MORE :
-{
-  < SingleLineCommentChar : ~["\n"] >
-}
-
 < CODE >
 SKIP :
 {
@@ -80,8 +80,12 @@ TOKEN:
 MORE:
 { 
   < MultiLineCommentOpen: "/*" > : MULTI_LINE_COMMENT
-| 
-  < SingleLineCommentOpen: "//" > : SINGLE_LINE_COMMENT
+}
+
+< CODE >
+SPECIAL_TOKEN:
+{ 
+  < SingleLineComment: "//" (~["\n"])* ("\n")?>
 }
 
 < CODE >

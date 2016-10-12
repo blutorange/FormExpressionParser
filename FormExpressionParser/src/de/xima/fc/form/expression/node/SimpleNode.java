@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import java.lang.reflect.Array;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
@@ -26,6 +27,11 @@ public abstract class SimpleNode implements Node {
 	protected final int uniqueId;
 
 	private transient Token startToken;
+	/** Reference to the list of all comments. It is set when
+	 * the node is created, but might be filled later, but it will
+	 * be filled once parsing is done.
+	 */
+	private List<Token> comments;
 	protected String embedment;
 	protected int nodeId;
 	protected Node parent;
@@ -252,8 +258,14 @@ public abstract class SimpleNode implements Node {
 		startLine = t.beginLine;
 		startColumn = t.beginColumn;
 		startToken = t;
+		comments = t.getComments();
 	}
 
+	@Override
+	public final List<Token> getComments() {
+		return comments;
+	}
+	
 	@Override
 	public final void closeNodeScope(final Token t) {
 		final Token next = startToken == null ? null : startToken.next;
@@ -264,6 +276,7 @@ public abstract class SimpleNode implements Node {
 		startToken = null;
 		endLine = t.endLine;
 		endColumn = t.endColumn;
+		if (comments == null) comments = t.getComments();
 	}
 
 	@Override

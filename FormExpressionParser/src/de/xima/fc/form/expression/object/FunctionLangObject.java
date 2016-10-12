@@ -13,6 +13,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
+import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public class FunctionLangObject extends ALangObject {
 
@@ -82,7 +83,7 @@ public class FunctionLangObject extends ALangObject {
 		else {
 			String unparse;
 			try {
-				unparse = UnparseVisitor.unparse(n, StringUtils.EMPTY, StringUtils.EMPTY, 0);
+				unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithCommentsConfig());
 			}
 			catch (final IOException e) {
 				LOG.error("Failed to unparse lambda", e);

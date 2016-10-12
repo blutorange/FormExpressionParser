@@ -84,6 +84,7 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODUN011("a=-43;-++a;", Tests.N42),
 	EMETHODUN012("a=42;a++;", Tests.N42),
 	EMETHODUN013("a=41;a++;a;", Tests.N42),
+	EMETHODUN014("40+ +2;", Tests.N42),
 	EMETHODBIN001("40+2;", Tests.N42),
 	EMETHODBIN002("50-8;", Tests.N42),
 	EMETHODBIN003("2*21;", Tests.N42),
