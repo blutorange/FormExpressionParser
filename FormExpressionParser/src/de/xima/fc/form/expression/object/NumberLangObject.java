@@ -152,10 +152,14 @@ public class NumberLangObject extends ALangObject {
 			return true;
 		if (!(o instanceof NumberLangObject))
 			return false;
-		final NumberLangObject other = (NumberLangObject) o;
-		return value == other.value;
+		return 0 == Double.compare(value, ((NumberLangObject)o).value);
 	}
 
+	@Override
+	protected int compareToSameType(final ALangObject o) {
+		return Double.compare(value, ((NumberLangObject)o).value);
+	}
+	
 	@Override
 	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec)
 			throws EvaluationException {
@@ -237,6 +241,11 @@ public class NumberLangObject extends ALangObject {
 		};
 	}
 
+	@Override
+	protected boolean isSingletonLike() {
+		return true;
+	}
+	
 	/**
 	 * @param operand
 	 *            Number to add.

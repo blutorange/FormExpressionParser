@@ -15,6 +15,7 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
 import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
+import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 /**
  * Servlet implementation class HighlightServlet
@@ -39,6 +40,13 @@ public class FormatServlet extends AFormExpressionServlet {
 				final String code = request.getParameter("code");
 				final String type = request.getParameter("type");
 				final String indent = request.getParameter("indent");
+				final UnparseVisitorConfig config = new UnparseVisitorConfig.Builder()
+					.setLinefeed("\n")
+					.setIndentPrefix(indent)
+					.setOptionalSpace(1)
+					.setRequiredSpace(1)
+					.setKeepComments(true)
+					.build();
 				final JSONObject json = new JSONObject();
 				if (code == null) {
 					json.put("error", "Parameter code must be given.");
@@ -52,7 +60,7 @@ public class FormatServlet extends AFormExpressionServlet {
 						else {
 							node = FormExpressionParsingUtil.Template.parse(code);
 						}
-						final String format = UnparseVisitor.unparse(node, indent, "\n");
+						final String format = UnparseVisitor.unparse(node, config);
 						json.put("text", format);
 					}
 					catch (ParseException | TokenMgrError | IOException e) {

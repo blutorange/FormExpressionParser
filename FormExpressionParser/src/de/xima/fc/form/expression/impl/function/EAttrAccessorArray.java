@@ -11,8 +11,20 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 
 public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
+	/**
+	 * @return {@link NumberLangObject} The length of this array.
+	 */
 	length(Impl.length),
+	/**
+	 * @param objectsToAdd {@link ALangObject} Varargs. Object(s) to add to the end of this array.
+	 * @return {@link ArrayLangObject} this.
+	 */
 	push(Impl.push),
+	/**
+	 * Sorts this array according to the natural ordering of {@link ALangObject}s.
+	 * @return {@link ArrayLangObject} this.
+	 */
+	sort(Impl.sort)
 	;
 
 	private final FunctionLangObject impl;
@@ -64,7 +76,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		 * @param objectToAdd {@link ALangObject}*. Object(s) to be added to the end of this array.
 		 * @return this. This array with the objects added at the end.
 		 */
-		push(null, "objectToAdd") {
+		push("objectsToAdd") {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -81,6 +93,14 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return NumberLangObject.create(thisContext.length());
+			}
+		},
+		sort(null) {
+			@Override
+			public ALangObject evaluate(IEvaluationContext ec, ArrayLangObject thisContext, ALangObject... args)
+					throws EvaluationException {
+				thisContext.sort();
+				return thisContext;
 			}
 		}
 		;

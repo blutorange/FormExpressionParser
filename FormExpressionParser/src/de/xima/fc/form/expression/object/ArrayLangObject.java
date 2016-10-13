@@ -123,10 +123,32 @@ public class ArrayLangObject extends ALangObject {
 	public boolean equals(final Object o) {
 		if (this == o) return true;
 		if (!(o instanceof ArrayLangObject)) return false;
-		final ArrayLangObject other = (ArrayLangObject)o;
-		return value.equals(other.value);
+		return value.equals(((ArrayLangObject)o).value);
 	}
 
+	/**
+	 * Sorts arrays like strings, ie. it compares each element starting at the
+	 * first. When all elements at common indices are equals, the smaller array 
+	 * comes before the larger array.
+	 * <ul>
+	 * <li>[1,2,3] < [2,1]</li>
+	 * <li>[1,2,3] < [1,2,3,4]</li>
+	 * <li>[] < [null]</li>
+	 * <li>[42] == [42]</li>
+	 * </ul>
+	 * @return Whether this object is less, equal, or greater than the given object.
+	 */
+	@Override
+	public int compareToSameType(final ALangObject o) {
+		final List<ALangObject> v = ((ArrayLangObject)o).value;
+		final int len = Math.min(value.size(), v.size());
+		for (int i = 0; i < len; ++i) {
+			final int res = (value.get(i).compareTo(v.get(i)));
+			if (res != 0) return res;
+		}
+		return Integer.compare(value.size(), v.size());
+	}
+	
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
@@ -203,9 +225,18 @@ public class ArrayLangObject extends ALangObject {
 		else for (int i = value.size(); i-->len ;) value.remove(i);
 	}
 
-	public ALangObject[] toArray() {
-		return value.toArray(new ALangObject[value.size()]);
+	/** Sorts the array according to the natural ordering of {@link ALangObject */
+	public void sort() {
+		Collections.sort(value);
 	}
 
 
+	public ALangObject[] toArray() {
+		return value.toArray(new ALangObject[value.size()]);
+	}
+	
+	@Override
+	protected boolean isSingletonLike() {
+		return false;
+	}
 }

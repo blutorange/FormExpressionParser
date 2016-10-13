@@ -108,6 +108,23 @@ public class BooleanLangObject extends ALangObject {
 		return value == ((BooleanLangObject)o).value;
 	}
 
+	/**
+	 * @return 0 iff both objects are <code>true</code> or both are <code>false</code>.
+	 * -1 iff this object is <code>false</code> and the other is <code>true</code>,
+	 * +1 iff this object is <code>true</code> and the other is <code>false</code>.
+	 * Therefore the ordering is <code>false (0)</code> before <code>true (1)</code>. 
+	 */
+	@Override
+	protected int compareToSameType(final ALangObject o) {
+		return ((BooleanLangObject)o).value==value ? 0 : value ? 1 : -1;
+	}
+	
+	@Override
+	protected boolean isSingletonLike() {
+		return true;
+	}
+
+
 	@Override
 	public String inspect() {
 		return "BooleanLangObject(" + value + ")";

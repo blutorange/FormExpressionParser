@@ -13,7 +13,7 @@ public class ASTUnaryExpressionNode extends SimpleNode {
 
 	public final void init(final EMethod method, final EMethod unary) throws ParseException {
 		assertChildrenExactly(1);
-		if (unary != null && EMethod.isAssigning(unary))
+		if (unary != null && unary.isAssigning())
 			assertChildrenAssignable(0, 1, "prefix operation");
 		siblingMethod = method;
 		unaryMethod = unary;

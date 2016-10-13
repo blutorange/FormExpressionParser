@@ -6,6 +6,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTBREAKCLAUSENODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTCOMPARISONEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTCONTINUECLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEQUALEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEXCEPTIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTFUNCTIONNODE;
@@ -43,6 +44,7 @@ import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
+import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -177,6 +179,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		case JJTBREAKCLAUSENODE:
 		case JJTCOMPARISONEXPRESSIONNODE:
 		case JJTCONTINUECLAUSENODE:
+		case JJTEQUALEXPRESSIONNODE:
 		case JJTEXCEPTIONNODE:
 		case JJTEXPRESSIONNODE:
 		case JJTFUNCTIONNODE:
@@ -234,7 +237,12 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	}
 
 	@Override
-	public Void visit(final ASTComparisonExpressionNode node, final String prefix) throws IOException {
+	public Void visit(final ASTEqualExpressionNode node, final String prefix) throws IOException {
+		return expressionNode(node, prefix);
+	}
+	
+	@Override
+	public Void visit(ASTComparisonExpressionNode node, String prefix) throws IOException {
 		return expressionNode(node, prefix);
 	}
 
@@ -739,7 +747,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(config.linefeed);
 		// body
 		writer.write(next);
-		blockOrClause(node.getLastChild(), prefix);
+		blockOrClause(node.getLastChild(), next);
 		writer.write(config.linefeed);
 		// footer
 		writer.write(prefix);

@@ -1,0 +1,70 @@
+/* Literals */
+null;true == !false
+                      ;1 == 1.0 == 1E1;"asd" == 'asd';#^0x\d+$#i;
+
+/* Compound literals. */
+[1,false,"asd",[10]];{"foo": 1, true: null}; // Hashes may contain any object.{foo:1,bar:2};
+
+/* Special objects. */
+exception("myexception");lambda = ->(foo){return foo;};lambda(42);lambda.call(null, 42);lambda.apply(null, [42]);
+ 
+/* Logging */
+loginfo("debug");loginfo("info");loginfo("warn");loginfo("error");
+
+/* Variables */
+variable = 1;myScope::variable = 2;variable + myScope::variable;
+
+/* Operators */
+(1+2)*3;"anne" > "andre";"string";true ? 42 : 0;
+
+/* Plain for loop. i++ will be implemented soon. */
+for(i=0;i<10;i+=1){loginfo(i);}
+
+/* Enhanced for loop. */
+for (i : [1,2,3]) loginfo(i);
+for (i : 3) loginfo(i);
+for (i : "123") loginfo(i);
+for (key : {1:null,2:null,3:null}) loginfo(key);
+
+/* While loop, Do-While loop */
+while (false) doSomething();do 1+2; while (false);
+
+/* Switch */
+name = "tom";switch (name) {  case "max":  case "tom":
+  case 
+         "julia":
+"known name"
+;
+                    break;
+
+  default
+                :
+    throw 
+           exception(
+   "unknown name"
+ );
+                     }
+
+/* Labels */
+while<outer>(true){for<inner>(i:10){if(i>5) break outer;continue inner;}
+     }
+
+/* Error handling. */
+try {nonExistingVariable;}catch (e) {  logerror(e);}
+
+/* Functions */
+function foo(bar,baz){arguments;baz;return arguments.length == 2 ? bar + baz : null;}
+
+foo(1,2);foo("1", "2");foo();
+
+/*
+ * Default scopes need to be supported for
+ * accessing unqualified form fields, but
+ * I recommend you always use qualified names.
+ */
+someScope::someVar = 0;anotherScope::someVar = 1;with (someScope, anotherScope) {someVar;}
+with (anotherScope,someScope){someVar;}with (someScope) {someVar = 2; someVar;  someScope::someVar;}
+
+/* Comments */
+// Single line comment
+19 + /* Inline comment*/ 23;

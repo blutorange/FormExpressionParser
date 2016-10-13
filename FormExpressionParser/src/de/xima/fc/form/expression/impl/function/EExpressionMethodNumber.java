@@ -52,47 +52,6 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 * @return The modulo of this number by the argument, eg. 5%3=2 or -3%5=2.
 	 */
 	PERCENT(EMethod.PERCENT, Impl.MODULO),
-	/**
-	 * @param comparand {@link ALangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-	 */
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.EQUALITY),
-	/**
-	 * @param comparand {@link ALangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. True iff this number is numerically equivalent to the argument.
-	 */
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.EQUALITY),
-	/**
-	 * @param comparand {@link ALangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. False iff this object is of the same {@link Type} as the argument and is logically equivalent.
-	 */
-	EXCLAMATION_EQUAL(EMethod.EXCLAMATION_EQUAL, Impl.INEQUALITY),
-	/**
-	 * @param comparand {@link ALangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. False iff this object is of the same {@link Type} as the argument and is logically equivalent.
-	 */
-	EXCLAMATION_DOUBLE_EQUAL(EMethod.EXCLAMATION_DOUBLE_EQUAL, Impl.INEQUALITY),
-	/**
-	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. True iff this number is smaller than the argument number.
-	 */
-	ANGLE_OPEN(EMethod.ANGLE_OPEN, Impl.SMALLER),
-	/**
-	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. True iff this number is smaller than or equal to the argument number.
-	 */
-	ANGLE_OPEN_EQUAL(EMethod.ANGLE_OPEN_EQUAL, Impl.SMALLER_OR_EQUAL),
-	/**
-	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. True iff this number is greater than the argument number.
-	 */
-	ANGLE_CLOSE(EMethod.ANGLE_CLOSE, Impl.GREATER),
-	/**
-	 * @param comparand {@link NumberLangObject}. Object to compare this object to.
-	 * @return {@link BooleanLangObject}. True iff this number is greater than or equal to the argument number.
-	 */
-	ANGLE_CLOSE_EQUAL(EMethod.ANGLE_CLOSE_EQUAL, Impl.GREATER_OR_EQUAL),
-
 	;
 	private final EMethod method;
 	private final IFunction<NumberLangObject> function;

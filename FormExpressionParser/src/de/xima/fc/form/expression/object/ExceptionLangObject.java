@@ -21,7 +21,7 @@ public class ExceptionLangObject extends ALangObject {
 
 	@Override
 	public ALangObject shallowClone() {
-		return ExceptionLangObject.create(value);
+		return new ExceptionLangObject(value);
 	}
 
 	@Override
@@ -74,13 +74,24 @@ public class ExceptionLangObject extends ALangObject {
 	public boolean equals(final Object o) {
 		if (this == o) return true;
 		if (!(o instanceof ExceptionLangObject)) return false;
-		return value.equals(((ExceptionLangObject)o).value);
+		return value.getMessage().equals(((ExceptionLangObject)o).value.getMessage());
 	}
+	
+	@Override
+	public int compareToSameType(ALangObject o) {
+		return value.getMessage().compareTo(((ExceptionLangObject)o).value.getMessage());
+	}
+	
 	@Override
 	public int hashCode() {
 		return value.hashCode();
 	}
 
+	@Override
+	protected boolean isSingletonLike() {
+		return false;
+	}
+	
 	// Coercion
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
@@ -95,13 +106,13 @@ public class ExceptionLangObject extends ALangObject {
 		return value;
 	}
 
-	public static ALangObject create(final CatchableEvaluationException value) {
-		if (value == null) return NullLangObject.getInstance();
+	public static ExceptionLangObject create(final CatchableEvaluationException value, final IEvaluationContext ec) {
+		if (value == null || value.getMessage() == null) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
 		return new ExceptionLangObject(value);
 	}
 
 	public static ExceptionLangObject create(final String message, final IEvaluationContext ec) {
-		if (message == null || message.length() == 0) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
+		if (message == null) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
 		return new ExceptionLangObject(new CustomRuntimeException(message, ec));
 	}
 }

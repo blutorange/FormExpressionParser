@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
@@ -143,28 +144,31 @@ import de.xima.fc.form.expression.exception.NoSuchMethodException;
  * @author mad_gaksha
  *
  */
-public abstract class ALangObject implements Iterable<ALangObject> {
+public abstract class ALangObject implements Iterable<ALangObject>, Comparable<ALangObject> {
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
 
 	private final Type type;
 	private final long id;
-	private static long idCounter = 0L;
+	private static AtomicLong ID_COUNTER = new AtomicLong();
 
 	public static enum Type {
-		STRING(StringLangObject.class),
-		NUMBER(NumberLangObject.class),
-		ARRAY(ArrayLangObject.class),
-		HASH(HashLangObject.class),
-		NULL(NullLangObject.class),
-		BOOLEAN(BooleanLangObject.class),
-		FUNCTION(FunctionLangObject.class),
-		EXCEPTION(ExceptionLangObject.class),
-		REGEX(RegexLangObject.class);
-
+		NULL(NullLangObject.class, 0),
+		BOOLEAN(BooleanLangObject.class, 1),
+		NUMBER(NumberLangObject.class, 2),
+		STRING(StringLangObject.class, 3),
+		REGEX(RegexLangObject.class, 4),
+		FUNCTION(FunctionLangObject.class, 5),
+		EXCEPTION(ExceptionLangObject.class, 6),
+		ARRAY(ArrayLangObject.class, 7),
+		HASH(HashLangObject.class, 8),
+		;
+		
 		public final Class<? extends ALangObject> clazz;
+		public final int order;
 
-		private Type(final Class<? extends ALangObject> clazz) {
+		private Type(final Class<? extends ALangObject> clazz, int order) {
 			this.clazz = clazz;
+			this.order = order;
 		}
 	}
 
@@ -321,9 +325,9 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 		return this.type == type;
 	}
 
-	public ALangObject(final Type type) {
+	protected ALangObject(final Type type) {
 		this.type = type;
-		id = ++idCounter;
+		id = ID_COUNTER.incrementAndGet();
 	}
 
 	public long getId() {
@@ -388,11 +392,46 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		if (!(o instanceof ALangObject))
-			return false;
-		return id == ((ALangObject) o).id;
+	public abstract boolean equals(final Object o);
+	
+	/**
+	 * <pre>The natural ordering for a class C is said to be consistent with equals if and only 
+	 * if e1.compareTo(e2) == 0 has the same boolean value as e1.equals(e2) for every e1 
+	 * and e2 of class C. Note that null is not an instance of any class, and e.compareTo(null)
+	 * should throw a NullPointerException even though e.equals(null) returns false.</pre>
+	 * 
+	 * <p>This holds true. When the comparand is null <code>o.type</code> throws a
+	 * NullPointerException. When the two objects are of different type, they are ordered
+	 * according to {@link Type#order} and cannot be equal. When the two objects are
+	 * of the same type, the abstract method {@link ALangObject#compareToSameType(ALangObject)}
+	 * is called. Subclasses are required to adhere to the above contract.
+	 * </p>
+	 *
+	*/
+	@Override
+	public final int compareTo(ALangObject o) {
+		if (type != o.type) return type.order - o.type.order;
+		return compareToSameType(o);
 	}
+	
+	public final int compareById(final ALangObject o) {
+		return Long.compare(id,  o.id);
+	}
+	
+	public boolean equalsSameObject(final ALangObject o) {
+		return isSingletonLike() ? equals(o) : id == o.id;
+	}
+	
+	protected abstract boolean isSingletonLike();
+	
+	/**
+	 * Needs to adhere to the contract of {@link Comparable}.
+	 * 
+	 * @param o
+	 * @return Guaranteed to be be non-<code>null</code>. An object
+	 *            of the same type as the subclass. It may be cast safely.
+	 */
+	protected abstract int compareToSameType(ALangObject o);
 
 	/**
 	 * May be overridden for specific objects.
@@ -412,7 +451,6 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	public final Type getType() {
 		return type;
 	}
-
 	public final boolean isArray() {
 		return type == Type.ARRAY;
 	}
@@ -433,6 +471,9 @@ public abstract class ALangObject implements Iterable<ALangObject> {
 	}
 	public final boolean isException() {
 		return type == Type.EXCEPTION;
+	}
+	public final boolean isRegex() {
+		return type == Type.REGEX;
 	}
 	public final boolean isNull() {
 		return type == Type.NULL;

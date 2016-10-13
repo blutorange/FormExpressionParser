@@ -86,6 +86,23 @@ public class RegexLangObject extends ALangObject {
 		return value.flags() == other.value.flags() && value.pattern().equals(other.value.pattern());
 	}
 
+	/**
+	 * Sorts regex first by their pattern, then by their flags.
+	 * @param o Object to compare this object to.
+	 * @return The result of the comparison.
+	 */
+	@Override
+	public int compareToSameType(ALangObject o) {
+		final Pattern v = ((RegexLangObject)o).value;
+		final int res = value.pattern().compareTo(v.pattern());
+		return res != 0 ? res : Integer.compare(value.flags(), v.flags());
+	}
+	
+	@Override
+	protected boolean isSingletonLike() {
+		return false;
+	}
+	
 	@Override
 	public String inspect() {
 		return "RegexLangObject(" + value + ")";

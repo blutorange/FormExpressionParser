@@ -86,12 +86,22 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
+	protected boolean isSingletonLike() {
+		return false;
+	}
+	
+	@Override
 	public boolean equals(final Object o) {
 		if (!(o instanceof StringLangObject)) return false;
 		final StringLangObject other = (StringLangObject)o;
 		return value.equals(other.value);
 	}
 
+	@Override
+	public int compareToSameType(final ALangObject o) {
+		return value.compareTo(((StringLangObject)o).value);
+	}
+	
 	@Override
 	public String inspect() {
 		return "StringLangObject(" + value + ")";

@@ -24,9 +24,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 /**
  * todo
- * - allow    i = if (true) 1; else 0;  etc.
- * - unparse: comments, los nicer
- * - ALangObject Comparable
+ * - unparse: los nicer
  */
 public class FormExpressionDemo {
 
@@ -45,8 +43,6 @@ public class FormExpressionDemo {
 
 		showUnparsed(rootNode);
 		
-		System.exit(0);
-
 		showEvaluatedResult(rootNode);
 
 		if (writer != null)

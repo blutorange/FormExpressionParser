@@ -9,6 +9,7 @@ import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
+import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -278,12 +279,17 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 	}
 
 	@Override
-	public R visit(final ASTComparisonExpressionNode node, final T data) throws E {
+	public R visit(final ASTEqualExpressionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 	
 	@Override
 	public R visit(final ASTPostUnaryExpressionNode node, final T data) throws E {
+		return processNode(node, data);
+	}
+	
+	@Override
+	public R visit(final ASTComparisonExpressionNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 }

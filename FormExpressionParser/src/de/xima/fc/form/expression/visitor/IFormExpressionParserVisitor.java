@@ -4,10 +4,11 @@ import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
-import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
+import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
+import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -71,6 +72,7 @@ public interface IFormExpressionParserVisitor<R,T,E extends Throwable>
 	public R visit(ASTRegexNode node, T data) throws E;
 	public R visit(ASTTernaryExpressionNode node, T data) throws E;
 	public R visit(ASTParenthesisExpressionNode node, T data) throws E;
-	public R visit(ASTComparisonExpressionNode node, T data) throws E;
+	public R visit(ASTEqualExpressionNode node, T data) throws E;
 	public R visit(ASTPostUnaryExpressionNode node, T data) throws E;
+	public R visit(ASTComparisonExpressionNode node, T data) throws E;
 }

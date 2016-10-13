@@ -88,6 +88,15 @@ public class NullLangObject extends ALangObject {
 		return true;
 	}
 
+	/**
+	 * @param o The comparand to compare this object to.
+	 * @return 0. There is only one <code>null</code> object, and it is equal to itself. 
+	 */
+	@Override
+	protected int compareToSameType(final ALangObject o) {
+		return 0;
+	}
+	
 	@Override
 	public String inspect() {
 		return "NullLangObject";
@@ -97,11 +106,18 @@ public class NullLangObject extends ALangObject {
 	public void toExpression(final StringBuilder builder) {
 		builder.append("null");
 	}
+	
+	
 
 	public static String toExpression() {
 		return "null";
 	}
 
+	@Override
+	protected boolean isSingletonLike() {
+		return true;
+	}
+	
 	// Coercion
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) {

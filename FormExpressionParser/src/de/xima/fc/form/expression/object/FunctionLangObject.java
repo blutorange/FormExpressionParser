@@ -130,6 +130,11 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	@Override
+	protected boolean isSingletonLike() {
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		// getDeclaredName can be empty for anonymous functions
 		return 31 * super.hashCode() + value.getDeclaredName().hashCode();
@@ -139,10 +144,13 @@ public class FunctionLangObject extends ALangObject {
 	public boolean equals(final Object o) {
 		if (o == this) return true;
 		if (!(o instanceof FunctionLangObject)) return false;
-		final FunctionLangObject func = (FunctionLangObject)o;
-		return value == func.value;
+		return super.equalsSameObject((FunctionLangObject)o);
 	}
 
+	@Override
+	public int compareToSameType(final ALangObject o) {
+		return super.compareById(o);
+	}
 
 	// Coercion
 	@Override

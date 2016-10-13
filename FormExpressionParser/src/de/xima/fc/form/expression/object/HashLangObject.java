@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.object;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +13,7 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.ComparatorEntryByKey;
 
 public class HashLangObject extends ALangObject {
 
@@ -125,6 +128,11 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
+	protected boolean isSingletonLike() {
+		return false;
+	}
+	
+	@Override
 	public boolean equals(final Object o) {
 		if (o == this) return true;
 		if (!(o instanceof HashLangObject)) return false;
@@ -132,6 +140,26 @@ public class HashLangObject extends ALangObject {
 		return value.equals(other.value);
 	}
 
+	@Override
+	public int compareToSameType(final ALangObject o) {
+		// Retrieve keys.
+		final Map<ALangObject, ALangObject> v = ((HashLangObject)o).value;
+		final List<Entry<ALangObject,ALangObject>> s1 = new ArrayList<>(value.entrySet());
+		final List<Entry<ALangObject,ALangObject>> s2 = new ArrayList<>(v.entrySet());
+		Collections.sort(s1, ComparatorEntryByKey.INSTANCE);
+		Collections.sort(s2, ComparatorEntryByKey.INSTANCE);
+		// Compare by keys.
+		final int len = Math.min(s1.size(), s2.size());
+		int res2 = 0;
+		for (int i = 0; i < len; ++i) {
+			final int res = (s1.get(i).getKey().compareTo(s2.get(i).getKey()));
+			if (res != 0) return res;
+			if (res2 == 0) res2 = (s1.get(i).getValue().compareTo(s2.get(i).getValue()));
+		}
+		if (s1.size() != s2.size()) return Integer.compare(value.size(), v.size());
+		return res2;
+	}
+	
 	@Override
 	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;

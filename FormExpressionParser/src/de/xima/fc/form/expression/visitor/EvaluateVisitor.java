@@ -27,6 +27,7 @@ import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
+import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -229,7 +230,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			// First we need to evaluate the variable (a),
 			// then the expression method (+).
 			if (method != EMethod.EQUAL)
-				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(EMethod.equalMethod(method), ec,
+				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(method.equalMethod(), ec,
 						assignee);
 			// Now we can set the variable to its new value.
 			setVariable(var, assignee, ec);
@@ -246,7 +247,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// then the expression method (+).
 				if (method != EMethod.EQUAL)
 					assignee = res.evaluateAttrAccessor(attrDot, true, ec)
-					.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
+					.evaluateExpressionMethod(method.equalMethod(), ec, assignee);
 				// Now we can call the attribute assigner and assign the
 				// value.
 				res.executeAttrAssigner(attrDot, true, assignee, ec);
@@ -258,7 +259,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// then the expression method (+).
 				if (method != EMethod.EQUAL)
 					assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
-					.evaluateExpressionMethod(EMethod.equalMethod(method), ec, assignee);
+					.evaluateExpressionMethod(method.equalMethod(), ec, assignee);
 				res.executeAttrAssigner(attrBracket, false, assignee, ec);
 				break;
 				// $CASES-OMITTED$
@@ -289,7 +290,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			// then the expression method (+).
 			res = jjtAccept(node, var, ec);
 			// Now we can set the variable to its new value.
-			setVariable(var, res.evaluateExpressionMethod(EMethod.equalMethod(method), ec), ec);
+			setVariable(var, res.evaluateExpressionMethod(method.equalMethod(), ec), ec);
 			break;
 		case JJTPROPERTYEXPRESSIONNODE:
 			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode)child;
@@ -304,7 +305,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				res = tmp.evaluateAttrAccessor(attrDot, true, ec);
 				// Now we can call the attribute assigner and assign the
 				// value.
-				res.executeAttrAssigner(attrDot, true, res.evaluateExpressionMethod(EMethod.equalMethod(method), ec),
+				res.executeAttrAssigner(attrDot, true, res.evaluateExpressionMethod(method.equalMethod(), ec),
 						ec);
 				break;
 			case BRACKET:
@@ -314,7 +315,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// then the expression method (+).
 				res = tmp.evaluateAttrAccessor(attrBracket, false, ec);
 				tmp.executeAttrAssigner(attrBracket, false,
-						res.evaluateExpressionMethod(EMethod.equalMethod(method), ec), ec);
+						res.evaluateExpressionMethod(method.equalMethod(), ec), ec);
 				break;
 				// $CASES-OMITTED$
 			default:
@@ -338,7 +339,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		// Child must be an expression and cannot be a break/continue/return node.
-		if (EMethod.isAssigning(node.getUnaryMethod()))
+		if (node.getUnaryMethod().isAssigning())
 			return performAssignment(node, node.getFirstChild(), node.getUnaryMethod(), null, ec);
 		if (node.getUnaryMethod() == EMethod.EXCLAMATION)
 			return jjtAccept(node, node.getFirstChild(), ec).coerceBoolean(ec).not();
@@ -349,7 +350,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	public ALangObject visit(final ASTPostUnaryExpressionNode node, final IEvaluationContext ec)
 			throws EvaluationException {
 		// Child must be an expression and cannot be a break/continue/return node.
-		if (EMethod.isAssigning(node.getUnaryMethod()))
+		if (node.getUnaryMethod().isAssigning())
 			return performPostUnaryAssignment(node, node.getFirstChild(), node.getUnaryMethod(), ec);
 		return jjtAccept(node, node.getFirstChild(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
@@ -589,7 +590,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		if (exception != null) {
 			ec.getBinding().nest(ec);
 			try {
-				final ALangObject e = ExceptionLangObject.create(exception);
+				final ALangObject e = ExceptionLangObject.create(exception, ec);
 				ec.getBinding().setVariable(node.getErrorVariableName(), e);
 				// Catch branch, no explicit check for mustJump as it returns
 				// immediately anyway
@@ -823,21 +824,61 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		// Binary expression node.
 		// Children are expressions and cannot contain break/clause/return
 		// clauses.
-		final ALangObject initial = jjtAccept(node, childrenArray[0], ec);
-		BooleanLangObject res = null;
+		ALangObject res = jjtAccept(node, childrenArray[0], ec);
 		for (int i = 1; i != childrenArray.length; ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
-			if (EMethod.isNegate(childrenArray[i].getSiblingMethod())) {
-				res = initial.evaluateExpressionMethod(EMethod.comparisonMethod(childrenArray[i].getSiblingMethod()),
-						ec, jjtAccept(node, childrenArray[i], ec)).coerceBoolean(ec).not();
-			}
-			else {
-				res = initial.evaluateExpressionMethod(childrenArray[i].getSiblingMethod(), ec,
-						jjtAccept(node, childrenArray[i], ec)).coerceBoolean(ec);
+			res = BooleanLangObject.create(childrenArray[i].getSiblingMethod()
+					.checkComparison(res.compareTo(jjtAccept(node, childrenArray[i], ec))));
+		}
+		return res;
+	}
+	
+	@Override
+	public ALangObject visit(final ASTEqualExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
+		// Arguments are expressions which cannot be clause/continue/return
+		// clauses
+		final Node[] childrenArray = node.getChildArray();
+
+		// Empty expression node.
+		if (childrenArray.length == 0)
+			return NullLangObject.getInstance();
+
+		// Binary expression node.
+		// Children are expressions and cannot contain break/clause/return
+		// clauses.
+		ALangObject res = jjtAccept(node, childrenArray[0], ec);
+		for (int i = 1; i != childrenArray.length; ++i) {
+			// Children are expressions and cannot contain break/clause/return
+			// clauses.
+			//!~ =~ == === !== !=
+			switch (childrenArray[i].getSiblingMethod()) {
+			case DOUBLE_EQUAL:
+				res = BooleanLangObject.create(res.equals(jjtAccept(node, childrenArray[i], ec)));
+				break;
+			case EXCLAMATION_EQUAL:
+				res = BooleanLangObject.create(!res.equals(jjtAccept(node, childrenArray[i], ec)));
+				break;
+			case TRIPLE_EQUAL:
+				res = BooleanLangObject.create(res.equalsSameObject(jjtAccept(node, childrenArray[i], ec)));
+				break;
+			case EXCLAMATION_DOUBLE_EQUAL:
+				res = BooleanLangObject.create(!res.equalsSameObject(jjtAccept(node, childrenArray[i], ec)));
+				break;
+			case EQUAL_TILDE:
+				res = res.evaluateExpressionMethod(EMethod.EQUAL_TILDE,	ec, jjtAccept(node, childrenArray[i], ec)).coerceBoolean(ec);
+				break;
+			case EXCLAMATION_TILDE:
+				res = res.evaluateExpressionMethod(EMethod.EQUAL_TILDE,	ec, jjtAccept(node, childrenArray[i], ec)).coerceBoolean(ec).not();
+				break;
+				//$CASES-OMITTED$
+			default:
+				throw new UncatchableEvaluationException(ec,
+						String.format("Unexptected enum %s. This is likely a bug with the parser. Contact support.",
+								childrenArray[i].getSiblingMethod()));
 			}
 		}
 
-		return res == null ? initial : res;
+		return res;
 	}
 }

@@ -47,7 +47,10 @@ public final class UnparseVisitorConfig {
 			if (indentPrefix == null) indentPrefix = StringUtils.SPACE;
 			if (linefeed == null) linefeed = StringUtils.LF;
 			if (optionalSpace == null) optionalSpace = StringUtils.EMPTY;
-			if (requiredSpace == null) requiredSpace = StringUtils.SPACE;			
+			if (requiredSpace == null) requiredSpace = StringUtils.SPACE;
+			indentPrefix = indentPrefix.replaceAll("[^\t ]", StringUtils.EMPTY);
+			linefeed = linefeed.replaceAll("[^\r\n]", "");
+			if (linefeed.isEmpty()) linefeed = StringUtils.LF;
 			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
 		}
 	}

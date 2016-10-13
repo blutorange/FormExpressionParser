@@ -10,14 +10,15 @@ public enum EMethod {
 	PLUS("+"), // +
 	PLUS_UNARY("+"), // +
 	DOUBLE_PLUS_PREFIX("++"), // ++i
-	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_PLUS_PREFIX} */
-	DOUBLE_PLUS_SUFFIX("++"), // i++
 	DASH("-"), // -
 	DASH_UNARY("-"), // -
 	DOUBLE_DASH_PREFIX("--"), // --i
+
+	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_PLUS_PREFIX} */
+	DOUBLE_PLUS_SUFFIX("++"), // i++
 	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_DASH_PREFIX} */
 	DOUBLE_DASH_SUFFIX("--"), // i--
-
+	
 	STAR("*"), // *
 	DOUBLE_STAR("**"), // **
 	SLASH("/"), // /
@@ -35,6 +36,9 @@ public enum EMethod {
 	EQUAL_TILDE("=~"), // =~
 	EXCLAMATION_TILDE("!~"), // !~
 
+	// These cannot be overridden, these operators use the non-equal
+	// versions during evaluation.
+	// Eg. a+=b is evaluated as if it were a=a+b
 	PLUS_EQUAL("+="), // +=
 	DASH_EQUAL("-="), // -=
 	STAR_EQUAL("*="), // *=
@@ -52,21 +56,25 @@ public enum EMethod {
 	CIRCUMFLEX_EQUAL("^="), // ^=
 
 	EQUAL("="), // =
+	EXCLAMATION("!"), // !
+
+	// These cannot be overridden, they use ALangObject#equals
 	DOUBLE_EQUAL("=="), // ==
 	TRIPLE_EQUAL("==="), // ===
-
-	EXCLAMATION("!"), // !
 	EXCLAMATION_EQUAL("!="), // !=
 	EXCLAMATION_DOUBLE_EQUAL("!=="), // !==
 
+	// These cannot be overridden, they use ALangObject#compareTo
 	ANGLE_OPEN("<"), // <
-	DOUBLE_ANGLE_OPEN("<<"), // <<
-	TRIPLE_ANGLE_OPEN("<<<"), // <<<
 	ANGLE_CLOSE(">"), // >
-	DOUBLE_ANGLE_CLOSE(">>"), // >>
-	TRIPLE_ANGLE_CLOSE(">>>"), // >>>
 	ANGLE_OPEN_EQUAL("<="),// <=
 	ANGLE_CLOSE_EQUAL(">="), // >=
+	
+	DOUBLE_ANGLE_OPEN("<<"), // <<
+	TRIPLE_ANGLE_OPEN("<<<"), // <<<
+	DOUBLE_ANGLE_CLOSE(">>"), // >>
+	TRIPLE_ANGLE_CLOSE(">>>"), // >>>
+
 	COERCE("=>"),
 
 	DOT("."),
@@ -84,8 +92,8 @@ public enum EMethod {
 		this.methodName = name;
 	}
 
-	public static EMethod equalMethod(final EMethod method) {
-		switch (method) {
+	public EMethod equalMethod() {
+		switch (this) {
 		case DOUBLE_PLUS_PREFIX: return EMethod.DOUBLE_PLUS_PREFIX;
 		case DOUBLE_DASH_PREFIX: return EMethod.DOUBLE_DASH_PREFIX;
 		case DOUBLE_PLUS_SUFFIX: return EMethod.DOUBLE_PLUS_PREFIX;
@@ -111,8 +119,8 @@ public enum EMethod {
 		}
 	}
 
-	public static EMethod comparisonMethod(final EMethod method) {
-		switch (method) {
+	public EMethod comparisonMethod() {
+		switch (this) {
 		case TRIPLE_EQUAL:
 		case EXCLAMATION_DOUBLE_EQUAL: return EMethod.TRIPLE_EQUAL;
 		case DOUBLE_EQUAL:
@@ -125,20 +133,8 @@ public enum EMethod {
 		}
 	}
 
-	public static boolean isNegate(final EMethod method) {
-		switch (method) {
-		case EXCLAMATION_EQUAL:
-		case EXCLAMATION_DOUBLE_EQUAL:
-		case EXCLAMATION_TILDE:
-			return true;
-			//$CASES-OMITTED$
-		default:
-			return false;
-		}
-	}
-
-	public static boolean isAssigning(final EMethod method) {
-		switch (method) {
+	public boolean isAssigning() {
+		switch (this) {
 		case EQUAL:
 		case DOUBLE_PLUS_PREFIX:
 		case DOUBLE_PLUS_SUFFIX:
@@ -163,6 +159,22 @@ public enum EMethod {
 			//$CASES-OMITTED$
 		default:
 			return false;
+		}
+	}
+	
+	//    -1 0 1
+	// >   f f t
+	// <   t f f
+	// >=  f t t
+	// <=  t t f
+	public boolean checkComparison(int comp) {
+		switch (this) {
+		case ANGLE_OPEN: return comp < 0;
+		case ANGLE_CLOSE: return comp > 0;
+		case ANGLE_OPEN_EQUAL: return comp <= 0;
+		case ANGLE_CLOSE_EQUAL: return comp >= 0;
+			//$CASES-OMITTED$
+		default: return false;
 		}
 	}
 }

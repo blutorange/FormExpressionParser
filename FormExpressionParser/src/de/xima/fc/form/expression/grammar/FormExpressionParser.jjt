@@ -986,7 +986,7 @@ void AmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
   }
 }
 
-void DoubleEqualTypeExpression(EMethod method) #ComparisonExpressionNode(createNode = jjtree.nodeArity() != 1) :
+void DoubleEqualTypeExpression(EMethod method) #EqualExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
   jjtThis.openNodeScope(token);
@@ -1034,7 +1034,7 @@ void DoubleEqualTypeExpression(EMethod method) #ComparisonExpressionNode(createN
   }
 }
 
-void AngleTypeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
+void AngleTypeExpression(EMethod method) #ComparisonExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
   jjtThis.openNodeScope(token);
