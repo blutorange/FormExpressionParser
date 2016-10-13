@@ -21,10 +21,7 @@ variable = 1;myScope::variable = 2;variable + myScope::variable;
 for(i=0;i<10;i+=1){loginfo(i);}
 
 /* Enhanced for loop. */
-for (i : [1,2,3]) loginfo(i);
-for (i : 3) loginfo(i);
-for (i : "123") loginfo(i);
-for (key : {1:null,2:null,3:null}) loginfo(key);
+for (i : [1,2,3]) loginfo(i);for (i : 3) loginfo(i);for (i : "123") loginfo(i);for(key:{1:null,2:null,3:null})loginfo(key);
 
 /* While loop, Do-While loop */
 while (false) doSomething();do 1+2; while (false);

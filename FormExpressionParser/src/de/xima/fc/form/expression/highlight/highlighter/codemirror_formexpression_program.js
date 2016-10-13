@@ -27,8 +27,8 @@ CodeMirror.defineSimpleMode("formexpression-program", {
   ],
   // The multi-line comment state.
   comment: [
-    {regex: /.*?\*\//, token: "comment", next: "start"},
-    {regex: /.*/, token: "comment"}
+    {regex: /[^]*?\*\//, token: "comment", next: "start"},
+    {regex: /[^]*/, token: "comment"}
   ],
   // The meta property contains global information about the mode. It
   // can contain properties like lineComment, which are supported by
