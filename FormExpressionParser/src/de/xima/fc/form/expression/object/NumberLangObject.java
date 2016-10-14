@@ -159,7 +159,7 @@ public class NumberLangObject extends ALangObject {
 	protected int compareToSameType(final ALangObject o) {
 		return Double.compare(value, ((NumberLangObject)o).value);
 	}
-	
+
 	@Override
 	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec)
 			throws EvaluationException {
@@ -245,7 +245,7 @@ public class NumberLangObject extends ALangObject {
 	protected boolean isSingletonLike() {
 		return true;
 	}
-	
+
 	/**
 	 * @param operand
 	 *            Number to add.
@@ -324,8 +324,13 @@ public class NumberLangObject extends ALangObject {
 		return NumberLangObject.create(-value);
 	}
 
+	/**
+	 * @param other
+	 * @return A number in the range [0...other).
+	 */
 	public NumberLangObject modulo(final NumberLangObject other) {
-		return NumberLangObject.create(Math.IEEEremainder(value, other.value));
+		final double res = Math.IEEEremainder(value, other.value);
+		return NumberLangObject.create(res < 0d ? res + other.value : res);
 	}
 
 	public NumberLangObject remainder(final NumberLangObject other) {

@@ -93,6 +93,8 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN006("[1,2]==[1,2];", Tests.TRUE),
 	EMETHODBIN007("[1,2]===[1,2];", Tests.FALSE),
 	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
+	EMETHODBIN009("48%7;;", NumberLangObject.create(6)),
+	EMETHODBIN010("-50%7;;", NumberLangObject.create(6)),
 
 	// Assigment
 	ASSIGNMENT001("a=0;b=23;c=19;a += b += c;",Tests.N42),
@@ -115,6 +117,7 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
 	GENERAL003("true ? 42 : 0;", Tests.N42), // Ternary
 	GENERAL004("function foo(){return 42;};foo();", Tests.N42), // Function return
+	GENERAL005("42;;;;;", Tests.N42), // Empty node is throughpass
 
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),

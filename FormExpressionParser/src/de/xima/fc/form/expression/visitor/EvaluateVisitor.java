@@ -279,7 +279,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		}
 		return assignee;
 	}
-	
+
 	private ALangObject performPostUnaryAssignment(final Node node, final Node child, final EMethod method, final IEvaluationContext ec) {
 		final ALangObject res, tmp;
 		switch (child.jjtGetNodeId()) {
@@ -354,7 +354,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			return performPostUnaryAssignment(node, node.getFirstChild(), node.getUnaryMethod(), ec);
 		return jjtAccept(node, node.getFirstChild(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
-	
+
 	@Override
 	public ALangObject visit(final ASTExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Arguments are expressions which cannot be clause/continue/return
@@ -777,7 +777,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 
 	@Override
 	public ALangObject visit(final ASTEmptyNode node, final IEvaluationContext ec) throws EvaluationException {
-		return NullLangObject.getInstance();
+		return this.currentResult;
 	}
 
 	@Override
@@ -833,7 +833,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		}
 		return res;
 	}
-	
+
 	@Override
 	public ALangObject visit(final ASTEqualExpressionNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Arguments are expressions which cannot be clause/continue/return
