@@ -13,4 +13,7 @@ function arraySort(array) {
   array;
 }
 
+// Of course, in practice it would be easier to
+// use in-build functions:
+// ["Anton","Alfred","Andre","Abigel"].sort;
 arraySort(["Anton","Alfred","Andre","Abigel"]);

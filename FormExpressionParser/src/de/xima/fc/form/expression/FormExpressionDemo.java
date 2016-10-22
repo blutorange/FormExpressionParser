@@ -42,7 +42,7 @@ public class FormExpressionDemo {
 		final Node rootNode = showParseTree(code);
 
 		showUnparsed(rootNode);
-		
+
 		showEvaluatedResult(rootNode);
 
 		if (writer != null)

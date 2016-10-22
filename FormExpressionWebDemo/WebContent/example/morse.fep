@@ -1,0 +1,49 @@
+<html>
+    <head>
+        [%%
+            table = {
+                A:'.-',
+                B:'-...',
+                C:'-.-.',
+                D:'-..',
+                E:'.',
+                F:'..-.',
+                G:'--.',
+                H:'....',
+                I:'..',
+                J:'.---',
+                K:'-.-',
+                L:'.-..',
+                M:'--',
+                N:'-.',
+                O:'---',
+                P:'.--.',
+                Q:'--.-',
+                R:'.-.',
+                S:'...',
+                T:'-',
+                U:'..-',
+                V:'...-',
+                W:'.--',
+                X:'-..-',
+                Y:'-.--',
+                Z:'--..'
+            };
+            function morse(text) {
+                res = '';
+                for (char : text) {
+                    res += table[char.toUpperCase()];
+                }
+                return res;
+            }
+        %]
+    </head>
+    <body>
+        <h1>Morse code</h1>
+        <ul>
+            [%% for (text : ['SOS','Help me', 'What is this']) { %]
+                <li>[%%=text%]: <code>[%%=morse(text)%]</code></li>
+            [%% } %]
+        </ul>
+    </body>
+</html>
