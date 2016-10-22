@@ -5,7 +5,9 @@ import java.io.Writer;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
+import de.xima.fc.form.expression.context.IExternalContextCommand;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 
 public class WriterOnlyExternalContext implements IExternalContext {
@@ -16,12 +18,17 @@ public class WriterOnlyExternalContext implements IExternalContext {
 	}
 
 	@Override
-	public Writer getWriter() {
-		return writer;
+	public void write(String data) throws EmbedmentOutputException {
+		try {
+			writer.write(data);
+		}
+		catch (IOException e) {
+			throw new EmbedmentOutputException(e, this);
+		}
 	}
 
 	@Override
-	public void flushWriter() throws EmbedmentOutputException {
+	public void finishWriting() throws EmbedmentOutputException {
 		try {
 			writer.flush();
 		}
@@ -39,5 +46,13 @@ public class WriterOnlyExternalContext implements IExternalContext {
 	@Override
 	public String toString() {
 		return writer.toString();
+	}
+
+	@Override
+	public void process(IExternalContextCommand command, IEvaluationContext ec) {
+	}
+
+	@Override
+	public void beginWriting() {
 	}
 }

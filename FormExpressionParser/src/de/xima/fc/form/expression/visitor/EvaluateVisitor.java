@@ -87,7 +87,14 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	 */
 	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
-		final ALangObject res = node.jjtAccept(v, ec);
+		final ALangObject res;
+		if (ec.getExternalContext() != null) ec.getExternalContext().beginWriting();
+		try {
+			res = node.jjtAccept(v, ec);
+		}
+		finally {
+			if (ec.getExternalContext() != null) ec.getExternalContext().finishWriting();
+		}
 		v.assertNoJumps(ec);
 		return res;
 	}
@@ -777,7 +784,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 
 	@Override
 	public ALangObject visit(final ASTEmptyNode node, final IEvaluationContext ec) throws EvaluationException {
-		return NullLangObject.getInstance();
+		return this.currentResult;
 	}
 
 	@Override

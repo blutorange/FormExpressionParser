@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
@@ -8,8 +9,8 @@ public class ASTIdentifierNameNode extends SimpleNode {
 
 	private String name;
 	
-	public ASTIdentifierNameNode(int nodeId) {
-		super(nodeId);
+	public ASTIdentifierNameNode(FormExpressionParser parser, int nodeId) {
+		super(parser, nodeId);
 	}
 
 	@Override

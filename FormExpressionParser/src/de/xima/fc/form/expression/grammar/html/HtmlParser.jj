@@ -1,0 +1,263 @@
+/*
+ Based on
+ https://github.com/antlr/grammars-v4/blob/master/html/HTMLLexer.g4
+ (BSD)
+
+ !!DO NOT USE ANY SKIP ACTIONS!! WE NEED TO PRESERVE ALL CHARS!!
+ THIS IS IMPORTANT FOR COMMANDS PROCESSED BY AHtmlExternalContext.
+*/
+options {
+  BUILD_PARSER = false;
+  BUILD_TOKEN_MANAGER  = true;
+  CACHE_TOKENS = false;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  COMMON_TOKEN_ACTION = true;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_PARSER = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  FORCE_LA_CHECK = true;
+  GENERATE_ANNOTATIONS = true;
+  GENERATE_GENERICS = true;
+  GENERATE_CHAINED_EXCEPTION = false;
+  GENERATE_STRING_BUILDER = false;
+  GRAMMAR_ENCODING="UTF-8";
+  IGNORE_CASE  = false;
+  JAVA_UNICODE_ESCAPE = false;
+  JDK_VERSION="1.7";
+  KEEP_LINE_COLUMN = true;
+  LOOKAHEAD = 1;
+  OTHER_AMBIGUITY_CHECK = 2;
+  UNICODE_INPUT = true;
+  USER_CHAR_STREAM = false;
+  USER_TOKEN_MANAGER = false;
+  SANITY_CHECK = true;
+  SUPPORT_CLASS_VISIBILITY_PUBLIC = true;
+  STATIC = false;
+  TOKEN_MANAGER_USES_PARSER = false;
+  TOKEN_EXTENDS = "AToken";
+  TOKEN_FACTORY = "";
+}
+PARSER_BEGIN(HtmlParser)
+package de.xima.fc.form.expression.grammar.html;
+import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.context.IExternalContextCommand;
+import java.util.List;
+import de.xima.fc.form.expression.impl.contextcommand.EDocumentCommandPack.PositionedDocumentCommand;
+
+public class HtmlParser
+{
+}
+
+PARSER_END(HtmlParser)
+
+TOKEN_MGR_DECLS :
+{
+  private List<PositionedDocumentCommand> commandList;
+  private int commandPos = 0;
+  private int charPos = 0;
+  private Token prevToken;
+  /**
+   * @param commandList Commands with the position given by position list. Must be sorted by positionList, highest position first.
+   * @param positionList Position for the commandList.
+   */
+  public void setExternalCommands(List<PositionedDocumentCommand> commandList) {
+    this.commandList = commandList;
+    this.commandPos = 0;
+  }
+  void CommonTokenAction(final Token token)
+  {
+    charPos += token.image.length();
+    token.prev = prevToken;
+    if (token.prev != null)
+      token.prev.next = token;
+    prevToken = token;
+    if (commandList == null)
+      return;
+    while (commandPos < commandList.size() 
+            && charPos >= commandList.get(commandPos).position)
+      commandList.get(commandPos++).token = token;
+  }
+}
+
+< DEFAULT >
+TOKEN :
+{
+  < htmlCommentBegin : "<!--" > : HTMLCOMMENT
+| < htmlConditionalCommentBegin : "<![" > : HTMLCONDITIONALCOMMENT
+| < xmlDeclaration : "<?xml" > : XMLDECLARATION
+| < cdataBegin : "<![CDATA[" > : CDATA
+| < dtdBegin : "<!" > : DTD
+| < scripletQBegin : "<?" > : SCRIPLETQ
+| < scripletPBegin : "<%" > : SCRIPLETP
+| < seaWs : ([" ", "\t", "\r", "\n"])+ >
+| < scriptBegin : "<script" (~[">"])* ">" > : SCRIPT
+| < styleBegin : "<style" (~[">"])* ">" > : STYLE
+| < tagBegin : "<" > : TAG
+| < htmlText : (~["<", " ", "\t", "\r" , "\n"])+ >
+}
+
+< TAG >
+TOKEN :
+{
+  < tagEnd : ">" > : DEFAULT
+| < tagSlash : "/" >
+| < tagWs : ([ " ", "\r", "\t", "\n" ])+ >
+| < tagName : < tagNameCharStart > (< tagNameChar >)* >
+| < tagEquals : "=" (" ")* > : ATTVALUE
+| < #tagNameCharStart :
+    [ "a"-"z", "A"-"Z" ]
+  | [ "\u2070"-"\u218f" ]
+  | [ "\u2c00"-"\u2fef" ]
+  | [ "\u3001"-"\ud7ff" ]
+  | [ "\uf900"-"\ufdcf" ]
+  | [ "\ufdf0"-"\ufffd" ] >
+| 
+  < #tagNameChar :
+    < tagNameCharStart >
+  | < tagDigit >
+  | [ "-", "_", "." ]
+  | "\u00b7"
+  | [ "\u0300"-"\u036f" ]
+  | [ "\u203f"-"\u2040" ] 
+  >
+| 
+  < #tagDigit : 
+    [ 
+    "0"-"9" ] >
+}
+
+< ATTVALUE >
+TOKEN :
+{
+  < attvAttribute :
+    < attvDoubleString >
+  | < attvSingleString >
+  | < attvChars > (["\"","'"])*
+  | < attvHexChars > (["\"","'"])*
+  | < attvDecChars > (["\"","'"])*
+  > : TAG
+| 
+  < #attvChar : [ "-", "_", ".", "/", "+", ",", "?", "=", ":", ";", "#",
+                   "0"-"9", "a"-"z", "A"-"Z" ] >
+|
+  < #attvHexChars : "#" (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #attvDecChars : "#" (["0"-"9"])+ ("%")? >
+|
+  < #attvChars : (< attvChar >)+  (" ")? >
+|
+  < #attvDoubleString : "\"" (~["<", "\""])* "\"" >
+|
+  < #attvSingleString : "'" (~["<", "'"])* "'" >
+}
+
+< STYLE >
+MORE :
+{
+  < styleChar : ~[ ] >
+}
+
+< STYLE >
+TOKEN :
+{
+  < styleEndShort : "</>" > : DEFAULT
+| < styleEnd : "</style>" > : DEFAULT
+}
+
+< SCRIPT >
+MORE :
+{
+  < scriptChar : ~[ ] >
+}
+
+< SCRIPT >
+TOKEN :
+{
+  < scriptEndShort : "</>" > : DEFAULT
+| < scriptEnd : "</script>" > : DEFAULT
+}
+
+< SCRIPLETQ >
+MORE :
+{
+  < scripletQChar : ~[ ] >
+}
+
+< SCRIPLETQ >
+TOKEN :
+{
+  < scripletQEnd : "?>" > : DEFAULT
+}
+
+< SCRIPLETP >
+MORE :
+{
+  < scripletPChar : ~[ ] >
+}
+
+< SCRIPLETP >
+TOKEN :
+{
+  < scripletPEnd : "%>" > : DEFAULT
+}
+
+< DTD >
+MORE :
+{
+  < dtdChar : ~[">"] >
+}
+
+< DTD >
+TOKEN :
+{
+  < dtdEnd : ">" > : DEFAULT
+}
+
+< CDATA >
+MORE :
+{
+  < cdataChar : ~[ ] >
+}
+
+< CDATA >
+TOKEN :
+{
+  < cdataEnd : "]]>" > : DEFAULT
+}
+
+< XMLDECLARATION >
+MORE :
+{
+  < xmlDeclarationChar : ~[ ">" ] >
+}
+
+< XMLDECLARATION >
+TOKEN :
+{
+  < xmlDeclarationEnd : ">" > : DEFAULT
+}
+
+< HTMLCOMMENT >
+MORE :
+{
+  < htmlCommentChar : ~[ ] >
+}
+
+< HTMLCOMMENT >
+TOKEN :
+{
+  < htmlCommentEnd : "-->" > : DEFAULT
+}
+
+< HTMLCONDITIONALCOMMENT >
+MORE :
+{
+  < htmlConditionalCommentChar : ~[ ] >
+}
+
+< HTMLCONDITIONALCOMMENT >
+TOKEN :
+{
+  < htmlConditionalCommentEnd : "]>" > : DEFAULT
+}

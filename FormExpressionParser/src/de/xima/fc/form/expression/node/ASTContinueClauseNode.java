@@ -1,14 +1,15 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTContinueClauseNode extends SimpleNode {
 	private String label;
 
-	public ASTContinueClauseNode(final int id) {
-		super(id);
+	public ASTContinueClauseNode(FormExpressionParser parser, final int id) {
+		super(parser, id);
 	}
 
 	@Override

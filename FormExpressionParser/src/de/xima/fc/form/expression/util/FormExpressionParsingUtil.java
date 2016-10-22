@@ -38,7 +38,7 @@ public final class FormExpressionParsingUtil {
 		 */
 		public static Node parse(final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				return new FormExpressionParser(asTokenManager(reader)).CompleteProgram(null);
+				return asParser(asTokenManager(reader)).CompleteProgram(null);
 			}
 		}
 
@@ -112,7 +112,7 @@ public final class FormExpressionParsingUtil {
 
 		public static Node parse(final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				final FormExpressionParser parser = new FormExpressionParser(asTokenManager(reader));
+				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
 				return parser.Template(null);
 			}
@@ -167,7 +167,13 @@ public final class FormExpressionParsingUtil {
 	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state)
 			throws TokenMgrError {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
-		return new FormExpressionParserTokenManager(stream, state);
+		return new FormExpressionParserTokenManager(null, stream, state);
+	}
+	
+	private static FormExpressionParser asParser(FormExpressionParserTokenManager tm) {
+		final FormExpressionParser parser = new FormExpressionParser(tm);
+		tm.parser = parser;
+		return parser;
 	}
 
 	private static Token[] tokenManagerToArray(final FormExpressionParserTokenManager tm) throws TokenMgrError {

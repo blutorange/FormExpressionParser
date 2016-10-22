@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -8,16 +7,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.impl.writer.SystemOutWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 // Dummy for illustration, remove this and use the real FORMCYCLE class FormVersion.
-public class FormcycleExternalContext implements IExternalContext {
+public class FormcycleExternalContext extends AHtmlExternalContext {
 	private Writer writer;
-
 
 	// For demonstration purposes only. Replace with access to actual form elements.
 	private static final ImmutableMap<String, String> nameMap;
@@ -42,6 +40,8 @@ public class FormcycleExternalContext implements IExternalContext {
 	}
 
 	public FormcycleExternalContext() {
+		// Write to stdout for debugging.
+		this.writer = SystemOutWriter.getInstance();
 	}
 
 	public FormcycleExternalContext(final Writer writer) {
@@ -63,28 +63,32 @@ public class FormcycleExternalContext implements IExternalContext {
 	}
 
 	@Override
-	public Writer getWriter() {
-		if (writer != null) return writer;
+	protected void output(String html) throws EmbedmentOutputException {
+		if (writer == null) return;
 		try {
-			writer = new FileWriter("/tmp/fep.out.html");
+			writer.write(html);
+			writer.flush();
 		}
-		catch (final IOException e) {
-			writer = DummyWriter.getInstance();
-		}
-		return writer;
-	}
-
-	@Override
-	public void flushWriter() throws EmbedmentOutputException {
-		if (writer != null)
-			try {
-				writer.flush();
-			}
-		catch (final IOException e) {
+		catch (IOException e) {
 			throw new EmbedmentOutputException(e, this);
 		}
 	}
 
+	@Override
+	protected void finishOutput() throws EmbedmentOutputException {
+		if (writer == null) return;
+		try {
+			writer.flush();
+		}
+		catch (IOException e) {
+			throw new EmbedmentOutputException(e, this);
+		}
+		finally {
+			writer = null;
+		}
+	}
+
+	
 	private final static ImmutableMap<String, ScopeImpl> scopeMap;
 	private static enum ScopeImpl {
 		FORM_FIELD {

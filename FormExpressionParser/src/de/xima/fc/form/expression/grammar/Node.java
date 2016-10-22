@@ -142,9 +142,6 @@ public interface Node extends Serializable, ITraceElement {
 	@Nullable
 	public Node getFirstChild();
 
-	public void openNodeScope(Token token);
-	public void closeNodeScope(Token token);
-
 	/**
 	 * @return The id for this TYPE of node.
 	 * @see FormExpressionParserTreeConstants
@@ -159,4 +156,6 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public List<Token> getComments();
 
+	public void jjtSetFirstToken(Token token);
+	public void jjtSetLastToken(Token token);
 }

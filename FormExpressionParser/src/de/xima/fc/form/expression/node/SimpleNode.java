@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -26,31 +27,36 @@ public abstract class SimpleNode implements Node {
 	 */
 	protected final int uniqueId;
 
-	private transient Token startToken;
 	/** Reference to the list of all comments. It is set when
 	 * the node is created, but might be filled later, but it will
 	 * be filled once parsing is done.
 	 */
 	private List<Token> comments;
 	protected String embedment;
+	/** ID of the node type. See {@link FormExpressionParserTreeConstants#jjtNodeName}. */
 	protected int nodeId;
+	/** Parent of this node, or <code>null</code>. */
 	protected Node parent;
+	/** Children of this node, non-null. */
 	protected Node[] children = EMPTY_NODE_ARRAY;
+	/** Used during evaluation. */
 	protected EMethod siblingMethod;
-	private int startLine = 1, endLine = 1;
-	private int startColumn = 1, endColumn = 1;
+	/** Line numbers for tracing etc. */
+	private int beginLine=1,beginColumn=1,endLine=1,endColumn=1;
 
 	/**
 	 * @param nodeId
 	 *            Node id. Not needed (yet).
 	 */
-	public SimpleNode(final int nodeId) {
+	public SimpleNode(FormExpressionParser parser, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
 		// by itself would raise many other issues...
 		uniqueId = ID_PROVIDER.incrementAndGet();
 		this.nodeId = nodeId;
+		this.comments = parser.getComments();
+		this.embedment = parser.getCurrentEmbedmentContext();
 	}
 
 	// For performance, calls to this method may be removed.
@@ -117,12 +123,12 @@ public abstract class SimpleNode implements Node {
 		.append(',')
 		.append(siblingMethod)
 		.append(',')
-		.append(startLine).append(':')
-		.append(startColumn)
+		.append(getStartLine()).append(':')
+		.append(getStartColumn())
 		.append('-')
-		.append(endLine)
+		.append(getEndLine())
 		.append(':')
-		.append(endColumn)
+		.append(getEndColumn())
 		.append(',')
 		.append(',');
 		additionalToStringFields(sb);
@@ -253,40 +259,18 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public final void openNodeScope(final Token t) {
-		embedment = t.getEmbedmentContext();
-		startLine = t.beginLine;
-		startColumn = t.beginColumn;
-		startToken = t;
-		comments = t.getComments();
-	}
-
-	@Override
 	public final List<Token> getComments() {
 		return comments;
 	}
 	
 	@Override
-	public final void closeNodeScope(final Token t) {
-		final Token next = startToken == null ? null : startToken.next;
-		if (next != null) {
-			startLine = next.beginLine;
-			startColumn = next.beginColumn;
-		}
-		startToken = null;
-		endLine = t.endLine;
-		endColumn = t.endColumn;
-		if (comments == null) comments = t.getComments();
-	}
-
-	@Override
 	public final int getStartLine() {
-		return startLine;
+		return beginLine;
 	}
 
 	@Override
 	public final int getStartColumn() {
-		return startColumn;
+		return beginColumn;
 	}
 
 	@Override
@@ -297,6 +281,18 @@ public abstract class SimpleNode implements Node {
 	@Override
 	public final int getEndColumn() {
 		return endColumn;
+	}
+	
+	@Override
+	public void jjtSetFirstToken(Token token) {
+		beginLine = token.beginLine;
+		beginColumn = token.beginColumn;
+	}
+	
+	@Override
+	public void jjtSetLastToken(Token token) {
+		endLine = token.endLine;
+		endColumn = token.endColumn;
 	}
 
 	@Override

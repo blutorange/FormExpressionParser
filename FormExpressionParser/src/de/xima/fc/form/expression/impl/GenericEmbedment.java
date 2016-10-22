@@ -1,7 +1,5 @@
 package de.xima.fc.form.expression.impl;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -11,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandler;
@@ -101,14 +100,8 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	private void output(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
-		if (ec.getExternalContext() == null || ec.getExternalContext().getWriter()==null) return;
-		try {
-			ec.getExternalContext().getWriter().write(data);
-		}
-		catch (IOException e) {
-			throw new EmbedmentOutputException(e, ec);
-		}
-
+		final IExternalContext external = ec.getExternalContext(); 
+		if (external != null) external.write(data);
 	}
 	
 	@Override

@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.highlight.IHighlightTheme;
 import de.xima.fc.form.expression.highlight.highlighter.HtmlHighlighter;
-import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
+import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 
 public final class FormExpressionHighlightingUtil {
 	private FormExpressionHighlightingUtil(){}

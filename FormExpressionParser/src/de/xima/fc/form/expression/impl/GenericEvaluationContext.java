@@ -82,7 +82,6 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 		scope.reset();
 		embedment.reset();
 		tracer.reset();
-		externalContext.flushWriter();
 		externalContext = null;
 		return null;
 	}

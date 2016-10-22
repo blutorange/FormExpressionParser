@@ -33,9 +33,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.Token;
-import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
+import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -109,8 +110,8 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		unparser.writeRemainingComments();
 		writer.flush();
 	}
-	
-	private UnparseVisitor(final Writer writer, List<Token> comments, UnparseVisitorConfig config) {
+
+	private UnparseVisitor(final Writer writer, final List<Token> comments, final UnparseVisitorConfig config) {
 		if (writer == null) throw new IllegalArgumentException("writer must not be null");
 		this.config = config;
 		this.writer = writer;
@@ -151,19 +152,19 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(config.linefeed);
 		while (commentToken != null) writeComment(StringUtils.EMPTY, true);
 	}
-	
+
 	private void writeCommentForNode(final Node node, final String prefix, final boolean isBlock) throws IOException {
 		if (!config.keepComments) return;
-		// We write the comment iff the node to be processed lies after the comment. 
+		// We write the comment iff the node to be processed lies after the comment.
 		// We check check for >= beginColumn to be safe, but the = case cannot happen
 		// as a comment token  cannot be at the same position as a non-comment node.
 		while (commentToken != null
 				&& (node.getStartLine() > commentToken.beginLine || node.getStartLine() == commentToken.beginLine
-						&& node.getStartColumn() >= commentToken.beginColumn)) {
+				&& node.getStartColumn() >= commentToken.beginColumn)) {
 			writeComment(prefix, isBlock);
 		}
 	}
-	
+
 	private Void expression(final Node node, final String prefix) throws IOException {
 		writeCommentForNode(node, prefix, false);
 		return node.jjtAccept(this, prefix);
@@ -240,9 +241,9 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	public Void visit(final ASTEqualExpressionNode node, final String prefix) throws IOException {
 		return expressionNode(node, prefix);
 	}
-	
+
 	@Override
-	public Void visit(ASTComparisonExpressionNode node, String prefix) throws IOException {
+	public Void visit(final ASTComparisonExpressionNode node, final String prefix) throws IOException {
 		return expressionNode(node, prefix);
 	}
 
@@ -321,7 +322,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		final int len = node.jjtGetNumChildren();
 		for (int i = 0; i != len; ++i) {
 			blockOrClause(node.jjtGetChild(i), prefix);
-			if (len != 1 && i < len - 1) {
+			if (len != 1 && i < len - 1 && ((node.jjtGetChild(i).jjtGetNodeId() != FormExpressionParserTreeConstants.JJTLOSNODE) || ((ASTLosNode)node.jjtGetChild(i)).isHasOpen())) {
 				writer.write(config.linefeed);
 				writer.write(prefix);
 			}
@@ -683,7 +684,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(node.getUnaryMethod().methodName);
 		return expression(node.jjtGetChild(0), prefix);
 	}
-	
+
 	@Override
 	public Void visit(final ASTPropertyExpressionNode node, final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();

@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
-import de.xima.fc.form.expression.impl.externalcontext.SystemOutExternalContext;
+import de.xima.fc.form.expression.impl.externalcontext.SystemExternalContext;
 import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
 import de.xima.fc.form.expression.impl.pool.GenericEcFactory;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -46,7 +46,7 @@ public final class FormExpressionEvaluationUtil {
 		public static ALangObject eval(final Node node, @Nullable IExternalContext externalContext)
 				throws EvaluationException {
 			if (node == null) return NullLangObject.getInstance();
-			if (externalContext == null) externalContext = SystemOutExternalContext.INSTANCE;
+			if (externalContext == null) externalContext = SystemExternalContext.OUT;
 			return FormExpressionEvaluationUtil.eval(node, GenericEcFactory.getPoolInstance(), externalContext);
 		}
 	}

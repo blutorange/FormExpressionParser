@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
@@ -11,8 +12,8 @@ public class ASTRegexNode extends SimpleNode {
 
 	private Pattern pattern;
 
-	public ASTRegexNode(final int nodeId) {
-		super(nodeId);
+	public ASTRegexNode(FormExpressionParser parser, int nodeId) {
+		super(parser, nodeId);
 	}
 
 	public void init(final EMethod method, final String regex) throws ParseException {

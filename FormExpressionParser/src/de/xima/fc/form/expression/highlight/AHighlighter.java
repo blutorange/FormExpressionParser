@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.xima.fc.form.expression.grammar.AToken;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
 
@@ -39,7 +40,7 @@ public abstract class AHighlighter {
 		else {
 			// Process joined los token.
 			if (embed.length() > 0 && embedBegin != null && embedEnd != null)
-				processToken(new Token(FormExpressionParserConstants.LosChar, embed.toString(), embedBegin.beginLine,
+				processToken(AToken.newToken(FormExpressionParserConstants.LosChar, embed.toString(), embedBegin.beginLine,
 						embedBegin.beginColumn, embedEnd.endLine, embedEnd.endColumn), styleList);
 			embed.setLength(0);
 			// Process comment tokens, when present.
@@ -56,7 +57,7 @@ public abstract class AHighlighter {
 	private void finishInternal() throws IOException {
 		// Process joined los token.
 		if (embed.length() > 0 && embedBegin != null && embedEnd != null)
-			processToken(new Token(FormExpressionParserConstants.LosChar, embed.toString(), embedBegin.beginLine,
+			processToken(AToken.newToken(FormExpressionParserConstants.LosChar, embed.toString(), embedBegin.beginLine,
 					embedBegin.beginColumn, embedEnd.endLine, embedEnd.endColumn), styleList);
 		embed.setLength(0);
 		styleList.clear();

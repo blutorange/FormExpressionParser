@@ -14,10 +14,10 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
-import de.xima.fc.form.expression.impl.externalcontext.DummyWriter;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
-import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
 import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
+import de.xima.fc.form.expression.impl.writer.DummyWriter;
+import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
 
 /**

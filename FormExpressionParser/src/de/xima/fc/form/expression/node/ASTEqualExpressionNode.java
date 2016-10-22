@@ -1,13 +1,14 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTEqualExpressionNode extends SimpleNode {
 
-	public ASTEqualExpressionNode(final int nodeId) {
-		super(nodeId);
+	public ASTEqualExpressionNode(FormExpressionParser parser, final int nodeId) {
+		super(parser, nodeId);
 	}
 
 	@Override

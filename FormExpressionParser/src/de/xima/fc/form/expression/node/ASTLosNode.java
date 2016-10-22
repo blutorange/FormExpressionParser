@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
@@ -9,9 +10,9 @@ public class ASTLosNode extends SimpleNode {
 	private String text;
 	private String open;
 	private boolean hasClose;
-
-	public ASTLosNode(final int nodeId) {
-		super(nodeId);
+	
+	public ASTLosNode(FormExpressionParser parser, int nodeId) {
+		super(parser, nodeId);
 	}
 
 	public void init(final EMethod method, final String text, final String open, final boolean hasClose) throws ParseException {

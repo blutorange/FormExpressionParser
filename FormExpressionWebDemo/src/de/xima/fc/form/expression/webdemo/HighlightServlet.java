@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
-import de.xima.fc.form.expression.impl.externalcontext.StringBuilderWriter;
+import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 
 /**

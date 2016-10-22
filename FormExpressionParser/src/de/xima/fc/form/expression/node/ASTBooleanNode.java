@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
@@ -8,8 +9,8 @@ public class ASTBooleanNode extends SimpleNode {
 
 	private boolean booleanValue;
 
-	public ASTBooleanNode(final int id) {
-		super(id);
+	public ASTBooleanNode(FormExpressionParser parser, final int id) {
+		super(parser, id);
 	}
 
 	@Override

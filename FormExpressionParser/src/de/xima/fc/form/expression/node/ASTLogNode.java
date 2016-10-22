@@ -2,14 +2,15 @@ package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTLogNode extends SimpleNode {
 	private ELogLevel logLevel;
 	
-	public ASTLogNode(final int id) {
-		super(id);
+	public ASTLogNode(FormExpressionParser parser, final int id) {
+		super(parser, id);
 	}
 
 	/**

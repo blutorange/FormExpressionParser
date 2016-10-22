@@ -1,17 +1,18 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTVariableNode extends SimpleNode {
 
+	public ASTVariableNode(FormExpressionParser parser, int nodeId) {
+		super(parser, nodeId);
+	}
+
 	private String name;
     private String scope;
-	
-	public ASTVariableNode(final int id) {
-		super(id);
-	}
 
 	public String getName() {
 		return name;

@@ -3,15 +3,17 @@ package de.xima.fc.form.expression.node;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTStringNode extends SimpleNode {
-	private String stringValue;
 
-	public ASTStringNode(final int id) {
-		super(id);
+	public ASTStringNode(FormExpressionParser parser, int nodeId) {
+		super(parser, nodeId);
 	}
+
+	private String stringValue;
 
 	/**
 	 * @param delimiter

@@ -1,14 +1,15 @@
 package de.xima.fc.form.expression.node;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTPostUnaryExpressionNode extends SimpleNode {
 	private EMethod unaryMethod;
 
-	public ASTPostUnaryExpressionNode(final int id) {
-		super(id);
+	public ASTPostUnaryExpressionNode(FormExpressionParser parser, int nodeId) {
+		super(parser, nodeId);
 	}
 
 	public final void init(final EMethod method, final EMethod unary) throws ParseException {

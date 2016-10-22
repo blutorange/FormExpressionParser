@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -99,6 +100,7 @@ public interface INode extends Serializable, ITraceElement {
 	 */
 	public void assertChildrenExactly(final int count) throws ParseException;
 
+	public void assertChildrenExactlyOneOf(int count1, int count2) throws ParseException;
 
 	/**
 	 * @param count The number of children this node must have at least.
@@ -143,13 +145,20 @@ public interface INode extends Serializable, ITraceElement {
 	@Nullable
 	public INode getFirstChild();
 
-	public void setStartPosition(Token token);
-	public void setEndPosition(Token token);
-
 	/**
-	 * @return The id of this node.
+	 * @return The id for this TYPE of node.
 	 * @see FormExpressionParserTreeConstants
 	 */
 	public int jjtGetNodeId();
 
+	public String getEmbedment();
+
+	/**
+	 * @return A list of all comments in the program. Do not use with
+	 * until parsing is done.
+	 */
+	public List<Token> getComments();
+
+	public void jjtSetFirstToken(Token token);
+	public void jjtSetLastToken(Token token);
 }
