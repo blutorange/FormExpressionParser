@@ -43,7 +43,7 @@ package de.xima.fc.form.expression.grammar.html;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.context.IExternalContextCommand;
 import java.util.List;
-import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand.PositionedDocumentCommand;
+import de.xima.fc.form.expression.impl.contextcommand.PositionedDocumentCommand;
 
 public class HtmlParser
 {

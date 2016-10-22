@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.grammar.html;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 
@@ -93,14 +94,14 @@ public class Token implements java.io.Serializable {
 	/**
 	 * Constructs a new token for the specified Image.
 	 */
-	public Token(int kind) {
+	public Token(final int kind) {
 		this(kind, null);
 	}
 
 	/**
 	 * Constructs a new token for the specified Image and Kind.
 	 */
-	public Token(int kind, String image) {
+	public Token(final int kind, final String image) {
 		this.kind = kind;
 		this.image = image;
 	}
@@ -119,58 +120,93 @@ public class Token implements java.io.Serializable {
 	 * @param kind Token type.
 	 * @return Inserted token.
 	 */
-	public Token insertToken(int kind) {
+	public Token insertToken(final int kind) {
 		return insertToken(Token.newToken(kind));
 	}
-	
+
 	/**
 	 * Inserts the given token after this token and returns the inserted token for chaining.
 	 * @param kind Token type.
 	 * @param image Token image.
 	 * @return Inserted token.
 	 */
-	public Token insertToken(int kind, String image) {
+	public Token insertToken(final int kind, final String image) {
 		return insertToken(Token.newToken(kind, image));
 	}
-	
+
 	/**
 	 * Inserts the given token after this token and returns the inserted token for chaining.
 	 * @param token Token to insert.
 	 * @return Inserted token.
 	 */
-	public Token insertToken(Token token) {
+	public Token insertToken(final Token token) {
 		token.specialToken = null;
 		token.next = this.next;
 		token.prev = this;
 		if (this.next != null) this.next.prev = token;
 		this.next = token;
-
-		// Adjust position numbers.
-		// Html parser does not use special tokens.
-		if (token.next != null) {
-			int deltaLine = token.endLine-token.beginLine;
-			int deltaColumn = deltaLine == 0 ? token.endColumn-token.beginColumn : token.endColumn - 1;
-			token.beginColumn = token.prev.endColumn + 1;
-			token.beginLine = token.prev.endLine;
-			token.endLine = token.prev.endLine + deltaLine;
-			if (token.endLine == token.prev.endLine)
-				token.endColumn = token.beginColumn + deltaColumn; 
-			Token t = token;
-			while ((t=t.next) != null) {
-				if (t.beginLine != token.endLine) {
-					t.beginLine += deltaLine;
-					t.endLine += deltaLine;
-				}
-				else {
-					t.beginColumn += deltaColumn + 1;
-					if (t.endLine != t.beginLine) t.endColumn += deltaColumn + 1;
-				}
-			}
-		}
-
 		return token;
 	}
-	
+
+	public Token insertHtmlText(final String text) {
+		return text != null ? insertToken(HtmlParserConstants.htmlText, StringEscapeUtils.escapeHtml4(text)) : this;
+	}
+
+	public Token insertClosingTag(final String tagName) {
+		return tagName == null ? this : insertToken(HtmlParserConstants.tagBegin)
+				.insertToken(HtmlParserConstants.tagSlash)
+				.insertToken(HtmlParserConstants.tagName, tagName)
+				.insertToken(HtmlParserConstants.tagEnd);
+	}
+
+	public Token insertOpeningTagFragment(final String tagName) {
+		return tagName == null ? this
+				: insertToken(HtmlParserConstants.tagBegin).insertToken(HtmlParserConstants.tagName, tagName);
+	}
+
+	public Token insertOpeningTag(final String tagName, final String... attributes) {
+		if (tagName == null) return this;
+		Token t = insertOpeningTagFragment(tagName);
+		for (int i = 1; i < attributes.length; i += 2) {
+			t = t.insertAttribute(attributes[i-1], attributes[i]);
+		}
+		return t.insertToken(HtmlParserConstants.tagEnd);
+	}
+
+	public Token insertAttribute(final String name, final String value) {
+		if (name != null && value != null) {
+			return insertToken(HtmlParserConstants.tagWs, StringUtils.SPACE)
+					.insertToken(HtmlParserConstants.tagName, name)
+					.insertToken(HtmlParserConstants.tagEquals)
+					.insertToken(HtmlParserConstants.attvDoubleString, "\"" + StringEscapeUtils.escapeHtml4(value) + "\"");
+		}
+		return this;
+	}
+
+	/**
+	 * Sets the position (line and column) of this and the next tokens so that
+	 * they are continous.
+	 * @return This token for chaining.
+	 */
+	public Token rebuildPositions() {
+		Token token = this;
+		while ((token = token.next) != null) {
+			final int deltaLine = token.endLine - token.beginLine;
+			if (token.beginColumn <= 1) {
+				token.beginLine = token.prev.endLine + 1;
+			}
+			else {
+				final int deltaColumn = token.endColumn - token.beginColumn;
+				token.beginColumn = token.prev.endColumn + 1;
+				token.beginLine = token.prev.endLine;
+				if (deltaLine == 0)
+					token.endColumn = token.beginColumn + deltaColumn;
+			}
+			token.endLine = token.beginLine + deltaLine;
+		}
+		return this;
+	}
+
 	/**
 	 * Returns a new Token object, by default. However, if you want, you can
 	 * create and return subclass objects based on the value of ofKind. Simply
@@ -183,9 +219,10 @@ public class Token implements java.io.Serializable {
 	 * to the following switch statement. Then you can cast matchedToken
 	 * variable to the appropriate type and use sit in your lexical actions.
 	 */
-	public static Token newToken(int ofKind, String image) {
+	public static Token newToken(final int ofKind, final String image) {
 		final Token token = new Token(ofKind, image);
-		if (image != null && !image.isEmpty()) token.endColumn = image.length() - 1;
+		token.beginColumn = token.beginLine = token.endLine = token.endColumn = 2;
+		if (image != null && !image.isEmpty()) token.endColumn = image.length() + 1;
 		return token;
 	}
 
@@ -196,10 +233,10 @@ public class Token implements java.io.Serializable {
 	 * @param ofKind Node type.
 	 * @return The token.
 	 */
-	public static Token newToken(int ofKind) {
+	public static Token newToken(final int ofKind) {
 		String image = null;
 		if (ofKind >= 0 && ofKind < HtmlParserConstants.tokenImage.length) {
-			String literal = HtmlParserConstants.tokenImage[ofKind];
+			final String literal = HtmlParserConstants.tokenImage[ofKind];
 			if (literal.length() > 0 && literal.charAt(0) == '"' && literal.charAt(literal.length() - 1) == '"') {
 				image = StringEscapeUtils.unescapeJava(literal.substring(1, literal.length() - 1));
 			}

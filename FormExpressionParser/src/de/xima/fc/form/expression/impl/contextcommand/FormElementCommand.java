@@ -10,19 +10,17 @@ public class FormElementCommand extends AExternalContextCommand {
 		this.type = null;
 		this.data = null;
 	}
-	
+
 	@Override
 	public Object getData() {
 		return data;
 	}
-	
+
 	@Override
 	public EFormElementCommandType getType() {
 		return type;
 	}
-	
-	public static enum EFormElementCommandType {
-		;
-	}
 
+	public static enum EFormElementCommandType {
+	}
 }

@@ -7,7 +7,7 @@ public enum ESystemOutCommand implements IExternalContextCommand {
 	ENABLE_OUTPUT;
 
 	@Override
-	public <T extends IExternalContextCommand> T castOrNull(Class<T> clazz) {
+	public <T extends IExternalContextCommand> T castOrNull(final Class<T> clazz) {
 		return this.getClass().isAssignableFrom(clazz) ? clazz.cast(this) : null;
 	}
 
