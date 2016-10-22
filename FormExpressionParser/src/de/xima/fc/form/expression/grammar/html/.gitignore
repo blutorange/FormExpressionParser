@@ -3,7 +3,6 @@
 /HtmlParser.java
 /HtmlParserConstants.java
 /HtmlParserTokenManager.java
-/Token.java
 /SimpleCharStream.java
 /ParseException.java
 /TokenMgrError.java
