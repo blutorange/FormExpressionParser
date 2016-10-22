@@ -35,7 +35,7 @@ options {
   SUPPORT_CLASS_VISIBILITY_PUBLIC = true;
   STATIC = false;
   TOKEN_MANAGER_USES_PARSER = false;
-  TOKEN_EXTENDS = "AToken";
+  TOKEN_EXTENDS = "";
   TOKEN_FACTORY = "";
 }
 PARSER_BEGIN(HtmlParser)
@@ -43,7 +43,7 @@ package de.xima.fc.form.expression.grammar.html;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.context.IExternalContextCommand;
 import java.util.List;
-import de.xima.fc.form.expression.impl.contextcommand.EDocumentCommandPack.PositionedDocumentCommand;
+import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand.PositionedDocumentCommand;
 
 public class HtmlParser
 {
@@ -104,7 +104,7 @@ TOKEN :
 | < tagSlash : "/" >
 | < tagWs : ([ " ", "\r", "\t", "\n" ])+ >
 | < tagName : < tagNameCharStart > (< tagNameChar >)* >
-| < tagEquals : "=" (" ")* > : ATTVALUE
+| < tagEquals : "=" > : ATTVALUE
 | < #tagNameCharStart :
     [ "a"-"z", "A"-"Z" ]
   | [ "\u2070"-"\u218f" ]
@@ -130,7 +130,8 @@ TOKEN :
 < ATTVALUE >
 TOKEN :
 {
-  < attvAttribute :
+  < attvWs : (" ")+ >
+| < attvAttribute :
     < attvDoubleString >
   | < attvSingleString >
   | < attvChars > (["\"","'"])*
