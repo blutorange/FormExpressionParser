@@ -114,6 +114,8 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 				if (pdc.token != null && !pdc.token.isDetached)
 					insertA(pdc.token, pdc.command.getData()[0], pdc.command.getData()[1], pdc.command.getData()[2]);
 				break;
+			case NO_OP:
+				break;
 			default:
 				break;
 			}
@@ -165,27 +167,20 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 	}
 
 	private Token removePrevious(final Token initial, final Token token, final String tagName) {
-		final Token beg = seekToPrevOpeningTag(token, tagName);
+		final Token end = seekToPrevClosingTag(token, tagName);
+		if (end == null)
+			return initial;
+		final Token beg = seekToEnclosingOpeningTag(end.prev, tagName);
 		if (beg == null)
-			return initial;
-		Token end = seekToEnclosingClosingTag(beg, tagName);
-		if (end == null)
-			return initial;
-		end = seekToEndOfTag(end);
-		if (end == null)
 			return initial;
 		return removeTokens(initial, beg, end);
 	}
 
 	private Token removeEnclosing(final Token initial, final Token token, final String tagName) {
-		// search for opening <p>
 		final Token beg = seekToEnclosingOpeningTag(token, tagName);
 		if (beg == null)
 			return initial;
-		Token end = seekToEnclosingClosingTag(token, tagName);
-		if (end == null)
-			return initial;
-		end = seekToEndOfTag(end);
+		final Token end = seekToEnclosingClosingTag(token, tagName);
 		if (end == null)
 			return initial;
 		return removeTokens(initial, beg, end);
@@ -195,10 +190,7 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 		final Token beg = seekToNextOpeningTag(token, tagName);
 		if (beg == null)
 			return initial;
-		Token end = seekToEnclosingClosingTag(beg, tagName);
-		if (end == null)
-			return initial;
-		end = seekToEndOfTag(end);
+		final Token end = seekToEnclosingClosingTag(beg, tagName);
 		if (end == null)
 			return initial;
 		return removeTokens(initial, beg, end);
@@ -255,19 +247,17 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 	private Token seekToEnclosingOpeningTag(Token token, final String tagName) {
 		int count = 0;
 		while (true) {
-			if (isOpeningTag(token, tagName)) {
-				if (count == 0)
-					return token;
-				--count;
-			}
-			token = token.prev;
 			if (token == null)
 				return null;
-			if (isClosingTag(token, tagName))
+			else if (isOpeningTag(token, tagName) && --count == -1)
+				return token;
+			else if (isClosingTag(token, tagName))
 				++count;
+			token = token.prev;
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private Token seekToPrevOpeningTag(Token token, final String tagName) {
 		while (true) {
 			if (isOpeningTag(token, tagName))
@@ -277,12 +267,21 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 		}
 	}
 
+	private Token seekToPrevClosingTag(Token token, final String tagName) {
+		while (true) {
+			if (isClosingTag(token, tagName))
+				return token;
+			if ((token = token.prev) == null)
+				return null;
+		}
+	}
+
 	private Token seekToNextOpeningTag(Token token, final String tagName) {
 		while (true) {
-			if (isOpeningTag(token, tagName))
-				return token;
 			if ((token = token.next) == null)
 				return null;
+			if (isOpeningTag(token, tagName))
+				return token;
 		}
 	}
 
@@ -310,16 +309,13 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 	private Token seekToEnclosingClosingTag(Token token, final String tagName) {
 		int count = 0;
 		while (true) {
-			if (isClosingTag(token, tagName)) {
-				if (count == 0)
-					return token;
-				--count;
-			}
 			token = token.next;
 			if (token == null)
 				return null;
-			if (isOpeningTag(token, tagName))
+			else if (isOpeningTag(token, tagName))
 				++count;
+			if (isClosingTag(token, tagName) && --count == -1)
+				return token;
 		}
 	}
 
@@ -329,24 +325,13 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 	}
 
 	private boolean isClosingTag(final Token token, final String tagName) {
-		return token.kind == HtmlParserConstants.tagBegin && token.next != null
-				&& token.next.kind == HtmlParserConstants.tagSlash && token.next.next != null
-				&& token.next.next.kind == HtmlParserConstants.tagName && token.next.next.image.equals(tagName);
-	}
-
-	/**
-	 *
-	 * @param token
-	 *            Current token, assumed to be somewhere inside a tag.
-	 * @return A token of kind {@link HtmlParserConstants#tagEnd} closing the
-	 *         current tag.
-	 */
-	private Token seekToEndOfTag(Token token) {
-		do {
-			if (token.kind == HtmlParserConstants.tagEnd)
-				return token;
-		} while ((token = token.next) != null);
-		return null;
+		final Token t;
+		// Almost always, the first check will return false, so we do not need to check all these conditions all the time.
+		return token.kind == HtmlParserConstants.tagEnd && token.prev != null
+				&& (t = token.prev.kind == HtmlParserConstants.tagWs ? token.prev.prev : token.prev) != null
+				&& t.kind == HtmlParserConstants.tagName && t.prev != null
+				&& t.prev.kind == HtmlParserConstants.tagSlash && t.prev.prev != null
+				&& t.prev.prev.kind == HtmlParserConstants.tagBegin && tagName.equals(t.image);
 	}
 
 	protected abstract void output(String html) throws EmbedmentOutputException;

@@ -8,7 +8,7 @@ public enum MathScope implements ICustomScope {
 	INSTANCE
 	;
 	@Override
-	public ALangObject fetch(String variableName) {
+	public ALangObject fetch(final String variableName) {
 		//TODO
 		return null;
 	}

@@ -32,11 +32,6 @@ public class DocumentCommand extends AExternalContextCommand {
 			throw new IllegalArgumentException(
 					String.format("Document command of type %s requires %d arguments, but %d were given: %s.", type,
 							new Integer(type.argc), new Integer(data.length), StringUtils.join(data, ',')));
-		for (int i = data.length; i --> 0; )
-			if (data[i] == null)
-				throw new IllegalArgumentException(
-						String.format("Datum at index %d for document command of type %s must not be null: %s.",
-								new Integer(i), type, StringUtils.join(data, ',')));
 	}
 
 	@Override
@@ -61,46 +56,51 @@ public class DocumentCommand extends AExternalContextCommand {
 		return InstanceHolder.REMOVE_ENCLOSING_TABLE_ROW;
 	}
 
+	public static DocumentCommand getNoOpInstance() {
+		return InstanceHolder.NO_OP;
+	}
+
 	public static DocumentCommand newInsertLink(final String href, final String text, final String target) {
 		return new DocumentCommand(EDocumentCommandType.INSERT_LINK, href, text, target);
 	}
 
 	public static DocumentCommand newRemoveEnclosingTag(final String tagName) {
-		return new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, tagName);
+		return tagName == null ? getNoOpInstance() : new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, tagName);
 	}
 
 	public static DocumentCommand newRemovePreviousTag(final String tagName) {
-		return new DocumentCommand(EDocumentCommandType.REMOVE_PREVIOUS_TAG, tagName);
+		return tagName == null ? getNoOpInstance() : new DocumentCommand(EDocumentCommandType.REMOVE_PREVIOUS_TAG, tagName);
 	}
 
 	public static DocumentCommand newRemoveNextTag(final String tagName) {
-		return new DocumentCommand(EDocumentCommandType.REMOVE_NEXT_TAG, tagName);
+		return tagName == null ? getNoOpInstance() : new DocumentCommand(EDocumentCommandType.REMOVE_NEXT_TAG, tagName);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s(%s)", type, data);
+		return String.format("%s(%s)", type, StringUtils.join(data, ','));
 	}
 
 	public static enum EDocumentCommandType {
 		/**
-		 * @param tagName Name of the tag to remove
+		 * @param tagName Name of the tag to remove. May be null.
 		 */
 		REMOVE_ENCLOSING_TAG(1),
 		/**
-		 * @param tagName Name of the tag to remove
+		 * @param tagName Name of the tag to remove. May be null.
 		 */
 		REMOVE_PREVIOUS_TAG(1),
 		/**
-		 * @param tagName Name of the tag to remove
+		 * @param tagName Name of the tag to remove. May be null.
 		 */
 		REMOVE_NEXT_TAG(1),
 		/**
-		 * @param href Hyperlink.
-		 * @param text Link text.
-		 * @param target Link target.
+		 * @param href Hyperlink. Can be null.
+		 * @param text Link text. Can be null.
+		 * @param target Link target. Can be null.
 		 */
 		INSERT_LINK(3),
+		NO_OP(0)
 		;
 		public final int argc;
 		private EDocumentCommandType(final int argc) {
@@ -112,5 +112,6 @@ public class DocumentCommand extends AExternalContextCommand {
 		public final static DocumentCommand REMOVE_ENCLOSING_PARAGRAPH = new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, "p");
 		public final static DocumentCommand REMOVE_ENCLOSING_TABLE = new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, "table");
 		public final static DocumentCommand REMOVE_ENCLOSING_TABLE_ROW = new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, "tr");
+		public final static DocumentCommand NO_OP = new DocumentCommand(EDocumentCommandType.NO_OP);
 	}
 }

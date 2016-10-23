@@ -41,6 +41,7 @@ public class NumberLangObject extends ALangObject {
 	private static class InstanceHolder {
 		public final static NumberLangObject ZERO = NumberLangObject.create(0);
 		public final static NumberLangObject ONE = NumberLangObject.create(1);
+		public static final NumberLangObject FOURTY_TWO = NumberLangObject.create(42);
 	}
 
 	private NumberLangObject(final double value) {
@@ -361,4 +362,7 @@ public class NumberLangObject extends ALangObject {
 		return InstanceHolder.ONE;
 	}
 
+	public static NumberLangObject getFourtyTwoInstance() {
+		return InstanceHolder.FOURTY_TWO;
+	}
 }

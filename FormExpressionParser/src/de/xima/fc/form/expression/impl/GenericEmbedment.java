@@ -32,16 +32,17 @@ public class GenericEmbedment implements IEmbedment {
 	private String currentEmbedment;
 	@Nullable
 	private String handlerEmbedment;
-   
+
 	private final static class InstanceHolder {
 		public final static GenericEmbedment GENERIC = new Builder()
 				.addHandler(EmbedmentHandlerBundleGeneral.values())
 				.build();
 		public final static GenericEmbedment FORMCYCLE = new Builder()
-				.addHandler(EmbedmentHandlerBundleGeneral.values()).addHandler(EmbedmentHandlerBundleFormcycle.values())
+				.addHandler(EmbedmentHandlerBundleGeneral.values())
+				.addHandler(EmbedmentHandlerBundleFormcycle.values())
 				.build();
 	}
-	
+
 	private GenericEmbedment(final ImmutableMap<String, IEmbedmentHandler> map) throws IllegalArgumentException {
 		if (map == null) throw new IllegalArgumentException("map must not be null");
 		this.map = map;
@@ -92,7 +93,7 @@ public class GenericEmbedment implements IEmbedment {
 	public void setCurrentEmbedment(final String embedment) throws EvaluationException {
 		currentEmbedment = embedment;
 	}
-	
+
 	private IEmbedmentHandler getHandler() {
 		if (currentEmbedment == null) return null;
 		if (currentEmbedment.equals(handlerEmbedment)) return handler;
@@ -100,15 +101,15 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	private void output(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
-		final IExternalContext external = ec.getExternalContext(); 
+		final IExternalContext external = ec.getExternalContext();
 		if (external != null) external.write(data);
 	}
-	
+
 	@Override
 	public void outputText(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
 		output(data, ec);
 	}
-	
+
 	@Override
 	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
 		final IEmbedmentHandler handler = getHandler();
@@ -136,5 +137,5 @@ public class GenericEmbedment implements IEmbedment {
 	public String[] getScopeList() {
 		final IEmbedmentHandler handler = getHandler();
 		return handler != null ? handler.getScopeList() : ArrayUtils.EMPTY_STRING_ARRAY;
-	}		
+	}
 }

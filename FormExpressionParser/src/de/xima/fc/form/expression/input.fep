@@ -1,6 +1,6 @@
 <html>
 <h1>Test</h1>
 <p>
-[%%= "hello".toLowerCase()%]
+[%%= math::foo%]
 </p>
 </h1>
