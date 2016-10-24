@@ -653,7 +653,7 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(CmnCnst.SYNTAX_LAMBDA_ARROW);
 		// Function argument (foo, bar)
 		writer.write(CmnCnst.SYNTAX_PAREN_OPEN);
-		for (int i = 0; i < len - 1; ++i) {
+		for (int i = node.isHasReturnTypeDeclaration() ? 1 : 0; i < len - 1; ++i) {
 			expression(node.jjtGetChild(i), prefix);
 			if (len != 2 && i < len - 2) {
 				writer.write(CmnCnst.SYNTAX_COMMA);
@@ -841,13 +841,13 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 
 	@Override
 	public Void visit(final ASTVariableTypeDeclarationNode node, final String data) throws IOException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		System.err.println("to be implemented");
+		return null;
 	}
 
 	@Override
 	public Void visit(final ASTCompoundVariableTypeDeclarationNode node, final String data) throws IOException {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		System.err.println("to be implemented");
+		return null;
 	}
 }

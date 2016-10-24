@@ -5,6 +5,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.A
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleCloseEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleOpen;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleOpenEqual;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BackslashQuotedRegex;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Bar;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BarEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BracesClose;
@@ -67,7 +68,6 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.P
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Plus;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PlusEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.QuestionMark;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Regex;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SemiColon;
@@ -84,7 +84,13 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.T
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Try;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.While;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.With;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Boolean;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Error;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Exception;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Hash;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Number;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Regex;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__String;
 
 /**
  * Groups several similar tokens and allows you to specify a style
@@ -144,7 +150,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LambdaArrow:
 			return getStyleLambdaLiteral();
 
-		case Regex:
+		case BackslashQuotedRegex:
 			return getStyleRegexLiteral();
 
 		case DoubleQuotedString:
@@ -221,11 +227,20 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case MultiLineCommentClose:
 			return getStyleComment();
 
+		case __Boolean:
+		case __Exception:
+		case __Hash:
+		case __Number:
+		case __Regex:
+		case __String:
+			return getStyleTypeDeclaration();
+
 		default:
 			return null;
 		}
 	}
 
+	protected abstract Style getStyleTypeDeclaration();
 	protected abstract Style getStyleKeyword();
 	protected abstract Style getStyleIdentifier();
 	/** @return Style for identifiers after a dot, eg. <code>myVar.someAttribute()</code>.*/

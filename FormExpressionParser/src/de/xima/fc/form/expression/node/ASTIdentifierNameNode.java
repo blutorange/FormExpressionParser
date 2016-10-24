@@ -19,7 +19,6 @@ public class ASTIdentifierNameNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method, final String name) throws ParseException {
-		assertChildrenExactly(0);
 		super.init(method);
 		this.name = name;
 	}

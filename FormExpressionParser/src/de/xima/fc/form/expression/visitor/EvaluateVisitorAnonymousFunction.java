@@ -18,12 +18,14 @@ class EvaluateVisitorAnonymousFunction implements IFunction<NullLangObject> {
 	private final EvaluateVisitor visitor;
 	private final Node body;
 	private final String[] argList;
-	public EvaluateVisitorAnonymousFunction(final EvaluateVisitor visitor, final ASTFunctionNode node, final IEvaluationContext ec) {
+
+	public EvaluateVisitorAnonymousFunction(final EvaluateVisitor visitor, final ASTFunctionNode node,
+			final IEvaluationContext ec) {
 		this.visitor = visitor;
 		final Node[] children = node.getChildArray();
-		body = children[children.length-1];
-		argList = new String[children.length-1];
-		for (int i=0; i != argList.length; ++i)
+		body = children[children.length - 1];
+		argList = new String[children.length - 1];
+		for (int i = node.isHasReturnTypeDeclaration() ? 1 : 0; i != argList.length; ++i)
 			argList[i] = children[i].jjtAccept(visitor, ec).coerceString(ec).stringValue();
 	}
 

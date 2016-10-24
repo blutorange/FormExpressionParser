@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.highlight.IHighlightTheme;
 import de.xima.fc.form.expression.highlight.Style;
 import de.xima.fc.form.expression.highlight.Weight;
 
-public class HighlightThemeEclipse extends ABasicHighlightTheme {	
+public class HighlightThemeEclipse extends ABasicHighlightTheme {
 	private final static class InstanceHolder {
 		public final static HighlightThemeEclipse INSTANCE = new HighlightThemeEclipse();
 	}
@@ -89,5 +89,9 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 	}
 	public static IHighlightTheme getInstance() {
 		return InstanceHolder.INSTANCE;
+	}
+	@Override
+	protected Style getStyleTypeDeclaration() {
+		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
 	}
 }

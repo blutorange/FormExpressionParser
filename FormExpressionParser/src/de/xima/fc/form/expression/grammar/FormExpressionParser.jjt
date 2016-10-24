@@ -283,7 +283,7 @@ TOKEN :
 | 
   < Case : "case" >
 | 
-  < Hash : "hash" >
+  < __Hash : "hash" >
 |
   < True : "true" >
 | 
@@ -291,7 +291,7 @@ TOKEN :
 | 
   < Break : "break" >
 | 
-  < Regex : "regex" >
+  < __Regex : "regex" >
 | 
   < While : "while" >
 | 
@@ -303,15 +303,15 @@ TOKEN :
 | 
   < False : "false" >
 | 
-  < Number : "number" >
+  < __Number : "number" >
 | 
   < Return : "return" >
 | 
-  < String : "string" >
+  < __String : "string" >
 | 
   < Switch : "switch" >
 | 
-  < Boolean : "boolean" >
+  < __Boolean : "boolean" >
 | 
   < LogInfo : "loginfo" >
 | 
@@ -527,11 +527,11 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
 }
 {
   (
-    < Function > VariableWithOptionalScope(null) < ParenOpen >
+    < Function > (TypeDeclaredVariableWithOptionalScope(null) | VariableWithOptionalScope(null)) < ParenOpen >
     (
-      [ IdentifierName(null) ]
+      [ IdentifierNameWithOptionalTypeDeclaration(null) ]
       (
-        < Comma > IdentifierName(null)
+        < Comma > IdentifierNameWithOptionalTypeDeclaration(null)
       )*
     )
     < ParenClose >
@@ -872,7 +872,7 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
 }
 {
   (
-    TernaryExpression(method)
+    ( TernaryExpression(method) | TypeDeclaredVariableWithOptionalScope(method) )
     (
       (
         < Equal >
@@ -1383,6 +1383,21 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
   }
 }
 
+void IdentifierNameWithOptionalTypeDeclaration(EMethod method) #IdentifierNameNode :
+{
+  Token t;
+  
+}
+{
+  (
+    [VariableTypeDeclaration(null)] t = < Identifier >
+  )
+  {
+    jjtThis.init(method, t.image);
+    
+  }
+}
+
 void FunctionArgumentList(EMethod method) #ArrayNode :
 {
   
@@ -1641,25 +1656,29 @@ void Exception(EMethod method) #ExceptionNode :
 
 void Function(EMethod method) #FunctionNode :
 {
-  
+  boolean hasReturnTypeDeclaration = false;
 }
 {
   (
-    < LambdaArrow > < ParenOpen >
+    < LambdaArrow >
+    [
+      VariableTypeDeclaration(null)
+      {
+        hasReturnTypeDeclaration = true;
+      }
+    ]
+    < ParenOpen >
     (
-      [ IdentifierName(null) ]
+      [ IdentifierNameWithOptionalTypeDeclaration(null) ]
       (
-        < Comma > IdentifierName(null)
+        < Comma > IdentifierNameWithOptionalTypeDeclaration(null)
       )*
     )
-    < ParenClose >
-    (
-      Block(null)
-    )
+    < ParenClose > 
+    Block(null)
   )
   {
-    jjtThis.init(method);
-    
+    jjtThis.init(method, hasReturnTypeDeclaration);
   }
 }
 
@@ -1701,21 +1720,22 @@ void VariableTypeDeclaration(EMethod method) #CompoundVariableTypeDeclarationNod
 }
 {
   (
-	(
-	   BooleanTypeDeclaration(method)
-	 | NumberTypeDeclaration(method)
-	 | StringTypeDeclaration(method)
-	 | RegexTypeDeclaration(method)
-	 | ExceptionTypeDeclaration(method)
-	 | HashTypeDeclaration(method)
-	 | FunctionTypeDeclaration(method)
-	)
-	(	  ArrayTypeDeclaration(null) | FunctionTypeDeclaration(null)
-	)*
+    (
+      BooleanTypeDeclaration(method)
+    | NumberTypeDeclaration(method)
+    | StringTypeDeclaration(method)
+    | RegexTypeDeclaration(method)
+    | ExceptionTypeDeclaration(method)
+    | HashTypeDeclaration(method)
+    )
+    (
+      ArrayTypeDeclaration(null)
+    | FunctionTypeDeclaration(null)
+    )*
   )
   {
-    if (jjtree.nodeCreated())
-      jjtThis.init(method);
+    if (jjtree.nodeCreated()) 
+    jjtThis.init(method);
   }
 }
 
@@ -1723,60 +1743,62 @@ void BooleanTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
 {
-  ( < Boolean > )
+  (< __Boolean >)
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.BOOLEAN);
-  } 
+  }
 }
 
 void NumberTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
 {
-  ( < Number > )
+  (< __Number >)
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.NUMBER);
-  } 
+  }
 }
 
 void StringTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
 {
-  ( < String > )
+  (< __String >)
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.STRING);
-  } 
+  }
 }
 
 void RegexTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
 {
-  ( < Regex > )
+  (< __Regex >)
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.REGEX);
-  } 
+  }
 }
 
 void ExceptionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
 {
-  ( < __Exception > )
+  (< __Exception >)
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.EXCEPTION);
-  } 
+  }
 }
 
 void HashTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
 {
-  ( < Hash > <AngleOpen > VariableTypeDeclaration(null) < AngleClose >)
+  (
+    < __Hash > < BracesOpen > VariableTypeDeclaration(null) < Comma > VariableTypeDeclaration(null) < BracesClose >
+  )
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.HASH);
-  } 
+  }
 }
 
 void ArrayTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
@@ -1784,11 +1806,11 @@ void ArrayTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 }
 {
   (
-    < BracketOpen > < BracketClose >
+  < BracketOpen > < BracketClose >
   )
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.ARRAY);
-  } 
+  }
 }
 
 void FunctionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
@@ -1796,9 +1818,33 @@ void FunctionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 }
 {
   (
-    < ParenOpen > [ VariableTypeDeclaration(null) (< Comma > VariableTypeDeclaration(null))* ] < ParenClose >
+    < BracesOpen >
+    [
+      VariableTypeDeclaration(null)
+      (
+        < Comma > VariableTypeDeclaration(null)
+      )*
+    ]
+    < BracesClose >
   )
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.FUNCTION);
-  } 
+  }
+}
+
+void TypeDeclaredVariableWithOptionalScope(EMethod method) #VariableNode :
+{
+  Token part1;
+  Token part2 = null;
+}
+{
+  (
+    VariableTypeDeclaration(null) part1 = < Identifier > [ < ScopeSeparator > part2 = < Identifier > ]
+  )
+  {
+    if (part2 == null) 
+    jjtThis.init(method, null, part1.image);
+    else 
+    jjtThis.init(method, part1.image, part2.image);
+  }
 }

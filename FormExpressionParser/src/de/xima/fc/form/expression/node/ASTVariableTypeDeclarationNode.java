@@ -18,6 +18,12 @@ public class ASTVariableTypeDeclarationNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
+	protected void additionalToStringFields(final StringBuilder sb) {
+		sb.append(type).append(",");
+	}
+
+
 	public void init(final EMethod method, final Type type) throws ParseException {
 		super.init(method);
 		this.type = type;
