@@ -9,7 +9,7 @@ public class ASTBooleanNode extends SimpleNode {
 
 	private boolean booleanValue;
 
-	public ASTBooleanNode(FormExpressionParser parser, final int id) {
+	public ASTBooleanNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
@@ -17,7 +17,7 @@ public class ASTBooleanNode extends SimpleNode {
 	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append((booleanValue ? "true)" : "false)")).append(",");
 	}
-	
+
 	@Override
 	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
 		return visitor.visit(this, data);
@@ -25,7 +25,7 @@ public class ASTBooleanNode extends SimpleNode {
 
 	public void init(final EMethod method, final boolean b) throws ParseException {
 		booleanValue = b;
-		siblingMethod = method;
+		super.init(method);
 	}
 
 	public boolean getBooleanValue() {

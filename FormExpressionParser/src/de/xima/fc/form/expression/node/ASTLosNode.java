@@ -10,14 +10,14 @@ public class ASTLosNode extends SimpleNode {
 	private String text;
 	private String open;
 	private boolean hasClose;
-	
-	public ASTLosNode(FormExpressionParser parser, int nodeId) {
+
+	public ASTLosNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
 	public void init(final EMethod method, final String text, final String open, final boolean hasClose) throws ParseException {
 		assertChildrenExactly(0);
-		siblingMethod = method;
+		super.init(method);
 		this.text = text;
 		this.open = open;
 		this.hasClose = hasClose;

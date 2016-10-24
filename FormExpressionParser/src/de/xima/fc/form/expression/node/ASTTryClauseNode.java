@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTTryClauseNode extends SimpleNode {
 
-	public ASTTryClauseNode(FormExpressionParser parser, int nodeId) {
+	public ASTTryClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -21,7 +21,7 @@ public class ASTTryClauseNode extends SimpleNode {
 
 	public void init(final EMethod method, final String errorVariableName) throws ParseException {
 		assertChildrenExactly(2);
-		siblingMethod = method;
+		super.init(method);
 		this.errorVariableName = errorVariableName;
 	}
 

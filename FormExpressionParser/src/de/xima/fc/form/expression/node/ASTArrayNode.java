@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTArrayNode extends SimpleNode {
-	public ASTArrayNode(FormExpressionParser parser, final int id) {
+	public ASTArrayNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
@@ -15,7 +15,8 @@ public class ASTArrayNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
-		siblingMethod = method;
+		super.init(method);
 	}
 }

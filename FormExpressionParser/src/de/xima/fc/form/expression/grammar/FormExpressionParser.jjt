@@ -283,23 +283,35 @@ TOKEN :
 | 
   < Case : "case" >
 | 
+  < Hash : "hash" >
+|
   < True : "true" >
 | 
   < Null : "null" >
 | 
   < Break : "break" >
 | 
+  < Regex : "regex" >
+| 
   < While : "while" >
 | 
   < Catch : "catch" >
+| 
+  < __Error : "error" >
 | 
   < Throw : "throw" >
 | 
   < False : "false" >
 | 
+  < Number : "number" >
+| 
   < Return : "return" >
 | 
+  < String : "string" >
+| 
   < Switch : "switch" >
+| 
+  < Boolean : "boolean" >
 | 
   < LogInfo : "loginfo" >
 | 
@@ -315,7 +327,7 @@ TOKEN :
 | 
   < LogDebug : "logdebug" >
 | 
-  < Exception : "exception" >
+  < __Exception : "exception" >
 | 
   < Identifier : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
 | 
@@ -345,7 +357,7 @@ TOKEN :
     )*
     "'" >
 |
-  < Regex :
+  < BackslashQuotedRegex :
     "#"
     (
       ("\\" ~[ ])
@@ -416,7 +428,7 @@ void LosOpen(EMethod method) #LosNode :
   )
   {
     if (!_customLosAllowed) throw new ParseException(
-      String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
+      java.lang.String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
     jjtThis.init(method, StringUtils.EMPTY, t.image, false);
     
   }
@@ -443,7 +455,7 @@ void LosBody(EMethod method) #LosNode :
   )
   {
     if (!_customLosAllowed) throw new ParseException(
-      String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
+      java.lang.String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
     jjtThis.init(method, sb.toString(), p != null ? p.image : null, true);
     
   }
@@ -1413,6 +1425,7 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
   }
 }
 
+
 void VariableWithOptionalScope(EMethod method) #VariableNode :
 {
   Token part1;
@@ -1618,7 +1631,7 @@ void Exception(EMethod method) #ExceptionNode :
 }
 {
   (
-    < Exception > < ParenOpen > Expression(null) < ParenClose >
+    < __Error > < ParenOpen > Expression(null) < ParenClose >
   )
   {
     jjtThis.init(method);
@@ -1660,7 +1673,7 @@ void Regex(EMethod method) #RegexNode :
 }
 {
   (
-    t = < Regex >  )
+    t = < BackslashQuotedRegex >  )
   {
     
     jjtThis.init(method, t.image);
@@ -1681,4 +1694,111 @@ void Literal(EMethod method) #void :
 | Log(method)
 | Function(method)
 | Exception(method)
+}
+
+void VariableTypeDeclaration(EMethod method) #CompoundVariableTypeDeclarationNode(>1) :
+{
+}
+{
+  (
+	(
+	   BooleanTypeDeclaration(method)
+	 | NumberTypeDeclaration(method)
+	 | StringTypeDeclaration(method)
+	 | RegexTypeDeclaration(method)
+	 | ExceptionTypeDeclaration(method)
+	 | HashTypeDeclaration(method)
+	 | FunctionTypeDeclaration(method)
+	)
+	(	  ArrayTypeDeclaration(null) | FunctionTypeDeclaration(null)
+	)*
+  )
+  {
+    if (jjtree.nodeCreated())
+      jjtThis.init(method);
+  }
+}
+
+void BooleanTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  ( < Boolean > )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.BOOLEAN);
+  } 
+}
+
+void NumberTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  ( < Number > )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.NUMBER);
+  } 
+}
+
+void StringTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  ( < String > )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.STRING);
+  } 
+}
+
+void RegexTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  ( < Regex > )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.REGEX);
+  } 
+}
+
+void ExceptionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  ( < __Exception > )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.EXCEPTION);
+  } 
+}
+
+void HashTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  ( < Hash > <AngleOpen > VariableTypeDeclaration(null) < AngleClose >)
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.HASH);
+  } 
+}
+
+void ArrayTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  (
+    < BracketOpen > < BracketClose >
+  )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.ARRAY);
+  } 
+}
+
+void FunctionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  (
+    < ParenOpen > [ VariableTypeDeclaration(null) (< Comma > VariableTypeDeclaration(null))* ] < ParenClose >
+  )
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.FUNCTION);
+  } 
 }

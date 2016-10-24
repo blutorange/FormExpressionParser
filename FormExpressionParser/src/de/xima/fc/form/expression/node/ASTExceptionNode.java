@@ -6,16 +6,17 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTExceptionNode extends SimpleNode {
-	public ASTExceptionNode(FormExpressionParser parser, final int id) {
+	public ASTExceptionNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
 	/**
 	 * @param delimiter Character which delimits the string. " or '
 	 */
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenExactly(1);
-		siblingMethod = method;
+		super.init(method);
 	}
 
 

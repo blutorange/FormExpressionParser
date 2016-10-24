@@ -3,21 +3,27 @@ package de.xima.fc.form.expression.node;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTExpressionNode extends SimpleNode {
-	public ASTExpressionNode(final FormExpressionParser parser, final int id) {
-		super(parser, id);
-	}
+public class ASTVariableTypeDeclarationNode extends SimpleNode {
+	private Type type;
 
-	@Override
-	public void init(final EMethod method) throws ParseException {
-		assertChildrenAtLeast(1);
-		super.init(method);
+	public ASTVariableTypeDeclarationNode(final FormExpressionParser parser, final int nodeId) {
+		super(parser, nodeId);
 	}
 
 	@Override
 	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
 		return visitor.visit(this, data);
+	}
+
+	public void init(final EMethod method, final Type type) throws ParseException {
+		super.init(method);
+		this.type = type;
+	}
+
+	public Type getType() {
+		return type;
 	}
 }

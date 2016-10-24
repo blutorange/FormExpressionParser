@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTContinueClauseNode extends SimpleNode {
 	private String label;
 
-	public ASTContinueClauseNode(FormExpressionParser parser, final int id) {
+	public ASTContinueClauseNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
@@ -19,7 +19,7 @@ public class ASTContinueClauseNode extends SimpleNode {
 
 	public void init(final EMethod method, final String label) throws ParseException {
 		assertChildrenExactly(0);
-		siblingMethod = method;
+		super.init(method);
 		this.label = label;
 	}
 

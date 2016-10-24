@@ -9,7 +9,7 @@ public class ASTSwitchClauseNode extends SimpleNode {
 
 	private String label;
 
-	public ASTSwitchClauseNode(FormExpressionParser parser, final int nodeId) {
+	public ASTSwitchClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -25,7 +25,7 @@ public class ASTSwitchClauseNode extends SimpleNode {
 
 	public void init(final EMethod method, final String label) throws ParseException {
 		assertChildrenAtLeast(1);
-		siblingMethod = method;
+		super.init(method);
 		this.label = label;
 	}
 

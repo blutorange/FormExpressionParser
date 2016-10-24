@@ -8,13 +8,14 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTTernaryExpressionNode extends SimpleNode {
 
 
-	public ASTTernaryExpressionNode(FormExpressionParser parser, int nodeId) {
+	public ASTTernaryExpressionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenExactly(3);
-		this.siblingMethod = method;
+		super.init(method);
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTStatementListNode extends SimpleNode {
 
-	public ASTStatementListNode(FormExpressionParser parser, int nodeId) {
+	public ASTStatementListNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -16,8 +16,9 @@ public class ASTStatementListNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
-		siblingMethod = method;
+		super.init(method);
 	}
 
 }

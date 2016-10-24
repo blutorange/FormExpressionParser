@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTReturnClauseNode extends SimpleNode {
-	public ASTReturnClauseNode(FormExpressionParser parser, int nodeId) {
+	public ASTReturnClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -15,8 +15,9 @@ public class ASTReturnClauseNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenBetween(0, 1);
-		siblingMethod = method;
+		super.init(method);
 	}
 }

@@ -31,7 +31,7 @@ public abstract class SimpleNode implements Node {
 	 * the node is created, but might be filled later, but it will
 	 * be filled once parsing is done.
 	 */
-	private List<Token> comments;
+	private final List<Token> comments;
 	protected String embedment;
 	/** ID of the node type. See {@link FormExpressionParserTreeConstants#jjtNodeName}. */
 	protected int nodeId;
@@ -40,7 +40,7 @@ public abstract class SimpleNode implements Node {
 	/** Children of this node, non-null. */
 	protected Node[] children = EMPTY_NODE_ARRAY;
 	/** Used during evaluation. */
-	protected EMethod siblingMethod;
+	private EMethod siblingMethod;
 	/** Line numbers for tracing etc. */
 	private int beginLine=1,beginColumn=1,endLine=1,endColumn=1;
 
@@ -48,7 +48,7 @@ public abstract class SimpleNode implements Node {
 	 * @param nodeId
 	 *            Node id. Not needed (yet).
 	 */
-	public SimpleNode(FormExpressionParser parser, final int nodeId) {
+	public SimpleNode(final FormExpressionParser parser, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
@@ -262,7 +262,7 @@ public abstract class SimpleNode implements Node {
 	public final List<Token> getComments() {
 		return comments;
 	}
-	
+
 	@Override
 	public final int getStartLine() {
 		return beginLine;
@@ -282,15 +282,15 @@ public abstract class SimpleNode implements Node {
 	public final int getEndColumn() {
 		return endColumn;
 	}
-	
+
 	@Override
-	public void jjtSetFirstToken(Token token) {
+	public void jjtSetFirstToken(final Token token) {
 		beginLine = token.beginLine;
 		beginColumn = token.beginColumn;
 	}
-	
+
 	@Override
-	public void jjtSetLastToken(Token token) {
+	public void jjtSetLastToken(final Token token) {
 		endLine = token.endLine;
 		endColumn = token.endColumn;
 	}
@@ -351,5 +351,9 @@ public abstract class SimpleNode implements Node {
 				throw new ParseException(msg);
 			}
 		}
+	}
+
+	public void init(final EMethod method) throws ParseException {
+		this.siblingMethod = method;
 	}
 }

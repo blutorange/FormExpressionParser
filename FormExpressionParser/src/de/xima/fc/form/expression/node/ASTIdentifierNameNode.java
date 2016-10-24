@@ -8,8 +8,8 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTIdentifierNameNode extends SimpleNode {
 
 	private String name;
-	
-	public ASTIdentifierNameNode(FormExpressionParser parser, int nodeId) {
+
+	public ASTIdentifierNameNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -18,18 +18,18 @@ public class ASTIdentifierNameNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(EMethod method, String name) throws ParseException {
+	public void init(final EMethod method, final String name) throws ParseException {
 		assertChildrenExactly(0);
-		siblingMethod = method;
+		super.init(method);
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	@Override
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append(name).append(",");
 	}
 }

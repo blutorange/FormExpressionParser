@@ -6,9 +6,9 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTThrowClauseNode extends SimpleNode {
-	
 
-	public ASTThrowClauseNode(FormExpressionParser parser, int nodeId) {
+
+	public ASTThrowClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -17,8 +17,9 @@ public class ASTThrowClauseNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenExactly(1);
-		siblingMethod = method;
+		super.init(method);
 	}
 }

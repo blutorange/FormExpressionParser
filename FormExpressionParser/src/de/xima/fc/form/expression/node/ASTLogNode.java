@@ -8,17 +8,17 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTLogNode extends SimpleNode {
 	private ELogLevel logLevel;
-	
-	public ASTLogNode(FormExpressionParser parser, final int id) {
+
+	public ASTLogNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
 	/**
 	 * @param delimiter Character which delimits the string. " or '
 	 */
-	public void init(final EMethod method, ELogLevel logLevel) throws ParseException {
+	public void init(final EMethod method, final ELogLevel logLevel) throws ParseException {
 		assertChildrenExactly(1);
-		siblingMethod = method;
+		super.init(method);
 		this.logLevel = logLevel;
 	}
 
@@ -29,10 +29,10 @@ public class ASTLogNode extends SimpleNode {
 
 
 	@Override
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append(logLevel).append(",");
 	}
-	
+
 	public ELogLevel getLogLevel() {
 		return logLevel;
 	}

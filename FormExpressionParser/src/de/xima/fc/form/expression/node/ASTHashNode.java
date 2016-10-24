@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTHashNode extends SimpleNode {
 
-	public ASTHashNode(FormExpressionParser parser, final int id) {
+	public ASTHashNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
@@ -16,9 +16,10 @@ public class ASTHashNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenEven();
-		siblingMethod = method;
+		super.init(method);
 	}
 
 }

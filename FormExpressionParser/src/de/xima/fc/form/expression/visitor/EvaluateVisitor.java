@@ -24,6 +24,7 @@ import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
+import de.xima.fc.form.expression.node.ASTCompoundVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
@@ -53,6 +54,7 @@ import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.node.ASTVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -887,5 +889,15 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		}
 
 		return res;
+	}
+
+	@Override
+	public ALangObject visit(final ASTVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
+		throw new UncatchableEvaluationException(ec, "ASTVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
+	}
+
+	@Override
+	public ALangObject visit(final ASTCompoundVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
+		throw new UncatchableEvaluationException(ec, "ASTVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
 	}
 }

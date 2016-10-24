@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTUnaryExpressionNode extends SimpleNode {
 
-	public ASTUnaryExpressionNode(FormExpressionParser parser, int nodeId) {
+	public ASTUnaryExpressionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -17,7 +17,7 @@ public class ASTUnaryExpressionNode extends SimpleNode {
 		assertChildrenExactly(1);
 		if (unary != null && unary.isAssigning())
 			assertChildrenAssignable(0, 1, "prefix operation");
-		siblingMethod = method;
+		super.init(method);
 		unaryMethod = unary;
 	}
 

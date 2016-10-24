@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
+import de.xima.fc.form.expression.node.ASTCompoundVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
@@ -36,6 +37,7 @@ import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.node.ASTVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
@@ -246,14 +248,26 @@ public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<V
 	}
 
 	@Override
-	public Void visit(ASTPostUnaryExpressionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTPostUnaryExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Void visit(ASTComparisonExpressionNode node, IEvaluationContext data) throws EvaluationException {
+	public Void visit(final ASTComparisonExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Void visit(final ASTVariableTypeDeclarationNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
+	}
+
+	@Override
+	public Void visit(final ASTCompoundVariableTypeDeclarationNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
 	}
 }

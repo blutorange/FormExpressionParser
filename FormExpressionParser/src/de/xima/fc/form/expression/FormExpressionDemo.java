@@ -25,6 +25,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 /**
  * todo
  * - unparse: los nicer
+ * - optional variable types
  */
 public class FormExpressionDemo {
 

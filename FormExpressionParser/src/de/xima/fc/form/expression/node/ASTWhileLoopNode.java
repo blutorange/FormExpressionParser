@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTWhileLoopNode extends SimpleNode {
 
-	public ASTWhileLoopNode(FormExpressionParser parser, int nodeId) {
+	public ASTWhileLoopNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -25,7 +25,7 @@ public class ASTWhileLoopNode extends SimpleNode {
 
 	public void init(final EMethod method, final String label) throws ParseException {
 		assertChildrenExactly(2);
-		siblingMethod = method;
+		super.init(method);
 		this.label = label;
 	}
 

@@ -11,7 +11,7 @@ public class ASTForLoopNode extends SimpleNode {
 
 	private String label;
 
-	public ASTForLoopNode(FormExpressionParser parser, final int nodeId) {
+	public ASTForLoopNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -22,7 +22,7 @@ public class ASTForLoopNode extends SimpleNode {
 
 	public void init(final EMethod method, final String iteratingLoopVariable, final String label) throws ParseException {
 		assertChildrenExactly(iteratingLoopVariable != null ? 2 : 4);
-		siblingMethod = method;
+		super.init(method);
 		this.iteratingLoopVariable = iteratingLoopVariable;
 		this.label = label;
 	}

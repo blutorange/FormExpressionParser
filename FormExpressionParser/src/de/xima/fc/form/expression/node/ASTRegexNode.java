@@ -12,7 +12,7 @@ public class ASTRegexNode extends SimpleNode {
 
 	private Pattern pattern;
 
-	public ASTRegexNode(FormExpressionParser parser, int nodeId) {
+	public ASTRegexNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -22,12 +22,12 @@ public class ASTRegexNode extends SimpleNode {
 			throw new ParseException("Regex is null. This is likely an error with the parser, contact support.");
 		if (regex.length() < 2)
 			throw new ParseException(String.format("Regex <%s> not terminated properly.  This is likely an error with the parser, contact support.", regex));
-		siblingMethod = method;
+		super.init(method);
 		final int lastHash = regex.lastIndexOf('#');
 		try {
 			pattern = Pattern.compile(regex.substring(1, lastHash), flags(regex, lastHash+1));
 		}
-		catch (PatternSyntaxException e) {
+		catch (final PatternSyntaxException e) {
 			throw new ParseException(String.format("Encountered invalid regex at line %d, column %d: %s",
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}

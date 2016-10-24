@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTNumberNode extends SimpleNode {
 	private double doubleValue;
 
-	public ASTNumberNode(FormExpressionParser parser, int nodeId) {
+	public ASTNumberNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -23,7 +23,7 @@ public class ASTNumberNode extends SimpleNode {
 		catch (final NumberFormatException e) {
 			throw new ParseException(String.format("Encountered invalid number %s at line %d, column %d: %s", string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
-		siblingMethod = method;
+		super.init(method);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class ASTNumberNode extends SimpleNode {
 	}
 
 	@Override
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append(doubleValue).append(",");
 	}
 

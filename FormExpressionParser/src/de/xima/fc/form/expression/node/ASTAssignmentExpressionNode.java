@@ -6,14 +6,15 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTAssignmentExpressionNode extends SimpleNode {
-	public ASTAssignmentExpressionNode(FormExpressionParser parser, final int id) {
+	public ASTAssignmentExpressionNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
 		assertChildrenAssignable(0, children.length-1, "assignment");
-		siblingMethod = method;
+		super.init(method);
 	}
 
 	@Override

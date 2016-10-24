@@ -7,34 +7,34 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTVariableNode extends SimpleNode {
 
-	public ASTVariableNode(FormExpressionParser parser, int nodeId) {
+	public ASTVariableNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
 	private String name;
-    private String scope;
+	private String scope;
 
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getScope() {
 		return scope;
 	}
-	
+
 	public boolean hasScope() {
 		return scope != null;
 	}
 
 	public void init(final EMethod method, final String scope, final String name) throws ParseException {
 		if (name == null) throw new ParseException("Name is null. This is likely an error with the parser. Contact support.");
-		siblingMethod = method;
+		super.init(method);
 		this.name =  name;
 		this.scope = scope;
 	}
 
 	@Override
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append(scope).append(",").append(name).append(",");
 	}
 

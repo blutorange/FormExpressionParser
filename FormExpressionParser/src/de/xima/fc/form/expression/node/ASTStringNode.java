@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTStringNode extends SimpleNode {
 
-	public ASTStringNode(FormExpressionParser parser, int nodeId) {
+	public ASTStringNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -20,7 +20,7 @@ public class ASTStringNode extends SimpleNode {
 	 *            Character which delimits the string. " or '
 	 */
 	public void init(final EMethod method, final String value, final char delimiter) throws ParseException {
-		siblingMethod = method;
+		super.init(method);
 		final String s = parseString(value);
 		stringValue = s;
 	}
@@ -33,7 +33,7 @@ public class ASTStringNode extends SimpleNode {
 		try {
 			return StringEscapeUtils.unescapeJava(literal.substring(1, literal.length() - 1));
 		}
-		catch (IllegalArgumentException e) {
+		catch (final IllegalArgumentException e) {
 			throw new ParseException(String.format("Encountered invalid string at line %d, column %d: %s",
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
@@ -49,7 +49,7 @@ public class ASTStringNode extends SimpleNode {
 	}
 
 	@Override
-	protected void additionalToStringFields(StringBuilder sb) {
+	protected void additionalToStringFields(final StringBuilder sb) {
 		sb.append('"').append(StringEscapeUtils.escapeJava(stringValue)).append('"').append(",");
 	}
 }

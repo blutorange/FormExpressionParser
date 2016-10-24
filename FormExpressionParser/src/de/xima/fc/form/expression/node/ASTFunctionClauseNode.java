@@ -9,13 +9,14 @@ public class ASTFunctionClauseNode extends SimpleNode {
 
 	private String functionName;
 
-	public ASTFunctionClauseNode(FormExpressionParser parser, final int nodeId) {
+	public ASTFunctionClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
-		siblingMethod = method;
+		super.init(method);
 		final ASTVariableNode var = getNthChildAs(0, ASTVariableNode.class);
 		functionName = var.getScope() != null ? var.getScope() + "::" + var.getName() : var.getName();
 	}

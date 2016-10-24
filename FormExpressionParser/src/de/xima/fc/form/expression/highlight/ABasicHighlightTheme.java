@@ -37,7 +37,6 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.D
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleStarEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Else;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Equal;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Exception;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Exclamation;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ExclamationDoubleEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ExclamationEqual;
@@ -85,6 +84,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.T
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Try;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.While;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.With;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Error;
 
 /**
  * Groups several similar tokens and allows you to specify a style
@@ -120,7 +120,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LogError:
 		case LogInfo:
 		case LogWarn:
-		case Exception:
+		case __Error:
 			return getStyleKeyword();
 
 		case Identifier:

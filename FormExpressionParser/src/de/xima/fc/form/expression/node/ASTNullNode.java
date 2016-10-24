@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTNullNode extends SimpleNode {
 
-	public ASTNullNode(FormExpressionParser parser, int nodeId) {
+	public ASTNullNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -16,7 +16,8 @@ public class ASTNullNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Override
 	public void init(final EMethod method) throws ParseException {
-		siblingMethod = method;
+		super.init(method);
 	}
 }
