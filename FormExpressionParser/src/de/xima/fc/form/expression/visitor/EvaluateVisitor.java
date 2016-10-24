@@ -893,11 +893,13 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 
 	@Override
 	public ALangObject visit(final ASTVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
+		// Type information is discarded at runtime.
 		throw new UncatchableEvaluationException(ec, "ASTVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
 	}
 
 	@Override
 	public ALangObject visit(final ASTCompoundVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
-		throw new UncatchableEvaluationException(ec, "ASTVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
+		// Type information is discarded at runtime.
+		throw new UncatchableEvaluationException(ec, "ASTCompoundVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
 	}
 }

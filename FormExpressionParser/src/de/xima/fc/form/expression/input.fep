@@ -1,3 +1,1 @@
-->string<regex>(number x, number<boolean> y){
-  "42";
-};
+void{string} x;

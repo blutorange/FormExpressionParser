@@ -91,6 +91,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants._
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Number;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Regex;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__String;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Void;
 
 /**
  * Groups several similar tokens and allows you to specify a style
@@ -233,6 +234,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case __Number:
 		case __Regex:
 		case __String:
+		case __Void:
 			return getStyleTypeDeclaration();
 
 		default:

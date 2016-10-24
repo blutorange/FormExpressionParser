@@ -84,6 +84,9 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public <T extends Node> T getNthChildAs(int index, final Class<T> clazz) throws ParseException;
 
+	public <T extends Node> T getNthChildAsOrNull(int index, Class<T> clazz);
+
+
 	/**
 	 * @param atLeast The minimum number of children this node can have.
 	 * @param atMost The maximum number of children this node can have.
@@ -158,4 +161,5 @@ public interface Node extends Serializable, ITraceElement {
 
 	public void jjtSetFirstToken(Token token);
 	public void jjtSetLastToken(Token token);
+
 }

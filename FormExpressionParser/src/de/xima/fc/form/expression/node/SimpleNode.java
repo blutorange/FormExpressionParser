@@ -182,6 +182,14 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
+	public <T extends Node> T getNthChildAsOrNull(final int index, final Class<T> clazz) {
+		final Node n = children[0];
+		if (!clazz.isAssignableFrom(n.getClass()))
+			return null;
+		return clazz.cast(n);
+	}
+
+	@Override
 	@Nullable
 	public Node getLastChild() {
 		if (children.length == 0)

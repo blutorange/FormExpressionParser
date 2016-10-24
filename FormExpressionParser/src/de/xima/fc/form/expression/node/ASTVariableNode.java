@@ -27,6 +27,7 @@ public class ASTVariableNode extends SimpleNode {
 	}
 
 	public void init(final EMethod method, final String scope, final String name) throws ParseException {
+		assertChildrenAtMost(1);
 		if (name == null) throw new ParseException("Name is null. This is likely an error with the parser. Contact support.");
 		super.init(method);
 		this.name =  name;

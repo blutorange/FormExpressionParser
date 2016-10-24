@@ -83,6 +83,7 @@ PARSER_END(FormExpressionParser)
 
 TOKEN_MGR_DECLS :
 {
+  private int nestLevelTypeDecl = 0;
   void CommonTokenAction(final Token token) {
     // Retrieve all comments, if there are any.
     if (parser == null) return;
@@ -278,6 +279,8 @@ TOKEN :
   < Try : "try" >
 | 
   < With : "with" >
+| 
+  < __Void : "void" >
 | 
   < Else : "else" >
 | 
@@ -1721,12 +1724,19 @@ void VariableTypeDeclaration(EMethod method) #CompoundVariableTypeDeclarationNod
 {
   (
     (
-      BooleanTypeDeclaration(method)
-    | NumberTypeDeclaration(method)
-    | StringTypeDeclaration(method)
-    | RegexTypeDeclaration(method)
-    | ExceptionTypeDeclaration(method)
-    | HashTypeDeclaration(method)
+      (
+        BooleanTypeDeclaration(method)
+      | NumberTypeDeclaration(method)
+      | StringTypeDeclaration(method)
+      | RegexTypeDeclaration(method)
+      | ExceptionTypeDeclaration(method)
+      | HashTypeDeclaration(method)
+      )
+    |
+      (
+        VoidTypeDeclaration(method) 
+        FunctionTypeDeclaration(method)
+      )
     )
     (
       ArrayTypeDeclaration(null)
@@ -1779,6 +1789,16 @@ void RegexTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
   }
 }
 
+void VoidTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
+{
+}
+{
+  (< __Void >)
+  {
+    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.NULL);
+  }
+}
+
 void ExceptionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 {
 }
@@ -1794,7 +1814,7 @@ void HashTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 }
 {
   (
-    < __Hash > < BracesOpen > VariableTypeDeclaration(null) < Comma > VariableTypeDeclaration(null) < BracesClose >
+    (< __Hash >) < BracesOpen > VariableTypeDeclaration(null) < Comma > VariableTypeDeclaration(null) < BracesClose >
   )
   {
     jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.HASH);
@@ -1818,7 +1838,7 @@ void FunctionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
 }
 {
   (
-    < BracesOpen >
+    <BracesOpen >
     [
       VariableTypeDeclaration(null)
       (
