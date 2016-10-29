@@ -14,7 +14,6 @@ import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
-import de.xima.fc.form.expression.node.ASTCompoundVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
@@ -64,41 +63,6 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
-
-	private IVariableType buildCompoundType(final ASTCompoundVariableTypeDeclarationNode node, final int endIndex) throws IllegalVariableTypeException {
-		if (endIndex < 1)
-			throw new IllegalVariableTypeException(node,
-					String.format(
-							"Illegal compound type with first node %s. This is likely a bug with the parser, contact support.",
-							node.jjtGetChild(0)));
-		final ASTVariableTypeDeclarationNode lastNode = node.getNthChildAsOrNull(endIndex-1, ASTVariableTypeDeclarationNode.class);
-		if (lastNode == null)
-			throw new IllegalVariableTypeException(node,
-					String.format(
-							"Node not of the correct type: %s. This is likely a bug with the parser, contact support.",
-							node.jjtGetChild(endIndex - 1)));
-		switch (lastNode.getType()) {
-		case FUNCTION:
-			final IVariableType returnType = buildCompoundType(node, endIndex-1);
-			final IVariableType[] argType = new IVariableType[lastNode.jjtGetNumChildren()];
-			for (int i = 0; i < argType.length; ++i)
-				argType[i] = lastNode.jjtGetChild(i).jjtAccept(this, Boolean.FALSE);
-			return new FunctionType(returnType, argType);
-		case ARRAY:
-			return new ArrayType(buildCompoundType(node, endIndex-1));
-		case HASH:
-		case BOOLEAN:
-		case EXCEPTION:
-		case NULL:
-		case NUMBER:
-		case REGEX:
-		case STRING:
-			if (endIndex == 1)
-				return lastNode.jjtAccept(this, Boolean.FALSE);
-		default:
-			throw new IllegalVariableTypeException(node, String.format("Unknown enum %s. This is likely a bug with the parser, contact support.", lastNode.getType()));
-		}
-	}
 
 	@Override
 	public IVariableType visit(final ASTExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
@@ -366,31 +330,9 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 
 	@Override
 	public IVariableType visit(final ASTVariableTypeDeclarationNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
-		switch (node.getType()) {
-		case BOOLEAN:
-			return BooleanType.INSTANCE;
-		case EXCEPTION:
-			return ExceptionType.INSTANCE;
-		case NUMBER:
-			return NumberType.INSTANCE;
-		case REGEX:
-			return RegexType.INSTANCE;
-		case STRING:
-			return StringType.INSTANCE;
-		case HASH:
-			final IVariableType keyType = node.jjtGetChild(0).jjtAccept(this, returnTypeNeeded);
-			final IVariableType valueType = node.jjtGetChild(1).jjtAccept(this, returnTypeNeeded);
-			return new HashType(keyType, valueType);
-		case ARRAY:
-		case FUNCTION:
-		case NULL:
-		default:
-			throw new IllegalVariableTypeException(node, String.format("Illegal enum %s. This is likely an error with the parser, contact support.", node.getType()));
-		}
-	}
-
-	@Override
-	public IVariableType visit(final ASTCompoundVariableTypeDeclarationNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
-		return buildCompoundType(node, node.jjtGetNumChildren());
+		final IVariableType[] children = new IVariableType[node.jjtGetNumChildren()];
+		for (int i = 0; i != children.length; ++i)
+			children[i] = node.jjtGetChild(i).jjtAccept(this, returnTypeNeeded);
+		return node.getType().asVariableType(children);
 	}
 }

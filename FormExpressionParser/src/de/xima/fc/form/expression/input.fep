@@ -1,1 +1,1 @@
-void{string} x;
+Function<String,Number,Number> x;

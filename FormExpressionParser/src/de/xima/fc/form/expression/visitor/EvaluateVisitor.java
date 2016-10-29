@@ -24,7 +24,6 @@ import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
-import de.xima.fc.form.expression.node.ASTCompoundVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
@@ -895,11 +894,5 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	public ALangObject visit(final ASTVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
 		// Type information is discarded at runtime.
 		throw new UncatchableEvaluationException(ec, "ASTVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
-	}
-
-	@Override
-	public ALangObject visit(final ASTCompoundVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
-		// Type information is discarded at runtime.
-		throw new UncatchableEvaluationException(ec, "ASTCompoundVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
 	}
 }

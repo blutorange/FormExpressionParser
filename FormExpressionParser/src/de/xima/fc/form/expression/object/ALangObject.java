@@ -15,6 +15,16 @@ import de.xima.fc.form.expression.exception.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAssignerException;
 import de.xima.fc.form.expression.exception.NoSuchMethodException;
+import de.xima.fc.form.expression.type.ArrayType;
+import de.xima.fc.form.expression.type.BooleanType;
+import de.xima.fc.form.expression.type.ExceptionType;
+import de.xima.fc.form.expression.type.FunctionType;
+import de.xima.fc.form.expression.type.HashType;
+import de.xima.fc.form.expression.type.IVariableType;
+import de.xima.fc.form.expression.type.NumberType;
+import de.xima.fc.form.expression.type.RegexType;
+import de.xima.fc.form.expression.type.StringType;
+import de.xima.fc.form.expression.type.VoidType;
 
 /**
  * <h1>Coercion rules</h1>
@@ -152,24 +162,73 @@ public abstract class ALangObject implements Iterable<ALangObject>, Comparable<A
 	private static AtomicLong ID_COUNTER = new AtomicLong();
 
 	public static enum Type {
-		NULL(NullLangObject.class, 0),
-		BOOLEAN(BooleanLangObject.class, 1),
-		NUMBER(NumberLangObject.class, 2),
-		STRING(StringLangObject.class, 3),
-		REGEX(RegexLangObject.class, 4),
-		FUNCTION(FunctionLangObject.class, 5),
-		EXCEPTION(ExceptionLangObject.class, 6),
-		ARRAY(ArrayLangObject.class, 7),
-		HASH(HashLangObject.class, 8),
+		NULL(NullLangObject.class, 0) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return VoidType.INSTANCE;
+			}
+		},
+		BOOLEAN(BooleanLangObject.class, 1) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return BooleanType.INSTANCE;
+			}
+		},
+		NUMBER(NumberLangObject.class, 2) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return NumberType.INSTANCE;
+			}
+		},
+		STRING(StringLangObject.class, 3) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return StringType.INSTANCE;
+			}
+		},
+		REGEX(RegexLangObject.class, 4) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return RegexType.INSTANCE;
+			}
+		},
+		FUNCTION(FunctionLangObject.class, 5) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				final IVariableType[] argType = new IVariableType[children.length-1];
+				System.arraycopy(children, 1, argType, 0, argType.length);
+				return new FunctionType(children[0], argType);
+			}
+		},
+		EXCEPTION(ExceptionLangObject.class, 6) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return ExceptionType.INSTANCE;
+			}
+		},
+		ARRAY(ArrayLangObject.class, 7) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return new ArrayType(children[0]);
+			}
+		},
+		HASH(HashLangObject.class, 8) {
+			@Override
+			public IVariableType asVariableType(final IVariableType[] children) {
+				return new HashType(children[0], children[1]);
+			}
+		},
 		;
-		
+
 		public final Class<? extends ALangObject> clazz;
 		public final int order;
 
-		private Type(final Class<? extends ALangObject> clazz, int order) {
+		private Type(final Class<? extends ALangObject> clazz, final int order) {
 			this.clazz = clazz;
 			this.order = order;
 		}
+
+		public abstract IVariableType asVariableType(IVariableType[] children);
 	}
 
 	public abstract ALangObject shallowClone();
@@ -393,13 +452,13 @@ public abstract class ALangObject implements Iterable<ALangObject>, Comparable<A
 
 	@Override
 	public abstract boolean equals(final Object o);
-	
+
 	/**
-	 * <pre>The natural ordering for a class C is said to be consistent with equals if and only 
-	 * if e1.compareTo(e2) == 0 has the same boolean value as e1.equals(e2) for every e1 
+	 * <pre>The natural ordering for a class C is said to be consistent with equals if and only
+	 * if e1.compareTo(e2) == 0 has the same boolean value as e1.equals(e2) for every e1
 	 * and e2 of class C. Note that null is not an instance of any class, and e.compareTo(null)
 	 * should throw a NullPointerException even though e.equals(null) returns false.</pre>
-	 * 
+	 *
 	 * <p>This holds true. When the comparand is null <code>o.type</code> throws a
 	 * NullPointerException. When the two objects are of different type, they are ordered
 	 * according to {@link Type#order} and cannot be equal. When the two objects are
@@ -407,26 +466,26 @@ public abstract class ALangObject implements Iterable<ALangObject>, Comparable<A
 	 * is called. Subclasses are required to adhere to the above contract.
 	 * </p>
 	 *
-	*/
+	 */
 	@Override
-	public final int compareTo(ALangObject o) {
+	public final int compareTo(final ALangObject o) {
 		if (type != o.type) return type.order - o.type.order;
 		return compareToSameType(o);
 	}
-	
+
 	public final int compareById(final ALangObject o) {
 		return Long.compare(id,  o.id);
 	}
-	
+
 	public boolean equalsSameObject(final ALangObject o) {
 		return isSingletonLike() ? equals(o) : id == o.id;
 	}
-	
+
 	protected abstract boolean isSingletonLike();
-	
+
 	/**
 	 * Needs to adhere to the contract of {@link Comparable}.
-	 * 
+	 *
 	 * @param o
 	 * @return Guaranteed to be be non-<code>null</code>. An object
 	 *            of the same type as the subclass. It may be cast safely.

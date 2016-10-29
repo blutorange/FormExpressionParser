@@ -62,11 +62,11 @@ enum SyntaxSuccess implements ITestCase {
 	TEST053("++r;"),
 	TEST054("a+b;//comment"),
 	TEST055("a + /* comment \n end */ b;"),
-	TEST056("regex x;boolean x;number x;exception x;number[] x;hash{number,number} x;number{string,boolean} x;"),
-	TEST058("number[][][] x;"),
-	TEST059("hash{number[],hash{boolean{},regex}} x;"),
-	TEST060("->string{string}(number[] x, hash{boolean,boolean} y){};"),
-	TEST061("function string{string} foo(number[] x, hash{boolean,boolean} y){};"),
+	TEST056("Regex x;Boolean x;Number x;Exception x;Array<Number> x;Hash<Number,Number> x;Function<Number,String,Boolean> x;"),
+	TEST058("Array<Array<Array<Number>>> x;"),
+	TEST059("Hash<Array<Number>,Hash<Function<Boolean>,Regex>> x;"),
+	TEST060("->Function<String,String>(Array<Number> x, Hash<Boolean,Boolean> y){};"),
+	TEST061("function Function<String,String> foo(Array<Number> x, Hash<Boolean,Boolean> y){};"),
 	;
 	private final String code;
 	private final ETestType type;
