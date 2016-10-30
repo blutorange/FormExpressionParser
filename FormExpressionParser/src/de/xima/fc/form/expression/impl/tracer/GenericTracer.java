@@ -9,6 +9,7 @@ public class GenericTracer implements ITracer<Node> {
 	private Node processed;
 	private Node[] stackTrace;
 	private int pos;
+	private final int initialSize;
 
 	public GenericTracer() {
 		this(16);
@@ -19,10 +20,11 @@ public class GenericTracer implements ITracer<Node> {
 			initialSize = 1;
 		stackTrace = new Node[initialSize];
 		pos = -1;
+		this.initialSize = initialSize;
 	}
 
 	@Override
-	public void setCurrentlyProcessed(Node object) {
+	public void setCurrentlyProcessed(final Node object) {
 		processed = object;
 	}
 
@@ -32,7 +34,7 @@ public class GenericTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public void descend(Node node) {
+	public void descend(final Node node) {
 		if (pos >= stackTrace.length - 1)
 			stackTrace = Arrays.copyOf(stackTrace, pos * 2);
 		stackTrace[++pos] = node;
@@ -52,8 +54,10 @@ public class GenericTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public Void reset() {
+	public void reset() {
+		Arrays.fill(stackTrace, null);
+		if (stackTrace.length != initialSize)
+			stackTrace = new Node[initialSize];
 		pos = -1;
-		return null;
-	}	
+	}
 }

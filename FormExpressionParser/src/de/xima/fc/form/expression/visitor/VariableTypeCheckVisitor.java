@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.visitor;
 
+import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.exception.variabletype.FunctionMissingReturnTypeException;
 import de.xima.fc.form.expression.exception.variabletype.IllegalVariableTypeException;
@@ -60,6 +61,7 @@ import de.xima.fc.form.expression.type.VoidType;
 
 public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IVariableType, Boolean, IllegalVariableTypeException> {
 
+	private IEvaluationContext ec;
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;

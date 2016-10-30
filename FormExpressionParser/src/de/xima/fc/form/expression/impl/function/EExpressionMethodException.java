@@ -5,15 +5,13 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
 
 public enum EExpressionMethodException implements IMethod2Function<ExceptionLangObject> {
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),
 	;
 	private final EMethod method;
 	private final IFunction<ExceptionLangObject> function;
@@ -34,59 +32,47 @@ public enum EExpressionMethodException implements IMethod2Function<ExceptionLang
 	}
 
 	private static enum Impl implements IFunction<ExceptionLangObject> {
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-		 */
-		DOUBLE_EQUAL(null, "comparand"){
+		// A dummy because I haven't implemented any methods yet.
+		@Deprecated
+		DUMMY(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.equals(args[0]));
+				throw new UncatchableEvaluationException(ec);
 			}},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
-		 */
-		TRIPLE_EQUAL(null, "comparand"){
-				@Override
-				public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
-						throws EvaluationException {
-					return BooleanLangObject.create(thisContext == args[0]);
-				}},
 		;
 
-		private final String[] argList;
-		private String optionalArgumentsName;
+			private final String[] argList;
+			private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
-			this.argList = argList;
-			this.optionalArgumentsName = optArg;
-		}
+			private Impl(final String optArg, final String... argList) {
+				this.argList = argList;
+				this.optionalArgumentsName = optArg;
+			}
 
-		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
-		}
+			@Override
+			public String getVarArgsName() {
+				return optionalArgumentsName;
+			}
 
-		@Override
-		public String getDeclaredName() {
-			return toString();
-		}
+			@Override
+			public String getDeclaredName() {
+				return toString();
+			}
 
-		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
-		}
+			@Override
+			public String[] getDeclaredArgumentList() {
+				return argList;
+			}
 
-		@Override
-		public Type getThisContextType() {
-			return Type.EXCEPTION;
-		}
+			@Override
+			public Type getThisContextType() {
+				return Type.EXCEPTION;
+			}
 
-		@Override
-		public Node getNode() {
-			return null;
-		}
+			@Override
+			public Node getNode() {
+				return null;
+			}
 	}
 }

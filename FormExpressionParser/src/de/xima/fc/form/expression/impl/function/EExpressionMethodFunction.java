@@ -5,15 +5,13 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 
 public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangObject> {
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),
 	;
 	private final EMethod method;
 	private final IFunction<FunctionLangObject> function;
@@ -34,26 +32,15 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 	}
 
 	private static enum Impl implements IFunction<FunctionLangObject> {
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-		 */
-		DOUBLE_EQUAL(null, "comparand"){
+		// A dummy because there are not methods yet.
+		@Deprecated
+		DUMMY(null, "comparand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.equals(args[0]));
-			}},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
-		 */
-		TRIPLE_EQUAL(null, "comparand"){
-				@Override
-				public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
-						throws EvaluationException {
-					return BooleanLangObject.create(thisContext == args[0]);
-				}},
+				throw new UncatchableEvaluationException(ec);
+			}
+		},
 		;
 
 		private final String[] argList;

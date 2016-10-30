@@ -30,9 +30,8 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public Void reset() {
+	public void reset() {
 		impl.reset();
-		return null;
 	}
 
 	@Override

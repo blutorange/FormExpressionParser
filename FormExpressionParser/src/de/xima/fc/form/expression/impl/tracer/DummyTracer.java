@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.grammar.Node;
 /**
  * A tracer that is not tracing anything. Use this when you
  * do not need tracing functionality.
- * 
+ *
  * @author mad_gaksha
  *
  */
@@ -14,7 +14,7 @@ public enum DummyTracer implements ITracer<Node> {
 	INSTANCE;
 	private final static Node[] EMPTY_NODE_ARRAY = new Node[0];
 	@Override
-	public void setCurrentlyProcessed(Node object) {
+	public void setCurrentlyProcessed(final Node object) {
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public enum DummyTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public void descend(Node position) {
+	public void descend(final Node position) {
 	}
 
 	@Override
@@ -36,7 +36,6 @@ public enum DummyTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public Void reset() {
-		return null;
+	public void reset() {
 	}
 }

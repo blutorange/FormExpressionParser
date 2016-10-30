@@ -66,10 +66,11 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 
 	@Override
 	public ALangObject getUnqualifiedVariable(final String name) throws EvaluationException {
+		// try local variables first
 		final ALangObject loc = getBinding().getVariable(name);
 		if (loc != null)
 			return loc;
-		// with() {} is deprecated, so this should not do much performance-wise
+		// with() {} is deprecated, so this should not do anything performance-wise
 		for (int i = defaultScopeList.size() - 1; i >= 0; --i) {
 			final ALangObject scp = getScope().getVariable(defaultScopeList.get(i), name, this);
 			if (scp != null)
@@ -77,7 +78,7 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		}
 		// embedded blocks with scopes should only
 		// be used for basic access like [%tf1%]
-		String[] embedmentScopeList = embedment.getScopeList();
+		final String[] embedmentScopeList = embedment.getScopeList();
 		for (int i = embedmentScopeList.length - 1; i >= 0; --i) {
 			final ALangObject scp = getScope().getVariable(embedmentScopeList[i], name, this);
 			if (scp != null)

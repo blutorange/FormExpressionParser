@@ -1,1 +1,13 @@
-Function<String,Number,Number> x;
+function foo(i) {
+  if (i>10)
+    throw error("yeah");
+  bar(i+1);
+}
+
+function bar(i) {
+  if (i>10)
+    throw error("yeah");
+  foo(i+1);
+}
+
+foo(0);

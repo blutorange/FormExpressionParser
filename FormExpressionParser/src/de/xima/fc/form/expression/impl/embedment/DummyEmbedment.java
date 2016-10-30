@@ -16,26 +16,25 @@ public class DummyEmbedment implements IEmbedment {
 		public final static DummyEmbedment INSTANCE = new DummyEmbedment();
 	}
 	@Override
-	public Void reset() {
-		return null;
-	}	
+	public void reset() {
+	}
 
 	public static IEmbedment getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
 	@Override
-	public void setCurrentEmbedment(String name) {
+	public void setCurrentEmbedment(final String name) {
 	}
 	@Override
 	public String[] getScopeList() {
 		return ArrayUtils.EMPTY_STRING_ARRAY;
 	}
 	@Override
-	public void outputCode(String data, IEvaluationContext ec) throws EmbedmentOutputException {
+	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
 		System.out.print(data);
 	}
 	@Override
-	public void outputText(String data, IEvaluationContext ec) throws EmbedmentOutputException {
+	public void outputText(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
 		System.out.print(data);
 	}
 }

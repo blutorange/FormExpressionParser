@@ -8,7 +8,6 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 
 public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject> {
@@ -131,48 +130,6 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.modulo(args[0].coerceNumber(ec));
-			}
-		},
-		EQUALITY(null, "comparand"){
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.equals(args[0]));
-			}
-		},
-		INEQUALITY(null, "comparand") {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(!thisContext.equals(args[0]));
-			}
-		},
-		SMALLER(null, "comparand") {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.smaller(args[0].coerceNumber(ec)));
-			}
-		},
-		SMALLER_OR_EQUAL(null, "comparand") {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.smallerOrEqual(args[0].coerceNumber(ec)));
-			}
-		},
-		GREATER(null, "comparand") {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.greater(args[0].coerceNumber(ec)));
-			}
-		},
-		GREATER_OR_EQUAL(null, "comparand") {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.greaterOrEqual(args[0].coerceNumber(ec)));
 			}
 		},
 		;

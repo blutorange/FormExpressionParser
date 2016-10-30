@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * Similar to {@link OnDemandLookUpBinding}, but uses a map of arrays (
- * <code>Map&lt;ALangObject[]&gt;</code>) instead. Try both and see which
+ * <code>Map&lt;T[]&gt;</code>) instead. Try both and see which
  * performs better. Probably performs better when most variables are non-local
  * and need to be looked up at lower nesting depths. Since <code>with (...) {}</code>
  * is deprecated, I suspect {@link OnDemandLookUpBinding} will perform better
@@ -35,10 +35,9 @@ public class LookUpBindingAlternative implements IBinding {
 	}
 
 	@Override
-	public Void reset() {
+	public void reset() {
 		map.clear();
 		Arrays.fill(breakpoints, false);
-		return null;
 	}
 
 	@Override

@@ -9,13 +9,10 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 
 public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> {
-	PLUS(EMethod.PLUS, Impl.PLUS),
-	DASH(EMethod.DASH, Impl.DASH),
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),
+	PLUS(EMethod.PLUS, Impl.UNION),
+	DASH(EMethod.DASH, Impl.DIFFERENCE),
 	;
 	private final EMethod method;
 	private final IFunction<ArrayLangObject> function;
@@ -40,7 +37,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToAdd {@link ALangObject}. Element(s) to be added to this array. When an array, all of the array's elements are added at the end of this array. Otherwise, the object itself is added to the end of this array.
 		 * @return <code>this</code>, with the elements specified by the argument added.
 		 */
-		PLUS(null, "elementsToAdd"){
+		UNION(null, "elementsToAdd"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -53,7 +50,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToRemove {@link ArrayLangObject}. Element(s) to be removed from this array. When an array, all of the array's elements are removed from this array. Otherwise, all occurences of the object are removed from this array.
 		 * @return <code>this</code>, with the elements specified by the argument removed.
 		 */
-		DASH(null, "elementsToRemove"){
+		DIFFERENCE(null, "elementsToRemove"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -62,26 +59,6 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 				return thisContext;
 			}
 		},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-		 */
-		DOUBLE_EQUAL(null, "comparand"){
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.equals(args[0]));
-			}},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
-		 */
-		TRIPLE_EQUAL(null, "comparand"){
-				@Override
-				public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
-						throws EvaluationException {
-					return BooleanLangObject.create(thisContext == args[0]);
-				}},
 		;
 
 

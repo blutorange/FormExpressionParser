@@ -22,21 +22,21 @@ public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext
 
 	private final static class InstanceHolder {
 		public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new GenericEcFactory());
-	}	
-	
+	}
+
 	@Override
-	public void passivateObject(PooledObject<IEvaluationContext> ec) throws Exception {
+	public void passivateObject(final PooledObject<IEvaluationContext> ec) throws Exception {
 		if (ec.getObject() == null) return;
 		ec.getObject().reset();
 	}
-	
+
 	@Override
 	public IEvaluationContext create() throws Exception {
 		return makeEc();
 	}
 
 	@Override
-	public PooledObject<IEvaluationContext> wrap(IEvaluationContext ec) {
+	public PooledObject<IEvaluationContext> wrap(final IEvaluationContext ec) {
 		return new DefaultPooledObject<IEvaluationContext>(ec);
 	}
 
@@ -46,11 +46,11 @@ public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext
 		final IEmbedment embedment = GenericEmbedment.getGenericEmbedment();
 		final IScope scope = GenericScope.getNewEmptyScope();
 		return new Builder()
-			.setEmbedment(embedment)
-			.setBinding(binding)
-			.setScope(scope)
-			.setTracer(tracer)
-			.build();
+				.setEmbedment(embedment)
+				.setBinding(binding)
+				.setScope(scope)
+				.setTracer(tracer)
+				.build();
 	}
 
 	public static ObjectPool<IEvaluationContext> getPoolInstance() {

@@ -12,6 +12,23 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
+/**
+ * <p>
+ * A namespace that contains all available functions and attribute accessors for each type of
+ * language object. For example, an array has got functions such as <code>length</code> or
+ * <code>sort</code>, and the attribute accessor that return the i-th element <code>myArray[i]</code>.
+ * </p><p>
+ * Note that attribute accessors may be written in two ways: for a language object of type hash
+ * <code>myHash.myValue</code> and <code>myHash["myValue"]</code> are equivalent. Whether an attribute
+ * is accessed via the dotNotation or not is indicated by the boolean argument <code>accessedViaDot</code>
+ * all attribute accessors and assigners get passed.
+ * </p><p>
+ * An attribute assigner is the opposite of an attribute accessor assigns a value to some attribute
+ * of an object, eg <code>myArray[0] = 1</code>.
+ * </p>
+ * @author madgaksha
+ *
+ */
 public interface INamespace {
 	public IFunction<StringLangObject> expressionMethodString(EMethod method) throws EvaluationException;
 	public IFunction<NumberLangObject> expressionMethodNumber(EMethod method) throws EvaluationException;

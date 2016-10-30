@@ -22,7 +22,7 @@ import de.xima.fc.form.expression.util.IReset;
  * </ul>
  * @author mad_gaksha
  */
-public interface IEvaluationContext extends IReset<Void> {
+public interface IEvaluationContext extends IReset {
 
 	public IScope getScope();
 	public IBinding getBinding();
@@ -65,7 +65,7 @@ public interface IEvaluationContext extends IReset<Void> {
 	 * @param scope Name of the scope to be added to the list of default lookup scopes for unqualified variables.
 	 */
 	public void beginDefaultScope(String scope);
-	
+
 	/**
 	 * Called at the end of a scope block and remove the scope added most recently.
 	 * <pre>

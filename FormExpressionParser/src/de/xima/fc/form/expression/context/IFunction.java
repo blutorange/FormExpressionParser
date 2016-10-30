@@ -31,6 +31,9 @@ public interface IFunction<T extends ALangObject> {
 	@Nonnull
 	public String[] getDeclaredArgumentList();
 
+	/**
+	 * @return Name of the varArgs argument. Null when this function does not allow varArgs arguments.
+	 */
 	@Nullable
 	public String getVarArgsName();
 

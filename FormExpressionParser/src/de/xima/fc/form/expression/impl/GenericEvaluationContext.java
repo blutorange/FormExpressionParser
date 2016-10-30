@@ -21,7 +21,7 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	protected final IScope scope;
 	protected final IEmbedment embedment;
 	protected IExternalContext externalContext;
-	
+
 	/**
 	 * Creates a new evaluation context.
 	 *
@@ -77,15 +77,14 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	}
 
 	@Override
-	public Void reset() {
+	public void reset() {
 		binding.reset();
 		scope.reset();
 		embedment.reset();
 		tracer.reset();
 		externalContext = null;
-		return null;
 	}
-	
+
 	/**
 	 * To help you get started, use this method to acquire a new
 	 * basic evaluation context. Details are subject to change,
@@ -98,9 +97,9 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 		b.setScope(GenericScope.getNewEmptyScope());
 		return b.build();
 	}
-	
+
 	@Override
-	public void setExternalContext(IExternalContext externalContext) {
+	public void setExternalContext(final IExternalContext externalContext) {
 		this.externalContext = externalContext;
 	}
 

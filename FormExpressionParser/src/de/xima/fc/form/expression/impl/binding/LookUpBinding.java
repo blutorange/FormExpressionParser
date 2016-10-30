@@ -54,11 +54,10 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public Void reset() {
+	public void reset() {
 		for (int i = 0; i < mapArray.length; ++i)
 			mapArray[i].clear();
 		currentDepth = 0;
-		return null;
 	}
 
 	@Override
@@ -110,5 +109,4 @@ public class LookUpBinding implements IBinding {
 	public int getNestingLimit() {
 		return mapArray.length - 1;
 	}
-
 }

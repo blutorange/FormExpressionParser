@@ -406,7 +406,6 @@ TOKEN :
 
 Node Template(EMethod method) #StatementListNode :
 {
-  
 }
 {
   (

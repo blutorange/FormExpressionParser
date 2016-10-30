@@ -11,12 +11,10 @@ import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 
 public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObject> {
-	DOUBLE_BAR(EMethod.DOUBLE_BAR, Impl.DOUBLE_BAR),
-	DOUBLE_AMPERSAND(EMethod.DOUBLE_AMPERSAND, Impl.DOUBLE_AMPERSAND),
-	CIRCUMFLEX(EMethod.CIRCUMFLEX, Impl.CIRCUMFLEX),
-	EXCLAMATION(EMethod.EXCLAMATION, Impl.EXCLAMATION),
-	DOUBLE_EQUAL(EMethod.DOUBLE_EQUAL, Impl.DOUBLE_EQUAL),
-	TRIPLE_EQUAL(EMethod.TRIPLE_EQUAL, Impl.TRIPLE_EQUAL),
+	DOUBLE_BAR(EMethod.DOUBLE_BAR, Impl.OR),
+	DOUBLE_AMPERSAND(EMethod.DOUBLE_AMPERSAND, Impl.AND),
+	CIRCUMFLEX(EMethod.CIRCUMFLEX, Impl.XOR),
+	EXCLAMATION(EMethod.EXCLAMATION, Impl.NOT),
 	;
 	private final EMethod method;
 	private final IFunction<BooleanLangObject> function;
@@ -41,7 +39,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param orOperand {@link BooleanLangObject}. Argument for the OR.
 		 * @return {@link BooleanLangObject}. The result of the logical OR disjunction between this boolean and the argument.
 		 */
-		DOUBLE_BAR(null, "orOperand"){
+		OR(null, "orOperand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -52,7 +50,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param andOperand {@link BooleanLangObject}. Argument for the AND.
 		 * @return {@link BooleanLangObject}. The result of the logical AND conjunction between this boolean and the argument.
 		 */
-		DOUBLE_AMPERSAND(null, "andOperand"){
+		AND(null, "andOperand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -63,7 +61,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param xorOperand {@link BooleanLangObject}. Argument for the XOR.
 		 * @return {@link BooleanLangObject}. The result of the logical XOR exclusive disjunction between this boolean and the argument.
 		 */
-		CIRCUMFLEX(null, "xorOperand"){
+		XOR(null, "xorOperand"){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -73,33 +71,13 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		/**
 		 * @return {@link BooleanLangObject}. The logical negation of this boolean.
 		 */
-		EXCLAMATION(null){
+		NOT(null){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext.not();
 			}
 		},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is of the same {@link Type} as the argument and is logically equivalent.
-		 */
-		DOUBLE_EQUAL(null, "comparand"){
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.equals(args[0]));
-			}},
-		/**
-		 * @param comparand {@link ALangObject}. Object to compare this object to.
-		 * @return {@link BooleanLangObject}. True iff this object is the same object as the argument.
-		 */
-		TRIPLE_EQUAL(null, "comparand"){
-				@Override
-				public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-						throws EvaluationException {
-					return BooleanLangObject.create(thisContext == args[0]);
-				}},
 		;
 
 		private final String[] argList;

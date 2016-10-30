@@ -127,10 +127,9 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	@Override
-	public Void reset() {
+	public void reset() {
 		currentEmbedment = handlerEmbedment = null;
 		handler = null;
-		return null;
 	}
 
 	@Override

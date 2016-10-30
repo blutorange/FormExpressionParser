@@ -5,8 +5,17 @@ import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.IReset;
+import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 
-public interface IBinding extends IReset<Void> {
+/**
+ * @author madgaksha
+ * @param <T>
+ *            Class of the variables this binding stores. For evaluation this
+ *            will be {@link ALangObject}, but there are some special purposes
+ *            requiring other classes, such as the
+ *            {@link VariableTypeCheckVisitor}.
+ */
+public interface IBinding extends IReset {
 
 	/**
 	 * Resets this binding and all children, if any, created by {@link #nest()}.
@@ -14,7 +23,7 @@ public interface IBinding extends IReset<Void> {
 	 * binding at nesting depth 0.
 	 */
 	@Override
-	public Void reset();
+	public void reset();
 
 	/**
 	 * Must return the same object every time it is called with equivalent
