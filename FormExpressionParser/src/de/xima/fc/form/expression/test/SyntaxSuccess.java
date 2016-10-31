@@ -1,11 +1,14 @@
 package de.xima.fc.form.expression.test;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
+@SuppressWarnings("nls")
 enum SyntaxSuccess implements ITestCase {
 	TEST001(""),
 	TEST002(";"),
@@ -68,18 +71,18 @@ enum SyntaxSuccess implements ITestCase {
 	TEST060("->Function<String,String>(Array<Number> x, Hash<Boolean,Boolean> y){};"),
 	TEST061("function Function<String,String> foo(Array<Number> x, Hash<Boolean,Boolean> y){};"),
 	;
-	private final String code;
-	private final ETestType type;
-	private final EContextType context;
+	@Nonnull private final String code;
+	@Nonnull private final ETestType type;
+	@Nonnull private final EContextType context;
 
-	private SyntaxSuccess(final String code) {
+	private SyntaxSuccess(@Nonnull final String code) {
 		this(code, ETestType.PROGRAM);
 	}
 
-	private SyntaxSuccess(final String code, final ETestType type) {
+	private SyntaxSuccess(@Nonnull final String code, @Nonnull final ETestType type) {
 		this(code, type, EContextType.GENERIC);
 	}
-	private SyntaxSuccess(final String code, final ETestType type, final EContextType context) {
+	private SyntaxSuccess(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final EContextType context) {
 		this.code = code;
 		this.type = type;
 		this.context = context;

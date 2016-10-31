@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -15,8 +16,7 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public abstract class SimpleNode implements Node {
-
-	private final static Node[] EMPTY_NODE_ARRAY = new Node[0];
+	private static final long serialVersionUID = 1L;
 	private final static AtomicInteger ID_PROVIDER = new AtomicInteger();
 
 	/**
@@ -38,7 +38,8 @@ public abstract class SimpleNode implements Node {
 	/** Parent of this node, or <code>null</code>. */
 	protected Node parent;
 	/** Children of this node, non-null. */
-	protected Node[] children = EMPTY_NODE_ARRAY;
+	@Nonnull
+	protected Node[] children = CmnCnst.EMPTY_NODE_ARRAY;
 	/** Used during evaluation. */
 	private EMethod siblingMethod;
 	/** Line numbers for tracing etc. */
@@ -95,7 +96,8 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public void jjtAddChild(final Node n, final int i) {
+	public void jjtAddChild(final Node n, final int i) throws IndexOutOfBoundsException {
+		if (n == null) throw new IndexOutOfBoundsException(CmnCnst.Error.NULL_CHILD_NODE);
 		if (i >= children.length) {
 			final Node c[] = new Node[i + 1];
 			System.arraycopy(children, 0, c, 0, children.length);
@@ -104,6 +106,8 @@ public abstract class SimpleNode implements Node {
 		children[i] = n;
 	}
 
+	@SuppressWarnings("null") // checked in method addChild
+	@Nonnull
 	@Override
 	public Node jjtGetChild(final int i) throws ArrayIndexOutOfBoundsException {
 		return children[i];
@@ -133,7 +137,7 @@ public abstract class SimpleNode implements Node {
 		.append(',');
 		additionalToStringFields(sb);
 		sb.setLength(sb.length() - 1);
-		sb.append(")");
+		sb.append(')');
 		return sb.toString();
 	}
 
@@ -145,6 +149,7 @@ public abstract class SimpleNode implements Node {
 		return uniqueId;
 	}
 
+	@Nonnull
 	@Override
 	public Node[] getChildArray() {
 		return children;
@@ -165,7 +170,7 @@ public abstract class SimpleNode implements Node {
 			final Node n = children[i];
 			if (!clazz.isAssignableFrom(n.getClass()))
 				throw new ParseException(String.format(
-						"Node type is %s, expected %s. This is likely an error with the parser, contact support.",
+						CmnCnst.Error.NODE_INCORRECT_TYPE,
 						n.getClass().getSimpleName(), clazz.getSimpleName()));
 			args[i - start] = clazz.cast(n);
 		}
@@ -176,8 +181,7 @@ public abstract class SimpleNode implements Node {
 	public <T extends Node> T getNthChildAs(final int index, final Class<T> clazz) throws ParseException {
 		final Node n = children[0];
 		if (!clazz.isAssignableFrom(n.getClass()))
-			throw new ParseException("Node not the correct type: " + n.getClass()
-			+ ". This is likely an error with the parser. Contact support.");
+			throw new ParseException(String.format(CmnCnst.Error.NODE_INCORRECT_TYPE, n.getClass().getSimpleName(), clazz.getSimpleName()));
 		return clazz.cast(n);
 	}
 
@@ -214,7 +218,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenBetween(final int atLeast, final int atMost) throws ParseException {
 		if (children.length < atLeast || children.length > atMost)
 			throw new ParseException(String.format(
-					"Node must have between %d and %d children, but it has %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_BETWEEN,
 					new Integer(atLeast), new Integer(atMost), new Integer(children.length)));
 	}
 
@@ -222,7 +226,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenExactly(final int count) throws ParseException {
 		if (children.length != count)
 			throw new ParseException(String.format(
-					"Node must have exactly %d children, not %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_EXACTLY,
 					new Integer(count), new Integer(children.length)));
 	}
 
@@ -230,7 +234,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenExactlyOneOf(final int count1, final int count2) throws ParseException {
 		if (children.length != count1 && children.length != count2)
 			throw new ParseException(String.format(
-					"Node must have exactly %d or %d children, not %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_EXACTLY_ONE_OF,
 					new Integer(count1), new Integer(count2), new Integer(children.length)));
 	}
 
@@ -238,7 +242,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenAtLeast(final int count) throws ParseException {
 		if (children.length < count)
 			throw new ParseException(String.format(
-					"Node must have at least %s children, but it has %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_AT_LEAST,
 					new Integer(count), new Integer(children.length)));
 	}
 
@@ -246,7 +250,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenAtMost(final int count) throws ParseException {
 		if (children.length > count)
 			throw new ParseException(String.format(
-					"Node can have at most %d children, but it has %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_AT_MOST,
 					new Integer(count), new Integer(children.length)));
 	}
 
@@ -254,7 +258,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenEven() throws ParseException {
 		if ((children.length & 1) != 0)
 			throw new ParseException(String.format(
-					"Node count is not even: %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_NOT_EVEN,
 					new Integer(children.length)));
 	}
 
@@ -262,7 +266,7 @@ public abstract class SimpleNode implements Node {
 	public void assertChildrenOdd() throws ParseException {
 		if ((children.length & 1) != 1)
 			throw new ParseException(String.format(
-					"Node count is not odd %d.  This is likely an error with the parser, contact support.",
+					CmnCnst.Error.NODE_COUNT_NOT_ODD,
 					new Integer(children.length)));
 	}
 
@@ -303,6 +307,7 @@ public abstract class SimpleNode implements Node {
 		endColumn = token.endColumn;
 	}
 
+	@Nonnull
 	@Override
 	public String getMethodName() {
 		if (this instanceof ASTFunctionClauseNode) {
@@ -344,16 +349,17 @@ public abstract class SimpleNode implements Node {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
 				break;
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
-				if (((ASTPropertyExpressionNode)children[i]).getLastChild().getSiblingMethod() == EMethod.PARENTHESIS) {
+				final Node pen = ((ASTPropertyExpressionNode)children[i]).getLastChild();
+				if (pen == null || pen.getSiblingMethod() == EMethod.PARENTHESIS) {
 					// Cannot do assignment a.foobar() = 42;
 					final String msg = String.format(
-							"Encountered illegal LVALUE (function call) %s in %s at line %s, column %s.", children[i],
+							CmnCnst.Error.ILLEGAL_LVALUE_FUNCTION, children[i],
 							assignType, new Integer(getStartLine()), new Integer(getStartColumn()));
 					throw new ParseException(msg);
 				}
 				break;
 			default:
-				final String msg = String.format("Encountered illegal LVALUE %s in %s at line %s, column %s.",
+				final String msg = String.format(CmnCnst.Error.ILLEGAL_LVALUE,
 						children[i].getClass().getSimpleName(), assignType, new Integer(getStartLine()),
 						new Integer(getStartColumn()));
 				throw new ParseException(msg);

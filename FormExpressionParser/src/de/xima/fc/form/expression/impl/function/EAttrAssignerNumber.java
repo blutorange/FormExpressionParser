@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -13,12 +15,12 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 	;
 
-	private final FunctionLangObject impl;
+	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
-	private final String[] argList;
+	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
-	private EAttrAssignerNumber(final Impl impl) {
+	private EAttrAssignerNumber(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -33,6 +35,7 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -61,10 +64,10 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 	private static enum Impl implements IFunction<NumberLangObject> {
 		;
 
-		private String[] argList;
+		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -79,6 +82,7 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 			return argList;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();
@@ -98,7 +102,7 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
 			throw new UncatchableEvaluationException(ec,
-					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support.");
+					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
 		}
 	}
 }

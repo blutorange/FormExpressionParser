@@ -10,6 +10,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IOException> {
 	private static class InstanceHolder {
@@ -63,7 +64,7 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IO
 				baos.write(headerAndFooter[i].getBytes(charset));
 			// Write body
 			v = new GraphvizVisitor(baos, charset, lineSeparator);
-			node.jjtAccept(v, null);
+			node.jjtAccept(v, CmnCnst.EMPTY_BYTE_ARRAY);
 			// Write footer
 			for (int i = footerBegin; i < headerAndFooter.length; ++i)
 				baos.write(headerAndFooter[i].getBytes(charset));
@@ -76,17 +77,17 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IO
 			throws IOException {
 		final String[] headerAndFooter = new String[11];
 
-		headerAndFooter[0] = "digraph G {";
+		headerAndFooter[0] = "digraph G {"; //$NON-NLS-1$
 		headerAndFooter[1] = System.lineSeparator();
-		headerAndFooter[2] = "ROOT->";
+		headerAndFooter[2] = "ROOT->"; //$NON-NLS-1$
 		headerAndFooter[3] = String.valueOf(node.getId());
 		headerAndFooter[4] = System.lineSeparator();
-		headerAndFooter[5] = "ROOT";
-		headerAndFooter[6] = " [label=\"";
+		headerAndFooter[5] = "ROOT"; //$NON-NLS-1$
+		headerAndFooter[6] = " [label=\""; //$NON-NLS-1$
 		headerAndFooter[7] = StringEscapeUtils.escapeHtml4(title);
-		headerAndFooter[8] = "\"]";
+		headerAndFooter[8] = "\"]"; //$NON-NLS-1$
 		headerAndFooter[9] = System.lineSeparator();
-		headerAndFooter[10] = "}";
+		headerAndFooter[10] = "}"; //$NON-NLS-1$
 
 		return GraphvizVisitor.toString(node, lineSeparator, headerAndFooter, 10);
 	}
@@ -145,28 +146,28 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IO
 		this.outputStream = outputStream;
 		this.charset = charset;
 		this.lineSeparator = lineSeparator.getBytes(charset);
-		bytesLabelOpen = " [label=\"".getBytes(charset);
-		bytesLabelClose = "\"]".getBytes(charset);
-		bytesArrow = "->".getBytes(charset);
+		bytesLabelOpen = " [label=\"".getBytes(charset); //$NON-NLS-1$
+		bytesLabelClose = "\"]".getBytes(charset); //$NON-NLS-1$
+		bytesArrow = "->".getBytes(charset); //$NON-NLS-1$
 	}
 
 	@Override
-	protected byte[] visitNode(final Node node, byte[] parentId) throws IOException {
+	protected byte[] visitNode(final Node node, final byte[] parentId) throws IOException {
 		final String label = StringEscapeUtils.escapeHtml4(node.toString());
 		final byte[] nodeId = String.valueOf(node.getId()).getBytes(charset);
 		outputStream.write(nodeId);
 		outputStream.write(bytesLabelOpen);
 		outputStream.write(label.getBytes(charset));
 		outputStream.write(bytesLabelClose);
-		
+
 		outputStream.write(lineSeparator);
-		
-		if (parentId != null) {
+
+		if (parentId.length != 0) {
 			outputStream.write(parentId);
 			outputStream.write(bytesArrow);
 			outputStream.write(nodeId);
 			outputStream.write(lineSeparator);
 		}
-		return nodeId;
+		return nodeId != null ? nodeId : CmnCnst.EMPTY_BYTE_ARRAY;
 	}
 }

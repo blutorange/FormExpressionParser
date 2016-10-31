@@ -9,6 +9,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Create a new binding instance with a new map for each nesting level. May not
@@ -117,8 +118,7 @@ public class CloneBinding implements IBinding {
 
 		public final Impl unnest(final IEvaluationContext ec) {
 			if (parent == null)
-				throw new UncatchableEvaluationException(ec,
-						"Cannot unnest global binding. This may be an error in the parser. Contact support.");
+				throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
 			map.clear();
 			return parent;
 		}

@@ -3,9 +3,11 @@ package de.xima.fc.form.expression.node;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTNumberNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 	private double doubleValue;
 
 	public ASTNumberNode(final FormExpressionParser parser, final int nodeId) {
@@ -21,7 +23,7 @@ public class ASTNumberNode extends SimpleNode {
 			doubleValue = Double.parseDouble(string);
 		}
 		catch (final NumberFormatException e) {
-			throw new ParseException(String.format("Encountered invalid number %s at line %d, column %d: %s", string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
+			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_NUMBER, string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 		super.init(method);
 	}
@@ -33,7 +35,7 @@ public class ASTNumberNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(doubleValue).append(",");
+		sb.append(doubleValue).append(',');
 	}
 
 	public double getDoubleValue() {

@@ -1,5 +1,11 @@
 package de.xima.fc.form.expression.enums;
 
+import javax.annotation.Nonnull;
+
+import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
+import de.xima.fc.form.expression.util.CmnCnst;
+
 /**
  * Method names for operators internal to the language.
  * <br><br>
@@ -7,84 +13,84 @@ package de.xima.fc.form.expression.enums;
  * @author madgaksha
  */
 public enum EMethod {
-	PLUS("+"), // +
-	PLUS_UNARY("+"), // +
-	DOUBLE_PLUS_PREFIX("++"), // ++i
-	DASH("-"), // -
-	DASH_UNARY("-"), // -
-	DOUBLE_DASH_PREFIX("--"), // --i
+	PLUS(CmnCnst.EMETHOD_PLUS), // +
+	PLUS_UNARY(CmnCnst.EMETHOD_PLUS), // +
+	DOUBLE_PLUS_PREFIX(CmnCnst.EMETHOD_DOUBLE_PLUS), // ++i
+	DASH(CmnCnst.EMETHOD_DASH), // -
+	DASH_UNARY(CmnCnst.EMETHOD_DASH), // -
+	DOUBLE_DASH_PREFIX(CmnCnst.EMETHOD_DOUBLE_DASH), // --i
 
 	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_PLUS_PREFIX} */
-	DOUBLE_PLUS_SUFFIX("++"), // i++
+	DOUBLE_PLUS_SUFFIX(CmnCnst.EMETHOD_DOUBLE_PLUS), // i++
 	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_DASH_PREFIX} */
-	DOUBLE_DASH_SUFFIX("--"), // i--
-	
-	STAR("*"), // *
-	DOUBLE_STAR("**"), // **
-	SLASH("/"), // /
-	PERCENT("%"), // %
+	DOUBLE_DASH_SUFFIX(CmnCnst.EMETHOD_DASH), // i--
 
-	AMPERSAND("&"), // &
-	DOUBLE_AMPERSAND("&&"), // &&
+	STAR(CmnCnst.EMETHOD_STAR), // *
+	DOUBLE_STAR(CmnCnst.EMETHOD_DOUBLE_STAR), // **
+	SLASH(CmnCnst.EMETHOD_SLASH), // /
+	PERCENT(CmnCnst.EMETHOD_PERCENT), // %
 
-	BAR("|"), // |
-	DOUBLE_BAR("||"), // ||
+	AMPERSAND(CmnCnst.EMETHOD_AMPERSAND), // &
+	DOUBLE_AMPERSAND(CmnCnst.EMETHOD_DOUBLE_AMPERSAND), // &&
 
-	CIRCUMFLEX("^"), // ^
+	BAR(CmnCnst.EMETHOD_BAR), // |
+	DOUBLE_BAR(CmnCnst.EMETHOD_DOUBLE_BAR), // ||
 
-	TILDE("~"), // ~
-	EQUAL_TILDE("=~"), // =~
-	EXCLAMATION_TILDE("!~"), // !~
+	CIRCUMFLEX(CmnCnst.EMETHOD_CIRCUMFLEX), // ^
+
+	TILDE(CmnCnst.EMETHOD_TILDE), // ~
+	EQUAL_TILDE(CmnCnst.EMETHOD_EQUAL_TILDE), // =~
+	EXCLAMATION_TILDE(CmnCnst.EMETHOD_EXCLAMATION_TILDE), // !~
 
 	// These cannot be overridden, these operators use the non-equal
 	// versions during evaluation.
 	// Eg. a+=b is evaluated as if it were a=a+b
-	PLUS_EQUAL("+="), // +=
-	DASH_EQUAL("-="), // -=
-	STAR_EQUAL("*="), // *=
-	DOUBLE_STAR_EQUAL("**="), // **=
-	SLASH_EQUAL("/="), // /=
-	PERCENT_EQUAL("%="), // %=
-	AMPERSAND_EQUAL("&="), // &=
-	DOUBLE_ANGLE_OPEN_EQUAL("<<="), // <<=
-	TRIPLE_ANGLE_OPEN_EQUAL("<<<="), // <<<=
-	DOUBLE_ANGLE_CLOSE_EQUAL(">>="), // >>=
-	TRIPLE_ANGLE_CLOSE_EQUAL(">>>="), // >>>=
-	DOUBLE_AMPERSAND_EQUAL("&&="), // &&=
-	BAR_EQUAL("|="), // |=
-	DOUBLE_BAR_EQUAL("||="), // ||=
-	CIRCUMFLEX_EQUAL("^="), // ^=
+	PLUS_EQUAL(CmnCnst.EMETHOD_PLUS_EQUAL), // +=
+	DASH_EQUAL(CmnCnst.EMETHOD_DASH_EQUAL), // -=
+	STAR_EQUAL(CmnCnst.EMETHOD_STAR_EQUAL), // *=
+	DOUBLE_STAR_EQUAL(CmnCnst.EMETHOD_DOUBLE_STAR_EQUAL), // **=
+	SLASH_EQUAL(CmnCnst.EMETHOD_SLASH_EQUAL), // /=
+	PERCENT_EQUAL(CmnCnst.EMETHOD_PERCENT_EQUAL), // %=
+	AMPERSAND_EQUAL(CmnCnst.EMETHOD_AMPERSAND_EQUAL), // &=
+	DOUBLE_ANGLE_OPEN_EQUAL(CmnCnst.EMETHOD_DOUBLE_ANGLE_OPEN_EQUAL), // <<=
+	TRIPLE_ANGLE_OPEN_EQUAL(CmnCnst.EMETHOD_TRIPLE_ANGLE_OPEN_EQUAL), // <<<=
+	DOUBLE_ANGLE_CLOSE_EQUAL(CmnCnst.EMETHOD_DOUBLE_ANGLE_CLOSE_EQUAL), // >>=
+	TRIPLE_ANGLE_CLOSE_EQUAL(CmnCnst.EMETHOD_TRIPLE_ANGLE_CLOSE_EQUAL), // >>>=
+	DOUBLE_AMPERSAND_EQUAL(CmnCnst.EMETHOD_DOUBLE_AMPERSAND_EQUAL), // &&=
+	BAR_EQUAL(CmnCnst.EMETHOD_BAR_EQUAL), // |=
+	DOUBLE_BAR_EQUAL(CmnCnst.EMETHOD_DOUBLE_BAR_EQUAL), // ||=
+	CIRCUMFLEX_EQUAL(CmnCnst.EMETHOD_AMPERSAND_EQUAL), // ^=
 
-	EQUAL("="), // =
-	EXCLAMATION("!"), // !
+	EQUAL(CmnCnst.EMETHOD_EQUAL), // =
+	EXCLAMATION(CmnCnst.EMETHOD_EXCLAMATION), // !
 
 	// These cannot be overridden, they use ALangObject#equals
-	DOUBLE_EQUAL("=="), // ==
-	TRIPLE_EQUAL("==="), // ===
-	EXCLAMATION_EQUAL("!="), // !=
-	EXCLAMATION_DOUBLE_EQUAL("!=="), // !==
+	DOUBLE_EQUAL(CmnCnst.EMETHOD_DOUBLE_EQUAL), // ==
+	TRIPLE_EQUAL(CmnCnst.EMETHOD_TRIPLE_EQUAL), // ===
+	EXCLAMATION_EQUAL(CmnCnst.EMETHOD_EXCLAMATION_EQUAL), // !=
+	EXCLAMATION_DOUBLE_EQUAL(CmnCnst.EMETHOD_EXCLAMATION_DOUBLE_EQUAL), // !==
 
 	// These cannot be overridden, they use ALangObject#compareTo
-	ANGLE_OPEN("<"), // <
-	ANGLE_CLOSE(">"), // >
-	ANGLE_OPEN_EQUAL("<="),// <=
-	ANGLE_CLOSE_EQUAL(">="), // >=
-	
-	DOUBLE_ANGLE_OPEN("<<"), // <<
-	TRIPLE_ANGLE_OPEN("<<<"), // <<<
-	DOUBLE_ANGLE_CLOSE(">>"), // >>
-	TRIPLE_ANGLE_CLOSE(">>>"), // >>>
+	ANGLE_OPEN(CmnCnst.EMETHOD_ANGLE_OPEN), // <
+	ANGLE_CLOSE(CmnCnst.EMETHOD_ANGLE_CLOSE), // >
+	ANGLE_OPEN_EQUAL(CmnCnst.EMETHOD_ANGLE_OPEN_EQUAL),// <=
+	ANGLE_CLOSE_EQUAL(CmnCnst.EMETHOD_ANGLE_CLOSE_EQUAL), // >=
 
-	COERCE("=>"),
+	DOUBLE_ANGLE_OPEN(CmnCnst.EMETHOD_DOUBLE_ANGLE_OPEN), // <<
+	TRIPLE_ANGLE_OPEN(CmnCnst.EMETHOD_TRIPLE_ANGLE_OPEN), // <<<
+	DOUBLE_ANGLE_CLOSE(CmnCnst.EMETHOD_DOUBLE_ANGLE_CLOSE), // >>
+	TRIPLE_ANGLE_CLOSE(CmnCnst.EMETHOD_TRIPLE_ANGLE_CLOSE), // >>>
 
-	DOT("."),
-	BRACKET("[]"),
-	PARENTHESIS("()"),
+	COERCE(CmnCnst.EMETHOD_COERCE),
+
+	DOT(CmnCnst.EMETHOD_DOT),
+	BRACKET(CmnCnst.EMETHOD_BRACKET),
+	PARENTHESIS(CmnCnst.EMETHOD_PARENTHESIS),
 
 	//Special do not use
-	SWITCHCASE("SWITCHCASE"),
-	SWITCHDEFAULT("SWITCHDEFAULT"),
-	SWITCHCLAUSE("SWITCHCLAUSE"),
+	SWITCHCASE(CmnCnst.EMETHOD_SWITCHCASE),
+	SWITCHDEFAULT(CmnCnst.EMETHOD_SWITCHDEFAULT),
+	SWITCHCLAUSE(CmnCnst.EMETHOD_SWITCHCLAUSE),
 	;
 
 	public final String methodName;
@@ -92,7 +98,8 @@ public enum EMethod {
 		this.methodName = name;
 	}
 
-	public EMethod equalMethod() {
+	@Nonnull
+	public EMethod equalMethod(@Nonnull final IEvaluationContext ec) {
 		switch (this) {
 		case DOUBLE_PLUS_PREFIX: return EMethod.DOUBLE_PLUS_PREFIX;
 		case DOUBLE_DASH_PREFIX: return EMethod.DOUBLE_DASH_PREFIX;
@@ -115,11 +122,12 @@ public enum EMethod {
 		case CIRCUMFLEX_EQUAL: return EMethod.CIRCUMFLEX;
 		//$CASES-OMITTED$
 		default:
-			return null;
+			throw new UncatchableEvaluationException(ec, String.format(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
 		}
 	}
 
-	public EMethod comparisonMethod() {
+	@Nonnull
+	public EMethod comparisonMethod(@Nonnull final IEvaluationContext ec) {
 		switch (this) {
 		case TRIPLE_EQUAL:
 		case EXCLAMATION_DOUBLE_EQUAL: return EMethod.TRIPLE_EQUAL;
@@ -129,7 +137,7 @@ public enum EMethod {
 		case EXCLAMATION_TILDE: return EMethod.EQUAL_TILDE;
 		//$CASES-OMITTED$
 		default:
-			return null;
+			throw new UncatchableEvaluationException(ec, String.format(CmnCnst.Error.INVALID_COMPARISON_METHOD, this));
 		}
 	}
 
@@ -161,19 +169,19 @@ public enum EMethod {
 			return false;
 		}
 	}
-	
+
 	//    -1 0 1
 	// >   f f t
 	// <   t f f
 	// >=  f t t
 	// <=  t t f
-	public boolean checkComparison(int comp) {
+	public boolean checkComparison(final int comp) {
 		switch (this) {
 		case ANGLE_OPEN: return comp < 0;
 		case ANGLE_CLOSE: return comp > 0;
 		case ANGLE_OPEN_EQUAL: return comp <= 0;
 		case ANGLE_CLOSE_EQUAL: return comp >= 0;
-			//$CASES-OMITTED$
+		//$CASES-OMITTED$
 		default: return false;
 		}
 	}

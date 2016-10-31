@@ -9,6 +9,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * A binding that creates a {@link Map} when instantiated for each nesting
@@ -93,8 +94,7 @@ public class LookUpBinding implements IBinding {
 	public void unnest(final IEvaluationContext ec) {
 		mapArray[currentDepth].clear();
 		if (currentDepth <= 0)
-			throw new UncatchableEvaluationException(ec,
-					"Cannot unnest global binding. This may be an error in the parser. Contact support.");
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
 		--currentDepth;
 		breakpointArray[currentDepth] = false;
 	}

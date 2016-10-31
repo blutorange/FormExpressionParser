@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -52,9 +54,9 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 */
 	PERCENT(EMethod.PERCENT, Impl.MODULO),
 	;
-	private final EMethod method;
-	private final IFunction<NumberLangObject> function;
-	private EExpressionMethodNumber(final EMethod method, final IFunction<NumberLangObject> function) {
+	@Nonnull private final EMethod method;
+	@Nonnull private final IFunction<NumberLangObject> function;
+	private EExpressionMethodNumber(@Nonnull final EMethod method, @Nonnull final IFunction<NumberLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -76,14 +78,14 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext;
 			}
 		},
-		ADD(null, "summand") {
+		ADD(null, "summand") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
 		},
-		SUBTRACT(null, "subtrahend") {
+		SUBTRACT(null, "subtrahend") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -111,21 +113,21 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.negate();
 			}
 		},
-		MULTIPLY(null, "multiplicand") {
+		MULTIPLY(null, "multiplicand") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 		},
-		DIVIDE(null, "dividend") {
+		DIVIDE(null, "dividend") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.divide(args[0].coerceNumber(ec));
 			}
 		},
-		MODULO(null,"operand"){
+		MODULO(null,"operand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -134,10 +136,10 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 		},
 		;
 
-		private final String[] argList;
+		@Nonnull private final String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -147,6 +149,7 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			return optionalArgumentsName;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

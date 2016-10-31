@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTLogNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 	private ELogLevel logLevel;
 
 	public ASTLogNode(final FormExpressionParser parser, final int id) {
@@ -30,7 +31,7 @@ public class ASTLogNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(logLevel).append(",");
+		sb.append(logLevel).append(',');
 	}
 
 	public ELogLevel getLogLevel() {

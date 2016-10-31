@@ -4,8 +4,8 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.exception.variabletype.FunctionMissingReturnTypeException;
 import de.xima.fc.form.expression.exception.variabletype.IllegalVariableTypeException;
-import de.xima.fc.form.expression.exception.variabletype.IncompatbileIfReturnType;
-import de.xima.fc.form.expression.exception.variabletype.IncompatbileStatementListReturnType;
+import de.xima.fc.form.expression.exception.variabletype.IncompatbileIfReturnTypeException;
+import de.xima.fc.form.expression.exception.variabletype.IncompatbileStatementListReturnTypeException;
 import de.xima.fc.form.expression.exception.variabletype.IncompatibleFunctionReturnTypeException;
 import de.xima.fc.form.expression.exception.variabletype.InhomogenousArrayTypesException;
 import de.xima.fc.form.expression.exception.variabletype.InhomogenousHashKeyTypesException;
@@ -58,6 +58,7 @@ import de.xima.fc.form.expression.type.NumberType;
 import de.xima.fc.form.expression.type.RegexType;
 import de.xima.fc.form.expression.type.StringType;
 import de.xima.fc.form.expression.type.VoidType;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IVariableType, Boolean, IllegalVariableTypeException> {
 
@@ -69,13 +70,13 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	@Override
 	public IVariableType visit(final ASTExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTAssignmentExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
@@ -144,7 +145,7 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 			final IVariableType tmp = node.jjtGetChild(i).jjtAccept(this,
 					returnTypeNeeded.booleanValue() && i == len - 1 ? Boolean.TRUE : Boolean.FALSE);
 			if (mustJump && returnTypeNeeded.booleanValue() && homogenousType != null && !homogenousType.compatible(tmp))
-				throw new IncompatbileStatementListReturnType(i, homogenousType, tmp, node);
+				throw new IncompatbileStatementListReturnTypeException(i, homogenousType, tmp, node);
 			homogenousType = tmp;
 		}
 		return homogenousType;
@@ -157,7 +158,7 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 		if (node.jjtGetNumChildren() > 2) {
 			final IVariableType elseType = node.jjtGetChild(2).jjtAccept(this, returnTypeNeeded);
 			if (returnTypeNeeded.booleanValue() && !ifType.compatible(elseType))
-				throw new IncompatbileIfReturnType(node, ifType, elseType);
+				throw new IncompatbileIfReturnTypeException(node, ifType, elseType);
 		}
 		return ifType;
 	}
@@ -165,31 +166,31 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	@Override
 	public IVariableType visit(final ASTForLoopNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTWhileLoopNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTTryClauseNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTSwitchClauseNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTDoWhileLoopNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
@@ -200,7 +201,7 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	@Override
 	public IVariableType visit(final ASTThrowClauseNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
@@ -230,7 +231,7 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	@Override
 	public IVariableType visit(final ASTLogNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
@@ -253,25 +254,25 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	@Override
 	public IVariableType visit(final ASTUnaryExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTPropertyExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTIdentifierNameNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTWithClauseNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
@@ -282,13 +283,13 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 	@Override
 	public IVariableType visit(final ASTEmptyNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTLosNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
@@ -302,32 +303,32 @@ public class VariableTypeCheckVisitor implements IFormExpressionParserVisitor<IV
 		final IVariableType ifType = node.jjtGetChild(1).jjtAccept(this, returnTypeNeeded);
 		final IVariableType elseType = node.jjtGetChild(2).jjtAccept(this, returnTypeNeeded);
 		if (returnTypeNeeded.booleanValue() && !ifType.compatible(elseType))
-			throw new IncompatbileIfReturnType(node, ifType, elseType);
+			throw new IncompatbileIfReturnTypeException(node, ifType, elseType);
 		return ifType;
 	}
 
 	@Override
 	public IVariableType visit(final ASTParenthesisExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTEqualExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTPostUnaryExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public IVariableType visit(final ASTComparisonExpressionNode node, final Boolean returnTypeNeeded) throws IllegalVariableTypeException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override

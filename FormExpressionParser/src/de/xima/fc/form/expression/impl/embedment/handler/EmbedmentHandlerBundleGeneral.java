@@ -1,12 +1,11 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
-	SILENT("[%%", false),
-	VERBOSE("[%%=", true),
+	SILENT("[%%", false), //$NON-NLS-1$
+	VERBOSE("[%%=", true), //$NON-NLS-1$
 	;
 
 	private final String name;
@@ -18,7 +17,7 @@ public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
 
 	@Override
 	public String[] getScopeList() {
-		return ArrayUtils.EMPTY_STRING_ARRAY;
+		return CmnCnst.EMPTY_STRING_ARRAY;
 	}
 
 	@Override

@@ -3,10 +3,12 @@ package de.xima.fc.form.expression.node;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTForLoopNode extends SimpleNode {
 
+	private static final long serialVersionUID = 1L;
 	private String iteratingLoopVariable;
 
 	private String label;
@@ -33,13 +35,13 @@ public class ASTForLoopNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(iteratingLoopVariable).append(",");
+		sb.append(iteratingLoopVariable).append(',');
 		sb.append(label).append(',');
 	}
 
 	@Override
 	protected String nodeName() {
-		return iteratingLoopVariable != null ? "ForIteratingLoopNode" : "ForPlainLoopNode";
+		return iteratingLoopVariable != null ? CmnCnst.NAME_FOR_ITERATING_NODE : CmnCnst.NAME_FOR_PLAIN_NODE;
 	}
 
 	public String getLabel() {

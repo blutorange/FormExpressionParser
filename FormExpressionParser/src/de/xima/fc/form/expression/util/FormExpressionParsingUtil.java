@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTokenManager;
@@ -36,9 +38,13 @@ public final class FormExpressionParsingUtil {
 		 * @throws ParseException
 		 *             When the code is not a valid program.
 		 */
-		public static Node parse(final String code) throws ParseException, TokenMgrError {
+		@Nonnull
+		public static Node parse(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
-				return asParser(asTokenManager(reader)).CompleteProgram(null);
+				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
+				if (node == null)
+					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
+				return node;
 			}
 		}
 
@@ -110,11 +116,15 @@ public final class FormExpressionParsingUtil {
 		private Template() {
 		}
 
-		public static Node parse(final String code) throws ParseException, TokenMgrError {
+		@Nonnull
+		public static Node parse(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
-				return parser.Template(null);
+				final Node node = parser.Template(null);
+				if (node == null)
+					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
+				return node;
 			}
 		}
 
@@ -155,7 +165,7 @@ public final class FormExpressionParsingUtil {
 
 		@Override
 		public void remove() {
-			throw new UnsupportedOperationException("Token iterator does not support removal.");
+			throw new UnsupportedOperationException(CmnCnst.Error.TOKEN_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
 		}
 
 		@Override
@@ -169,8 +179,8 @@ public final class FormExpressionParsingUtil {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
 		return new FormExpressionParserTokenManager(null, stream, state);
 	}
-	
-	private static FormExpressionParser asParser(FormExpressionParserTokenManager tm) {
+
+	private static FormExpressionParser asParser(final FormExpressionParserTokenManager tm) {
 		final FormExpressionParser parser = new FormExpressionParser(tm);
 		tm.parser = parser;
 		return parser;

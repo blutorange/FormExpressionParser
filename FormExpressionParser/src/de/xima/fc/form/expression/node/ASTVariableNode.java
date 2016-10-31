@@ -1,23 +1,35 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTVariableNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 
 	public ASTVariableNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	private String name;
+	@Nonnull
+	private String name = CmnCnst.EMPTY_STRING;
+	@Nullable
 	private String scope;
 
+	@Nonnull
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @return The scope, or <code>null</code> when it is a local variable.
+	 */
+	@Nullable
 	public String getScope() {
 		return scope;
 	}
@@ -28,7 +40,7 @@ public class ASTVariableNode extends SimpleNode {
 
 	public void init(final EMethod method, final String scope, final String name) throws ParseException {
 		assertChildrenAtMost(1);
-		if (name == null) throw new ParseException("Name is null. This is likely an error with the parser. Contact support.");
+		if (name == null) throw new ParseException(CmnCnst.Error.VARIABLE_NODE_NULL_NAME);
 		super.init(method);
 		this.name =  name;
 		this.scope = scope;
@@ -36,7 +48,7 @@ public class ASTVariableNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(scope).append(",").append(name).append(",");
+		sb.append(scope).append(',').append(name).append(',');
 	}
 
 	@Override

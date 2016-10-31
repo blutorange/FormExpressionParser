@@ -6,6 +6,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTExceptionNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 	public ASTExceptionNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}

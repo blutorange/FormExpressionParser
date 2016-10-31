@@ -1,10 +1,11 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class ReturnClauseException extends UncatchableEvaluationException {
-	private final static String MESSAGE = "Return clause used outside a function.";
+	private static final long serialVersionUID = 1L;
 	public ReturnClauseException(final IEvaluationContext ec) {
-		super(ec, MESSAGE);
+		super(ec, CmnCnst.Error.RETURN_CLAUSE);
 	}
 }

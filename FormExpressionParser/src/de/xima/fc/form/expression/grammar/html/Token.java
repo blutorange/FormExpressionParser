@@ -1,9 +1,12 @@
 package de.xima.fc.form.expression.grammar.html;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Describes the input token stream.
@@ -53,11 +56,13 @@ public class Token implements java.io.Serializable {
 	 * This is true only if this token is also a regular token. Otherwise, see
 	 * below for a description of the contents of this field.
 	 */
+	@Nullable
 	public Token next;
 
 	/**
 	 * A reference the the previous token. <code>null</code> when there is none.
 	 */
+	@Nullable
 	public Token prev;
 
 	/**
@@ -72,6 +77,7 @@ public class Token implements java.io.Serializable {
 	 * (without an intervening regular token). If there is no such token, this
 	 * field is null.
 	 */
+	@Nullable
 	public Token specialToken;
 
 	/**
@@ -81,6 +87,7 @@ public class Token implements java.io.Serializable {
 	 * different from the image. Any subclass of Token that actually wants to
 	 * return a non-null value can override this method as appropriate.
 	 */
+	@Nullable
 	public Object getValue() {
 		return null;
 	}
@@ -89,13 +96,14 @@ public class Token implements java.io.Serializable {
 	 * No-argument constructor
 	 */
 	public Token() {
+		this(0,CmnCnst.EMPTY_STRING);
 	}
 
 	/**
 	 * Constructs a new token for the specified Image.
 	 */
 	public Token(final int kind) {
-		this(kind, null);
+		this(kind, CmnCnst.EMPTY_STRING);
 	}
 
 	/**
@@ -134,6 +142,11 @@ public class Token implements java.io.Serializable {
 		return insertToken(Token.newToken(kind, image));
 	}
 
+	public Token insertDoubleString(final String string) {
+		return insertToken(HtmlParserConstants.attvDoubleString,
+				CmnCnst.SYNTAX_QUOTE + StringEscapeUtils.escapeHtml4(string) + CmnCnst.SYNTAX_QUOTE);
+	}
+
 	/**
 	 * Inserts the given token after this token and returns the inserted token for chaining.
 	 * @param token Token to insert.
@@ -143,7 +156,7 @@ public class Token implements java.io.Serializable {
 		token.specialToken = null;
 		token.next = this.next;
 		token.prev = this;
-		if (this.next != null) this.next.prev = token;
+		if (next != null) next.prev = token;
 		this.next = token;
 		return token;
 	}
@@ -178,7 +191,7 @@ public class Token implements java.io.Serializable {
 			return insertToken(HtmlParserConstants.tagWs, StringUtils.SPACE)
 					.insertToken(HtmlParserConstants.tagName, name)
 					.insertToken(HtmlParserConstants.tagEquals)
-					.insertToken(HtmlParserConstants.attvDoubleString, "\"" + StringEscapeUtils.escapeHtml4(value) + "\"");
+					.insertDoubleString(value);
 		}
 		return this;
 	}
@@ -192,13 +205,16 @@ public class Token implements java.io.Serializable {
 		Token token = this;
 		while ((token = token.next) != null) {
 			final int deltaLine = token.endLine - token.beginLine;
+			final Token tmp = token.prev;
 			if (token.beginColumn <= 1) {
-				token.beginLine = token.prev.endLine + 1;
+				if (tmp != null) token.beginLine = tmp.endLine + 1;
 			}
 			else {
 				final int deltaColumn = token.endColumn - token.beginColumn;
-				token.beginColumn = token.prev.endColumn + 1;
-				token.beginLine = token.prev.endLine;
+				if (tmp != null) {
+					token.beginColumn = tmp.endColumn + 1;
+					token.beginLine = tmp.endLine;
+				}
 				if (deltaLine == 0)
 					token.endColumn = token.beginColumn + deltaColumn;
 			}

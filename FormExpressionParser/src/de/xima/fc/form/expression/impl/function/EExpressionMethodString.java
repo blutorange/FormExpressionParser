@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -17,9 +19,9 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 	 */
 	PLUS(EMethod.PLUS, Impl.CONCATENATE),
 	;
-	private final EMethod method;
-	private final IFunction<StringLangObject> function;
-	private EExpressionMethodString(final EMethod method, final IFunction<StringLangObject> function) {
+	@Nonnull private final EMethod method;
+	@Nonnull private final IFunction<StringLangObject> function;
+	private EExpressionMethodString(@Nonnull final EMethod method, @Nonnull final IFunction<StringLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -33,7 +35,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 	}
 
 	private static enum Impl implements IFunction<StringLangObject> {
-		CONCATENATE(null, "stringToJoin") {
+		CONCATENATE(null, "stringToJoin") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -42,10 +44,10 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		},
 		;
 
-		private final String[] argList;
+		@Nonnull private final String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -55,6 +57,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 			return optionalArgumentsName;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

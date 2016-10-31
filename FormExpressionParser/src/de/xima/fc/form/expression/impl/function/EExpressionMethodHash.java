@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -13,10 +15,10 @@ import de.xima.fc.form.expression.object.HashLangObject;
 
 public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 	;
-	private final EMethod method;
-	private final IFunction<HashLangObject> function;
+	@Nonnull private final EMethod method;
+	@Nonnull private final IFunction<HashLangObject> function;
 
-	private EExpressionMethodHash(final EMethod method, final IFunction<HashLangObject> function) {
+	private EExpressionMethodHash(@Nonnull final EMethod method, @Nonnull final IFunction<HashLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -31,10 +33,11 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 		return function;
 	}
 
+	@SuppressWarnings("unused")
 	private static enum Impl implements IFunction<HashLangObject> {
 		// A dummy because there are no methods yet.
 		@Deprecated
-		DUMMY(null, "comparand"){
+		DUMMY(null, "comparand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -43,10 +46,10 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 		},
 		;
 
-		private final String[] argList;
+		@Nonnull private final String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -56,6 +59,7 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 			return optionalArgumentsName;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

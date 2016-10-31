@@ -2,6 +2,8 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -35,12 +37,12 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	length(Impl.length),
 	;
 
-	private final FunctionLangObject impl;
+	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
-	private final String[] argList;
+	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
-	private EAttrAccessorString(final Impl impl) {
+	private EAttrAccessorString(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -48,13 +50,14 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
+	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final StringLangObject thisContext,
+			@Nonnull final ALangObject... args) throws EvaluationException {
 		if (!evalImmediately)
 			return impl;
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -81,7 +84,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	}
 
 	private static enum Impl implements IFunction<StringLangObject> {
-		toUpperCase(null, "locale") {
+		toUpperCase(null, "locale") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -89,7 +92,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
 		},
-		toLowerCase(null, "locale") {
+		toLowerCase(null, "locale") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -106,10 +109,10 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 		},
 		;
 
-		private String[] argList;
+		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -124,6 +127,7 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 			return argList;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

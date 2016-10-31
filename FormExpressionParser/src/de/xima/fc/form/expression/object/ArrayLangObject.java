@@ -2,30 +2,36 @@ package de.xima.fc.form.expression.object;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+
+import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class ArrayLangObject extends ALangObject {
 
-	private final List<ALangObject> value;
+	@Nonnull private final List<ALangObject> value;
 
-	private ArrayLangObject(final List<ALangObject> value) {
+	private ArrayLangObject(@Nonnull final List<ALangObject> value) {
 		super(Type.ARRAY);
 		this.value = value;
 	}
 
+	@Nonnull
 	public static ArrayLangObject create() {
 		return new ArrayLangObject(new ArrayList<ALangObject>());
 	}
 
+	@Nonnull
 	public static ArrayLangObject create(final Map<ALangObject, ALangObject> value) {
 		final List<ALangObject> list = new ArrayList<>(2*value.size());
 		for (final Entry<ALangObject, ALangObject> entry : value.entrySet()) {
@@ -35,6 +41,7 @@ public class ArrayLangObject extends ALangObject {
 		return new ArrayLangObject(list);
 	}
 
+	@Nonnull
 	public static ALangObject create(final ALangObject value) {
 		if (value == null) return NullLangObject.getInstance();
 		final List<ALangObject> list = new ArrayList<>(1);
@@ -42,6 +49,7 @@ public class ArrayLangObject extends ALangObject {
 		return new ArrayLangObject(list);
 	}
 
+	@Nonnull
 	public static ALangObject create(final ALangObject... value) {
 		if (value == null) return NullLangObject.getInstance();
 		final List<ALangObject> list = new ArrayList<>(value.length);
@@ -49,6 +57,7 @@ public class ArrayLangObject extends ALangObject {
 		return new ArrayLangObject(list);
 	}
 
+	@Nonnull
 	public static ALangObject create(final List<ALangObject> value) {
 		if (value == null) return NullLangObject.getInstance();
 		return new ArrayLangObject(value);
@@ -92,25 +101,32 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
+			final ALangObject... args) throws EvaluationException {
 		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodArray(method), method, ec, args);
 	}
+
 	@Override
-	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorArray(object, accessedViaDot), object, accessedViaDot, ec);
+	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot,
+			final IEvaluationContext ec) throws EvaluationException {
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorArray(object, accessedViaDot), object,
+				accessedViaDot, ec);
 	}
+
 	@Override
-	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerArray(object, accessedViaDot), object, accessedViaDot, value, ec);
+	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot,
+			final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
+		executeAttrAssigner(this, ec.getNamespace().attrAssignerArray(object, accessedViaDot), object, accessedViaDot,
+				value, ec);
 	}
 
 	@Override
 	public String inspect() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("ArrayLangObject[");
-		for (final ALangObject o : value) sb.append(o.inspect()).append(",");
+		sb.append(CmnCnst.ToString.INSPECT_ARRAY_LANG_OBJECT).append('[');
+		for (final ALangObject o : value) sb.append(o.inspect()).append(',');
 		if (sb.length() > 16) sb.setLength(sb.length()-1);
-		sb.append("]");
+		sb.append(']');
 		return sb.toString();
 	}
 
@@ -128,7 +144,7 @@ public class ArrayLangObject extends ALangObject {
 
 	/**
 	 * Sorts arrays like strings, ie. it compares each element starting at the
-	 * first. When all elements at common indices are equals, the smaller array 
+	 * first. When all elements at common indices are equals, the smaller array
 	 * comes before the larger array.
 	 * <ul>
 	 * <li>[1,2,3] < [2,1]</li>
@@ -148,25 +164,24 @@ public class ArrayLangObject extends ALangObject {
 		}
 		return Integer.compare(value.size(), v.size());
 	}
-	
+
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append("[");
-		for (final ALangObject o : value) builder.append(o.toString()).append(",");
+		builder.append(CmnCnst.SYNTAX_BRACE_OPEN);
+		for (final ALangObject o : value) builder.append(o.toString()).append(CmnCnst.SYNTAX_COMMA);
 		if (builder.length() > 1) builder.setLength(builder.length()-1);
-		builder.append("]");
+		builder.append(CmnCnst.SYNTAX_BRACKET_CLOSE);
 	}
 
 	@Override
-	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
-
 	@Override
-	public Iterator<ALangObject> iterator() {
-		return value.iterator();
+	public NonNullIterator<ALangObject> iterator() {
+		return new Itr();
 	}
 
 	public List<ALangObject> listValue() {
@@ -201,8 +216,9 @@ public class ArrayLangObject extends ALangObject {
 		return value.size();
 	}
 
+	@Nonnull
 	public ALangObject get(final int index) throws ArrayIndexOutOfBoundsException {
-		return value.get(index);
+		return ALangObject.create(value.get(index));
 	}
 
 	/**
@@ -230,13 +246,45 @@ public class ArrayLangObject extends ALangObject {
 		Collections.sort(value);
 	}
 
-
+	@SuppressWarnings("null")
+	@Nonnull
 	public ALangObject[] toArray() {
 		return value.toArray(new ALangObject[value.size()]);
 	}
-	
+
 	@Override
 	protected boolean isSingletonLike() {
 		return false;
+	}
+
+	private class Itr implements NonNullIterator<ALangObject> {
+		private int cursor;       // index of next element to return
+		private int lastRet = -1; // index of last element returned; -1 if no such
+		@Override
+		public boolean hasNext() {
+			return cursor != value.size();
+		}
+
+		@Override
+		public ALangObject next() {
+			final int i = cursor;
+			if (i >= value.size())
+				throw new NoSuchElementException();
+			cursor = i + 1;
+			return ALangObject.create(value.get(lastRet = i));
+		}
+
+		@Override
+		public void remove() {
+			if (lastRet < 0)
+				throw new IllegalStateException();
+			try {
+				value.remove(lastRet);
+				cursor = lastRet;
+				lastRet = -1;
+			} catch (final IndexOutOfBoundsException ex) {
+				throw new ConcurrentModificationException();
+			}
+		}
 	}
 }

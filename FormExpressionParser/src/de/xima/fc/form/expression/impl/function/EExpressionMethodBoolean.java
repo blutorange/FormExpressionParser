@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -16,10 +18,10 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 	CIRCUMFLEX(EMethod.CIRCUMFLEX, Impl.XOR),
 	EXCLAMATION(EMethod.EXCLAMATION, Impl.NOT),
 	;
-	private final EMethod method;
-	private final IFunction<BooleanLangObject> function;
+	@Nonnull private final EMethod method;
+	@Nonnull private final IFunction<BooleanLangObject> function;
 
-	private EExpressionMethodBoolean(final EMethod method, final IFunction<BooleanLangObject> function) {
+	private EExpressionMethodBoolean(@Nonnull final EMethod method, @Nonnull final IFunction<BooleanLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -39,7 +41,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param orOperand {@link BooleanLangObject}. Argument for the OR.
 		 * @return {@link BooleanLangObject}. The result of the logical OR disjunction between this boolean and the argument.
 		 */
-		OR(null, "orOperand"){
+		OR(null, "orOperand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -50,7 +52,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param andOperand {@link BooleanLangObject}. Argument for the AND.
 		 * @return {@link BooleanLangObject}. The result of the logical AND conjunction between this boolean and the argument.
 		 */
-		AND(null, "andOperand"){
+		AND(null, "andOperand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -61,7 +63,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param xorOperand {@link BooleanLangObject}. Argument for the XOR.
 		 * @return {@link BooleanLangObject}. The result of the logical XOR exclusive disjunction between this boolean and the argument.
 		 */
-		XOR(null, "xorOperand"){
+		XOR(null, "xorOperand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -80,10 +82,10 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		},
 		;
 
-		private final String[] argList;
+		@Nonnull private final String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -93,6 +95,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			return optionalArgumentsName;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

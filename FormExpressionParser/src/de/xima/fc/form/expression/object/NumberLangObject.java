@@ -3,8 +3,9 @@ package de.xima.fc.form.expression.object;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.Locale;
+
+import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
@@ -13,6 +14,9 @@ import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.MathDivisionByZeroException;
 import de.xima.fc.form.expression.exception.MathException;
+import de.xima.fc.form.expression.exception.NumberTooLongForIntException;
+import de.xima.fc.form.expression.exception.NumberTooLongForLongException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Number objects are immutable. Performing any operations on a number object
@@ -31,7 +35,7 @@ public class NumberLangObject extends ALangObject {
 
 	final static ThreadLocal<NumberFormat> NUMBER_FORMAT = new ThreadLocal<NumberFormat>(){
 		@Override protected NumberFormat initialValue() {
-			final NumberFormat nf = new DecimalFormat("#0.#########", DecimalFormatSymbols.getInstance(Locale.ROOT));
+			final NumberFormat nf = new DecimalFormat("#0.#########", DecimalFormatSymbols.getInstance(Locale.ROOT)); //$NON-NLS-1$
 			nf.setGroupingUsed(false);
 			return nf;
 		}
@@ -39,9 +43,9 @@ public class NumberLangObject extends ALangObject {
 
 
 	private static class InstanceHolder {
-		public final static NumberLangObject ZERO = NumberLangObject.create(0);
-		public final static NumberLangObject ONE = NumberLangObject.create(1);
-		public static final NumberLangObject FOURTY_TWO = NumberLangObject.create(42);
+		@Nonnull public final static NumberLangObject ZERO = NumberLangObject.create(0);
+		@Nonnull public final static NumberLangObject ONE = NumberLangObject.create(1);
+		@Nonnull public static final NumberLangObject FOURTY_TWO = NumberLangObject.create(42);
 	}
 
 	private NumberLangObject(final double value) {
@@ -55,56 +59,65 @@ public class NumberLangObject extends ALangObject {
 
 	public long longValue(final IEvaluationContext ec) throws MathException {
 		if (Double.isNaN(value) || value > 9007199254740993f || value < -9007199254740993f)
-			throw new MathException("Number too large to be represented as a long: " + value, ec);
+			throw new NumberTooLongForLongException(value, ec);
 		return (long) value;
 	}
 
 	public int intValue(final IEvaluationContext ec) throws MathException {
 		if (Double.isNaN(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE)
-			throw new MathException("Number too large to be represented as an int: " + value, ec);
+			throw new NumberTooLongForIntException(value, ec);
 		return (int) value;
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final int value) {
 		return new NumberLangObject(value);
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final long value) {
 		return new NumberLangObject(value);
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final float value) {
 		return new NumberLangObject(value);
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final double value) {
 		return new NumberLangObject(value);
 	}
 
+	@Nonnull
 	public static ALangObject create(final Integer value) {
 		if (value == null)
 			return NullLangObject.getInstance();
 		return create(value.intValue());
 	}
 
+	@Nonnull
 	public static ALangObject create(final Long value) {
 		if (value == null)
 			return NullLangObject.getInstance();
 		return create(value.longValue());
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final Float value) {
 		if (value == null)
 			return NumberLangObject.getZeroInstance();
 		return create(value.floatValue());
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final Double value) {
 		if (value == null)
 			return NumberLangObject.create(0);
 		return create(value.doubleValue());
 	}
 
+	@Nonnull
 	public static NumberLangObject create(final String value) {
 		if (value == null)
 			return NumberLangObject.getZeroInstance();
@@ -121,6 +134,7 @@ public class NumberLangObject extends ALangObject {
 		return StringLangObject.create(value);
 	}
 
+	@Nonnull
 	@Override
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
 		return RegexLangObject.createForString(NumberLangObject.toExpression(value));
@@ -201,7 +215,7 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return "NumberLangObject(" + value + ")";
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('"').append(value).append(')').toString();
 	}
 
 	@Override
@@ -214,32 +228,13 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
-	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
 	@Override
-	public Iterator<ALangObject> iterator() {
-		return new Iterator<ALangObject>() {
-			private double i = 0.0;
-
-			@Override
-			public boolean hasNext() {
-				return i < value;
-			}
-
-			@Override
-			public ALangObject next() {
-				final ALangObject res = NumberLangObject.create(i);
-				++i;
-				return res;
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException("Removal not supported for NumberLangObject::iterator.");
-			}
-		};
+	public NonNullIterator<ALangObject> iterator() {
+		return new Itr();
 	}
 
 	@Override
@@ -252,6 +247,7 @@ public class NumberLangObject extends ALangObject {
 	 *            Number to add.
 	 * @return A new number, the sum of this number and the operand.
 	 */
+	@Nonnull
 	public NumberLangObject add(final NumberLangObject operand) {
 		return NumberLangObject.create(value + operand.value);
 	}
@@ -261,6 +257,7 @@ public class NumberLangObject extends ALangObject {
 	 *            Number to subtract.
 	 * @return A new number, the difference of this number and the operand.
 	 */
+	@Nonnull
 	public NumberLangObject subtract(final NumberLangObject operand) {
 		return NumberLangObject.create(value - operand.value);
 	}
@@ -270,24 +267,9 @@ public class NumberLangObject extends ALangObject {
 	 *            Number to multiply by.
 	 * @return A new number, the product of this number and the operand.
 	 */
+	@Nonnull
 	public NumberLangObject multiply(final NumberLangObject operand) {
 		return NumberLangObject.create(value * operand.value);
-	}
-
-	public boolean smaller(final NumberLangObject other) {
-		return value < other.value;
-	}
-
-	public boolean greater(final NumberLangObject other) {
-		return value > other.value;
-	}
-
-	public boolean smallerOrEqual(final NumberLangObject other) {
-		return value <= other.value;
-	}
-
-	public boolean greaterOrEqual(final NumberLangObject other) {
-		return value >= other.value;
 	}
 
 	/**
@@ -297,6 +279,7 @@ public class NumberLangObject extends ALangObject {
 	 * @throws MathDivisionByZeroException
 	 *             When the operand is 0.
 	 */
+	@Nonnull
 	public NumberLangObject divide(final NumberLangObject operand) {
 		return NumberLangObject.create(value / operand.value);
 	}
@@ -313,14 +296,17 @@ public class NumberLangObject extends ALangObject {
 		return value <= 0.0d ? -value <= Double.MAX_VALUE : value <= Double.MAX_VALUE;
 	}
 
+	@Nonnull
 	public NumberLangObject abs() {
 		return NumberLangObject.create(value < 0.0d ? -value : value);
 	}
 
+	@Nonnull
 	public NumberLangObject signum() {
 		return NumberLangObject.create(value > 0d ? 1 : value < 0d ? -1 : 0);
 	}
 
+	@Nonnull
 	public NumberLangObject negate() {
 		return NumberLangObject.create(-value);
 	}
@@ -329,11 +315,13 @@ public class NumberLangObject extends ALangObject {
 	 * @param other
 	 * @return A number in the range [0...other).
 	 */
+	@Nonnull
 	public NumberLangObject modulo(final NumberLangObject other) {
 		final double res = Math.IEEEremainder(value, other.value);
 		return NumberLangObject.create(res < 0d ? res + other.value : res);
 	}
 
+	@Nonnull
 	public NumberLangObject remainder(final NumberLangObject other) {
 		return NumberLangObject.create(value % other.value);
 	}
@@ -342,27 +330,51 @@ public class NumberLangObject extends ALangObject {
 		return NumberLangObject.create(Math.pow(value, operand.value));
 	}
 
+	@Nonnull
 	public NumberLangObject log() throws MathException {
 		return NumberLangObject.create(Math.log(value));
 	}
 
+	@Nonnull
 	public NumberLangObject sin() throws MathException {
 		return NumberLangObject.create(Math.sin(value));
 	}
 
+	@Nonnull
 	public NumberLangObject cos() throws MathException {
 		return NumberLangObject.create(Math.cos(value));
 	}
 
+	@Nonnull
 	public static NumberLangObject getZeroInstance() {
 		return InstanceHolder.ZERO;
 	}
 
+	@Nonnull
 	public static NumberLangObject getOneInstance() {
 		return InstanceHolder.ONE;
 	}
 
+	@Nonnull
 	public static NumberLangObject getFourtyTwoInstance() {
 		return InstanceHolder.FOURTY_TWO;
+	}
+
+	private class Itr implements NonNullIterator<ALangObject> {
+		private double i = 0.0;
+		@Override
+		public boolean hasNext() {
+			return i < value;
+		}
+		@Override
+		public ALangObject next() {
+			final ALangObject res = NumberLangObject.create(i);
+			++i;
+			return res;
+		}
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException(CmnCnst.Error.NUMBER_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
+		}
 	}
 }

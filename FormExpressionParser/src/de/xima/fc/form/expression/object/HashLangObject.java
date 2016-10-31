@@ -8,18 +8,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.ComparatorEntryByKey;
 
 public class HashLangObject extends ALangObject {
 
+	@Nonnull
 	private final Map<ALangObject, ALangObject> value;
 
-	private HashLangObject(final Map<ALangObject, ALangObject> value) {
+	private HashLangObject(@Nonnull final Map<ALangObject, ALangObject> value) {
 		super(Type.HASH);
 		this.value = value;
 	}
@@ -49,21 +53,21 @@ public class HashLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append("{");
+		builder.append(CmnCnst.SYNTAX_BRACE_OPEN);
 		for (final Entry<ALangObject, ALangObject> v : value.entrySet())
-			builder.append(v.getKey().toString()).append(":").append(v.getValue().toString()).append(",");
+			builder.append(v.getKey().toString()).append(CmnCnst.SYNTAX_COLON).append(v.getValue().toString()).append(CmnCnst.SYNTAX_COMMA);
 		if (builder.length() > 1) builder.setLength(builder.length()-1);
-		builder.append("}");
+		builder.append(CmnCnst.SYNTAX_BRACE_CLOSE);
 	}
 
 	@Override
 	public String inspect() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("HashLangObject{");
+		sb.append(CmnCnst.ToString.INSPECT_HASH_LANG_OBJECT).append('{');
 		for (final Entry<ALangObject, ALangObject> v : value.entrySet())
-			sb.append(v.getKey().inspect()).append(":").append(v.getValue().inspect()).append(",");
+			sb.append(v.getKey().inspect()).append(':').append(v.getValue().inspect()).append(',');
 		if (sb.length() > 15) sb.setLength(sb.length()-1);
-		sb.append("}");
+		sb.append('}');
 		return sb.toString();
 	}
 
@@ -101,6 +105,7 @@ public class HashLangObject extends ALangObject {
 	 * @param key The key for which to retrieve the mapped value.
 	 * @return The value for the key, or null when it has not been set yet.
 	 */
+	@Nonnull
 	public ALangObject get(final ALangObject key) {
 		return ALangObject.create(value.get(key));
 	}
@@ -131,7 +136,7 @@ public class HashLangObject extends ALangObject {
 	protected boolean isSingletonLike() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean equals(final Object o) {
 		if (o == this) return true;
@@ -159,24 +164,25 @@ public class HashLangObject extends ALangObject {
 		if (s1.size() != s2.size()) return Integer.compare(value.size(), v.size());
 		return res2;
 	}
-	
+
 	@Override
-	public Iterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
 	@Override
-	public Iterator<ALangObject> iterator() {
-		return value.keySet().iterator();
+	public NonNullIterator<ALangObject> iterator() {
+		return new Itr(value.keySet().iterator());
 	}
 
-
+	@Nonnull
 	public static ALangObject create(final Map<ALangObject, ALangObject> value) {
 		if (value == null) return NullLangObject.getInstance();
 		return new HashLangObject(value);
 	}
 
 	/** @return An empty hash. */
+	@Nonnull
 	public static HashLangObject create() {
 		return new HashLangObject(new HashMap<ALangObject, ALangObject>());
 	}
@@ -185,6 +191,7 @@ public class HashLangObject extends ALangObject {
 	 * @param value An array with an even number of entries, each pair of two representing a key-value pair.
 	 * @return The hash map.
 	 */
+	@Nonnull
 	public static ALangObject create(final ALangObject... value) {
 		if (value == null) return NullLangObject.getInstance();
 		final int len = value.length - value.length%2;
@@ -198,6 +205,7 @@ public class HashLangObject extends ALangObject {
 	 * @param value A list with an even number of entries, each pair of two representing a key-value pair.
 	 * @return The hash map.
 	 */
+	@Nonnull
 	public static HashLangObject create(final List<ALangObject> value) {
 		if (value == null)
 			return new HashLangObject(new HashMap<ALangObject, ALangObject>());
@@ -208,6 +216,7 @@ public class HashLangObject extends ALangObject {
 		return new HashLangObject(map);
 	}
 
+	@Nonnull
 	public Map<ALangObject, ALangObject> hashValue() {
 		return value;
 	}
@@ -215,4 +224,26 @@ public class HashLangObject extends ALangObject {
 	public int length() {
 		return value.size();
 	}
+
+	private class Itr implements NonNullIterator<ALangObject> {
+		private final Iterator<ALangObject> it;
+		public Itr(final Iterator<ALangObject> it) {
+			this.it = it;
+		}
+		@Override
+		public boolean hasNext() {
+			return it.hasNext();
+		}
+
+		@Override
+		public ALangObject next() {
+			return ALangObject.create(it.next());
+		}
+
+		@Override
+		public void remove() {
+			it.remove();
+		}
+	}
+
 }

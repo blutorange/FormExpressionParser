@@ -4,6 +4,8 @@ import javax.annotation.concurrent.Immutable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.util.CmnCnst;
+
 /**
  * An immutable color class with (r,g,b,a) values all ranging
  * from 0 to 1. a=1 is full opacity, a=0.0 is full transparency.
@@ -13,33 +15,29 @@ import org.apache.commons.lang3.StringUtils;
 @Immutable
 public final class Color {
 	public final float r,g,b,a;
-	
-	public Color(float r, float g, float b, float a) {
+
+	public Color(final float r, final float g, final float b, final float a) {
 		this.r = clamp(r);
 		this.g = clamp(g);
 		this.b = clamp(b);
 		this.a = clamp(a);
 	}
-	
-	public Color(float r, float g, float b) {
+
+	public Color(final float r, final float g, final float b) {
 		this(r,g,b,1f);
 	}
-	
-	/** 
+
+	/**
 	 * @param rgba An integer with the four channels. <code>new Color(0xFF000005)</code> produces a red with an alpha value of 5.
 	 */
-	public Color(int rgba) {
-		long val = (rgba < 0 ? rgba+0x100000000L : rgba);
+	public Color(final int rgba) {
+		final long val = (rgba < 0 ? rgba+0x100000000L : rgba);
 		r = clamp(((val&0xFF000000)>>24)/255.0f);
 		g =	clamp(((val&0x00FF0000)>>16)/255.0f);
 		b =	clamp(((val&0x0000FF00)>>8)/255.0f);
 		a = clamp(((val&0x000000FF))/255.0f);
 	}
-	
-	private float clamp(float x) {
-		return x < 0f ? 0f : x > 1f ? 1f : x;
-	}
-	
+
 	public final static Color RED = new Color(1f,0f,0f);
 	public final static Color GREEN = new Color(0f,1f,0f);
 	public final static Color BLUE = new Color(0f,0f,1f);
@@ -75,7 +73,7 @@ public final class Color {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) return true;
 		if (!(obj instanceof Color)) return false;
 		final Color other = (Color) obj;
@@ -101,11 +99,11 @@ public final class Color {
 	 */
 	public String getHexStringRgba() {
 		return StringUtils.leftPad(Integer.toHexString(getHexRgba()), 8, '0');
-	}	
-	
+	}
+
 	@Override
 	public String toString() {
-		return "Color("+getHexStringRgba()+")";
+		return String.format(CmnCnst.ToString.COLOR, getHexStringRgba());
 	}
 
 	/** @return The r channel in the range [0,255]. */
@@ -115,7 +113,7 @@ public final class Color {
 	/** @return The g channel in the range [0,255]. */
 	public int getByteG() {
 		return (int)(g*255f);
-	}	
+	}
 	/** @return The b channel in the range [0,255]. */
 	public int getByteB() {
 		return (int)(b*255f);
@@ -130,4 +128,9 @@ public final class Color {
 	public boolean isFullyOpaque() {
 		return a != 1.0f;
 	}
+
+	private static float clamp(final float x) {
+		return x < 0f ? 0f : x > 1f ? 1f : x;
+	}
+
 }

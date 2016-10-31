@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
@@ -20,7 +22,7 @@ public interface IExternalContext {
 	 * @throws EmbedmentOutputException When an I/O error occurs.
 	 * @throw InvalidTemplateDataException When the data is syntactically or semantically invalid.
 	 */
-	public void write(String data) throws EmbedmentOutputException, InvalidTemplateDataException;
+	public void write(@Nonnull String data) throws EmbedmentOutputException, InvalidTemplateDataException;
 
 	/**
 	 * Called once after evaluation is finished.
@@ -36,7 +38,7 @@ public interface IExternalContext {
 	 * paragraph (eg. the current &lt;p&gt; tag) from the output.
 	 * @param command The command to process.
 	 */
-	public void process(IExternalContextCommand command, IEvaluationContext ec);
+	public void process(@Nonnull IExternalContextCommand command, @Nonnull IEvaluationContext ec);
 
 	/**
 	 * <p>
@@ -63,5 +65,5 @@ public interface IExternalContext {
 	 *         return some default value instead, eg. the empty string. Otherwise,
 	 *         the program will throw a {@link VariableNotDefinedException}.
 	 */
-	public ALangObject fetchScopedVariable(String scope, String name, IEvaluationContext ec);
+	public ALangObject fetchScopedVariable(@Nonnull String scope, @Nonnull String name, @Nonnull IEvaluationContext ec);
 }

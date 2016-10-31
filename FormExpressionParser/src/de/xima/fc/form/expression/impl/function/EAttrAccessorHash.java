@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -37,12 +39,12 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 	length(Impl.length),
 	;
 
-	private final FunctionLangObject impl;
+	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
-	private final String[] argList;
+	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
-	private EAttrAccessorHash(final Impl impl) {
+	private EAttrAccessorHash(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -50,13 +52,14 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
+	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final HashLangObject thisContext,
+			@Nonnull final ALangObject... args) throws EvaluationException {
 		if (!evalImmediately)
 			return impl;
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -83,14 +86,14 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 	}
 
 	private static enum Impl implements IFunction<HashLangObject> {
-		get(null, "key") {
+		get(null, "key") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				return thisContext.hashValue().get(args.length == 0 ? NullLangObject.getInstance() : args[0]);
+				return thisContext.get(args.length == 0 ? NullLangObject.getInstance() : args[0]);
 			}
 		},
-		contains(null, "key") {
+		contains(null, "key") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -107,10 +110,10 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 		}
 		;
 
-		private String[] argList;
+		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -125,6 +128,7 @@ public enum EAttrAccessorHash implements IFunction<HashLangObject> {
 			return argList;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

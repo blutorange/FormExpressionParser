@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.util;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.commons.pool2.ObjectPool;
 import org.slf4j.Logger;
@@ -14,11 +13,9 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
-import de.xima.fc.form.expression.impl.externalcontext.SystemExternalContext;
 import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
 import de.xima.fc.form.expression.impl.pool.GenericEcFactory;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 
 public final class FormExpressionEvaluationUtil {
@@ -31,22 +28,20 @@ public final class FormExpressionEvaluationUtil {
 		private Generic() {
 		}
 
-		public static ALangObject evalProgram(final String code, @Nullable final IExternalContext externalContext)
+		public static ALangObject evalProgram(@Nonnull final String code, @Nonnull final IExternalContext externalContext)
 				throws ParseException, EvaluationException {
 			final Node node = FormExpressionParsingUtil.Program.parse(code);
 			return eval(node, externalContext);
 		}
 
-		public static ALangObject evalTemplate(final String code, @Nullable final IExternalContext externalContext)
+		public static ALangObject evalTemplate(@Nonnull final String code, @Nonnull final IExternalContext externalContext)
 				throws ParseException, EvaluationException {
 			final Node node = FormExpressionParsingUtil.Template.parse(code);
 			return eval(node, externalContext);
 		}
 
-		public static ALangObject eval(final Node node, @Nullable IExternalContext externalContext)
+		public static ALangObject eval(@Nonnull final Node node, @Nonnull final IExternalContext externalContext)
 				throws EvaluationException {
-			if (node == null) return NullLangObject.getInstance();
-			if (externalContext == null) externalContext = SystemExternalContext.OUT;
 			return FormExpressionEvaluationUtil.eval(node, GenericEcFactory.getPoolInstance(), externalContext);
 		}
 	}
@@ -55,33 +50,29 @@ public final class FormExpressionEvaluationUtil {
 		private Formcycle() {
 		}
 
-		public static ALangObject evalProgram(final String code, @Nonnull final FormcycleExternalContext formcycle)
-				throws ParseException, EvaluationException {
+		public static ALangObject evalProgram(@Nonnull final String code, @Nonnull final FormcycleExternalContext formcycle)
+				throws ParseException, EvaluationException, IllegalArgumentException {
 			final Node node = FormExpressionParsingUtil.Program.parse(code);
 			return eval(node, formcycle);
 		}
 
-		public static ALangObject evalTemplate(final String code, @Nonnull final FormcycleExternalContext formcycle)
-				throws ParseException, EvaluationException {
+		public static ALangObject evalTemplate(@Nonnull final String code, @Nonnull final FormcycleExternalContext formcycle)
+				throws ParseException, EvaluationException, IllegalArgumentException {
 			final Node node = FormExpressionParsingUtil.Template.parse(code);
 			return eval(node, formcycle);
 		}
 
-		public static ALangObject eval(final Node node, @Nonnull final FormcycleExternalContext formcycle)
+		public static ALangObject eval(@Nonnull final Node node, @Nonnull final FormcycleExternalContext formcycle)
 				throws EvaluationException, IllegalArgumentException {
-			if (node == null)
-				return NullLangObject.getInstance();
-			if (formcycle == null)
-				throw new IllegalArgumentException("external context must not be null");
 			return FormExpressionEvaluationUtil.eval(node, FormcycleEcFactory.getPoolInstance(), formcycle);
 		}
 	}
 
-	private static  ALangObject eval(final Node node, ObjectPool<IEvaluationContext> pool, final IExternalContext externalContext) throws EvaluationException {
+	private static  ALangObject eval(final Node node, final ObjectPool<IEvaluationContext> pool, final IExternalContext externalContext) throws EvaluationException {
 		final IEvaluationContext ec;
 		try {
 			ec = pool.borrowObject();
-		} catch (Exception exception) {
+		} catch (final Exception exception) {
 			throw new CannotAcquireEvaluationContextException(exception);
 		}
 		ec.setExternalContext(externalContext);
@@ -90,8 +81,8 @@ public final class FormExpressionEvaluationUtil {
 		} finally {
 			try {
 				pool.returnObject(ec);
-			} catch (Exception e) {
-				LOG.error(String.format("Failed to return evaluation context %s to pool.", ec), e);
+			} catch (final Exception e) {
+				LOG.error(String.format(CmnCnst.Error.POOL_FAILED_TO_RETURN_EC, ec), e);
 			}
 		}
 	}

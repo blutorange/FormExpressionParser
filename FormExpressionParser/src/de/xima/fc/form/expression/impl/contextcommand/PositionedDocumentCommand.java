@@ -1,17 +1,23 @@
 package de.xima.fc.form.expression.impl.contextcommand;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.grammar.html.Token;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class PositionedDocumentCommand implements Comparable<PositionedDocumentCommand> {
-	public final int position;
+	@Nonnull
 	public final DocumentCommand command;
+	@Nullable public Token token;
+	/** Position in the input stream. */
+	public final int position;
 	/**
 	 * The order in which commands were issued. The lower, the earlier.
 	 * Commands issued earlier will be processed earlier.
 	 */
 	public final int priority;
-	public Token token;
-	public PositionedDocumentCommand(final DocumentCommand command, final int position, final int priority) {
+	public PositionedDocumentCommand(@Nonnull final DocumentCommand command, final int position, final int priority) {
 		this.command = command;
 		this.position = position;
 		this.priority = priority;
@@ -37,6 +43,6 @@ public class PositionedDocumentCommand implements Comparable<PositionedDocumentC
 
 	@Override
 	public String toString() {
-		return String.format("%s@%s(%s)", command, new Integer(position), token);
+		return String.format(CmnCnst.ToString.POSITIONED_DOCUMENT_COMMAND, command, new Integer(position), token);
 	}
 }

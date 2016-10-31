@@ -2,8 +2,10 @@ package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class IllegalNumberOfArgumentsException extends CatchableEvaluationException {
+	private static final long serialVersionUID = 1L;
 	public final int isCount, expectedCountMin, expectedCountMax;
 	public final String functionName;
 
@@ -13,7 +15,7 @@ public class IllegalNumberOfArgumentsException extends CatchableEvaluationExcept
 
 	public IllegalNumberOfArgumentsException(final String functionName, final int isCount, final int expectedCount,
 			final IEvaluationContext ec) {
-		super(ec, "Encountered " + isCount + " argument(s) for function " + functionName + ", " + "expected at least " + expectedCount);
+		super(ec, String.format(CmnCnst.Error.ILLEGAL_NUMBER_OF_ARGUMENTS_EXACT, isCount, functionName, expectedCount));
 		this.isCount = isCount;
 		expectedCountMin = expectedCount;
 		expectedCountMax = expectedCount;
@@ -22,8 +24,7 @@ public class IllegalNumberOfArgumentsException extends CatchableEvaluationExcept
 
 	public IllegalNumberOfArgumentsException(final String functionName, final int isCount, final int expectedCountMin,
 			final int expectedCountMax, final IEvaluationContext ec) {
-		super(ec, "Encountered " + isCount + "number of arguments for function " + functionName + System.lineSeparator()
-		+ "expected " + expectedCountMin + " to " + expectedCountMax);
+		super(ec, String.format(CmnCnst.Error.ILLEGAL_NUMBER_OF_ARGUMENTS_RANGE, isCount, functionName, expectedCountMin,expectedCountMax ));
 		this.isCount = isCount;
 		this.expectedCountMin = expectedCountMin;
 		this.expectedCountMax = expectedCountMax;

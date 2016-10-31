@@ -1,31 +1,37 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTUnaryExpressionNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 
 	public ASTUnaryExpressionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	private EMethod unaryMethod;
+	@Nonnull
+	private EMethod unaryMethod = EMethod.PLUS_UNARY;
 
-	public final void init(final EMethod method, final EMethod unary) throws ParseException {
+	public final void init(final EMethod method, @Nonnull final EMethod unary) throws ParseException {
 		assertChildrenExactly(1);
-		if (unary != null && unary.isAssigning())
-			assertChildrenAssignable(0, 1, "prefix operation");
+		if (unary.isAssigning())
+			assertChildrenAssignable(0, 1, CmnCnst.NAME_PREFIX_OPERATION);
 		super.init(method);
 		unaryMethod = unary;
 	}
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(unaryMethod).append(",");
+		sb.append(unaryMethod).append(',');
 	}
 
+	@Nonnull
 	public EMethod getUnaryMethod() {
 		return unaryMethod;
 	}

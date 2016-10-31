@@ -8,7 +8,9 @@ import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
  * @author mad_gaksha
  */
 public class InvalidTemplateDataException extends UncatchableEvaluationException {
-	public InvalidTemplateDataException(String msg, Throwable throwable) {
+	private static final long serialVersionUID = 1L;
+
+	public InvalidTemplateDataException(final String msg, final Throwable throwable) {
 		super(msg, throwable);
 	}
 }

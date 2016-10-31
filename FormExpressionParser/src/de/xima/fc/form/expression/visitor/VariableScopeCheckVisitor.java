@@ -39,228 +39,230 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTVariableTypeDeclarationNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
+import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.Void;
 
 public class VariableScopeCheckVisitor implements IFormExpressionParserVisitor<Void, IEvaluationContext, EvaluationException>{
 
 	@Override
 	public Void visit(final ASTExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTAssignmentExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTNumberNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTArrayNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTHashNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTNullNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTBooleanNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTVariableNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTStringNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTStatementListNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTIfClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTForLoopNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTWhileLoopNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTTryClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTSwitchClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTDoWhileLoopNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTExceptionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTThrowClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTBreakClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTContinueClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTReturnClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTLogNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTFunctionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTUnaryExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTPropertyExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTIdentifierNameNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTWithClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTFunctionClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTEmptyNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTLosNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTRegexNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		return null;
+		return Void.NULL;
 	}
 
 	@Override
 	public Void visit(final ASTTernaryExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTParenthesisExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTEqualExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 
 	@Override
 	public Void visit(final ASTPostUnaryExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		return null;
+		return Void.NULL;
 	}
 
 	@Override
 	public Void visit(final ASTComparisonExpressionNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		return null;
+		return Void.NULL;
 	}
 
 	@Override
 	public Void visit(final ASTVariableTypeDeclarationNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("TODO - not yet implemented");
+		throw new RuntimeException(CmnCnst.Error.TODO);
 	}
 }

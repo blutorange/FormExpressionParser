@@ -79,7 +79,7 @@ public class SVGRender {
 		} catch (final ParseException e) {
 			final TextInBox root = new TextInBox(e.getMessage());
 			tree = new DefaultTreeForTreeLayout<TextInBox>(root);
-			final TextInBox msg = new TextInBox(StringEscapeUtils.escapeHtml4(StringUtils.join("\n",e.getStackTrace())));
+			final TextInBox msg = new TextInBox(StringEscapeUtils.escapeHtml4(StringUtils.join("\n",e.getStackTrace()))); //$NON-NLS-1$
 			tree.addChild(root, msg);
 		}
 
@@ -103,7 +103,7 @@ public class SVGRender {
 
 
 	private static void help() {
-		System.out.println("Usage: svgDemo expression");
+		System.out.println("Usage: svgDemo expression"); //$NON-NLS-1$
 	}
 
 }

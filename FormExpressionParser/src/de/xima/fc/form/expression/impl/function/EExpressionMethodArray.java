@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -14,10 +16,10 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 	PLUS(EMethod.PLUS, Impl.UNION),
 	DASH(EMethod.DASH, Impl.DIFFERENCE),
 	;
-	private final EMethod method;
-	private final IFunction<ArrayLangObject> function;
+	@Nonnull private final EMethod method;
+	@Nonnull private final IFunction<ArrayLangObject> function;
 
-	private EExpressionMethodArray(final EMethod method, final IFunction<ArrayLangObject> function) {
+	private EExpressionMethodArray(@Nonnull final EMethod method, @Nonnull final IFunction<ArrayLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -37,7 +39,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToAdd {@link ALangObject}. Element(s) to be added to this array. When an array, all of the array's elements are added at the end of this array. Otherwise, the object itself is added to the end of this array.
 		 * @return <code>this</code>, with the elements specified by the argument added.
 		 */
-		UNION(null, "elementsToAdd"){
+		UNION(null, "elementsToAdd"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -50,7 +52,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToRemove {@link ArrayLangObject}. Element(s) to be removed from this array. When an array, all of the array's elements are removed from this array. Otherwise, all occurences of the object are removed from this array.
 		 * @return <code>this</code>, with the elements specified by the argument removed.
 		 */
-		DIFFERENCE(null, "elementsToRemove"){
+		DIFFERENCE(null, "elementsToRemove"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -62,10 +64,10 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		;
 
 
-		private final String[] argList;
+		@Nonnull private final String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -75,6 +77,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			return optionalArgumentsName;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

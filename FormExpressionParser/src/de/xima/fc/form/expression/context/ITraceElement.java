@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.grammar.Node;
 
 /**
@@ -14,5 +16,5 @@ public interface ITraceElement {
 	public int getStartColumn();
 	public int getEndLine();
 	public int getEndColumn();
-	public String getMethodName();
+	@Nonnull public String getMethodName();
 }

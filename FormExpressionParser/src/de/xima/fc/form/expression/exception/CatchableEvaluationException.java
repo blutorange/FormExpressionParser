@@ -8,6 +8,8 @@ import de.xima.fc.form.expression.context.IExternalContext;
  * @author awa
  */
 public class CatchableEvaluationException extends EvaluationException {
+	private static final long serialVersionUID = 1L;
+
 	public CatchableEvaluationException(final IEvaluationContext ec) {
 		super(ec);
 	}
@@ -15,10 +17,10 @@ public class CatchableEvaluationException extends EvaluationException {
 		super(ec, msg);
 	}
 
-	public CatchableEvaluationException(IExternalContext externalContext, final String msg, Throwable throwable) {
+	public CatchableEvaluationException(final IExternalContext externalContext, final String msg, final Throwable throwable) {
 		super(externalContext, msg, throwable);
 	}
-	
+
 	public CatchableEvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
 		super(ec, msg, throwable);
 	}

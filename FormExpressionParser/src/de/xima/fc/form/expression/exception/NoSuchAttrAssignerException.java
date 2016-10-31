@@ -4,23 +4,24 @@ package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class NoSuchAttrAssignerException extends NoSuchFunctionException {
 	private static final long serialVersionUID = 1L;
 
 	public NoSuchAttrAssignerException(final String name, final IEvaluationContext ec) {
-		super("attribute assigner", name, ec);
+		super(CmnCnst.NAME_ATTRIBUTE_ASSIGNER, name, ec);
 	}
 
 	public NoSuchAttrAssignerException(final String name, final boolean accessedViaDot, final IEvaluationContext ec) {
-		super(accessedViaDot ? "dot attribute assigner" : "bracket attribute assigner", name, ec);
+		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ASSIGNER : CmnCnst.NAME_BRACKET_ATTRIBUTE_ASSIGNER, name, ec);
 	}
 
 	public NoSuchAttrAssignerException(final String name, final ALangObject thisContext, final IEvaluationContext ec) {
-		super("attribute assigner", name, thisContext, ec);
+		super(CmnCnst.NAME_ATTRIBUTE_ASSIGNER, name, thisContext, ec);
 	}
 
 	public NoSuchAttrAssignerException(final String name, final ALangObject thisContext, final boolean accessedViaDot, final IEvaluationContext ec) {
-		super(accessedViaDot ? "dot attribute assigner" : "bracket attribute assigner", name, thisContext, ec);
+		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ASSIGNER : CmnCnst.NAME_BRACKET_ATTRIBUTE_ASSIGNER, name, thisContext, ec);
 	}
 }

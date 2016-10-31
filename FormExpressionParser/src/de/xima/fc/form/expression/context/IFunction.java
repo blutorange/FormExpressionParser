@@ -52,13 +52,13 @@ public interface IFunction<T extends ALangObject> {
 	 * @throws EvaluationException
 	 */
 	@Nonnull
-	public ALangObject evaluate(IEvaluationContext ec, T thisContext, ALangObject... args) throws EvaluationException;
+	public ALangObject evaluate(@Nonnull IEvaluationContext ec, @Nonnull T thisContext, @Nonnull ALangObject... args) throws EvaluationException;
 
 	/**
 	 * @return Such that {@link Type#clazz} equals the type parameter T.
 	 */
 	@Nonnull
-	public ALangObject.Type getThisContextType();
+	public Type getThisContextType();
 
 	/**
 	 * @return May be null for native code. The node with the user-defined code

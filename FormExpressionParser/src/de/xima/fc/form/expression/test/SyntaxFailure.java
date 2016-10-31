@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.test;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -7,6 +9,7 @@ import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
+@SuppressWarnings("nls")
 enum SyntaxFailure implements ITestCase {
 	TEST001("if (i==0) { alert() }", "Encountered \" \"}\" \"} \"\" at line 1, column 21."),
 	TEST002("if(a) a; else b; else if(c) c;", "Encountered \" \"else\" \"else \"\" at line 1, column 18."),
@@ -31,28 +34,28 @@ enum SyntaxFailure implements ITestCase {
 	TEMPLATE002("<foo>[% i = 0;", ETestType.TEMPLATE,"Final code block in templates must be closed."),
 	TEMPLATE003("<foo> [% foo(); <bar>", ETestType.TEMPLATE,"Encountered \" \"<\" \"< \"\" at line 1, column 17."),
 	;
-	private final String code;
-	private final ETestType type;
-	private final EContextType context;
+	@Nonnull private final String code;
+	@Nonnull private final ETestType type;
+	@Nonnull private final EContextType context;
 	private final String errorBegin;
 	private final Class<? extends Throwable> errorClass;
 
-	private SyntaxFailure(final String code) {
+	private SyntaxFailure(@Nonnull final String code) {
 		this(code, ETestType.PROGRAM, null);
 	}
-	private SyntaxFailure(final String code, final String errorBegin) {
+	private SyntaxFailure(@Nonnull final String code, final String errorBegin) {
 		this(code, ETestType.PROGRAM, errorBegin);
 	}
-	private SyntaxFailure(final String code, final String errorBegin, final Class<? extends Throwable> errorClass) {
+	private SyntaxFailure(@Nonnull final String code, final String errorBegin, final Class<? extends Throwable> errorClass) {
 		this(code, ETestType.PROGRAM, errorBegin, EContextType.GENERIC, errorClass);
 	}
-	private SyntaxFailure(final String code, final ETestType type) {
+	private SyntaxFailure(@Nonnull final String code, @Nonnull final ETestType type) {
 		this(code, type, null);
 	}
-	private SyntaxFailure(final String code, final ETestType type, final String errorBegin) {
+	private SyntaxFailure(@Nonnull final String code, @Nonnull final ETestType type, final String errorBegin) {
 		this(code, type, errorBegin, EContextType.GENERIC, ParseException.class);
 	}
-	private SyntaxFailure(final String code, final ETestType type, final String errorBegin, final EContextType context, final Class<? extends Throwable> errorClass) {
+	private SyntaxFailure(@Nonnull final String code, @Nonnull final ETestType type, final String errorBegin, @Nonnull final EContextType context, final Class<? extends Throwable> errorClass) {
 		this.code = code;
 		this.type = type;
 		this.errorBegin = errorBegin;

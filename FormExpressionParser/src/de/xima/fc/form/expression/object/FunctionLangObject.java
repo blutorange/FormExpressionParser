@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.object;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,23 +12,24 @@ import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public class FunctionLangObject extends ALangObject {
 
 	private final static Logger LOG = LoggerFactory.getLogger(FunctionLangObject.class);
-	private final IFunction<ALangObject> value;
+	@Nonnull private final IFunction<ALangObject> value;
 
 	private static class InstanceHolder {
-		public final static FunctionLangObject NO_OP = new FunctionLangObject(new IFunction<ALangObject>(){
+		@Nonnull public final static FunctionLangObject NO_OP = new FunctionLangObject(new IFunction<ALangObject>(){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext, final ALangObject... args) throws EvaluationException {
 				return NullLangObject.getInstance();
 			}
 			@Override
 			public String[] getDeclaredArgumentList() {
-				return ArrayUtils.EMPTY_STRING_ARRAY;
+				return CmnCnst.EMPTY_STRING_ARRAY;
 			}
 			@Override
 			public Node getNode() {
@@ -36,7 +37,7 @@ public class FunctionLangObject extends ALangObject {
 			}
 			@Override
 			public String getDeclaredName() {
-				return StringUtils.EMPTY;
+				return CmnCnst.EMPTY_STRING;
 			}
 			@Override
 			public Type getThisContextType() {
@@ -49,7 +50,7 @@ public class FunctionLangObject extends ALangObject {
 		});
 	}
 
-	private FunctionLangObject(final IFunction<ALangObject> value) {
+	private FunctionLangObject(@Nonnull final IFunction<ALangObject> value) {
 		super(Type.FUNCTION);
 		this.value = value;
 	}
@@ -70,33 +71,34 @@ public class FunctionLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append("->(");
+		builder.append(CmnCnst.SYNTAX_LAMBDA_ARROW).append(CmnCnst.SYNTAX_PAREN_OPEN);
 		// Add arguments.
-		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(",");
+		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(CmnCnst.SYNTAX_COMMA);
 		// Remove final comma
 		if (builder.length()>3) builder.setLength(builder.length()-1);
-		builder.append("){");
+		builder.append(CmnCnst.SYNTAX_PAREN_CLOSE).append(CmnCnst.SYNTAX_BRACE_OPEN);
 		// Convert body.
 		final Node n = value.getNode();
 		if (n == null)
-			builder.append("'[native code]'");
+			builder.append(CmnCnst.SYNTAX_NATIVE_CODE);
 		else {
 			String unparse;
 			try {
 				unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithCommentsConfig());
 			}
 			catch (final IOException e) {
-				LOG.error("Failed to unparse lambda", e);
-				unparse = "'[error during unparsing]'";
+				LOG.error(CmnCnst.Error.FAILURE_UNPARSING_LAMBDA, e);
+				unparse = CmnCnst.SYNTAX_FAILED_TO_UNPARSE_LAMBDA;
 			}
 			builder.append(unparse);
 		}
-		builder.append("};");
+		builder.append(CmnCnst.SYNTAX_BRACE_CLOSE).append(CmnCnst.SYNTAX_SEMI_COLON);
 	}
 
 	@Override
 	public String inspect() {
-		return "FunctionLangObject(" + value.getDeclaredName() + ")";
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_FUNCTION_LANG_OBJECT).append('(')
+				.append(value.getDeclaredName()).append(')').toString();
 	}
 
 	@Override
@@ -133,7 +135,7 @@ public class FunctionLangObject extends ALangObject {
 	protected boolean isSingletonLike() {
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		// getDeclaredName can be empty for anonymous functions
@@ -153,20 +155,24 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	// Coercion
+	@Nonnull
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return StringLangObject.create(value.getDeclaredName());
 	}
 
+	@Nonnull
 	@Override
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
 		return this;
 	}
 
+	@Nonnull
 	public static FunctionLangObject getNoOpInstance() {
 		return InstanceHolder.NO_OP;
 	}
 
+	@Nonnull
 	public static FunctionLangObject create(final IFunction<? extends ALangObject> value) {
 		if (value == null) return getNoOpInstance();
 		return new FunctionLangObject((IFunction<ALangObject>)value);

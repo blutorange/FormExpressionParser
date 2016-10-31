@@ -1,12 +1,13 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class BreakClauseException extends UncatchableEvaluationException {
-	private final static String MESSAGE = "Break used outside of loop or switch, or label does not match any loop or switch.";
+	private static final long serialVersionUID = 1L;
 	public final String label;
 	public BreakClauseException(final String label, final IEvaluationContext ec) {
-		super(ec, MESSAGE);
+		super(ec, CmnCnst.Error.BREAK_CLAUSE);
 		this.label = label;
 	}
 }

@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -27,11 +29,11 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 	sort(Impl.sort)
 	;
 
-	private final FunctionLangObject impl;
+	@Nonnull private final FunctionLangObject impl;
+	@Nonnull private final String[] argList;
 	private final boolean evalImmediately;
-	private final String[] argList;
 	private final String varArgsName;
-	private EAttrAccessorArray(final Impl impl) {
+	private EAttrAccessorArray(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -45,6 +47,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -76,7 +79,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		 * @param objectToAdd {@link ALangObject}*. Object(s) to be added to the end of this array.
 		 * @return this. This array with the objects added at the end.
 		 */
-		push("objectsToAdd") {
+		push("objectsToAdd") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -97,7 +100,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		},
 		sort(null) {
 			@Override
-			public ALangObject evaluate(IEvaluationContext ec, ArrayLangObject thisContext, ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				thisContext.sort();
 				return thisContext;
@@ -105,10 +108,10 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		}
 		;
 
-		private String[] argList;
+		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -123,6 +126,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 			return argList;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

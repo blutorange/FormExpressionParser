@@ -1,8 +1,10 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nullable;
+
 public interface ILogger {
-	public void error(String message);
-	public void warn(String message);
-	public void info(String message);
-	public void debug(String message);
+	public void error(@Nullable String message);
+	public void warn(@Nullable String message);
+	public void info(@Nullable String message);
+	public void debug(@Nullable String message);
 }

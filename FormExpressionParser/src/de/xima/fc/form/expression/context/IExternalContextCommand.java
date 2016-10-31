@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 public interface IExternalContextCommand {
 	@Nullable
 	public <T extends IExternalContextCommand> T castOrNull(Class<T> clazz);
+
 	/**
 	 *
 	 * @return Data of this command. Implementing classes should replace

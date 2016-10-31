@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -13,12 +15,12 @@ public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 	;
 
 	private final String name;
-	private final String[] scopeList;
+	@Nonnull private final String[] scopeList;
 	private final boolean doOutput;
 	private EmbedmentHandlerBundleFormcycle(final String name, final boolean doOutput, final String... scopeList) {
 		this.name = name;
 		this.doOutput = doOutput;
-		this.scopeList = scopeList;
+		this.scopeList = scopeList == null ? CmnCnst.EMPTY_STRING_ARRAY : scopeList;
 	}
 
 	@Override

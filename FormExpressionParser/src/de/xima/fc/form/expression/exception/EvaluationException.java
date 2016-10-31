@@ -11,11 +11,14 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class EvaluationException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
+
 	public EvaluationException(final EvaluationException exception) {
 		super(exception);
 		if (exception != null) {
-			ec = exception.ec;
-			externalContext = ec.getExternalContext();
+			final IEvaluationContext tmpEc = exception.ec;
+			ec = tmpEc;
+			externalContext = tmpEc == null ? null : tmpEc.getExternalContext();
 		}
 		else {
 			ec = null;
@@ -78,18 +81,21 @@ public class EvaluationException extends RuntimeException {
 			}
 		}
 		sb.append(System.lineSeparator())
-		.append("Evaluation context is ")
+		.append(CmnCnst.Error.EVALUATION_EXCEPTION_EC)
+		.append(' ')
 		.append(ec);
 		if (ec != null) {
 			sb.append('(')
 			.append(ec.getClass().getCanonicalName())
 			.append(')')
 			.append(System.lineSeparator())
-			.append("External context is ")
+			.append(CmnCnst.Error.EVALUATION_EXCEPTION_EX)
+			.append(' ')
 			.append(ec.getExternalContext());
-			if (ec.getExternalContext() != null) {
+			final IExternalContext ex = ec.getExternalContext();
+			if (ex != null) {
 				sb.append('(')
-				.append(ec.getExternalContext().getClass().getCanonicalName())
+				.append(ex.getClass().getCanonicalName())
 				.append(')');
 			}
 		}
@@ -97,13 +103,24 @@ public class EvaluationException extends RuntimeException {
 	}
 
 	private static void appendTraceElement(final StringBuilder sb, final ITraceElement el) {
-		sb.append("\tat ").append(el == null ? CmnCnst.TRACER_POSITION_NAME_UNKNOWN : el.getMethodName())
-		.append(" (");
+		sb.append('\t')
+		.append(CmnCnst.Error.EVALUATION_EXCEPTION_AT)
+		.append(' ')
+		.append(el == null ? CmnCnst.TRACER_POSITION_NAME_UNKNOWN : el.getMethodName())
+		.append(' ')
+		.append('(');
 		if (el == null) {
 			sb.append(CmnCnst.TRACER_POSITION_UNKNOWN);
 		}
 		else {
-			sb.append("line ").append(el.getStartLine()).append(", column ").append(el.getStartColumn());
+			sb.append(CmnCnst.Error.EVALUATION_EXCEPTION_LINE)
+			.append(' ')
+			.append(el.getStartLine())
+			.append(',')
+			.append(' ')
+			.append(CmnCnst.Error.EVALUATION_EXCEPTION_COLUMN)
+			.append(' ')
+			.append(el.getStartColumn());
 		}
 		sb.append(')');
 	}

@@ -4,5 +4,4 @@
 /HtmlParserConstants.java
 /HtmlParserTokenManager.java
 /SimpleCharStream.java
-/ParseException.java
 /TokenMgrError.java

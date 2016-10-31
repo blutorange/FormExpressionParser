@@ -3,9 +3,11 @@ package de.xima.fc.form.expression.node;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTAssignmentExpressionNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 	public ASTAssignmentExpressionNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
@@ -13,7 +15,7 @@ public class ASTAssignmentExpressionNode extends SimpleNode {
 	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
-		assertChildrenAssignable(0, children.length-1, "assignment");
+		assertChildrenAssignable(0, children.length-1, CmnCnst.NAME_ASSIGNMENT);
 		super.init(method);
 	}
 

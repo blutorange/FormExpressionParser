@@ -10,6 +10,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Similar to {@link OnDemandLookUpBinding}, but uses a map of arrays (
@@ -95,7 +96,7 @@ public class LookUpBindingAlternative implements IBinding {
 	public void unnest(final IEvaluationContext ec) {
 		for (final ALangObject[] values : map.values())
 			if (currentDepth < values.length) values[currentDepth] = null;
-		if (currentDepth <= 0) throw new UncatchableEvaluationException(ec, "Cannot unnest global binding. This may be an error in the parser. Contact support.");
+		if (currentDepth <= 0) throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
 		--currentDepth;
 		breakpoints[currentDepth] = false;
 	}

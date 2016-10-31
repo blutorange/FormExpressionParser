@@ -3,6 +3,8 @@ package de.xima.fc.form.expression.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -16,6 +18,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.impl.logger.SystemLogger;
 import de.xima.fc.form.expression.impl.tracer.DummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Optionally, a scope may be specified for a variable by prepending it
@@ -57,10 +60,12 @@ import de.xima.fc.form.expression.object.ALangObject;
  */
 public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 
+	@Nonnull
 	private final List<String> defaultScopeList = new ArrayList<>(16);
 
-	private ReadScopedEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace,
-			final ITracer<Node> tracer, final IEmbedment embedment, final ILogger logger) {
+	private ReadScopedEvaluationContext(@Nonnull final IBinding binding, @Nonnull final IScope scope,
+			@Nonnull final INamespace namespace, @Nonnull final ITracer<Node> tracer,
+			@Nonnull final IEmbedment embedment, @Nonnull final ILogger logger) {
 		super(binding, scope, namespace, tracer, embedment, logger);
 	}
 
@@ -72,6 +77,8 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 			return loc;
 		// with() {} is deprecated, so this should not do anything performance-wise
 		for (int i = defaultScopeList.size() - 1; i >= 0; --i) {
+			// We never add anything that is null, see beginDefaultScope(String).
+			@SuppressWarnings("null")
 			final ALangObject scp = getScope().getVariable(defaultScopeList.get(i), name, this);
 			if (scp != null)
 				return scp;
@@ -80,6 +87,8 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		// be used for basic access like [%tf1%]
 		final String[] embedmentScopeList = embedment.getScopeList();
 		for (int i = embedmentScopeList.length - 1; i >= 0; --i) {
+			// Embedments must not return a scope list with nulls.
+			@SuppressWarnings("null")
 			final ALangObject scp = getScope().getVariable(embedmentScopeList[i], name, this);
 			if (scp != null)
 				return scp;
@@ -93,7 +102,7 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 	}
 
 	@Override
-	public void beginDefaultScope(final String scope) {
+	public void beginDefaultScope(@Nonnull final String scope) {
 		defaultScopeList.add(scope);
 	}
 
@@ -160,8 +169,14 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		}
 
 		public IEvaluationContext build() throws IllegalStateException {
-			if (binding == null) throw new IllegalStateException("Binding not set.");
-			if (scope == null) throw new IllegalStateException("Scope not set.");
+			final IBinding binding = this.binding;
+			final IScope scope = this.scope;
+			ILogger logger = this.logger;
+			IEmbedment embedment = this.embedment;
+			ITracer<Node> tracer = this.tracer;
+			INamespace namespace = this.namespace;
+			if (binding == null) throw new IllegalStateException(CmnCnst.Error.ILLEGAL_STATE_EC_BUILDER_BINDING);
+			if (scope == null) throw new IllegalStateException(CmnCnst.Error.ILLEGAL_STATE_EC_BUILDER_SCOPE);
 			if (logger == null)	logger = SystemLogger.getInfoLogger();
 			if (embedment == null) embedment = GenericEmbedment.getGenericEmbedment();
 			if (tracer == null) tracer = DummyTracer.INSTANCE;

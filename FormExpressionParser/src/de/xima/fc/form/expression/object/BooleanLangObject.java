@@ -1,10 +1,13 @@
 package de.xima.fc.form.expression.object;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class BooleanLangObject extends ALangObject {
 	private final boolean value;
@@ -15,36 +18,44 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	private static class InstanceHolder {
-		private static BooleanLangObject TRUE = new BooleanLangObject(true);
-		private static BooleanLangObject FALSE = new BooleanLangObject(false);
+		@Nonnull private static BooleanLangObject TRUE = new BooleanLangObject(true);
+		@Nonnull private static BooleanLangObject FALSE = new BooleanLangObject(false);
 	}
 
 	public boolean booleanValue() {
 		return value;
 	}
 
+	@Nonnull
 	public BooleanLangObject or(final BooleanLangObject other) {
 		return BooleanLangObject.create(value||other.value);
 	}
+	@Nonnull
 	public BooleanLangObject and(final BooleanLangObject other) {
 		return BooleanLangObject.create(value&&other.value);
 	}
+	@Nonnull
 	public BooleanLangObject xor(final BooleanLangObject other) {
 		return BooleanLangObject.create(value^other.value);
 	}
+
+	@Nonnull
 	public BooleanLangObject not() {
 		return BooleanLangObject.create(!value);
 	}
 
 	// Coercion
+	@Nonnull
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
 		return value ? StringLangObject.getTrueInstance() : StringLangObject.getFalseInstance();
 	}
+	@Nonnull
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
 		return value ? NumberLangObject.getOneInstance() : NumberLangObject.getZeroInstance();
 	}
+	@Nonnull
 	@Override
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
 		return value ? RegexLangObject.getAllMatchingInstance() : RegexLangObject.getUnmatchableInstance();
@@ -112,13 +123,13 @@ public class BooleanLangObject extends ALangObject {
 	 * @return 0 iff both objects are <code>true</code> or both are <code>false</code>.
 	 * -1 iff this object is <code>false</code> and the other is <code>true</code>,
 	 * +1 iff this object is <code>true</code> and the other is <code>false</code>.
-	 * Therefore the ordering is <code>false (0)</code> before <code>true (1)</code>. 
+	 * Therefore the ordering is <code>false (0)</code> before <code>true (1)</code>.
 	 */
 	@Override
 	protected int compareToSameType(final ALangObject o) {
 		return ((BooleanLangObject)o).value==value ? 0 : value ? 1 : -1;
 	}
-	
+
 	@Override
 	protected boolean isSingletonLike() {
 		return true;
@@ -127,7 +138,8 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return "BooleanLangObject(" + value + ")";
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_BOOLEAN_LANG_OBJECT).append('(').append(value)
+				.append(')').toString();
 	}
 
 	@Override
@@ -135,18 +147,22 @@ public class BooleanLangObject extends ALangObject {
 		builder.append(toExpression(value));
 	}
 
+	@Nonnull
 	public static String toExpression(final boolean value) {
-		return value ? "true" : "false";
+		return value ? CmnCnst.SYNTAX_TRUE : CmnCnst.SYNTAX_FALSE;
 	}
 
+	@Nonnull
 	public static BooleanLangObject create(final boolean b) {
 		return b ? getTrueInstance() : getFalseInstance();
 	}
 
+	@Nonnull
 	public static BooleanLangObject getTrueInstance() {
 		return InstanceHolder.TRUE;
 	}
 
+	@Nonnull
 	public static BooleanLangObject getFalseInstance() {
 		return InstanceHolder.FALSE;
 	}

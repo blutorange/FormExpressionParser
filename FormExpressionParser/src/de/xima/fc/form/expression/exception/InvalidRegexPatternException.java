@@ -1,11 +1,12 @@
 package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class InvalidRegexPatternException extends CatchableEvaluationException {
-
-	public InvalidRegexPatternException(String pattern, int flags, IEvaluationContext ec) {
-		super(ec, String.format("Invalid regex pattern %s and/or flags %s.", pattern, new Integer(flags)));
+	private static final long serialVersionUID = 1L;
+	public InvalidRegexPatternException(final String pattern, final int flags, final IEvaluationContext ec) {
+		super(ec, String.format(CmnCnst.Error.INVALID_REGEX_PATTERN, pattern, new Integer(flags)));
 		this.pattern = pattern;
 		this.flags = flags;
 	}

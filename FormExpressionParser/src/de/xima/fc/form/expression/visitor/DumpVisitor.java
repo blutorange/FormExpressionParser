@@ -7,20 +7,23 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 
 public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOException> {
 	private static class InstanceHolder {
-		public final static DumpVisitor SYSTEM_OUT_DUMPER = new DumpVisitor(System.out);
-		public final static DumpVisitor SYSTEM_ERR_DUMPER = new DumpVisitor(System.err);
+		@Nonnull public final static DumpVisitor SYSTEM_OUT_DUMPER = new DumpVisitor(System.out);
+		@Nonnull public final static DumpVisitor SYSTEM_ERR_DUMPER = new DumpVisitor(System.err);
 	}
 
 	/**
 	 * Factory method for a dumper to {@link System#out}, with the default charset and line separator.
 	 * @return A dumper to stdout.
 	 */
+	@Nonnull
 	public static DumpVisitor getSystemOutDumper() {
 		return InstanceHolder.SYSTEM_OUT_DUMPER;
 	}
@@ -28,6 +31,7 @@ public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOExce
 	 * Factory method for a dumper to {@link System#err}, with the default charset and line separator.
 	 * @return A dumper to stderr.
 	 */
+	@Nonnull
 	public static DumpVisitor getSystemErrDumper() {
 		return InstanceHolder.SYSTEM_ERR_DUMPER;
 	}
@@ -39,7 +43,7 @@ public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOExce
 	 * @return The result of visiting the given node, as a string.
 	 * @throws EvaluationException
 	 */
-	public static String toString(final de.xima.fc.form.expression.grammar.Node node, final String data, final String lineSeparator) throws IOException {
+	public static String toString(@Nonnull final de.xima.fc.form.expression.grammar.Node node, @Nonnull final String data, final String lineSeparator) throws IOException {
 		DumpVisitor v = null;
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			final Charset charset = Charset.defaultCharset();
@@ -106,7 +110,7 @@ public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOExce
 	protected String map(final String prefix) {
 		return prefix + StringUtils.SPACE;
 	}
-	
+
 	@Override
 	protected String visitNode(final Node node, final String prefix) throws IOException {
 		outputStream.write(prefix.getBytes(charset));

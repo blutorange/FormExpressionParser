@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.test;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.exception.BreakClauseException;
 import de.xima.fc.form.expression.exception.ContinueClauseException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
@@ -12,6 +14,7 @@ import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
+@SuppressWarnings("nls")
 enum SemanticsFailure implements ITestCase {
 	TEST001("k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
 	TEST002("break;", BreakClauseException.class,"Break used outside of loop or switch, or label does not match any loop or switch."),
@@ -23,17 +26,17 @@ enum SemanticsFailure implements ITestCase {
 	TEST008("h={'f':''.toLowerCase};h.f();", IllegalThisContextException.class),
 	;
 
-	private final String code;
+	@Nonnull private final String code;
+	@Nonnull private final EContextType context;
 	private final String errorBegin;
-	private final EContextType context;
 	private final Class<? extends EvaluationException> expectedException;
-	private SemanticsFailure (final String code, final Class<? extends EvaluationException> exception) {
+	private SemanticsFailure (@Nonnull final String code, final Class<? extends EvaluationException> exception) {
 		this(code, exception, null);
 	}
-	private SemanticsFailure (final String code, final Class<? extends EvaluationException> exception, final String errorBegin) {
+	private SemanticsFailure (@Nonnull final String code, final Class<? extends EvaluationException> exception, final String errorBegin) {
 		this(code, exception, EContextType.GENERIC, errorBegin);
 	}
-	private SemanticsFailure (final String code, final Class<? extends EvaluationException> exception, final EContextType context, final String errorBegin) {
+	private SemanticsFailure (@Nonnull final String code, final Class<? extends EvaluationException> exception, @Nonnull final EContextType context, final String errorBegin) {
 		this.code = code;
 		this.expectedException = exception;
 		this.errorBegin = errorBegin;

@@ -5,6 +5,7 @@ package de.xima.fc.form.expression.exception;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * This exception is thrown when an object support the division
@@ -16,7 +17,7 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 	private static final long serialVersionUID = 1L;
 
 	public IllegalArgumentValueException(final IFunction<?> function, final String functionName, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
-		super(ec, "Illegal value " + thisContext.inspect() + " for argument " + index + " of function " + functionName + ": " + argument.inspect());
+		super(ec, String.format(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index, functionName, argument.inspect()));
 		this.functionName = functionName;
 		this.thisContext = thisContext;
 		this.index = index;

@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTSwitchClauseNode extends SimpleNode {
-
+	private static final long serialVersionUID = 1L;
 	private String label;
 
 	public ASTSwitchClauseNode(final FormExpressionParser parser, final int nodeId) {

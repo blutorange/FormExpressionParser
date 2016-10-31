@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.impl;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -14,13 +17,13 @@ import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
-	protected final IBinding binding;
-	protected final INamespace namespace;
-	protected final ILogger logger;
-	protected final ITracer<Node> tracer;
-	protected final IScope scope;
-	protected final IEmbedment embedment;
-	protected IExternalContext externalContext;
+	@Nonnull protected final IBinding binding;
+	@Nonnull protected final INamespace namespace;
+	@Nonnull protected final ILogger logger;
+	@Nonnull protected final ITracer<Node> tracer;
+	@Nonnull protected final IScope scope;
+	@Nonnull protected final IEmbedment embedment;
+	@Nullable protected IExternalContext externalContext;
 
 	/**
 	 * Creates a new evaluation context.
@@ -32,7 +35,9 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	 * @param logger
 	 *            The logger used for logging.
 	 */
-	public GenericEvaluationContext(final IBinding binding, final IScope scope, final INamespace namespace, final ITracer<Node> tracer, final IEmbedment embedment, final ILogger logger) {
+	public GenericEvaluationContext(@Nonnull final IBinding binding, @Nonnull final IScope scope,
+			@Nonnull final INamespace namespace, @Nonnull final ITracer<Node> tracer,
+			@Nonnull final IEmbedment embedment, @Nonnull final ILogger logger) {
 		this.binding = binding;
 		this.namespace = namespace;
 		this.scope = scope;

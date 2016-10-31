@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.context.IEvaluationContext;
  * @author awa
  */
 public class UncatchableEvaluationException extends EvaluationException {
+	private static final long serialVersionUID = 1L;
 
 	public UncatchableEvaluationException(final IEvaluationContext ec) {
 		super(ec);

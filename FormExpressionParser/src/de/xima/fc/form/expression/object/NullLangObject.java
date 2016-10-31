@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.object;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -9,6 +11,7 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NullObjectAccessException;
 import de.xima.fc.form.expression.exception.NullObjectAssignException;
 import de.xima.fc.form.expression.exception.NullObjectMethodException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class NullLangObject extends ALangObject {
 	private NullLangObject() {
@@ -16,7 +19,7 @@ public class NullLangObject extends ALangObject {
 	}
 
 	private static class InstanceHolder {
-		private static NullLangObject INSTANCE = new NullLangObject();
+		@Nonnull private static NullLangObject INSTANCE = new NullLangObject();
 	}
 
 	public Object nullValue() {
@@ -45,6 +48,7 @@ public class NullLangObject extends ALangObject {
 		return shallowClone();
 	}
 
+	@Nonnull
 	public static NullLangObject getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
@@ -90,65 +94,70 @@ public class NullLangObject extends ALangObject {
 
 	/**
 	 * @param o The comparand to compare this object to.
-	 * @return 0. There is only one <code>null</code> object, and it is equal to itself. 
+	 * @return 0. There is only one <code>null</code> object, and it is equal to itself.
 	 */
 	@Override
 	protected int compareToSameType(final ALangObject o) {
 		return 0;
 	}
-	
+
 	@Override
 	public String inspect() {
-		return "NullLangObject";
+		return CmnCnst.ToString.INSPECT_NULL_LANG_OBJECT;
 	}
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append("null");
+		builder.append(CmnCnst.SYNTAX_NULL);
 	}
-	
-	
 
 	public static String toExpression() {
-		return "null";
+		return CmnCnst.SYNTAX_NULL;
 	}
 
 	@Override
 	protected boolean isSingletonLike() {
 		return true;
 	}
-	
+
 	// Coercion
+	@Nonnull
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) {
 		return NumberLangObject.getZeroInstance();
 	}
 
+	@Nonnull
 	@Override
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) {
 		return RegexLangObject.getUnmatchableInstance();
 	}
 
+	@Nonnull
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return StringLangObject.getEmptyInstance();
 	}
 
+	@Nonnull
 	@Override
 	public ArrayLangObject coerceArray(final IEvaluationContext ec) {
 		return ArrayLangObject.create();
 	}
 
+	@Nonnull
 	@Override
 	public HashLangObject coerceHash(final IEvaluationContext ec) {
 		return HashLangObject.create();
 	}
 
+	@Nonnull
 	@Override
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) {
 		return ExceptionLangObject.create(StringUtils.EMPTY, ec);
 	}
 
+	@Nonnull
 	@Override
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
 		return FunctionLangObject.getNoOpInstance();

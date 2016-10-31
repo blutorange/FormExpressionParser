@@ -5,7 +5,11 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.enums.EJump;
@@ -63,10 +67,12 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
+import de.xima.fc.form.expression.object.NonNullIterator;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class EvaluateVisitor
 implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
@@ -89,18 +95,19 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res;
-		if (ec.getExternalContext() != null) ec.getExternalContext().beginWriting();
+		final IExternalContext ex = ec.getExternalContext();
+		if (ex != null) ex.beginWriting();
 		try {
 			res = node.jjtAccept(v, ec);
 		}
 		finally {
-			if (ec.getExternalContext() != null) ec.getExternalContext().finishWriting();
+			if (ex != null) ex.finishWriting();
 		}
 		v.assertNoJumps(ec);
 		return res;
 	}
 
-	private ALangObject currentResult;
+	@Nonnull private ALangObject currentResult = NullLangObject.getInstance();
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
@@ -127,12 +134,15 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				throw new ReturnClauseException(ec);
 			default:
 				throw new UncatchableEvaluationException(ec, String.format(
-						"Invalid jump type %s. This is likely a bug with the paser. Contact support.", jumpType));
+						CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
 			}
 		}
 	}
 
-	private ALangObject jjtAccept(final Node parentNode, final Node node, final IEvaluationContext ec) {
+	@Nonnull
+	private ALangObject jjtAccept(@Nonnull final Node parentNode, @Nullable final Node node, @Nonnull final IEvaluationContext ec) {
+		if (node == null)
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		ec.getTracer().setCurrentlyProcessed(node);
 		ec.getEmbedment().setCurrentEmbedment(node.getEmbedment());
 		try {
@@ -143,31 +153,36 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		}
 	}
 
-	private ALangObject setVariable(final ASTVariableNode var, final ALangObject val, final IEvaluationContext ec) {
-		if (var.getScope() != null)
-			ec.getScope().setVariable(var.getScope(), var.getName(), val);
+	@Nonnull
+	private static ALangObject setVariable(@Nullable final ASTVariableNode var, @Nonnull final ALangObject val, final IEvaluationContext ec) {
+		if (var == null)
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE);
+		final String scope = var.getScope();
+		if (scope != null)
+			ec.getScope().setVariable(scope, var.getName(), val);
 		else
 			ec.setUnqualifiedVariable(var.getName(), val);
 		return val;
 	}
 
-	private ALangObject[] evaluateChildren(final Node node, final IEvaluationContext ec) {
-		final Node[] children = node.getChildArray();
-		final ALangObject[] res = new ALangObject[children.length];
-		for (int i = 0; i != children.length; ++i)
-			res[i] = jjtAccept(node, children[i], ec);
+	@Nonnull
+	private ALangObject[] evaluateChildren(@Nonnull final Node node, @Nonnull final IEvaluationContext ec) {
+		final int len = node.jjtGetNumChildren();
+		final ALangObject[] res = new ALangObject[len];
+		for (int i = 0; i != len; ++i)
+			res[i] = jjtAccept(node, node.jjtGetChild(i), ec);
 		return res;
 	}
 
-	private ALangObject evaluatePropertyExpression(final Node parentNode, final int indexOneAfterEnd,
-			final IEvaluationContext ec) {
-		final Node[] children = parentNode.getChildArray();
+	@Nonnull
+	private ALangObject evaluatePropertyExpression(@Nonnull final Node parentNode, final int indexOneAfterEnd,
+			@Nonnull final IEvaluationContext ec) {
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(parentNode, children[0], ec);
-		ALangObject thisContext = NullLangObject.getInstance();
+		@Nonnull ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0), ec);
+		@Nonnull ALangObject thisContext = NullLangObject.getInstance();
 		for (int i = 1; i < indexOneAfterEnd; ++i) {
-			final Node n = children[i];
+			final Node n = parentNode.jjtGetChild(i);
 			switch (n.getSiblingMethod()) {
 			case DOT:
 				thisContext = res;
@@ -193,9 +208,10 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				ec.getBinding().nestLocal(ec);
 				ec.getTracer().descend(parentNode);
 				try {
+					if (func.getThisContextType() == Type.NULL)
+						thisContext = NullLangObject.getInstance();
 					// Evaluate function
-					thisContext = res = func.evaluate(ec,
-							func.getThisContextType() == Type.NULL ? NullLangObject.getInstance() : thisContext, args);
+					thisContext = res = func.evaluate(ec, thisContext, args);
 				}
 				finally {
 					ec.getTracer().ascend();
@@ -214,7 +230,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 					default:
 						throw new EvaluationException(ec,
 								String.format(
-										"Unknown jump type %s after function evaluation. This is most likely a bug with the parser. Contact support.",
+										CmnCnst.Error.INVALID_JUMP_TYPE,
 										jumpType));
 					}
 				}
@@ -223,14 +239,20 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			default:
 				throw new UncatchableEvaluationException(ec,
 						String.format(
-								"Illegal enum constant %s at ASTPropertyExpressionNode. This is likely a bug with the parser. Contact support.",
+								CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION,
 								n.getSiblingMethod()));
 			}
 		}
 		return res;
 	}
 
-	private ALangObject performAssignment(final Node node, final Node child, final EMethod method, ALangObject assignee, final IEvaluationContext ec) {
+	@Nonnull
+	private ALangObject performAssignment(@Nonnull final Node node, @Nullable final Node child,
+			@Nullable final EMethod method, @Nullable ALangObject assignee, @Nonnull final IEvaluationContext ec) {
+		if (child == null)
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
+		if (method == null)
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_METHOD);
 		switch (child.jjtGetNodeId()) {
 		case JJTVARIABLENODE:
 			final ASTVariableNode var = (ASTVariableNode)child;
@@ -238,15 +260,20 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			// First we need to evaluate the variable (a),
 			// then the expression method (+).
 			if (method != EMethod.EQUAL)
-				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(method.equalMethod(), ec,
-						assignee);
+				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
 			// Now we can set the variable to its new value.
+			if (assignee == null) assignee = NullLangObject.getInstance();
 			setVariable(var, assignee, ec);
 			break;
 		case JJTPROPERTYEXPRESSIONNODE:
 			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode)child;
 			final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
 			final Node last = prop.getLastChild();
+			if (last == null)
+				throw new UncatchableEvaluationException(ec,
+						String.format(
+								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+								null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
 			case DOT:
 				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
@@ -255,9 +282,10 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// then the expression method (+).
 				if (method != EMethod.EQUAL)
 					assignee = res.evaluateAttrAccessor(attrDot, true, ec)
-					.evaluateExpressionMethod(method.equalMethod(), ec, assignee);
+					.evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
 				// Now we can call the attribute assigner and assign the
 				// value.
+				if (assignee == null) assignee = NullLangObject.getInstance();
 				res.executeAttrAssigner(attrDot, true, assignee, ec);
 				break;
 			case BRACKET:
@@ -267,14 +295,15 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// then the expression method (+).
 				if (method != EMethod.EQUAL)
 					assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
-					.evaluateExpressionMethod(method.equalMethod(), ec, assignee);
+					.evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
+				if (assignee == null) assignee = NullLangObject.getInstance();
 				res.executeAttrAssigner(attrBracket, false, assignee, ec);
 				break;
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
 						String.format(
-								"Illegal enum constant %s at %s. This is likely a bug with the parser. Contact support.",
+								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 								last.getSiblingMethod(), node.getClass().getSimpleName()));
 			}
 			break;
@@ -282,13 +311,16 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		default:
 			throw new UncatchableEvaluationException(ec,
 					String.format(
-							"Unknown assignment type %s at %s. This is likely a bug with the parser. Contact support.",
+							CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 							child.getSiblingMethod(), node.getClass().getSimpleName()));
 		}
 		return assignee;
 	}
 
-	private ALangObject performPostUnaryAssignment(final Node node, final Node child, final EMethod method, final IEvaluationContext ec) {
+	@Nonnull
+	private ALangObject performPostUnaryAssignment(@Nonnull final Node node, @Nullable final Node child, @Nonnull final EMethod method, @Nonnull final IEvaluationContext ec) {
+		if (child == null)
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		final ALangObject res, tmp;
 		switch (child.jjtGetNodeId()) {
 		case JJTVARIABLENODE:
@@ -298,12 +330,17 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			// then the expression method (+).
 			res = jjtAccept(node, var, ec);
 			// Now we can set the variable to its new value.
-			setVariable(var, res.evaluateExpressionMethod(method.equalMethod(), ec), ec);
+			setVariable(var, res.evaluateExpressionMethod(method.equalMethod(ec), ec), ec);
 			break;
 		case JJTPROPERTYEXPRESSIONNODE:
 			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode)child;
 			tmp = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
 			final Node last = prop.getLastChild();
+			if (last == null)
+				throw new UncatchableEvaluationException(ec,
+						String.format(
+								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+								null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
 			case DOT:
 				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
@@ -313,7 +350,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				res = tmp.evaluateAttrAccessor(attrDot, true, ec);
 				// Now we can call the attribute assigner and assign the
 				// value.
-				res.executeAttrAssigner(attrDot, true, res.evaluateExpressionMethod(method.equalMethod(), ec),
+				res.executeAttrAssigner(attrDot, true, res.evaluateExpressionMethod(method.equalMethod(ec), ec),
 						ec);
 				break;
 			case BRACKET:
@@ -323,13 +360,13 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// then the expression method (+).
 				res = tmp.evaluateAttrAccessor(attrBracket, false, ec);
 				tmp.executeAttrAssigner(attrBracket, false,
-						res.evaluateExpressionMethod(method.equalMethod(), ec), ec);
+						res.evaluateExpressionMethod(method.equalMethod(ec), ec), ec);
 				break;
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
 						String.format(
-								"Illegal enum constant %s at %s. This is likely a bug with the parser. Contact support.",
+								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 								last.getSiblingMethod(), node.getClass().getSimpleName()));
 			}
 			break;
@@ -337,14 +374,14 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		default:
 			throw new UncatchableEvaluationException(ec,
 					String.format(
-							"Unknown assignment type %s at %s. This is likely a bug with the parser. Contact support.",
+							CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 							child.getSiblingMethod(), node.getClass().getSimpleName()));
 		}
 		return res;
 	}
 
 	@Override
-	public ALangObject visit(final ASTUnaryExpressionNode node, final IEvaluationContext ec)
+	public ALangObject visit(@Nonnull final ASTUnaryExpressionNode node, @Nonnull final IEvaluationContext ec)
 			throws EvaluationException {
 		// Child must be an expression and cannot be a break/continue/return node.
 		if (node.getUnaryMethod().isAssigning())
@@ -381,7 +418,10 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			final Node arg = childrenArray[i];
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
-			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, jjtAccept(node, arg, ec));
+			final EMethod m = arg.getSiblingMethod();
+			if (m == null)
+				throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_METHOD);
+			res = res.evaluateExpressionMethod(m, ec, jjtAccept(node, arg, ec));
 		}
 
 		return res;
@@ -507,8 +547,9 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			}
 			else {
 				// Iterating for loop
-				forloop: for (final ALangObject value : jjtAccept(node, children[0], ec).getIterable(ec)) {
-					ec.getBinding().setVariable(variableName, value);
+				final NonNullIterator<ALangObject> it = jjtAccept(node, children[0], ec).getIterable(ec).iterator();
+				forloop: while(it.hasNext()) {
+					ec.getBinding().setVariable(variableName, it.next());
 					res = jjtAccept(node, children[1], ec);
 					// Handle break, continue, return.
 					if (mustJump) {
@@ -611,7 +652,6 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		return res;
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	public ALangObject visit(final ASTSwitchClauseNode node, final IEvaluationContext ec) throws EvaluationException {
 		final Node[] children = node.getChildArray();
@@ -653,9 +693,10 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 							break forloop;
 					}
 					break;
+					//$CASES-OMITTED$
 				default:
 					throw new UncatchableEvaluationException(ec,
-							"Invalid switch syntax. This is most likely an error with the parser. Contact support.");
+							String.format(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, children[i].getSiblingMethod()));
 				}
 			}
 		}
@@ -725,8 +766,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			break;
 		default:
 			throw new UncatchableEvaluationException(ec,
-					String.format("No such log level %s. This is most likely a bug with the parser. Contact support.",
-							node.getLogLevel()));
+					String.format(CmnCnst.Error.ILLEGAL_ENUM_LOGLEVEL, node.getLogLevel()));
 		}
 		return message;
 	}
@@ -882,17 +922,15 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				//$CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						String.format("Unexptected enum %s. This is likely a bug with the parser. Contact support.",
-								childrenArray[i].getSiblingMethod()));
+						String.format(CmnCnst.Error.ILLEGAL_ENUM_EQUAL,	childrenArray[i].getSiblingMethod()));
 			}
 		}
-
 		return res;
 	}
 
 	@Override
 	public ALangObject visit(final ASTVariableTypeDeclarationNode node, final IEvaluationContext ec) throws EvaluationException {
-		// Type information is discarded at runtime.
-		throw new UncatchableEvaluationException(ec, "ASTVariableTypeDeclarationNode cannot be evaluated. This is most likely a bug with the parser. Contact support.");
+		// Type information is discarded at runtime. Evaluate visitor never visits this node.
+		throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_EVALUATE_VARIABLE_TYPE_NODE);
 	}
 }

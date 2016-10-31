@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -21,12 +23,12 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 	matches(Impl.matches),
 	;
 
-	private final FunctionLangObject impl;
+	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
-	private final String[] argList;
+	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
-	private EAttrAccessorRegex(final Impl impl) {
+	private EAttrAccessorRegex(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -41,6 +43,7 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -67,7 +70,7 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 	}
 
 	private static enum Impl implements IFunction<RegexLangObject> {
-		matches(null, "string") {
+		matches(null, "string") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -77,10 +80,10 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 		},
 		;
 
-		private String[] argList;
+		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -95,6 +98,7 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 			return argList;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

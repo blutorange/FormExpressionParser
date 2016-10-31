@@ -6,6 +6,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTBreakClauseNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 	private String label;
 
 	public ASTBreakClauseNode(final FormExpressionParser parser, final int id) {

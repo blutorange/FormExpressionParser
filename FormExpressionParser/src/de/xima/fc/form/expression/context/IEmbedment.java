@@ -17,7 +17,7 @@ public interface IEmbedment extends IReset {
 	 */
 	public void setCurrentEmbedment(@Nullable String name);
 
-	/** @return List of scopes this embedment defines. */
+	/** @return List of scopes this embedment defines. Must not return any <code>null</code> elements. */
 	@Nonnull
 	public String[] getScopeList();
 
@@ -30,7 +30,7 @@ public interface IEmbedment extends IReset {
 	 * @throws EmbedmentOutputException
 	 *             When an error occurred and data could not be written.
 	 */
-	public void outputCode(String data, IEvaluationContext ec) throws EmbedmentOutputException;
+	public void outputCode(@Nonnull String data, @Nonnull IEvaluationContext ec) throws EmbedmentOutputException;
 
 	/**
 	 * Writes the output of a plain text block (between code blocks) with the
@@ -41,5 +41,5 @@ public interface IEmbedment extends IReset {
 	 * @throws EmbedmentOutputException
 	 *             When an error occurred and data could not be written.
 	 */
-	public void outputText(String data, IEvaluationContext ec) throws EmbedmentOutputException;
+	public void outputText(@Nonnull String data, @Nonnull IEvaluationContext ec) throws EmbedmentOutputException;
 }

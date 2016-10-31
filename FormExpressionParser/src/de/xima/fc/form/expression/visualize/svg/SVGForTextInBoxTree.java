@@ -84,7 +84,7 @@ public class SVGForTextInBoxTree {
 			for (final TextInBox child : getChildren(parent)) {
 				final Rectangle2D.Double b2 = getBoundsOfNode(child);
 				result.append(line(x1, y1, b2.getCenterX(), b2.getCenterY(),
-						"stroke:black; stroke-width:2px;"));
+						"stroke:black; stroke-width:2px;")); //$NON-NLS-1$
 
 				generateEdges(result, child);
 			}
@@ -96,14 +96,14 @@ public class SVGForTextInBoxTree {
 		// draw the box in the background
 		final Rectangle2D.Double box = getBoundsOfNode(textInBox);
 		result.append(rect(box.x + 1, box.y + 1, box.width - 2, box.height - 2,
-				"text-anchor=\"middle\" alignment-baseline=\"central\" fill:orange; stroke:rgb(0,0,0);", "rx=\"10\""));
+				"text-anchor=\"middle\" alignment-baseline=\"central\" fill:orange; stroke:rgb(0,0,0);", "rx=\"10\"")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// draw the text on top of the box (possibly multiple lines)
-		final String[] lines = textInBox.text.split("\n");
+		final String[] lines = textInBox.text.split("\n"); //$NON-NLS-1$
 		final int fontSize = 12;
 		final double x = box.x + box.width/2;
 		double y = box.y + box.height - (fontSize-1)/2;
-		final String style = String.format("font-family:sans-serif;font-size:%dpx;",
+		final String style = String.format("font-family:sans-serif;font-size:%dpx;", //$NON-NLS-1$
 				fontSize);
 		for (int i = 0; i < lines.length; i++) {
 			result.append(text(x, y, style, lines[i]));

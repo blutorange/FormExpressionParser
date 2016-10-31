@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -24,15 +25,21 @@ import de.xima.fc.form.expression.util.IReset;
  */
 public interface IEvaluationContext extends IReset {
 
+	@Nonnull
 	public IScope getScope();
+	@Nonnull
 	public IBinding getBinding();
+	@Nonnull
 	public INamespace getNamespace();
+	@Nonnull
 	public ILogger getLogger();
+	@Nonnull
 	public ITracer<Node> getTracer();
+	@Nonnull
 	public IEmbedment getEmbedment();
+
 	@Nullable
 	public IExternalContext getExternalContext();
-
 	public void setExternalContext(@Nullable IExternalContext externalContext);
 
 	/**
@@ -44,7 +51,8 @@ public interface IEvaluationContext extends IReset {
 	 * @throws VariableNotDefinedException When the variable cannot be found anywhere.
 	 * @throws EvaluationException When the variable cannot be retrieved for any other reason.
 	 */
-	public ALangObject getUnqualifiedVariable(String name) throws EvaluationException;
+	@Nonnull
+	public ALangObject getUnqualifiedVariable(@Nonnull String name) throws EvaluationException;
 
 	/**
 	 * When writing to an unqualified variable, this method must resolve the
@@ -53,7 +61,7 @@ public interface IEvaluationContext extends IReset {
 	 * @param value Value to be set.
 	 * @throws EvaluationException When the variable cannot be set for any reason.
 	 */
-	public void setUnqualifiedVariable(String name, ALangObject value) throws EvaluationException;
+	public void setUnqualifiedVariable(@Nonnull String name, @Nonnull ALangObject value) throws EvaluationException;
 
 	/**
 	 * Called at the beginning of a scope block:
@@ -64,7 +72,7 @@ public interface IEvaluationContext extends IReset {
 	 * </pre>
 	 * @param scope Name of the scope to be added to the list of default lookup scopes for unqualified variables.
 	 */
-	public void beginDefaultScope(String scope);
+	public void beginDefaultScope(@Nonnull String scope);
 
 	/**
 	 * Called at the end of a scope block and remove the scope added most recently.
@@ -85,5 +93,5 @@ public interface IEvaluationContext extends IReset {
 	 * @return Whether two variable names are equivalent and refer to the same
 	 *         variable. Default could be {@link String#equals(Object)}
 	 */
-	public boolean variableNameEquals(String name1, String name2);
+	public boolean variableNameEquals(@Nonnull String name1, @Nonnull String name2);
 }

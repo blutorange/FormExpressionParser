@@ -66,7 +66,7 @@ public class SwingDemo {
 
 	private static void showInDialog(final JComponent panel) {
 		final JScrollPane scrollPane = new JScrollPane(panel);
-		final JFrame dummy = new JFrame("Graph for expression");
+		final JFrame dummy = new JFrame("Graph for expression"); //$NON-NLS-1$
 		dummy.add(scrollPane);
 		dummy.pack();
 		dummy.setLocationRelativeTo(null);
@@ -88,11 +88,11 @@ public class SwingDemo {
 		String expression;
 		if (args.length < 1) {
 			help();
-			expression = JOptionPane.showInputDialog("Enter expression:");
+			expression = JOptionPane.showInputDialog("Enter expression:"); //$NON-NLS-1$
 		} else
 			try {
-				expression = FileUtils.readFileToString(new File(args[0]), "UTF-8");
-			} catch (IOException e) {
+				expression = FileUtils.readFileToString(new File(args[0]), "UTF-8"); //$NON-NLS-1$
+			} catch (final IOException e) {
 				e.printStackTrace();
 				return;
 			}
@@ -103,12 +103,12 @@ public class SwingDemo {
 		}
 		catch (final ParseException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), "Could not parse expression", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), "Could not parse expression", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return;
 		}
 		catch (final Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), "Uncaught exception", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), "Uncaught exception", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return;
 		}
 
@@ -132,6 +132,6 @@ public class SwingDemo {
 	}
 
 	private static void help() {
-		System.out.println("Usage: swingDemo [expression]");
+		System.out.println("Usage: swingDemo [expression]"); //$NON-NLS-1$
 	}
 }

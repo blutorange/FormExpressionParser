@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -12,17 +14,20 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.InvalidRegexPatternException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class RegexLangObject extends ALangObject {
 
 	private final static class InstanceHolder {
-		public final static RegexLangObject UNMATCHABLE = new RegexLangObject(Pattern.compile("(?!)"));
-		public final static RegexLangObject ALL_MATCHING = new RegexLangObject(Pattern.compile(""));
+		@SuppressWarnings("null")
+		@Nonnull public final static RegexLangObject UNMATCHABLE = new RegexLangObject(Pattern.compile("(?!)")); //$NON-NLS-1$
+		@SuppressWarnings("null")
+		@Nonnull public final static RegexLangObject ALL_MATCHING = new RegexLangObject(Pattern.compile("")); //$NON-NLS-1$
 	}
 
-	private final Pattern value;
+	@Nonnull private final Pattern value;
 
-	private RegexLangObject(final Pattern value) {
+	private RegexLangObject(@Nonnull final Pattern value) {
 		super(Type.REGEX);
 		this.value = value;
 	}
@@ -92,20 +97,20 @@ public class RegexLangObject extends ALangObject {
 	 * @return The result of the comparison.
 	 */
 	@Override
-	public int compareToSameType(ALangObject o) {
+	public int compareToSameType(final ALangObject o) {
 		final Pattern v = ((RegexLangObject)o).value;
 		final int res = value.pattern().compareTo(v.pattern());
 		return res != 0 ? res : Integer.compare(value.flags(), v.flags());
 	}
-	
+
 	@Override
 	protected boolean isSingletonLike() {
 		return false;
 	}
-	
+
 	@Override
 	public String inspect() {
-		return "RegexLangObject(" + value + ")";
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_REGEX_LANG_OBJECT).append('(').append(value).append(')').toString();
 	}
 
 	@Override
@@ -145,8 +150,9 @@ public class RegexLangObject extends ALangObject {
 	 * @param value Pattern to compile.
 	 * @return {@link ALangObject} representing the parameter string best, may not be an instance of {@link RegexLangObject}.
 	 */
+	@Nonnull
 	public static RegexLangObject create(final Pattern value) {
-		if (value == null) return new RegexLangObject(Pattern.compile(StringUtils.EMPTY));
+		if (value == null) return getAllMatchingInstance();
 		return new RegexLangObject(value);
 	}
 
@@ -154,9 +160,11 @@ public class RegexLangObject extends ALangObject {
 	 * @param string String to matches. When null, the empty string is used.
 	 * @return A regex that matches the literal characters of the given string, at any position.
 	 */
+	@Nonnull
 	public static RegexLangObject createForString(String string) {
 		if (string == null) string = StringUtils.EMPTY;
-		return new RegexLangObject(Pattern.compile(Pattern.quote(string)));
+		final Pattern p = Pattern.compile(Pattern.quote(string));
+		return p != null ? new RegexLangObject(p) : getAllMatchingInstance();
 	}
 
 	/**
@@ -165,10 +173,12 @@ public class RegexLangObject extends ALangObject {
 	 * @return A regex with the given pattern.
 	 * @throws InvalidRegexPatternException When the pattern is invalid.
 	 */
+	@Nonnull
 	public static RegexLangObject create(final String value, final IEvaluationContext ec) throws InvalidRegexPatternException {
 		return create(value, 0, ec);
 	}
 
+	@Nonnull
 	public static RegexLangObject create(final String value, final int flags, final IEvaluationContext ec) throws InvalidRegexPatternException {
 		Pattern pattern;
 		try {
@@ -177,12 +187,16 @@ public class RegexLangObject extends ALangObject {
 		catch (final IllegalArgumentException e) {
 			throw new InvalidRegexPatternException(value, flags, ec);
 		}
+		if (pattern == null)
+			throw new InvalidRegexPatternException(value, flags, ec);
 		return new RegexLangObject(pattern);
 	}
 
+	@Nonnull
 	public static RegexLangObject getUnmatchableInstance() {
 		return InstanceHolder.UNMATCHABLE;
 	}
+	@Nonnull
 	public static RegexLangObject getAllMatchingInstance() {
 		return InstanceHolder.ALL_MATCHING;
 	}

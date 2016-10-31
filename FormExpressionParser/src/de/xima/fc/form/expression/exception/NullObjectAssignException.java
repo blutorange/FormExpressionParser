@@ -5,6 +5,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 
 public class NullObjectAssignException extends NoSuchAttrAssignerException {
+	private static final long serialVersionUID = 1L;
 	public NullObjectAssignException(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) {
 		super(object.inspect(), NullLangObject.getInstance(), accessedViaDot, ec);
 	}

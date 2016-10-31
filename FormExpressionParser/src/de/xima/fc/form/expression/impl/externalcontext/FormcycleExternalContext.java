@@ -24,16 +24,16 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 		final Builder<String, String> builderName = new Builder<String, String>();
 		final Builder<String, String> builderAlias = new Builder<String, String>();
 		// Elements by name
-		builderName.put("tf1", "Hello");
-		builderName.put("tf2", "World");
-		builderName.put("tf3", "igel");
-		builderName.put("lang", "tr");
-		builderName.put("backslash", "\\");
-		builderName.put("tfVorname", "Andre");
-		builderName.put("tfNachname","Wachsmuth");
+		builderName.put("tf1", "Hello"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderName.put("tf2", "World"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderName.put("tf3", "igel"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderName.put("lang", "tr"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderName.put("backslash", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderName.put("tfVorname", "Andre"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderName.put("tfNachname","Wachsmuth"); //$NON-NLS-1$ //$NON-NLS-2$
 		// Elements by alias
-		builderAlias.put("VornameUnicode", "André");
-		builderAlias.put("NachnameUnicode","Wachsmuth");
+		builderAlias.put("VornameUnicode", "André"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderAlias.put("NachnameUnicode","Wachsmuth"); //$NON-NLS-1$ //$NON-NLS-2$
 		// Build
 		nameMap = builderName.build();
 		aliasMap = builderAlias.build();
@@ -63,13 +63,13 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 	}
 
 	@Override
-	protected void output(String html) throws EmbedmentOutputException {
+	protected void output(final String html) throws EmbedmentOutputException {
 		if (writer == null) return;
 		try {
 			writer.write(html);
 			writer.flush();
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new EmbedmentOutputException(e, this);
 		}
 	}
@@ -80,7 +80,7 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 		try {
 			writer.flush();
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new EmbedmentOutputException(e, this);
 		}
 		finally {
@@ -88,7 +88,7 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 		}
 	}
 
-	
+
 	private final static ImmutableMap<String, ScopeImpl> scopeMap;
 	private static enum ScopeImpl {
 		FORM_FIELD {

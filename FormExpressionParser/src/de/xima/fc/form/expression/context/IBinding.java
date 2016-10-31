@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
@@ -44,7 +47,8 @@ public interface IBinding extends IReset {
 	 *             an exception when the variable does not exist, but return
 	 *             <code>null</code> instead.
 	 */
-	public ALangObject getVariable(String name) throws EvaluationException;
+	@Nullable
+	public ALangObject getVariable(@Nonnull String name) throws EvaluationException;
 
 	/**
 	 * Sets a local variable. Must never look it up in any scopes. When the variable
@@ -55,7 +59,7 @@ public interface IBinding extends IReset {
 	 * @param value Value to set.
 	 * @throws EvaluationException When the variable cannot be set.
 	 */
-	public void setVariable(String name, ALangObject value) throws EvaluationException;
+	public void setVariable(@Nonnull String name, @Nonnull ALangObject value) throws EvaluationException;
 
 	/**
 	 * Creates a new binding derived from the this binding. {@link #getVariable(String)}
@@ -66,7 +70,7 @@ public interface IBinding extends IReset {
 	 * @return An {@link IBinding} that keeps the current variables and can be unnested to
 	 * the current binding undoing all changes made to the nested binding.
 	 */
-	public void nest(IEvaluationContext ec) throws NestingLevelTooDeepException;
+	public void nest(@Nonnull IEvaluationContext ec) throws NestingLevelTooDeepException;
 
 	/**
 	 * Same as {@link #nest()}, but without falling back to the parent binding.
@@ -74,7 +78,7 @@ public interface IBinding extends IReset {
 	 * return the previous binding (a binding equivalent to this one).
 	 * @return
 	 */
-	public void nestLocal(IEvaluationContext ec);
+	public void nestLocal(@Nonnull IEvaluationContext ec);
 
 	/**
 	 * Gets the previous binding from which this binding was derived.

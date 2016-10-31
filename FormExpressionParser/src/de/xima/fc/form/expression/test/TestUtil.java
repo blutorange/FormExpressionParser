@@ -4,6 +4,9 @@ import static org.junit.Assert.fail;
 
 import java.io.Writer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -19,6 +22,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
 import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 
+@SuppressWarnings("nls")
 public final class TestUtil {
 	private TestUtil() {}
 	public static enum ETestType {
@@ -30,19 +34,18 @@ public final class TestUtil {
 		FORMCYCLE;
 	}
 	public static interface ITestCase {
-		public String getCode();
+		@Nonnull public String getCode();
+		@Nonnull public ETestType getTestType();
 
-		public ALangObject getExpectedResult();
+		@Nullable public ALangObject getExpectedResult();
 
 		public boolean isPerformEvaluation();
 
-		public Class<? extends Throwable> getExpectedException();
+		@Nullable public Class<? extends Throwable> getExpectedException();
 
-		public ETestType getTestType();
-		
-		public EContextType getContextType();
+		@Nonnull public EContextType getContextType();
 
-		public String getErrorBegin();
+		@Nullable public String getErrorBegin();
 	}
 
 	public static void test(final Class<? extends ITestCase> clazz) throws IllegalArgumentException, AssertionError {
@@ -94,12 +97,12 @@ public final class TestUtil {
 						exceptionClass);
 			}
 			else if (test.isPerformEvaluation()) {
+				final ALangObject er = test.getExpectedResult();
 				if (res == null) {
 					msg = "No language object was returned.";
 				}
-				else if (test.getExpectedResult() != null && !test.getExpectedResult().equals(res)) {
-					msg = String.format("Expected result was %s, but code evaluated to %s.",
-							test.getExpectedResult().inspect(), res.inspect());
+				else if (er != null && !er.equals(res)) {
+					msg = String.format("Expected result was %s, but code evaluated to %s.", er.inspect(), res.inspect());
 				}
 			}
 			if (msg != null) {
@@ -109,7 +112,7 @@ public final class TestUtil {
 		}
 	}
 
-	private static ALangObject evaluate(final Node node, final EContextType context, final ETestType type) throws EvaluationException {
+	private static ALangObject evaluate(@Nonnull final Node node, @Nonnull final EContextType context, @Nonnull final ETestType type) throws EvaluationException {
 		switch(context) {
 		case GENERIC:
 			switch (type) {
@@ -138,7 +141,8 @@ public final class TestUtil {
 		}
 	}
 
-	private static Node parse(final String code, final ETestType type) throws ParseException, TokenMgrError {
+	@Nonnull
+	private static Node parse(@Nonnull final String code, @Nonnull final ETestType type) throws ParseException, TokenMgrError {
 		switch (type) {
 		case PROGRAM:
 			return FormExpressionParsingUtil.Program.parse(code);

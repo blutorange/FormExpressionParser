@@ -6,9 +6,11 @@ import java.util.regex.PatternSyntaxException;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTRegexNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 
 	private Pattern pattern;
 
@@ -19,16 +21,16 @@ public class ASTRegexNode extends SimpleNode {
 	public void init(final EMethod method, final String regex) throws ParseException {
 		assertChildrenExactly(0);
 		if (regex == null)
-			throw new ParseException("Regex is null. This is likely an error with the parser, contact support.");
+			throw new ParseException(CmnCnst.Error.NODE_NULL_REGEX);
 		if (regex.length() < 2)
-			throw new ParseException(String.format("Regex <%s> not terminated properly.  This is likely an error with the parser, contact support.", regex));
+			throw new ParseException(String.format(CmnCnst.Error.NODE_IMPROPER_REGEX_TERMINATION, regex));
 		super.init(method);
 		final int lastHash = regex.lastIndexOf('#');
 		try {
 			pattern = Pattern.compile(regex.substring(1, lastHash), flags(regex, lastHash+1));
 		}
 		catch (final PatternSyntaxException e) {
-			throw new ParseException(String.format("Encountered invalid regex at line %d, column %d: %s",
+			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_REGEX,
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 	}
@@ -38,7 +40,16 @@ public class ASTRegexNode extends SimpleNode {
 		sb.append(pattern.pattern()).append(',').append(pattern.flags()).append(',');
 	}
 
-	private int flags(final String flagString, final int beginIndex) {
+	@Override
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
+		return visitor.visit(this, data);
+	}
+
+	public Pattern getPattern() {
+		return pattern;
+	}
+
+	private static int flags(final String flagString, final int beginIndex) {
 		final int len = flagString.length();
 		int flags = 0;
 		for (int i = beginIndex; i < len; ++i) {
@@ -55,14 +66,5 @@ public class ASTRegexNode extends SimpleNode {
 			}
 		}
 		return flags;
-	}
-
-	@Override
-	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
-		return visitor.visit(this, data);
-	}
-
-	public Pattern getPattern() {
-		return pattern;
 	}
 }

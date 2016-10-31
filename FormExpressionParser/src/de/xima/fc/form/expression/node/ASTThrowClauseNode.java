@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTThrowClauseNode extends SimpleNode {
 
+	private static final long serialVersionUID = 1L;
 
 	public ASTThrowClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

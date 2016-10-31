@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.context.ICustomScope;
 import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -41,8 +42,8 @@ public class GenericScope implements IScope {
 			final ICustomScope customScope = custom.get(scope);
 			value = customScope != null ? customScope.fetch(name) : null;
 		}
-		return value != null ? value
-				: ec.getExternalContext() != null ? ec.getExternalContext().fetchScopedVariable(scope, name, ec) : null;
+		final IExternalContext ex = ec.getExternalContext();
+		return value != null ? value : ex != null ? ex.fetchScopedVariable(scope, name, ec) : null;
 	}
 
 	@Override

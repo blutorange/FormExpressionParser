@@ -3,22 +3,25 @@ package de.xima.fc.form.expression.impl.logger;
 import java.text.DateFormat;
 import java.util.Date;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.ILogger;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class SystemLogger implements ILogger {
 
 	private final Level level;
 	private final String prefix;
-	
+
 	private static class InstanceHolder {
-		public final static SystemLogger ERROR = new SystemLogger(Level.ERROR, "SystemLogger:");
-		public final static SystemLogger WARN = new SystemLogger(Level.WARN, "SystemLogger:");
-		public final static SystemLogger INFO = new SystemLogger(Level.INFO, "SystemLogger:");
-		public final static SystemLogger DEBUG = new SystemLogger(Level.DEBUG, "SystemLogger:");
+		@Nonnull public final static SystemLogger ERROR = new SystemLogger(Level.ERROR, CmnCnst.NAME_SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger WARN = new SystemLogger(Level.WARN, CmnCnst.NAME_SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger INFO = new SystemLogger(Level.INFO, CmnCnst.NAME_SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger DEBUG = new SystemLogger(Level.DEBUG, CmnCnst.NAME_SYSTEM_LOGGER);
 	}
-	
+
 	public static enum Level {
 		OFF(0),
 		ERROR(1),
@@ -27,54 +30,67 @@ public class SystemLogger implements ILogger {
 		DEBUG(4),
 		ALL(5);
 		public final int numeric;
-		private Level(int numeric) {
+
+		private Level(final int numeric) {
 			this.numeric = numeric;
 		}
 	}
-	
-	public SystemLogger(Level level) {
+
+	public SystemLogger(final Level level) {
 		this(level, StringUtils.EMPTY);
 	}
-	public SystemLogger(Level level, String prefix) {
+
+	public SystemLogger(final Level level, final String prefix) {
 		this.level = level;
 		this.prefix = prefix;
 	}
-	
+
 	@Override
-	public void error(String message) {
-		if (level.numeric >= Level.ERROR.numeric) System.err.println(String.format("[ERROR] (%s) %s %s", getDate(), prefix, message));
+	public void error(final String message) {
+		if (level.numeric >= Level.ERROR.numeric)
+			System.err.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.ERROR, getCurrentDate(), prefix, message));
 	}
 
 	@Override
-	public void warn(String message) {
-		if (level.numeric >= Level.WARN.numeric) System.err.println(String.format("[WARN] (%s) %s %s", getDate(), prefix, message));
+	public void warn(final String message) {
+		if (level.numeric >= Level.WARN.numeric)
+			System.err.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.WARN, getCurrentDate(), prefix, message));
 	}
 
 	@Override
-	public void info(String message) {
-		if (level.numeric >= Level.INFO.numeric) System.out.println(String.format("[INFO] (%s) %s %s", getDate(), prefix, message));
+	public void info(final String message) {
+		if (level.numeric >= Level.INFO.numeric)
+			System.out.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.INFO, getCurrentDate(), prefix, message));
 	}
 
 	@Override
-	public void debug(String message) {
-		if (level.numeric >= Level.DEBUG.numeric) System.out.println(String.format("[DEBUG] (%s) %s %s", getDate(), prefix, message));
+	public void debug(final String message) {
+		if (level.numeric >= Level.DEBUG.numeric)
+			System.out.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.DEBUG, getCurrentDate(), prefix, message));
 	}
-	
-	private String getDate() {
-		final Date now = new Date();
-		return DateFormat.getDateInstance().format(now) + " " + DateFormat.getTimeInstance().format(now);
-	}
-	
+
+	@Nonnull
 	public static SystemLogger getErrorLogger() {
 		return InstanceHolder.ERROR;
 	}
+
+	@Nonnull
 	public static SystemLogger getDebugLogger() {
 		return InstanceHolder.DEBUG;
 	}
+
+	@Nonnull
 	public static SystemLogger getWarnLogger() {
 		return InstanceHolder.WARN;
 	}
+
+	@Nonnull
 	public static SystemLogger getInfoLogger() {
 		return InstanceHolder.INFO;
+	}
+
+	private static String getCurrentDate() {
+		final Date now = new Date();
+		return DateFormat.getDateInstance().format(now) + StringUtils.SPACE + DateFormat.getTimeInstance().format(now);
 	}
 }

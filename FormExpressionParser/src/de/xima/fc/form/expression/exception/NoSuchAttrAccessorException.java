@@ -4,24 +4,25 @@ package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class NoSuchAttrAccessorException extends NoSuchFunctionException {
 	private static final long serialVersionUID = 1L;
 
 	public NoSuchAttrAccessorException(final String name, final IEvaluationContext ec) {
-		super("attribute accessor", name, ec);
+		super(CmnCnst.NAME_ATTRIBUTE_ACCESSOR, name, ec);
 	}
 
 	public NoSuchAttrAccessorException(final String name, final boolean accessedViaDot, final IEvaluationContext ec) {
-		super(accessedViaDot ? "dot attribute accessor" : "bracket attribute accessor", name, ec);
+		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name, ec);
 	}
 
 	public NoSuchAttrAccessorException(final String name, final ALangObject thisContext, final IEvaluationContext ec) {
-		super("attribute accessor", name, thisContext, ec);
+		super(CmnCnst.NAME_ATTRIBUTE_ACCESSOR, name, thisContext, ec);
 	}
 
 	public NoSuchAttrAccessorException(final String name, final ALangObject thisContext, final boolean accessedViaDot, final IEvaluationContext ec) {
-		super(accessedViaDot ? "dot attribute accessor" : "bracket attribute accessor", name, thisContext, ec);
+		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name, thisContext, ec);
 	}
 
 }

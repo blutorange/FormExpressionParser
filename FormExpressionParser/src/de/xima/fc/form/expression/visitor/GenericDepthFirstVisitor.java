@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.visitor;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -77,7 +79,8 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 		}
 	}
 
-	private final Node wrapper;
+	@Nonnull private final Node wrapper;
+
 	public GenericDepthFirstVisitor() {
 		wrapper = new Node();
 	}
@@ -89,7 +92,8 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 	 * @param data
 	 * @return
 	 */
-	protected abstract R visitNode(Node node, T data) throws E;
+	@Nonnull
+	protected abstract R visitNode(@Nonnull Node node, @Nonnull T data) throws E;
 
 	/**
 	 * Reduces the return values from the parent node and its children.
@@ -98,14 +102,17 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 	 * @param newValue New value to be added.
 	 * @return The reduced value.
 	 */
-	protected R reduce(final R reducedValue, final R newValue) {
+	@Nonnull
+	protected R reduce(@Nonnull final R reducedValue, @Nonnull final R newValue) {
 		return reducedValue;
 	}
-	protected T map(final T value) {
+	@Nonnull
+	protected T map(@Nonnull final T value) {
 		return value;
 	}
 
-	private R processNode(final de.xima.fc.form.expression.grammar.Node node, final T data) throws E {
+	@Nonnull
+	private R processNode(@Nonnull final de.xima.fc.form.expression.grammar.Node node, @Nonnull final T data) throws E {
 		wrapper.node = node;
 		final T childData = map(data);
 		R reduced = visitNode(wrapper, data);

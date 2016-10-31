@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -13,10 +15,10 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 
 public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangObject> {
 	;
-	private final EMethod method;
-	private final IFunction<FunctionLangObject> function;
+	@Nonnull private final EMethod method;
+	@Nonnull private final IFunction<FunctionLangObject> function;
 
-	private EExpressionMethodFunction(final EMethod method, final IFunction<FunctionLangObject> function) {
+	private EExpressionMethodFunction(@Nonnull final EMethod method, @Nonnull final IFunction<FunctionLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -31,10 +33,11 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 		return function;
 	}
 
+	@SuppressWarnings("unused")
 	private static enum Impl implements IFunction<FunctionLangObject> {
 		// A dummy because there are not methods yet.
 		@Deprecated
-		DUMMY(null, "comparand"){
+		DUMMY(null, "comparand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -43,10 +46,10 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 		},
 		;
 
-		private final String[] argList;
+		@Nonnull private final String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -56,6 +59,7 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 			return optionalArgumentsName;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

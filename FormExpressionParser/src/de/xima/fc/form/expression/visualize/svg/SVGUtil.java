@@ -79,8 +79,8 @@ public class SVGUtil {
 
 	public static String svg(final String width, final String height, final String content) {
 		return String
-				.format("<svg width=\"%s\" height=\"%s\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n"
-						+ "%s" + "</svg>\n", width, height, content);
+				.format("<svg width=\"%s\" height=\"%s\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n" //$NON-NLS-1$
+						+ "%s" + "</svg>\n", width, height, content); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static String svg(final Number width, final Number height, final String content) {
@@ -91,8 +91,8 @@ public class SVGUtil {
 	public static String svg(final String x, final String y, final String width, final String height,
 			final String content) {
 		return String
-				.format("<svg x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n"
-						+ "%s" + "</svg>\n", x, y, width, height, content);
+				.format("<svg x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n" //$NON-NLS-1$
+						+ "%s" + "</svg>\n", x, y, width, height, content); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static String svg(final Number x, final Number y, final Number width, final Number height,
@@ -120,13 +120,13 @@ public class SVGUtil {
 	public static String rect(final String x, final String y, final String width, final String height,
 			final String style, final String extraAttributes) {
 		return String
-				.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"%s\" %s/>\n",
+				.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"%s\" %s/>\n", //$NON-NLS-1$
 						x, y, width, height, style, extraAttributes);
 	}
 
 	public static String rect(final String x, final String y, final String width, final String height,
 			final String style) {
-		return rect(x, y, width, height, style, "");
+		return rect(x, y, width, height, style, ""); //$NON-NLS-1$
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class SVGUtil {
 
 	public static String rect(final Number x, final Number y, final Number width, final Number height,
 			final String style) {
-		return rect(x, y, width, height, style, "");
+		return rect(x, y, width, height, style, ""); //$NON-NLS-1$
 	}
 
 	// ------------------------------------------------------------------------
@@ -159,7 +159,7 @@ public class SVGUtil {
 	public static String line(final String x1, final String y1, final String x2, final String y2,
 			final String style) {
 		return String
-				.format("<line x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\" style=\"%s\" />\n",
+				.format("<line x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\" style=\"%s\" />\n", //$NON-NLS-1$
 						x1, y1, x2, y2, style);
 	}
 
@@ -176,7 +176,7 @@ public class SVGUtil {
 
 	public static String text(final String x, final String y, final String style, final String text) {
 		return String.format(
-				"<text x=\"%s\" y=\"%s\" style=\"%s\">\n%s\n</text>\n", x, y,
+				"<text x=\"%s\" y=\"%s\" style=\"%s\">\n%s\n</text>\n", x, y, //$NON-NLS-1$
 				style, text);
 	}
 
@@ -190,18 +190,18 @@ public class SVGUtil {
 
 	public static String doc(final String content) {
 		return String
-				.format("<?xml version=\"1.0\" standalone=\"no\" ?>\n"
-						+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n"
-						+ "%s\n", content);
+				.format("<?xml version=\"1.0\" standalone=\"no\" ?>\n" //$NON-NLS-1$
+						+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n" //$NON-NLS-1$
+						+ "%s\n", content); //$NON-NLS-1$
 	}
 
 	// ------------------------------------------------------------------------
 	// main
 
 	private static boolean viewSVG(final File file) throws IOException {
-		if ("Mac OS X".equals(System.getProperty("os.name"))) {
+		if ("Mac OS X".equals(System.getProperty("os.name"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			Runtime.getRuntime().exec(
-					String.format("open -a /Applications/Safari.app %s",
+					String.format("open -a /Applications/Safari.app %s", //$NON-NLS-1$
 							file.getAbsoluteFile()));
 			return true;
 		}
@@ -220,38 +220,33 @@ public class SVGUtil {
 		final String s = doc(svg(
 				160,
 				200,
-				rect(0, 0, 160, 200, "fill:red;")
+				rect(0, 0, 160, 200, "fill:red;") //$NON-NLS-1$
 				+ svg(10,
 						10,
 						100,
 						100,
 						rect(0, 0, 100, 100,
-								"fill:orange; stroke:rgb(0,0,0);"))
+								"fill:orange; stroke:rgb(0,0,0);")) //$NON-NLS-1$
 				+ line(20, 20, 100, 100,
-						"stroke:black; stroke-width:2px;")
+						"stroke:black; stroke-width:2px;") //$NON-NLS-1$
 				+ line(20, 100, 100, 20,
-						"stroke:black; stroke-width:2px;")
+						"stroke:black; stroke-width:2px;") //$NON-NLS-1$
 				+ text(10,
 						140,
-						"font-family:verdana; font-size:20px; font-weight:bold;",
-						"Hello world")));
+						"font-family:verdana; font-size:20px; font-weight:bold;", //$NON-NLS-1$
+						"Hello world"))); //$NON-NLS-1$
 
-		final File file = new File("demo.svg");
-		FileWriter w = null;
-		try {
-			w = new FileWriter(file);
+		final File file = new File("demo.svg"); //$NON-NLS-1$
+		try(FileWriter w = new FileWriter(file)) {
 			w.write(s);
-		} finally {
-			if (w != null)
-				w.close();
 		}
-		System.out.println(String.format("File written: %s",
+		System.out.println(String.format("File written: %s", //$NON-NLS-1$
 				file.getAbsolutePath()));
 
 		// optionally view the just created file
-		if (args.length > 0 && args[0].equals("-view"))
+		if (args.length > 0 && args[0].equals("-view")) //$NON-NLS-1$
 			if (!viewSVG(file))
-				System.err.println("'-view' not supported on this platform");
+				System.err.println("'-view' not supported on this platform"); //$NON-NLS-1$
 	}
 
 }

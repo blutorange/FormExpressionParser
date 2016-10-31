@@ -2,6 +2,8 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Arrays;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -37,12 +39,12 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 	 */
 	apply(Impl.apply),;
 
-	private final FunctionLangObject impl;
+	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
-	private final String[] argList;
+	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
-	private EAttrAccessorFunction(final Impl impl) {
+	private EAttrAccessorFunction(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
@@ -51,12 +53,13 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
+			@Nonnull final ALangObject... args) throws EvaluationException {
 		if (!evalImmediately)
 			return impl;
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -90,7 +93,7 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 				return StringLangObject.create(thisContext.functionValue().getDeclaredName());
 			}
 		},
-		apply(null, "thisContext", "argsArray") {
+		apply(null, "thisContext", "argsArray") { //$NON-NLS-1$ //$NON-NLS-2$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -109,7 +112,8 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 				}
 			}
 		},
-		call("args", "thisContext") {
+		call("args", "thisContext") { //$NON-NLS-1$ //$NON-NLS-2$
+			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -129,10 +133,10 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 			}
 		};
 
-		private String[] argList;
+		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, final String... argList) {
+		private Impl(final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}
@@ -147,6 +151,7 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 			return argList;
 		}
 
+		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

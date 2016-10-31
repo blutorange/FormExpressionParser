@@ -6,7 +6,7 @@
 	<version>0.1-SNAPSHOT</version>
 	<name>FormExpressionParser</name>
 	<dependencies>
-		
+
 		<!-- BSD2-clause license -->
 		<dependency>
 			<groupId>net.java.dev.javacc</groupId>
@@ -14,69 +14,69 @@
 			<version>6.1.2</version>
 			<scope />
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
 			<version>4.1</version>
 		</dependency>
-		
+
 		<!-- Only needed for testing, can be removed later -->
 		<dependency>
 			<groupId>org.abego.treelayout</groupId>
 			<artifactId>org.abego.treelayout.core</artifactId>
 			<version>1.0.3</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-pool2</artifactId>
 			<version>2.4.2</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.3.2</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.21</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.10</version>
 		</dependency>
-		
-<!-- 		 MIT license -->
-<!--         <dependency> -->
-<!--             <groupId>org.jsoup</groupId> -->
-<!--             <artifactId>jsoup</artifactId> -->
-<!--             <version>1.9.2</version> -->
-<!--         </dependency> -->
-        
+
+		<!-- MIT license -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.jsoup</groupId> -->
+		<!-- <artifactId>jsoup</artifactId> -->
+		<!-- <version>1.9.2</version> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -95,18 +95,18 @@
 			</resource>
 		</resources>
 		<plugins>
-		    <plugin>
-		      <artifactId>maven-resources-plugin</artifactId>
-		      <version>2.5</version>
-		      <configuration>
-		        <encoding>UTF-8</encoding>
-		      </configuration>
-		    </plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-				    <encoding>UTF-8</encoding>
+					<encoding>UTF-8</encoding>
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>

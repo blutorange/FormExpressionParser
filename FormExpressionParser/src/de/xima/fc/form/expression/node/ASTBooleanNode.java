@@ -3,9 +3,11 @@ package de.xima.fc.form.expression.node;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTBooleanNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 
 	private boolean booleanValue;
 
@@ -15,7 +17,7 @@ public class ASTBooleanNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append((booleanValue ? "true)" : "false)")).append(",");
+		sb.append(booleanValue ? CmnCnst.ToString.BOOLEAN_TRUE : CmnCnst.ToString.BOOLEAN_FALSE).append(',');
 	}
 
 	@Override

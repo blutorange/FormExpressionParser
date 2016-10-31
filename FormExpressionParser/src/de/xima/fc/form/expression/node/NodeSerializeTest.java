@@ -11,6 +11,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 public final class NodeSerializeTest {
 
+	@SuppressWarnings("nls")
 	public static void main(final String[] args) {
 		final String string = "if('') 8 ; else 42;";
 		System.out.println("Input string\n" + string);

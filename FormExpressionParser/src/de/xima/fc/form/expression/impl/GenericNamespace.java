@@ -4,6 +4,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
@@ -47,6 +49,7 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * A generic immutable {@link INamespace} that only needs to be constructed once
@@ -343,7 +346,7 @@ public class GenericNamespace implements INamespace {
 			genericAttrAccessorRegex = func;
 			return this;
 		}
-		
+
 		public final Builder setGenericAttrAssignerString(final IFunction<StringLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerString == null) ++ count;
@@ -437,10 +440,10 @@ public class GenericNamespace implements INamespace {
 			attrAssignerRegex = null;
 		}
 
+		@Nonnull
 		public final INamespace build() throws IllegalStateException {
 			if (count != FIELDS_TO_FILL)
-				throw new IllegalStateException(
-						"All expression method, attribute accessors, and attribute assigners must be set.");
+				throw new IllegalStateException(CmnCnst.Error.ILLEGAL_STATE_NAMESPACE_BUILDER);
 			final GenericNamespace retVal = new GenericNamespace(
 					expressionMethodBoolean,
 					expressionMethodNumber,
@@ -615,7 +618,7 @@ public class GenericNamespace implements INamespace {
 	public IFunction<RegexLangObject> expressionMethodRegex(final EMethod method) throws EvaluationException {
 		return expressionMethodRegex.get(method);
 	}
-	
+
 	@Override
 	public IFunction<StringLangObject> attrAccessorString(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -717,12 +720,13 @@ public class GenericNamespace implements INamespace {
 		return func != null ? func : genericAttrAssignerRegex;
 	}
 
+	@Nonnull
 	public static INamespace getGenericNamespaceInstance() {
 		return InstanceHolder.GENERIC;
 	}
 
 	private final static class InstanceHolder {
-		public final static INamespace GENERIC;
+		@Nonnull public final static INamespace GENERIC;
 		static {
 			final GenericNamespace.Builder builder = new GenericNamespace.Builder();
 

@@ -21,11 +21,13 @@ public class Tests {
 		TestUtil.test(SemanticsFailure.class);
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public final void testSyntaxSuccess() {
 		TestUtil.test(SyntaxSuccess.class);
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public final void testSyntaxFailure() {
 		TestUtil.test(SyntaxFailure.class);

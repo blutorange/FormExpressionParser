@@ -6,6 +6,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTIdentifierNameNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 
 	private String name;
 
@@ -29,6 +30,6 @@ public class ASTIdentifierNameNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(name).append(",");
+		sb.append(name).append(',');
 	}
 }

@@ -2,13 +2,15 @@ package de.xima.fc.form.expression.visitor;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.util.CmnCnst;
+
 public final class UnparseVisitorConfig {
 	public final String indentPrefix;
 	public final String linefeed;
 	public final String optionalSpace;
 	public final String requiredSpace;
 	public final boolean keepComments;
-	private UnparseVisitorConfig(String indentPrefix, String linefeed, String optionalSpace, String requiredSpace, boolean keepComments) {
+	private UnparseVisitorConfig(final String indentPrefix, final String linefeed, final String optionalSpace, final String requiredSpace, final boolean keepComments) {
 		this.indentPrefix = indentPrefix;
 		this.linefeed = linefeed;
 		this.optionalSpace = optionalSpace;
@@ -21,11 +23,11 @@ public final class UnparseVisitorConfig {
 		public String optionalSpace;
 		public String requiredSpace;
 		public boolean keepComments;
-		public Builder setIndentPrefix(String indentPrefix) {
+		public Builder setIndentPrefix(final String indentPrefix) {
 			this.indentPrefix = indentPrefix;
 			return this;
 		}
-		public Builder setLinefeed(String linefeed) {
+		public Builder setLinefeed(final String linefeed) {
 			this.linefeed = linefeed;
 			return this;
 		}
@@ -39,7 +41,7 @@ public final class UnparseVisitorConfig {
 			this.requiredSpace = StringUtils.repeat(' ', requiredSpace);
 			return this;
 		}
-		public Builder setKeepComments(boolean keepComments) {
+		public Builder setKeepComments(final boolean keepComments) {
 			this.keepComments = keepComments;
 			return this;
 		}
@@ -48,24 +50,24 @@ public final class UnparseVisitorConfig {
 			if (linefeed == null) linefeed = StringUtils.LF;
 			if (optionalSpace == null) optionalSpace = StringUtils.EMPTY;
 			if (requiredSpace == null) requiredSpace = StringUtils.SPACE;
-			indentPrefix = indentPrefix.replaceAll("[^\t ]", StringUtils.EMPTY);
-			linefeed = linefeed.replaceAll("[^\r\n]", "");
+			indentPrefix = indentPrefix.replaceAll("[^\t ]", StringUtils.EMPTY); //$NON-NLS-1$
+			linefeed = linefeed.replaceAll("[^\r\n]", StringUtils.EMPTY); //$NON-NLS-1$
 			if (linefeed.isEmpty()) linefeed = StringUtils.LF;
 			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
 		}
 	}
-	
+
 	private final static class InstanceHolder {
 		public final static UnparseVisitorConfig STYLED = new Builder()
-				.setLinefeed("\n")
-				.setIndentPrefix("  ")
+				.setLinefeed(CmnCnst.SYNTAX_LINEFEED)
+				.setIndentPrefix(CmnCnst.SYNTAX_INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(true)
 				.build();
 		public final static UnparseVisitorConfig STYLED_WITHOUT_COMMENTS = new Builder()
-				.setLinefeed("\n")
-				.setIndentPrefix("  ")
+				.setLinefeed(CmnCnst.SYNTAX_LINEFEED)
+				.setIndentPrefix(CmnCnst.SYNTAX_INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(false)
@@ -85,7 +87,7 @@ public final class UnparseVisitorConfig {
 				.setKeepComments(false)
 				.build();
 	}
-	
+
 	/**
 	 * @return Some (working) configuration, no guarantees on its details.
 	 */
@@ -96,11 +98,11 @@ public final class UnparseVisitorConfig {
 	public static UnparseVisitorConfig getStyledWithCommentsConfig() {
 		return InstanceHolder.STYLED;
 	}
-	
+
 	public static UnparseVisitorConfig getStyledWithoutCommentsConfig() {
 		return InstanceHolder.STYLED_WITHOUT_COMMENTS;
 	}
-	
+
 	/**
 	 * @return A config that keeps comments, but does not add any optional spaces or newlines.
 	 */

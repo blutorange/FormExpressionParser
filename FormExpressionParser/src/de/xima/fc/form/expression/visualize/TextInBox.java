@@ -47,7 +47,7 @@ public class TextInBox {
 	}
 
 	public TextInBox(final String string) {
-		final String[] lines = string.split("\n");
+		final String[] lines = string.split("\n"); //$NON-NLS-1$
 		text = string;
 		int w = lines[0].length();
 		for (int i = 1; i<lines.length; ++i)

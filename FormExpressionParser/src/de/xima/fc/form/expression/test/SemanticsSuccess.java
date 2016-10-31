@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.test;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -12,6 +14,7 @@ import de.xima.fc.form.expression.test.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.TestUtil.ITestCase;
 
+@SuppressWarnings("nls")
 enum SemanticsSuccess implements ITestCase {
 	// Object literals.
 	LITERALS001("null;", NullLangObject.getInstance()),
@@ -123,17 +126,17 @@ enum SemanticsSuccess implements ITestCase {
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),
 	;
 
-	private final String code;
+	@Nonnull private final String code;
 	private final ALangObject expectedResult;
-	private final ETestType type;
-	private final EContextType context;
-	private SemanticsSuccess(final String code, final ALangObject expectedResult) {
+	@Nonnull private final ETestType type;
+	@Nonnull private final EContextType context;
+	private SemanticsSuccess(@Nonnull final String code, final ALangObject expectedResult) {
 		this(code, EContextType.GENERIC, expectedResult);
 	}
-	private SemanticsSuccess(final String code, final EContextType context, final ALangObject expectedResult) {
+	private SemanticsSuccess(@Nonnull final String code, @Nonnull final EContextType context, final ALangObject expectedResult) {
 		this(code, ETestType.PROGRAM, context, expectedResult);
 	}
-	private SemanticsSuccess(final String code, final ETestType type, final EContextType context, final ALangObject expectedResult) {
+	private SemanticsSuccess(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final EContextType context, final ALangObject expectedResult) {
 		this.code = code;
 		this.expectedResult = expectedResult;
 		this.context = context;

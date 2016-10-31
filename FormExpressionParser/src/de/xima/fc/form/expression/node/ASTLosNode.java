@@ -1,13 +1,17 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTLosNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 
-	private String text;
+	private String text = CmnCnst.EMPTY_STRING;
 	private String open;
 	private boolean hasClose;
 
@@ -23,8 +27,9 @@ public class ASTLosNode extends SimpleNode {
 		this.hasClose = hasClose;
 	}
 
+	@Nonnull
 	public String getText() {
-		return text;
+		return text != null ? text : CmnCnst.EMPTY_STRING;
 	}
 
 	public boolean isHasOpen() {

@@ -1,11 +1,12 @@
 package de.xima.fc.form.expression.impl.contextcommand;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.impl.AExternalContextCommand;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class DocumentCommand extends AExternalContextCommand {
 	@Nonnull
@@ -19,26 +20,28 @@ public class DocumentCommand extends AExternalContextCommand {
 	 * @throws IllegalArgumentException When type is <code>null</code>, or the number of String arguments does not match
 	 * {@link EDocumentCommandType#argc}.
 	 */
-	private DocumentCommand(final EDocumentCommandType type, String... data) throws IllegalArgumentException {
-		data = data != null ? data: ArrayUtils.EMPTY_STRING_ARRAY;
-		assertArguments(type, data);
+	private DocumentCommand(@Nonnull final EDocumentCommandType type, @Nullable final String... data) throws IllegalArgumentException {
+		final String[] dataArray = data != null ? data: CmnCnst.EMPTY_STRING_ARRAY;
+		assertArguments(type, dataArray);
 		this.type = type;
-		this.data = data;
+		this.data = dataArray;
 	}
 
-	private final void assertArguments(final EDocumentCommandType type, final String[] data) {
-		if (type == null) throw new IllegalArgumentException("Type must not be null.");
+	private final static void assertArguments(final EDocumentCommandType type, final String[] data) {
+		if (type == null) throw new IllegalArgumentException(CmnCnst.Error.NULL_TYPE);
 		if (data.length != type.argc)
 			throw new IllegalArgumentException(
-					String.format("Document command of type %s requires %d arguments, but %d were given: %s.", type,
+					String.format(CmnCnst.Error.ILLEGAL_ARGUMENTS_FOR_DOCUMENT_COMMAND, type,
 							new Integer(type.argc), new Integer(data.length), StringUtils.join(data, ',')));
 	}
 
+	@Nonnull
 	@Override
 	public String[] getData() {
 		return data;
 	}
 
+	@Nonnull
 	@Override
 	public EDocumentCommandType getType() {
 		return type;
@@ -78,7 +81,7 @@ public class DocumentCommand extends AExternalContextCommand {
 
 	@Override
 	public String toString() {
-		return String.format("%s(%s)", type, StringUtils.join(data, ','));
+		return String.format(CmnCnst.ToString.DOCUMENT_COMMAND, type, StringUtils.join(data, ','));
 	}
 
 	public static enum EDocumentCommandType {
@@ -109,9 +112,12 @@ public class DocumentCommand extends AExternalContextCommand {
 	}
 
 	private final static class InstanceHolder {
-		public final static DocumentCommand REMOVE_ENCLOSING_PARAGRAPH = new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, "p");
-		public final static DocumentCommand REMOVE_ENCLOSING_TABLE = new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, "table");
-		public final static DocumentCommand REMOVE_ENCLOSING_TABLE_ROW = new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, "tr");
+		public final static DocumentCommand REMOVE_ENCLOSING_PARAGRAPH = new DocumentCommand(
+				EDocumentCommandType.REMOVE_ENCLOSING_TAG, "p"); //$NON-NLS-1$
+		public final static DocumentCommand REMOVE_ENCLOSING_TABLE = new DocumentCommand(
+				EDocumentCommandType.REMOVE_ENCLOSING_TAG, "table"); //$NON-NLS-1$
+		public final static DocumentCommand REMOVE_ENCLOSING_TABLE_ROW = new DocumentCommand(
+				EDocumentCommandType.REMOVE_ENCLOSING_TAG, "tr"); //$NON-NLS-1$
 		public final static DocumentCommand NO_OP = new DocumentCommand(EDocumentCommandType.NO_OP);
 	}
 }

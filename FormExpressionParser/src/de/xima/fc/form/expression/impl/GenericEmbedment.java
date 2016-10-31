@@ -3,8 +3,6 @@ package de.xima.fc.form.expression.impl;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.context.IEmbedment;
@@ -16,6 +14,7 @@ import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandler;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleFormcycle;
 import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleGeneral;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Generic embedment allowing you to inject different implementations.
@@ -34,17 +33,17 @@ public class GenericEmbedment implements IEmbedment {
 	private String handlerEmbedment;
 
 	private final static class InstanceHolder {
-		public final static GenericEmbedment GENERIC = new Builder()
+		@Nonnull public final static GenericEmbedment GENERIC = new Builder()
 				.addHandler(EmbedmentHandlerBundleGeneral.values())
 				.build();
-		public final static GenericEmbedment FORMCYCLE = new Builder()
+		@Nonnull public final static GenericEmbedment FORMCYCLE = new Builder()
 				.addHandler(EmbedmentHandlerBundleGeneral.values())
 				.addHandler(EmbedmentHandlerBundleFormcycle.values())
 				.build();
 	}
 
 	private GenericEmbedment(final ImmutableMap<String, IEmbedmentHandler> map) throws IllegalArgumentException {
-		if (map == null) throw new IllegalArgumentException("map must not be null");
+		if (map == null) throw new IllegalArgumentException(CmnCnst.Error.NULL_MAP);
 		this.map = map;
 	}
 
@@ -82,6 +81,7 @@ public class GenericEmbedment implements IEmbedment {
 					getMap().put(handler.getEmbedmentName(), handler);
 			return this;
 		}
+		@Nonnull
 		public GenericEmbedment build() {
 			final GenericEmbedment embedment = new GenericEmbedment(getMap().build());
 			reinit();
@@ -95,14 +95,10 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	private IEmbedmentHandler getHandler() {
-		if (currentEmbedment == null) return null;
-		if (currentEmbedment.equals(handlerEmbedment)) return handler;
-		return handler = map.get(handlerEmbedment = currentEmbedment);
-	}
-
-	private void output(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
-		final IExternalContext external = ec.getExternalContext();
-		if (external != null) external.write(data);
+		final String e = currentEmbedment;
+		if (e == null) return null;
+		if (e.equals(handlerEmbedment)) return handler;
+		return handler = map.get(handlerEmbedment = e);
 	}
 
 	@Override
@@ -117,10 +113,12 @@ public class GenericEmbedment implements IEmbedment {
 		output(data, ec);
 	}
 
+	@Nonnull
 	public static IEmbedment getGenericEmbedment() {
 		return InstanceHolder.GENERIC;
 	}
 
+	@Nonnull
 	public static IEmbedment getFormcycleEmbedment() {
 		return InstanceHolder.FORMCYCLE;
 
@@ -135,6 +133,11 @@ public class GenericEmbedment implements IEmbedment {
 	@Override
 	public String[] getScopeList() {
 		final IEmbedmentHandler handler = getHandler();
-		return handler != null ? handler.getScopeList() : ArrayUtils.EMPTY_STRING_ARRAY;
+		return handler != null ? handler.getScopeList() : CmnCnst.EMPTY_STRING_ARRAY;
+	}
+
+	private static void output(@Nonnull final String data, @Nonnull final IEvaluationContext ec) throws EmbedmentOutputException {
+		final IExternalContext external = ec.getExternalContext();
+		if (external != null) external.write(data);
 	}
 }

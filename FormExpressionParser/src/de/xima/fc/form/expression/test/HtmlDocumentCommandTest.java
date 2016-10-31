@@ -2,6 +2,8 @@ package de.xima.fc.form.expression.test;
 
 import static org.junit.Assert.fail;
 
+import javax.annotation.Nonnull;
+
 import org.junit.Test;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -12,8 +14,8 @@ import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 import de.xima.fc.form.expression.impl.pool.GenericEcFactory;
 import de.xima.fc.form.expression.object.ALangObject;
 
+@SuppressWarnings("nls")
 public class HtmlDocumentCommandTest {
-
 	private static enum TestCase {
 		TEST001("<html></html>", "<html></html>"),
 
@@ -54,6 +56,7 @@ public class HtmlDocumentCommandTest {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
 	public final void test() {
 		for (final TestCase test : TestCase.values()) {
@@ -93,16 +96,22 @@ public class HtmlDocumentCommandTest {
 		}
 	}
 
-	private String process(final Object... stuffToWrite) throws Exception {
+	private static String process(final Object... stuffToWrite) throws Exception {
 		final HtmlExternalContext hec = new HtmlExternalContext();
+		@SuppressWarnings("null")
+		@Nonnull
 		final IEvaluationContext ec = GenericEcFactory.getPoolInstance().borrowObject();
 		try {
 			hec.beginWriting();
 			for (final Object stuff : stuffToWrite) {
 				if (stuff instanceof IExternalContextCommand)
 					hec.process((IExternalContextCommand) stuff, ec);
-				else
-					hec.write(stuff.toString());
+				else {
+					@SuppressWarnings("null")
+					@Nonnull
+					final String s = String.valueOf(stuff);
+					hec.write(s);
+				}
 			}
 			hec.finishWriting();
 		}

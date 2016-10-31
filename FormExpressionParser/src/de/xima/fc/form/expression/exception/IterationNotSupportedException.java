@@ -4,6 +4,7 @@ package de.xima.fc.form.expression.exception;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * This exception is thrown when an object is coerced to another type
@@ -15,7 +16,7 @@ public class IterationNotSupportedException extends CatchableEvaluationException
 	private static final long serialVersionUID = 1L;
 
 	public IterationNotSupportedException(final ALangObject thisContext, final IEvaluationContext ec) {
-		super(ec, String.format("Object <%s> of type %s does not support iteration.", thisContext.toString(), thisContext.getType()));
+		super(ec, String.format(CmnCnst.Error.ITERATION_NOT_SUPPORTED, thisContext.toString(), thisContext.getType()));
 		this.thisContext = thisContext;
 	}
 

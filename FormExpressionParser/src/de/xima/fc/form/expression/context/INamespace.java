@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -30,30 +33,30 @@ import de.xima.fc.form.expression.object.StringLangObject;
  *
  */
 public interface INamespace {
-	public IFunction<StringLangObject> expressionMethodString(EMethod method) throws EvaluationException;
-	public IFunction<NumberLangObject> expressionMethodNumber(EMethod method) throws EvaluationException;
-	public IFunction<ArrayLangObject> expressionMethodArray(EMethod method) throws EvaluationException;
-	public IFunction<HashLangObject> expressionMethodHash(EMethod method) throws EvaluationException;
-	public IFunction<BooleanLangObject> expressionMethodBoolean(EMethod method) throws EvaluationException;
-	public IFunction<ExceptionLangObject> expressionMethodException(EMethod method) throws EvaluationException;
-	public IFunction<FunctionLangObject> expressionMethodFunction(EMethod method) throws EvaluationException;
-	public IFunction<RegexLangObject> expressionMethodRegex(EMethod method) throws EvaluationException;
+	@Nullable public IFunction<StringLangObject> expressionMethodString(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<NumberLangObject> expressionMethodNumber(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<ArrayLangObject> expressionMethodArray(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<HashLangObject> expressionMethodHash(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<BooleanLangObject> expressionMethodBoolean(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<ExceptionLangObject> expressionMethodException(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<FunctionLangObject> expressionMethodFunction(@Nonnull EMethod method) throws EvaluationException;
+	@Nullable public IFunction<RegexLangObject> expressionMethodRegex(@Nonnull EMethod method) throws EvaluationException;
 
-	public IFunction<StringLangObject> attrAccessorString(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<NumberLangObject> attrAccessorNumber(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<ArrayLangObject> attrAccessorArray(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<HashLangObject> attrAccessorHash(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<BooleanLangObject> attrAccessorBoolean(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<ExceptionLangObject> attrAccessorException(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<FunctionLangObject> attrAccessorFunction(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<RegexLangObject> attrAccessorRegex(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<StringLangObject> attrAccessorString(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<NumberLangObject> attrAccessorNumber(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<ArrayLangObject> attrAccessorArray(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<HashLangObject> attrAccessorHash(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<BooleanLangObject> attrAccessorBoolean(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<ExceptionLangObject> attrAccessorException(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<FunctionLangObject> attrAccessorFunction(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<RegexLangObject> attrAccessorRegex(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
 
-	public IFunction<StringLangObject> attrAssignerString(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<NumberLangObject> attrAssignerNumber(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<ArrayLangObject> attrAssignerArray(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<HashLangObject> attrAssignerHash(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<BooleanLangObject> attrAssignerBoolean(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<ExceptionLangObject> attrAssignerException(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<FunctionLangObject> attrAssignerFunction(ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	public IFunction<RegexLangObject> attrAssignerRegex(ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<StringLangObject> attrAssignerString(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<NumberLangObject> attrAssignerNumber(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<ArrayLangObject> attrAssignerArray(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<HashLangObject> attrAssignerHash(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<BooleanLangObject> attrAssignerBoolean(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<ExceptionLangObject> attrAssignerException(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<FunctionLangObject> attrAssignerFunction(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	@Nullable public IFunction<RegexLangObject> attrAssignerRegex(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
 }

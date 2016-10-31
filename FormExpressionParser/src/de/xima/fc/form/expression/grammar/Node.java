@@ -37,13 +37,15 @@ public interface Node extends Serializable, ITraceElement {
 	/**
 	 * This method tells the node to add its argument to the node's list of
 	 * children.
+	 * @throws ParseException
 	 */
-	public void jjtAddChild(Node n, int i);
+	public void jjtAddChild(Node n, int i) throws IndexOutOfBoundsException;
 
 	/**
 	 * This method returns a child node. The children are numbered from zero,
 	 * left to right.
 	 */
+	@Nonnull
 	public Node jjtGetChild(int i);
 
 	/** Return the number of children the node has. */
@@ -138,6 +140,7 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public EMethod getSiblingMethod();
 
+	@Nonnull
 	public Node[] getChildArray();
 
 	@Nullable

@@ -5,6 +5,8 @@ import javax.annotation.concurrent.Immutable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import de.xima.fc.form.expression.util.CmnCnst;
+
 @Immutable
 public class Style {
 	/** Text color */
@@ -18,14 +20,14 @@ public class Style {
 
 	public Style() {
 		this(Color.BLACK);
-	}	
-	public Style(Color color) {
+	}
+	public Style(final Color color) {
 		this(color, Weight.DEFAULT);
-	}	
-	public Style(Color color, Weight weight) {
+	}
+	public Style(final Color color, final Weight weight) {
 		this(color, weight, Size.DEFAULT);
 	}
-	public Style(Color color, Weight weight, Size size, Feature... featureList) {
+	public Style(Color color, Weight weight, Size size, final Feature... featureList) {
 		if (color == null) color = Color.BLACK;
 		if (size == null) size = Size.DEFAULT;
 		if (weight == null) weight = Weight.DEFAULT;
@@ -41,16 +43,6 @@ public class Style {
 	}
 	@Override
 	public String toString() {
-		return new StringBuilder().append("Style")
-				.append('(')
-				.append(color)
-				.append(',')
-				.append(weight)
-				.append(',')
-				.append(size)
-				.append(',')
-				.append(featureSet)
-				.append(')')
-				.toString();
+		return String.format(CmnCnst.ToString.STYLE, color, weight, size, featureSet);
 	}
 }

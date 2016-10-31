@@ -104,11 +104,11 @@ public class TextInBoxTreePane extends JComponent {
 	}
 
 	private void paintBox(final Graphics g, final TextInBox textInBox) {
-		final String[] lines = textInBox.text.split("\n");
+		final String[] lines = textInBox.text.split("\n"); //$NON-NLS-1$
 		final FontMetrics m = getFontMetrics(getFont());
 		int stringWidth = 0;
 		double stringHeight = 0;
-		for (final String line : textInBox.text.split("\n")) {
+		for (final String line : textInBox.text.split("\n")) { //$NON-NLS-1$
 			final Rectangle2D rect = m.getStringBounds(line, g);
 			stringWidth = Math.max(stringWidth, (int)rect.getWidth());
 			stringHeight += rect.getHeight() + 1;

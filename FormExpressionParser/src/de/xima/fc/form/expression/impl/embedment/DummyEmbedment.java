@@ -1,10 +1,9 @@
 package de.xima.fc.form.expression.impl.embedment;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * A dummy embedment that simply prints any data to stdout.
@@ -27,7 +26,7 @@ public class DummyEmbedment implements IEmbedment {
 	}
 	@Override
 	public String[] getScopeList() {
-		return ArrayUtils.EMPTY_STRING_ARRAY;
+		return CmnCnst.EMPTY_STRING_ARRAY;
 	}
 	@Override
 	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {

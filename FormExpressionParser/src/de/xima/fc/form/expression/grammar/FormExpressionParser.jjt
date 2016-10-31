@@ -707,7 +707,6 @@ void SwitchDefault() #void :
 void TryClause(EMethod method) #TryClauseNode :
 {
   Token t;
-  
 }
 {
   (
@@ -721,7 +720,7 @@ void TryClause(EMethod method) #TryClauseNode :
     )
   )
   {
-    jjtThis.init(method, t == null ? null : t.image);
+    jjtThis.init(method, t.image);
     
   }
 }

@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.highlight.Size;
 import de.xima.fc.form.expression.highlight.Style;
 import de.xima.fc.form.expression.highlight.Weight;
 
+@SuppressWarnings("nls")
 public class HtmlHighlighter extends AHighlighter {
 	private Writer html, css;
 	private Set<Color> colorSet;
@@ -246,7 +247,7 @@ public class HtmlHighlighter extends AHighlighter {
 		}
 	}
 
-	private void cssColor(final Writer css, final Color color, final String attribute) throws IOException {
+	private static void cssColor(final Writer css, final Color color, final String attribute) throws IOException {
 		css.write(attribute);
 		css.write(":rgb(");
 		css.write(Integer.toString(color.getByteR(), 10));

@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.object;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
@@ -9,12 +11,13 @@ import de.xima.fc.form.expression.exception.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class ExceptionLangObject extends ALangObject {
 
-	private final CatchableEvaluationException value;
+	@Nonnull private final CatchableEvaluationException value;
 
-	private ExceptionLangObject(final CatchableEvaluationException value) {
+	private ExceptionLangObject(@Nonnull final CatchableEvaluationException value) {
 		super(Type.EXCEPTION);
 		this.value = value;
 	}
@@ -31,14 +34,15 @@ public class ExceptionLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append("§exception(");
+		builder.append(CmnCnst.SYNTAX_ERROR).append(CmnCnst.SYNTAX_PAREN_OPEN);
 		StringLangObject.toExpression(value.getMessage(), builder);
-		builder.append(")");
+		builder.append(CmnCnst.SYNTAX_PAREN_CLOSE);
 	}
 
 	@Override
 	public String inspect() {
-		return "ExceptionLangObject(" + value.getMessage() + ")";
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_EXCEPTION_LANG_OBJECT).append('(')
+				.append(value.getMessage()).append(')').toString();
 	}
 
 	@Override
@@ -76,12 +80,12 @@ public class ExceptionLangObject extends ALangObject {
 		if (!(o instanceof ExceptionLangObject)) return false;
 		return value.getMessage().equals(((ExceptionLangObject)o).value.getMessage());
 	}
-	
+
 	@Override
-	public int compareToSameType(ALangObject o) {
+	public int compareToSameType(final ALangObject o) {
 		return value.getMessage().compareTo(((ExceptionLangObject)o).value.getMessage());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return value.hashCode();
@@ -91,12 +95,14 @@ public class ExceptionLangObject extends ALangObject {
 	protected boolean isSingletonLike() {
 		return false;
 	}
-	
+
 	// Coercion
+	@Nonnull
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
 		return StringLangObject.create(value.getMessage());
 	}
+	@Nonnull
 	@Override
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
 		return this;
@@ -106,11 +112,13 @@ public class ExceptionLangObject extends ALangObject {
 		return value;
 	}
 
+	@Nonnull
 	public static ExceptionLangObject create(final CatchableEvaluationException value, final IEvaluationContext ec) {
 		if (value == null || value.getMessage() == null) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
 		return new ExceptionLangObject(value);
 	}
 
+	@Nonnull
 	public static ExceptionLangObject create(final String message, final IEvaluationContext ec) {
 		if (message == null) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
 		return new ExceptionLangObject(new CustomRuntimeException(message, ec));

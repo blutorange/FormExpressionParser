@@ -21,11 +21,13 @@ public class VisualizeTreeGraphviz {
 
 		// Parse the expression.
 		final String expression = args[0];
+		if (expression == null)
+			throw new RuntimeException("First argument (code) must not be null."); //$NON-NLS-1$
 		final Node rootNode;
 		try {
 			rootNode = FormExpressionParsingUtil.Program.parse(expression);
 		} catch (final ParseException e) {
-			System.out.println("Failed to parse expression.");
+			System.out.println("Failed to parse expression."); //$NON-NLS-1$
 			e.printStackTrace();
 			System.exit(-1);
 			return;
@@ -42,19 +44,19 @@ public class VisualizeTreeGraphviz {
 		if (args.length > 1)
 			try (FileOutputStream fos = new FileOutputStream(args[1])) {
 				byte[] bytes;
-				final String charset = args.length > 2 ? args[2] : "UTF-8";
+				final String charset = args.length > 2 ? args[2] : "UTF-8"; //$NON-NLS-1$
 				try {
 					bytes = graphviz.getBytes(charset);
 				} catch (final UnsupportedEncodingException e) {
-					System.out.println("No such charset " + charset + "; using system default");
+					System.out.println("No such charset " + charset + "; using system default"); //$NON-NLS-1$ //$NON-NLS-2$
 					bytes = graphviz.getBytes();
 				}
 				fos.write(bytes);
 			} catch (final FileNotFoundException e) {
-				System.out.println("File not found: " + args[1]);
+				System.out.println("File not found: " + args[1]); //$NON-NLS-1$
 				e.printStackTrace();
 			} catch (final IOException e) {
-				System.out.println("Error writing to file: " + args[1]);
+				System.out.println("Error writing to file: " + args[1]); //$NON-NLS-1$
 				e.printStackTrace();
 			}
 		else
@@ -62,8 +64,8 @@ public class VisualizeTreeGraphviz {
 	}
 
 	private static void help() {
-		System.out.println("Usage: visualizeTree expression [outputFile] [encoding=UTF-8]");
-		System.out.println("For example, to convert the graph to a png:");
-		System.out.println("./visualizeTree.jar \"(ab+cd)*ef\" out.dot && dot -T png out.dot > out.png");
+		System.out.println("Usage: visualizeTree expression [outputFile] [encoding=UTF-8]"); //$NON-NLS-1$
+		System.out.println("For example, to convert the graph to a png:"); //$NON-NLS-1$
+		System.out.println("./visualizeTree.jar \"(ab+cd)*ef\" out.dot && dot -T png out.dot > out.png"); //$NON-NLS-1$
 	}
 }

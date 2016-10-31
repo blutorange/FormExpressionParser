@@ -7,6 +7,7 @@ import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTVariableTypeDeclarationNode extends SimpleNode {
+	private static final long serialVersionUID = 1L;
 	private Type type;
 
 	public ASTVariableTypeDeclarationNode(final FormExpressionParser parser, final int nodeId) {
@@ -20,7 +21,7 @@ public class ASTVariableTypeDeclarationNode extends SimpleNode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(type).append(",");
+		sb.append(type).append(',');
 	}
 
 

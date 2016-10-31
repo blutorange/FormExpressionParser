@@ -10,14 +10,14 @@ import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
 
 public abstract class AHighlighter {
-	private final Pattern splitter = Pattern.compile("(\\r)?\\n");
+	private final Pattern splitter = Pattern.compile("(\\r)?\\n"); //$NON-NLS-1$
 	private final IHighlightTheme theme;
 	private int currentLine, currentColumn;
 	private Token embedBegin, embedEnd;
 	private StringBuilder embed;
 	private List<Style> styleList;
-	
-	public AHighlighter(IHighlightTheme theme) {
+
+	public AHighlighter(final IHighlightTheme theme) {
 		this.theme = theme;
 	}
 	private void prepareInternal(final Color backgroundColor) throws IOException {
@@ -29,7 +29,7 @@ public abstract class AHighlighter {
 		embedBegin = null;
 		embedEnd = null;
 	}
-	private void processInternal(Token token) throws IOException {
+	private void processInternal(final Token token) throws IOException {
 		// Join all los chars to one string.
 		if (token.kind == FormExpressionParserConstants.LosChar) {
 			embedEnd = token;
@@ -64,26 +64,26 @@ public abstract class AHighlighter {
 		embed = null;
 		styleList = null;
 	}
-	
+
 	protected final void process(final Iterable<Token> tokenStream) throws IOException {
 		final Color backgroundColor = theme.getColorForBackground();
 		prepareInternal(backgroundColor);
-		for (Token token : tokenStream)
+		for (final Token token : tokenStream)
 			processInternal(token);
 		finishInternal();
 		finishProcessing(backgroundColor);
 	}
-	
+
 	protected final void process(final Token[] tokenArray) throws IOException {
 		final Color backgroundColor = theme.getColorForBackground();
 		prepareInternal(backgroundColor);
-		for (Token token : tokenArray)
+		for (final Token token : tokenArray)
 			processInternal(token);
 		finishInternal();
 		finishProcessing(backgroundColor);
 	}
-	
-	private void processToken(Token token, List<Style> styleList) throws IOException {
+
+	private void processToken(final Token token, final List<Style> styleList) throws IOException {
 		// Write spaces and line breaks to get to current position.
 		if (token.beginLine > currentLine) {
 			currentColumn = 0;
