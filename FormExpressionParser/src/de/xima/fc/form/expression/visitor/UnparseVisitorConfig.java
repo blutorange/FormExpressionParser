@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.visitor;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -45,6 +47,7 @@ public final class UnparseVisitorConfig {
 			this.keepComments = keepComments;
 			return this;
 		}
+		@Nonnull
 		public UnparseVisitorConfig build() {
 			if (indentPrefix == null) indentPrefix = StringUtils.SPACE;
 			if (linefeed == null) linefeed = StringUtils.LF;
@@ -58,28 +61,28 @@ public final class UnparseVisitorConfig {
 	}
 
 	private final static class InstanceHolder {
-		public final static UnparseVisitorConfig STYLED = new Builder()
+		@Nonnull public final static UnparseVisitorConfig STYLED = new Builder()
 				.setLinefeed(CmnCnst.SYNTAX_LINEFEED)
 				.setIndentPrefix(CmnCnst.SYNTAX_INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(true)
 				.build();
-		public final static UnparseVisitorConfig STYLED_WITHOUT_COMMENTS = new Builder()
+		@Nonnull public final static UnparseVisitorConfig STYLED_WITHOUT_COMMENTS = new Builder()
 				.setLinefeed(CmnCnst.SYNTAX_LINEFEED)
 				.setIndentPrefix(CmnCnst.SYNTAX_INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(false)
 				.build();
-		public final static UnparseVisitorConfig UNSTYLED_WITH_COMMENTS = new Builder()
+		@Nonnull public final static UnparseVisitorConfig UNSTYLED_WITH_COMMENTS = new Builder()
 				.setLinefeed(StringUtils.EMPTY)
 				.setIndentPrefix(StringUtils.EMPTY)
 				.setOptionalSpace(0)
 				.setRequiredSpace(1)
 				.setKeepComments(true)
 				.build();
-		public final static UnparseVisitorConfig UNSTYLED_WITHOUT_COMMENTS = new Builder()
+		@Nonnull public final static UnparseVisitorConfig UNSTYLED_WITHOUT_COMMENTS = new Builder()
 				.setLinefeed(StringUtils.EMPTY)
 				.setIndentPrefix(StringUtils.EMPTY)
 				.setOptionalSpace(0)
@@ -91,14 +94,17 @@ public final class UnparseVisitorConfig {
 	/**
 	 * @return Some (working) configuration, no guarantees on its details.
 	 */
+	@Nonnull
 	public static UnparseVisitorConfig getDefaultConfig() {
 		return InstanceHolder.STYLED;
 	}
 
+	@Nonnull
 	public static UnparseVisitorConfig getStyledWithCommentsConfig() {
 		return InstanceHolder.STYLED;
 	}
 
+	@Nonnull
 	public static UnparseVisitorConfig getStyledWithoutCommentsConfig() {
 		return InstanceHolder.STYLED_WITHOUT_COMMENTS;
 	}
@@ -106,6 +112,7 @@ public final class UnparseVisitorConfig {
 	/**
 	 * @return A config that keeps comments, but does not add any optional spaces or newlines.
 	 */
+	@Nonnull
 	public static UnparseVisitorConfig getUnstyledWithCommentsConfig() {
 		return InstanceHolder.UNSTYLED_WITH_COMMENTS;
 	}
@@ -113,6 +120,7 @@ public final class UnparseVisitorConfig {
 	/**
 	 * @return A config that does not keep comments, nor does it add any optional spaces or newlines.
 	 */
+	@Nonnull
 	public static UnparseVisitorConfig getUnstyledWithoutCommentsConfig() {
 		return InstanceHolder.UNSTYLED_WITHOUT_COMMENTS;
 	}

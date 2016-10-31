@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.pool;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
@@ -21,7 +23,7 @@ import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
 
 	private final static class InstanceHolder {
-		public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new GenericEcFactory());
+		@Nonnull public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new GenericEcFactory());
 	}
 
 	@Override
@@ -53,6 +55,7 @@ public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext
 				.build();
 	}
 
+	@Nonnull
 	public static ObjectPool<IEvaluationContext> getPoolInstance() {
 		return InstanceHolder.INSTANCE;
 	}

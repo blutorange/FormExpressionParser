@@ -1,11 +1,6 @@
 package de.xima.fc.form.expression.object;
 
-import java.io.IOException;
-
 import javax.annotation.Nonnull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
@@ -17,8 +12,6 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public class FunctionLangObject extends ALangObject {
-
-	private final static Logger LOG = LoggerFactory.getLogger(FunctionLangObject.class);
 	@Nonnull private final IFunction<ALangObject> value;
 
 	private static class InstanceHolder {
@@ -82,14 +75,7 @@ public class FunctionLangObject extends ALangObject {
 		if (n == null)
 			builder.append(CmnCnst.SYNTAX_NATIVE_CODE);
 		else {
-			String unparse;
-			try {
-				unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithCommentsConfig());
-			}
-			catch (final IOException e) {
-				LOG.error(CmnCnst.Error.FAILURE_UNPARSING_LAMBDA, e);
-				unparse = CmnCnst.SYNTAX_FAILED_TO_UNPARSE_LAMBDA;
-			}
+			final String unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithCommentsConfig());
 			builder.append(unparse);
 		}
 		builder.append(CmnCnst.SYNTAX_BRACE_CLOSE).append(CmnCnst.SYNTAX_SEMI_COLON);
@@ -172,6 +158,7 @@ public class FunctionLangObject extends ALangObject {
 		return InstanceHolder.NO_OP;
 	}
 
+	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling IFunction#evaluate
 	@Nonnull
 	public static FunctionLangObject create(final IFunction<? extends ALangObject> value) {
 		if (value == null) return getNoOpInstance();

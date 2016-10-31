@@ -92,6 +92,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	 * @throws EvaluationException
 	 *             When the code cannot be evaluated.
 	 */
+	@Nonnull
 	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res;
@@ -209,7 +210,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				ec.getTracer().descend(parentNode);
 				try {
 					if (func.getThisContextType() == Type.NULL)
-						thisContext = NullLangObject.getInstance();
+						NullLangObject.getInstance();
 					// Evaluate function
 					thisContext = res = func.evaluate(ec, thisContext, args);
 				}

@@ -93,22 +93,29 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 	private Token commentToken;
 	private int commentPos;
 
-	public static void unparse(final Writer writer, final Node node) throws IOException {
+	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node) throws IOException {
 		unparse(writer, node, UnparseVisitorConfig.getDefaultConfig());
 	}
 
-	public static String unparse(final Node node) throws IOException {
+	@Nonnull
+	public static String unparse(@Nonnull final Node node) {
 		return unparse(node, UnparseVisitorConfig.getDefaultConfig());
 	}
 
-	public static String unparse(final Node node, final UnparseVisitorConfig config) throws IOException {
+	@Nonnull
+	public static String unparse(@Nonnull final Node node, @Nonnull final UnparseVisitorConfig config) {
 		try (final Writer writer = new StringBuilderWriter()) {
 			unparse(writer, node, config);
-			return writer.toString();
+			final String s = writer.toString();
+			return s != null ? s : CmnCnst.EMPTY_STRING;
+		}
+		// StringBuilderWriter does not throw.
+		catch (final IOException e) {
+			return CmnCnst.EMPTY_STRING;
 		}
 	}
 
-	public static void unparse(final Writer writer, final Node node, final UnparseVisitorConfig config)
+	public static void unparse(@Nonnull  final Writer writer, @Nonnull  final Node node, @Nonnull final UnparseVisitorConfig config)
 			throws IOException {
 		final UnparseVisitor unparser = new UnparseVisitor(writer, node.getComments(), config);
 		unparser.blockOrClause(node, CmnCnst.EMPTY_STRING);

@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
+import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.visitor.GraphvizVisitor;
 
 public class VisualizeTreeGraphviz {
@@ -25,7 +25,7 @@ public class VisualizeTreeGraphviz {
 			throw new RuntimeException("First argument (code) must not be null."); //$NON-NLS-1$
 		final Node rootNode;
 		try {
-			rootNode = FormExpressionParsingUtil.Program.parse(expression);
+			rootNode = FormExpressionFactory.Program.parse(expression).getRootNode();
 		} catch (final ParseException e) {
 			System.out.println("Failed to parse expression."); //$NON-NLS-1$
 			e.printStackTrace();

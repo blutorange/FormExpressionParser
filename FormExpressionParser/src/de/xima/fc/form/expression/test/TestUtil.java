@@ -9,18 +9,19 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import de.xima.fc.form.expression.context.IFormExpression;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
+import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
+import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
+import de.xima.fc.form.expression.impl.pool.GenericEcFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
-import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 
 @SuppressWarnings("nls")
 public final class TestUtil {
@@ -55,8 +56,8 @@ public final class TestUtil {
 			Throwable exception = null;
 			ALangObject res = null;
 			try {
-				final Node node = parse(test.getCode(), test.getTestType());
-				if (test.isPerformEvaluation()) res = evaluate(node, test.getContextType(), test.getTestType());
+				final IFormExpression fe = parse(test.getCode(), test.getTestType());
+				if (test.isPerformEvaluation()) res = evaluate(fe, test.getContextType(), test.getTestType());
 			} catch (final TokenMgrError e) {
 				exception = e;
 			} catch (final ParseException e) {
@@ -112,15 +113,15 @@ public final class TestUtil {
 		}
 	}
 
-	private static ALangObject evaluate(@Nonnull final Node node, @Nonnull final EContextType context, @Nonnull final ETestType type) throws EvaluationException {
+	private static ALangObject evaluate(@Nonnull final IFormExpression fe, @Nonnull final EContextType context, @Nonnull final ETestType type) throws EvaluationException {
 		switch(context) {
 		case GENERIC:
 			switch (type) {
 			case PROGRAM:
-				return FormExpressionEvaluationUtil.Generic.eval(node, DummyExternalContext.INSTANCE);
+				return fe.evaluate(GenericEcFactory.getPoolInstance(), DummyExternalContext.INSTANCE);
 			case TEMPLATE:
 				final WriterOnlyExternalContext woec = new WriterOnlyExternalContext(new StringBuilderWriter());
-				FormExpressionEvaluationUtil.Generic.eval(node, woec);
+				fe.evaluate(GenericEcFactory.getPoolInstance(), woec);
 				return StringLangObject.create(woec.toString());
 			default:
 				throw new RuntimeException("Unkown enum: " + type);
@@ -128,10 +129,10 @@ public final class TestUtil {
 		case FORMCYCLE:
 			switch (type) {
 			case PROGRAM:
-				return FormExpressionEvaluationUtil.Formcycle.eval(node, new FormcycleExternalContext());
+				return fe.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext());
 			case TEMPLATE:
 				final Writer sbw = new StringBuilderWriter();
-				FormExpressionEvaluationUtil.Formcycle.eval(node, new FormcycleExternalContext(sbw));
+				fe.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext(sbw));
 				return StringLangObject.create(sbw.toString());
 			default:
 				throw new RuntimeException("Unkown enum: " + type);
@@ -142,12 +143,12 @@ public final class TestUtil {
 	}
 
 	@Nonnull
-	private static Node parse(@Nonnull final String code, @Nonnull final ETestType type) throws ParseException, TokenMgrError {
+	private static IFormExpression parse(@Nonnull final String code, @Nonnull final ETestType type) throws ParseException, TokenMgrError {
 		switch (type) {
 		case PROGRAM:
-			return FormExpressionParsingUtil.Program.parse(code);
+			return FormExpressionFactory.Program.parse(code);
 		case TEMPLATE:
-			return FormExpressionParsingUtil.Template.parse(code);
+			return FormExpressionFactory.Template.parse(code);
 		default:
 			throw new ParseException("Unkown enum: " + type);
 		}

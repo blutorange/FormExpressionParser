@@ -9,20 +9,19 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.io.IOUtils;
 
+import de.xima.fc.form.expression.context.IFormExpression;
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
+import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
+import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
-import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
-import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
 /**
  * todo
@@ -44,14 +43,15 @@ public class FormExpressionDemo {
 
 		showHighlighting(tokenArray);
 
-		final Node rootNode = showParseTree(code);
-		if (rootNode == null)
-			throw new RuntimeException("Root node must not be null."); //$NON-NLS-1$
+		final IFormExpression expression = parseCode(code);
+		if (expression == null)
+			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
 
+		showParseTree(expression);
 
-		showUnparsed(rootNode);
+		showUnparsed(expression);
 
-		showEvaluatedResult(rootNode);
+		showEvaluatedResult(expression);
 
 		if (writer != null)
 			try {
@@ -89,7 +89,7 @@ public class FormExpressionDemo {
 		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
-			tokenArray = FormExpressionParsingUtil.Program.asTokenArray(code);
+			tokenArray = FormExpressionFactory.Program.asTokenArray(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final TokenMgrError e) {
@@ -125,11 +125,11 @@ public class FormExpressionDemo {
 		System.out.println();
 	}
 
-	private static Node showParseTree(@Nonnull final String code) {
-		final Node rootNode;
+	private static IFormExpression parseCode(@Nonnull final String code) {
+		final IFormExpression ex;
 		try {
 			final long t1 = System.nanoTime();
-			rootNode = FormExpressionParsingUtil.Program.parse(code);
+			ex = FormExpressionFactory.Program.parse(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final ParseException e) {
@@ -137,42 +137,37 @@ public class FormExpressionDemo {
 			System.exit(-1);
 			return null;
 		}
+		return ex;
+	}
 
+
+	private static void showParseTree(@Nonnull final IFormExpression ex) {
 		System.out.println("\n===Parse tree==="); //$NON-NLS-1$
 		try {
-			rootNode.jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.EMPTY_STRING);
+			ex.getRootNode().jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.EMPTY_STRING);
 		} catch (final IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
-			return null;
-		}
-		System.out.println();
-		return rootNode;
-	}
-
-	private static void showUnparsed(final Node node) {
-		final String unparse;
-		try {
-			unparse = UnparseVisitor.unparse(node);
-		}
-		catch (final IOException e) {
-			e.printStackTrace();
 			return;
 		}
-		System.out.println("===Unparse==="); //$NON-NLS-1$
-		System.out.println(unparse);
 		System.out.println();
 	}
 
-	private static void showEvaluatedResult(@Nonnull final Node rootNode) {
+	private static void showUnparsed(@Nonnull final IFormExpression ex) {
+		System.out.println("===Unparse==="); //$NON-NLS-1$
+		System.out.println(ex.unparse(null));
+		System.out.println();
+	}
+
+	private static void showEvaluatedResult(@Nonnull final IFormExpression ex) {
 		final ALangObject result;
 		try {
 			// Do it once so we don't measure setup times.
-			FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getFec());
+			ex.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext());
 
 			// Measure how long it takes in practice.
 			final long t1 = System.nanoTime();
-			result = FormExpressionEvaluationUtil.Formcycle.eval(rootNode, getFec());
+			result = ex.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext());
 			final long t2 = System.nanoTime();
 
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -193,10 +188,4 @@ public class FormExpressionDemo {
 		System.out.println("toString: " + result.toString()); //$NON-NLS-1$
 		System.out.println("inspect: " + result.inspect()); //$NON-NLS-1$
 	}
-
-	@Nonnull
-	private static FormcycleExternalContext getFec() {
-		return new FormcycleExternalContext();
-	}
-
 }

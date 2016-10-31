@@ -12,8 +12,8 @@ import org.json.simple.JSONObject;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
-import de.xima.fc.form.expression.util.FormExpressionParsingUtil;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
@@ -55,10 +55,10 @@ public class FormatServlet extends AFormExpressionServlet {
 					try (final Writer html = new StringBuilderWriter(); final Writer css = new StringBuilderWriter()) {
 						final Node node;
 						if ("program".equalsIgnoreCase(type)) {
-							node = FormExpressionParsingUtil.Program.parse(code);
+							node = FormExpressionFactory.Program.parse(code);
 						}
 						else {
-							node = FormExpressionParsingUtil.Template.parse(code);
+							node = FormExpressionFactory.Template.parse(code);
 						}
 						final String format = UnparseVisitor.unparse(node, config);
 						json.put("text", format);

@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.util;
+package de.xima.fc.form.expression.impl.formexpression;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.context.IFormExpression;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTokenManager;
@@ -16,9 +17,10 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.util.CmnCnst;
 
-public final class FormExpressionParsingUtil {
-	private FormExpressionParsingUtil() {
+public final class FormExpressionFactory {
+	private FormExpressionFactory() {
 	}
 
 	/**
@@ -35,16 +37,18 @@ public final class FormExpressionParsingUtil {
 		 * tree.
 		 *
 		 * @return Top level node of the parse tree.
-		 * @throws ParseException
-		 *             When the code is not a valid program.
+		 * @throws ParseException When the code is not a valid program. Specifically, when
+		 * the tokens cannot be parsed as a valid program.
+		 * @throws TokenMgrError When the code is not a valid program. Specifically, when
+		 * the code cannot be parsed into valid tokens.
 		 */
 		@Nonnull
-		public static Node parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return node;
+				return new FormExpression(node);
 			}
 		}
 
@@ -117,14 +121,14 @@ public final class FormExpressionParsingUtil {
 		}
 
 		@Nonnull
-		public static Node parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
 				final Node node = parser.Template(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return node;
+				return new FormExpression(node);
 			}
 		}
 
