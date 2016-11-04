@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.highlight;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 
 public interface IHighlightTheme {
@@ -12,7 +15,9 @@ public interface IHighlightTheme {
 	 * @return The color to be used for the token type. When <code>null</code>,
 	 * some default color will be used.
 	 */
+	@Nullable
 	public Style getStyleForToken(int tokenType);
-	
+
+	@Nonnull
 	public Color getColorForBackground();
 }

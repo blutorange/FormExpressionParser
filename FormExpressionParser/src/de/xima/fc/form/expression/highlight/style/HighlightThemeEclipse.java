@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.highlight.style;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.highlight.ABasicHighlightTheme;
 import de.xima.fc.form.expression.highlight.Color;
 import de.xima.fc.form.expression.highlight.IHighlightTheme;
@@ -8,7 +10,7 @@ import de.xima.fc.form.expression.highlight.Weight;
 
 public class HighlightThemeEclipse extends ABasicHighlightTheme {
 	private final static class InstanceHolder {
-		public final static HighlightThemeEclipse INSTANCE = new HighlightThemeEclipse();
+		@Nonnull public final static HighlightThemeEclipse INSTANCE = new HighlightThemeEclipse();
 	}
 	private HighlightThemeEclipse(){}
 	@Override
@@ -87,6 +89,7 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 	public Color getColorForBackground() {
 		return Color.TRANSPARENT_WHITE;
 	}
+	@Nonnull
 	public static IHighlightTheme getInstance() {
 		return InstanceHolder.INSTANCE;
 	}

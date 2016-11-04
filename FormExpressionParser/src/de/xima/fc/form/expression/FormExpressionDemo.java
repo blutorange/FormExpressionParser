@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 
 import de.xima.fc.form.expression.context.IFormExpression;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
@@ -47,7 +48,10 @@ public class FormExpressionDemo {
 		if (expression == null)
 			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
 
-		showParseTree(expression);
+		final Node node = showParseTree(code);
+
+		if (node == null)
+			throw new RuntimeException("Node must not be null."); //$NON-NLS-1$
 
 		showUnparsed(expression);
 
@@ -85,7 +89,8 @@ public class FormExpressionDemo {
 		System.out.println(code);
 	}
 
-	private static Token[] showTokenStream(final String code) {
+	@Nonnull
+	private static Token[] showTokenStream(@Nonnull final String code) {
 		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
@@ -114,7 +119,7 @@ public class FormExpressionDemo {
 		return tokenArray;
 	}
 
-	private static void showHighlighting(final Token[] tokenArray) {
+	private static void showHighlighting(@Nonnull final Token[] tokenArray) {
 		System.out.println("===Syntax highlighted HTML==="); //$NON-NLS-1$
 		try {
 			System.out.println(FormExpressionHighlightingUtil.highlightHtml(tokenArray,
@@ -141,16 +146,26 @@ public class FormExpressionDemo {
 	}
 
 
-	private static void showParseTree(@Nonnull final IFormExpression ex) {
+	private static Node showParseTree(@Nonnull final String code) {
+		final Node node;
+		try {
+			node = FormExpressionFactory.Program.asNode(code);
+		} catch (final ParseException e) {
+			e.printStackTrace();
+			System.exit(-1);
+			return null;
+		}
+
 		System.out.println("\n===Parse tree==="); //$NON-NLS-1$
 		try {
-			ex.getRootNode().jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.EMPTY_STRING);
+			node.jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.EMPTY_STRING);
 		} catch (final IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
-			return;
+			return null;
 		}
 		System.out.println();
+		return node;
 	}
 
 	private static void showUnparsed(@Nonnull final IFormExpression ex) {

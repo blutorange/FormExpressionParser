@@ -44,11 +44,16 @@ public final class FormExpressionFactory {
 		 */
 		@Nonnull
 		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+			return new FormExpression(asNode(code));
+		}
+
+		@Nonnull
+		public static Node asNode(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return new FormExpression(node);
+				return node;
 			}
 		}
 
@@ -80,6 +85,7 @@ public final class FormExpressionFactory {
 				return tokenManagerToArray(asTokenManager(reader));
 			}
 		}
+
 	}
 
 	/**
@@ -124,15 +130,20 @@ public final class FormExpressionFactory {
 		}
 
 		@Nonnull
-		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+		public static Node asNode(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
 				final Node node = parser.Template(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return new FormExpression(node);
+				return node;
 			}
+		}
+
+		@Nonnull
+		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+			return new FormExpression(asNode(code));
 		}
 
 		@Nonnull

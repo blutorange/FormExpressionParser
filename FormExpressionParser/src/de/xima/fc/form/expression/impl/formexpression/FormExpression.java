@@ -73,10 +73,4 @@ class FormExpression implements IFormExpression {
 		if (unparse != null) return unparse;
 		return unparse = UnparseVisitor.unparse(node, config == null ? UnparseVisitorConfig.getDefaultConfig() : config);
 	}
-
-	@Override
-	public Node getRootNode() {
-		return node;
-	}
-
 }

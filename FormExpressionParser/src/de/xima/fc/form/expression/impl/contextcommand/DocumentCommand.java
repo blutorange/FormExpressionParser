@@ -15,24 +15,28 @@ public class DocumentCommand extends AExternalContextCommand {
 	private final String[] data;
 
 	/**
-	 * @param type Command type.
-	 * @param data Data for the command.
-	 * @throws IllegalArgumentException When type is <code>null</code>, or the number of String arguments does not match
-	 * {@link EDocumentCommandType#argc}.
+	 * @param type
+	 *            Command type.
+	 * @param data
+	 *            Data for the command.
+	 * @throws IllegalArgumentException
+	 *             When type is <code>null</code>, or the number of String
+	 *             arguments does not match {@link EDocumentCommandType#argc}.
 	 */
-	private DocumentCommand(@Nonnull final EDocumentCommandType type, @Nullable final String... data) throws IllegalArgumentException {
-		final String[] dataArray = data != null ? data: CmnCnst.EMPTY_STRING_ARRAY;
+	private DocumentCommand(@Nonnull final EDocumentCommandType type, @Nullable final String... data)
+			throws IllegalArgumentException {
+		final String[] dataArray = data != null ? data : CmnCnst.EMPTY_STRING_ARRAY;
 		assertArguments(type, dataArray);
 		this.type = type;
 		this.data = dataArray;
 	}
 
 	private final static void assertArguments(final EDocumentCommandType type, final String[] data) {
-		if (type == null) throw new IllegalArgumentException(CmnCnst.Error.NULL_TYPE);
+		if (type == null)
+			throw new IllegalArgumentException(CmnCnst.Error.NULL_TYPE);
 		if (data.length != type.argc)
-			throw new IllegalArgumentException(
-					String.format(CmnCnst.Error.ILLEGAL_ARGUMENTS_FOR_DOCUMENT_COMMAND, type,
-							new Integer(type.argc), new Integer(data.length), StringUtils.join(data, ',')));
+			throw new IllegalArgumentException(String.format(CmnCnst.Error.ILLEGAL_ARGUMENTS_FOR_DOCUMENT_COMMAND, type,
+					new Integer(type.argc), new Integer(data.length), StringUtils.join(data, ',')));
 	}
 
 	@Nonnull
@@ -68,11 +72,13 @@ public class DocumentCommand extends AExternalContextCommand {
 	}
 
 	public static DocumentCommand newRemoveEnclosingTag(final String tagName) {
-		return tagName == null ? getNoOpInstance() : new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, tagName);
+		return tagName == null ? getNoOpInstance()
+				: new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, tagName);
 	}
 
 	public static DocumentCommand newRemovePreviousTag(final String tagName) {
-		return tagName == null ? getNoOpInstance() : new DocumentCommand(EDocumentCommandType.REMOVE_PREVIOUS_TAG, tagName);
+		return tagName == null ? getNoOpInstance()
+				: new DocumentCommand(EDocumentCommandType.REMOVE_PREVIOUS_TAG, tagName);
 	}
 
 	public static DocumentCommand newRemoveNextTag(final String tagName) {
@@ -86,26 +92,32 @@ public class DocumentCommand extends AExternalContextCommand {
 
 	public static enum EDocumentCommandType {
 		/**
-		 * @param tagName Name of the tag to remove. May be null.
+		 * @param tagName
+		 *            Name of the tag to remove. May be null.
 		 */
 		REMOVE_ENCLOSING_TAG(1),
 		/**
-		 * @param tagName Name of the tag to remove. May be null.
+		 * @param tagName
+		 *            Name of the tag to remove. May be null.
 		 */
 		REMOVE_PREVIOUS_TAG(1),
 		/**
-		 * @param tagName Name of the tag to remove. May be null.
+		 * @param tagName
+		 *            Name of the tag to remove. May be null.
 		 */
 		REMOVE_NEXT_TAG(1),
 		/**
-		 * @param href Hyperlink. Can be null.
-		 * @param text Link text. Can be null.
-		 * @param target Link target. Can be null.
+		 * @param href
+		 *            Hyperlink. Can be null.
+		 * @param text
+		 *            Link text. Can be null.
+		 * @param target
+		 *            Link target. Can be null.
 		 */
 		INSERT_LINK(3),
-		NO_OP(0)
-		;
+		NO_OP(0);
 		public final int argc;
+
 		private EDocumentCommandType(final int argc) {
 			this.argc = argc;
 		}

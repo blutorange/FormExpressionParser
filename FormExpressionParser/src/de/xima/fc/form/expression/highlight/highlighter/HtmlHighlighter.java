@@ -5,6 +5,9 @@ import java.io.Writer;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,15 +19,16 @@ import de.xima.fc.form.expression.highlight.IHighlightTheme;
 import de.xima.fc.form.expression.highlight.Size;
 import de.xima.fc.form.expression.highlight.Style;
 import de.xima.fc.form.expression.highlight.Weight;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 @SuppressWarnings("nls")
 public class HtmlHighlighter extends AHighlighter {
-	private Writer html, css;
-	private Set<Color> colorSet;
+	@Nullable private Writer html, css;
+	@Nullable private Set<Color> colorSet;
 	private String cssClassPrefix;
 	private boolean basicStyling = true;
 	private StringBuilder currentLine;
-	private HtmlHighlighter(final IHighlightTheme theme) throws IllegalArgumentException {
+	private HtmlHighlighter(@Nonnull final IHighlightTheme theme) throws IllegalArgumentException {
 		super(theme);
 	}
 
@@ -38,6 +42,8 @@ public class HtmlHighlighter extends AHighlighter {
 
 	@Override
 	protected void writeNewline(final int numberOfNewlines) throws IOException {
+		final Writer html = this.html;
+		final Writer css = this.css;
 		if (html == null || css == null || numberOfNewlines < 1) return;
 		// Write one newline.
 		if (currentLine.length() == 0) html.write("<br>");
@@ -52,7 +58,7 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	@Override
-	protected void writeStyledText(final String text, final Style style) throws IOException {
+	protected void writeStyledText(@Nonnull final String text, @Nonnull final Style style) throws IOException {
 		if (currentLine == null) return;
 		final String line = StringEscapeUtils.escapeHtml4(text).replaceAll(" ", "&nbsp;");
 		currentLine.append("<span class=\"");
@@ -66,6 +72,8 @@ public class HtmlHighlighter extends AHighlighter {
 
 	@Override
 	protected void prepareProcessing(final Color backgroundColor) throws IOException {
+		final Writer html = this.html;
+		final Writer css = this.css;
 		if (html == null || css == null) return;
 		colorSet = new HashSet<>();
 		currentLine = new StringBuilder();
@@ -80,30 +88,34 @@ public class HtmlHighlighter extends AHighlighter {
 
 	@Override
 	protected void finishProcessing(final Color backgroundColor) throws IOException {
-		if (html == null || css == null) return;
-		cssColor();
-		if (currentLine.length() == 0) html.write("<br>");
-		else {
-			html.write("<p>");
-			html.write(currentLine.toString());
-			html.write("</p>");
+		final Writer html = this.html;
+		final Writer css = this.css;
+		if (html != null && css != null) {
+			cssColor();
+			if (currentLine.length() == 0) html.write("<br>");
+			else {
+				html.write("<p>");
+				html.write(currentLine.toString());
+				html.write("</p>");
+			}
+			html.write("</div>");
+			html.flush();
+			css.flush();
 		}
-		html.write("</div>");
-		html.flush();
-		css.flush();
-		html = null;
-		css = null;
+		this.html = null;
+		this.css = null;
 		currentLine = null;
-		colorSet.clear();
+		if (colorSet != null)
+			colorSet.clear();
 		colorSet = null;
 		cssClassPrefix = null;
 	}
 
-	public final void process(final Iterable<Token> tokenStream, final Writer html, final Writer css) throws IOException {
+	public final void process(@Nonnull final Iterable<Token> tokenStream, @Nonnull final Writer html,@Nonnull final Writer css) throws IOException {
 		process(tokenStream, null, true, html, css);
 	}
 
-	public final void process(final Token[] tokenArray, final String cssClassPrefix, final boolean basicStyling, final Writer html, final Writer css) throws IOException {
+	public final void process(@Nonnull final Token[] tokenArray, @Nullable final String cssClassPrefix, final boolean basicStyling, @Nonnull final Writer html, @Nonnull final Writer css) throws IOException {
 		this.html = html;
 		this.css = css;
 		this.cssClassPrefix = sanitizeCssClassPrefix(cssClassPrefix);
@@ -111,7 +123,7 @@ public class HtmlHighlighter extends AHighlighter {
 		super.process(tokenArray);
 	}
 
-	public final void process(final Iterable<Token> tokenStream, final String cssClassPrefix, final boolean basicStyling, final Writer html, final Writer css) throws IOException {
+	public final void process(@Nonnull final Iterable<Token> tokenStream, @Nullable final String cssClassPrefix, final boolean basicStyling, @Nonnull final Writer html, @Nonnull final Writer css) throws IOException {
 		this.html = html;
 		this.css = css;
 		this.cssClassPrefix = sanitizeCssClassPrefix(cssClassPrefix);
@@ -149,6 +161,8 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	private void cssWeight() throws IOException {
+		final Writer css = this.css;
+		if (css == null) return;
 		for (final Weight weight : Weight.values()) {
 			css.write(".");
 			css.write(cssClassPrefix);
@@ -179,6 +193,8 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	private void cssSize() throws IOException {
+		final Writer css = this.css;
+		if (css == null) return;
 		for (final Size size: Size.values()) {
 			css.write(".");
 			css.write(cssClassPrefix);
@@ -209,6 +225,8 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	private void cssFeature() throws IOException {
+		final Writer css = this.css;
+		if (css == null) return;
 		for (final Feature feature: Feature.values()) {
 			css.write(".");
 			css.write(cssClassPrefix);
@@ -233,6 +251,9 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	private void cssColor() throws IOException {
+		final Writer css = this.css;
+		final Set<Color> colorSet = this.colorSet;
+		if (css == null) return;
 		if (colorSet == null) return;
 		for (final Color color: colorSet) {
 			final String hexString = color.getHexStringRgb();
@@ -247,7 +268,7 @@ public class HtmlHighlighter extends AHighlighter {
 		}
 	}
 
-	private static void cssColor(final Writer css, final Color color, final String attribute) throws IOException {
+	private static void cssColor(@Nonnull final Writer css, @Nonnull final Color color, @Nonnull final String attribute) throws IOException {
 		css.write(attribute);
 		css.write(":rgb(");
 		css.write(Integer.toString(color.getByteR(), 10));
@@ -269,6 +290,8 @@ public class HtmlHighlighter extends AHighlighter {
 	}
 
 	private void cssGeneral(final Color backgroundColor) throws IOException {
+		final Writer css = this.css;
+		if (css == null) return;
 		if (!backgroundColor.isFullyTransparent()) {
 			css.write("div.");
 			css.write(cssClassPrefix);
@@ -287,15 +310,20 @@ public class HtmlHighlighter extends AHighlighter {
 		}
 	}
 
-	public static HtmlHighlighter getFor(final IHighlightTheme theme) {
+	@Nonnull
+	public static HtmlHighlighter getFor(@Nonnull final IHighlightTheme theme) {
 		return new HtmlHighlighter(theme);
 	}
 
-	public static String sanitizeCssClassPrefix(String cssClassPrefix) {
-		if (cssClassPrefix == null) cssClassPrefix = StringUtils.EMPTY;
-		cssClassPrefix = cssClassPrefix.replaceAll("[^-a-zA-Z0-9_]", StringUtils.EMPTY);
-		if (cssClassPrefix.isEmpty()) cssClassPrefix = "hglt";
-		return cssClassPrefix;
+	@Nonnull
+	public static String sanitizeCssClassPrefix(@Nullable String cssClassPrefix) {
+		@Nonnull
+		final String pref = cssClassPrefix == null ? CmnCnst.EMPTY_STRING : cssClassPrefix;
+		final String p = pref.replaceAll("[^-a-zA-Z0-9_]", CmnCnst.EMPTY_STRING);
+		if (p == null)
+			return CmnCnst.EMPTY_STRING;
+		if (p.isEmpty()) cssClassPrefix = "hglt";
+		return p;
 	}
 
 }

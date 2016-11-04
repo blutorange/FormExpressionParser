@@ -3,6 +3,9 @@ package de.xima.fc.form.expression.util;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.highlight.IHighlightTheme;
@@ -31,7 +34,9 @@ public final class FormExpressionHighlightingUtil {
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static void highlightHtml(final String code, final IHighlightTheme theme, final String cssClassPrefix, final boolean basicStyling, final Writer html, final Writer css) throws IOException, ParseException {
+		public static void highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme,
+				final String cssClassPrefix, final boolean basicStyling,@Nonnull final Writer html,@Nonnull final Writer css)
+						throws IOException, ParseException {
 			final Token[] tokenList = FormExpressionFactory.Program.asTokenArray(code);
 			final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
 			highlighter.process(tokenList, cssClassPrefix, basicStyling, html, css);
@@ -46,7 +51,7 @@ public final class FormExpressionHighlightingUtil {
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static String highlightHtml(final String code, final IHighlightTheme theme, final String cssClassPrefix, final boolean basicStyling) throws IOException, ParseException {
+		public static String highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme, final String cssClassPrefix, final boolean basicStyling) throws IOException, ParseException {
 			final Token[] tokenList = FormExpressionFactory.Program.asTokenArray(code);
 			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix, basicStyling);
 		}
@@ -68,7 +73,9 @@ public final class FormExpressionHighlightingUtil {
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static void highlightHtml(final String code, final IHighlightTheme theme, final String cssClassPrefix, final boolean basicStyling, final Writer html, final Writer css) throws IOException, ParseException {
+		public static void highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme,
+				@Nullable final String cssClassPrefix, final boolean basicStyling, @Nonnull final Writer html,
+				@Nonnull final Writer css) throws IOException, ParseException {
 			final Token[] tokenList = FormExpressionFactory.Template.asTokenArray(code);
 			final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
 			highlighter.process(tokenList, cssClassPrefix, basicStyling, html, css);
@@ -83,14 +90,16 @@ public final class FormExpressionHighlightingUtil {
 		 * @throws IOException When output could not be written to the string builder, should not happen.
 		 * @throws ParseException When the code is invalid.
 		 */
-		public static String highlightHtml(final String code, final IHighlightTheme theme, final String cssClassPrefix, final boolean basicStyling) throws IOException, ParseException {
+		public static String highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme,
+				@Nullable final String cssClassPrefix, final boolean basicStyling) throws IOException, ParseException {
 			final Token[] tokenList = FormExpressionFactory.Template.asTokenArray(code);
 			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix, basicStyling);
 		}
 	}
 
 
-	public static String highlightHtml(final Token[] tokenArray, final IHighlightTheme theme, String cssClassPrefix, final boolean basicStyling) throws IOException {
+	public static String highlightHtml(@Nonnull final Token[] tokenArray, @Nonnull final IHighlightTheme theme,
+			@Nullable String cssClassPrefix, final boolean basicStyling) throws IOException {
 		cssClassPrefix = HtmlHighlighter.sanitizeCssClassPrefix(cssClassPrefix);
 		final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
 		try(final StringBuilderWriter html = new StringBuilderWriter();

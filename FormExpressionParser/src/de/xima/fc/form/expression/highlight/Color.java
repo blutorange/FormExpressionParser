@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.highlight;
 
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,20 +39,20 @@ public final class Color {
 		a = clamp(((val&0x000000FF))/255.0f);
 	}
 
-	public final static Color RED = new Color(1f,0f,0f);
-	public final static Color GREEN = new Color(0f,1f,0f);
-	public final static Color BLUE = new Color(0f,0f,1f);
-	public final static Color YELLOW = new Color(1f,1f,0f);
-	public final static Color PURPLE = new Color(1f,0f,1f);
-	public final static Color CYAN = new Color(0f,1f,1f);
-	public final static Color WHITE = new Color(1f,1f,1f);
-	public final static Color BLACK = new Color(0f,0f,0f);
-	public final static Color GRAY40 = new Color(0.4f,0.4f,0.4f);
-	public final static Color GRAY50 = new Color(0.5f,0.5f,0.5f);
+	@Nonnull public final static Color RED = new Color(1f,0f,0f);
+	@Nonnull public final static Color GREEN = new Color(0f,1f,0f);
+	@Nonnull public final static Color BLUE = new Color(0f,0f,1f);
+	@Nonnull public final static Color YELLOW = new Color(1f,1f,0f);
+	@Nonnull public final static Color PURPLE = new Color(1f,0f,1f);
+	@Nonnull public final static Color CYAN = new Color(0f,1f,1f);
+	@Nonnull public final static Color WHITE = new Color(1f,1f,1f);
+	@Nonnull public final static Color BLACK = new Color(0f,0f,0f);
+	@Nonnull public final static Color GRAY40 = new Color(0.4f,0.4f,0.4f);
+	@Nonnull public final static Color GRAY50 = new Color(0.5f,0.5f,0.5f);
 
-	public final static Color MAGENTA_HAZE = new Color(0x9F4576FF);
-	public static final Color TRANSPARENT_WHITE = new Color(0xFFFFFF00);
-	public static final Color TRANSPARENT_BLACK = new Color(0x00000000);
+	@Nonnull public final static Color MAGENTA_HAZE = new Color(0x9F4576FF);
+	@Nonnull public static final Color TRANSPARENT_WHITE = new Color(0xFFFFFF00);
+	@Nonnull public static final Color TRANSPARENT_BLACK = new Color(0x00000000);
 
 	public int getHexRgba() {
 		return (((int)(r*255f))<<24)|(((int)(g*255f))<<16)|(((int)(b*255f))<<8)|((int)(a*255f));

@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.pool2.ObjectPool;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
@@ -28,7 +27,4 @@ public interface IFormExpression extends Serializable {
 	 */
 	@Nonnull
 	public String unparse(@Nullable UnparseVisitorConfig config);
-
-	@Deprecated
-	public Node getRootNode();
 }

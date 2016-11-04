@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.grammar.AToken;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
@@ -20,7 +22,7 @@ public abstract class AHighlighter {
 	public AHighlighter(final IHighlightTheme theme) {
 		this.theme = theme;
 	}
-	private void prepareInternal(final Color backgroundColor) throws IOException {
+	private void prepareInternal(@Nonnull final Color backgroundColor) throws IOException {
 		currentLine = 1;
 		currentColumn = 0;
 		prepareProcessing(backgroundColor);
@@ -115,9 +117,9 @@ public abstract class AHighlighter {
 		currentLine = token.endLine;
 	}
 
-	protected abstract void writeStyledText(final String text, final Style style) throws IOException;
+	protected abstract void writeStyledText(final @Nonnull String text, final @Nonnull Style style) throws IOException;
 	protected abstract void writeSpace(int numberOfSpaces) throws IOException;
 	protected abstract void writeNewline(int numberOfNewlines) throws IOException;
-	protected abstract void prepareProcessing(final Color backgroundStyle) throws IOException;
-	protected abstract void finishProcessing(final Color backgroundStyle) throws IOException;
+	protected abstract void prepareProcessing(@Nonnull final Color backgroundStyle) throws IOException;
+	protected abstract void finishProcessing(@Nonnull final Color backgroundStyle) throws IOException;
 }
