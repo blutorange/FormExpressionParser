@@ -56,7 +56,8 @@ public final class FormExpressionFactory {
 		 * @param reader Reader to read from.
 		 * @return A token manager for tokenizing the stream.
 		 */
-		public static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
+		@Nonnull
+		public static FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
 			return tokenManagerForState(reader,	FormExpressionParserTokenManager.CODE);
 		}
 
@@ -68,11 +69,13 @@ public final class FormExpressionFactory {
 		 *         calling {@link Iterable#iterator()} more than once.
 		 * @throws TokenMgrError
 		 */
-		public static TokenIterator asTokenStream(final Reader reader) throws TokenMgrError {
+		@Nonnull
+		public static TokenIterator asTokenStream(@Nonnull final Reader reader) throws TokenMgrError {
 			return new TokenIterator(asTokenManager(reader));
 		}
 
-		public static Token[] asTokenArray(final String code) throws TokenMgrError {
+		@Nonnull
+		public static Token[] asTokenArray(@Nonnull final String code) throws TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				return tokenManagerToArray(asTokenManager(reader));
 			}
@@ -132,17 +135,20 @@ public final class FormExpressionFactory {
 			}
 		}
 
-		public static TokenIterator asTokenStream(final Reader reader) throws TokenMgrError {
+		@Nonnull
+		public static TokenIterator asTokenStream(@Nonnull final Reader reader) throws TokenMgrError {
 			return new TokenIterator(asTokenManager(reader));
 		}
 
-		public static Token[] asTokenArray(final String code) throws TokenMgrError {
+		@Nonnull
+		public static Token[] asTokenArray(@Nonnull final String code) throws TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				return tokenManagerToArray(asTokenManager(reader));
 			}
 		}
 
-		public static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
+		@Nonnull
+		public static FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
 			return tokenManagerForState(reader,	FormExpressionParserTokenManager.LOS);
 		}
 	}
@@ -151,7 +157,7 @@ public final class FormExpressionFactory {
 		private boolean hasNext = true;
 		private final FormExpressionParserTokenManager tm;
 
-		public TokenIterator(final FormExpressionParserTokenManager tm) {
+		public TokenIterator(@Nonnull final FormExpressionParserTokenManager tm) {
 			this.tm = tm;
 		}
 
@@ -160,6 +166,7 @@ public final class FormExpressionFactory {
 			return hasNext;
 		}
 
+		@Nonnull
 		@Override
 		public Token next() {
 			final Token t = tm.getNextToken();
@@ -172,29 +179,35 @@ public final class FormExpressionFactory {
 			throw new UnsupportedOperationException(CmnCnst.Error.TOKEN_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
 		}
 
+		@Nonnull
 		@Override
 		public Iterator<Token> iterator() {
 			return this;
 		}
 	}
 
-	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state)
+	@Nonnull
+	private static FormExpressionParserTokenManager tokenManagerForState(@Nonnull final Reader reader, final int state)
 			throws TokenMgrError {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
 		return new FormExpressionParserTokenManager(null, stream, state);
 	}
 
-	private static FormExpressionParser asParser(final FormExpressionParserTokenManager tm) {
+	@Nonnull
+	private static FormExpressionParser asParser(@Nonnull final FormExpressionParserTokenManager tm) {
 		final FormExpressionParser parser = new FormExpressionParser(tm);
 		tm.parser = parser;
 		return parser;
 	}
 
-	private static Token[] tokenManagerToArray(final FormExpressionParserTokenManager tm) throws TokenMgrError {
+	@Nonnull
+	private static Token[] tokenManagerToArray(@Nonnull final FormExpressionParserTokenManager tm) throws TokenMgrError {
 		final List<Token> list = new ArrayList<>();
 		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm
 				.getNextToken())
 			list.add(token);
-		return list.toArray(new Token[list.size()]);
+		final Token[] res = new Token[list.size()];
+		list.toArray(res);
+		return res;
 	}
 }

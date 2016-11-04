@@ -13,8 +13,13 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public interface IFormExpression extends Serializable {
+	@Nonnull
 	public ALangObject evaluate(@Nonnull final ObjectPool<IEvaluationContext> pool,
-			@Nonnull final IExternalContext externalContext) throws EvaluationException;
+			@Nullable final IExternalContext externalContext) throws EvaluationException;
+
+	@Nonnull
+	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nullable final IExternalContext ex)
+			throws EvaluationException;
 
 	/**
 	 *

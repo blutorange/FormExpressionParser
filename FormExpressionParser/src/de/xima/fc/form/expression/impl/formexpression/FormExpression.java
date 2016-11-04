@@ -34,8 +34,16 @@ class FormExpression implements IFormExpression {
 
 	@Override
 	@Nonnull
+	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nullable final IExternalContext ex)
+			throws EvaluationException {
+		ec.setExternalContext(ex);
+		return EvaluateVisitor.evaluateCode(node, ec);
+	}
+
+	@Override
+	@Nonnull
 	public ALangObject evaluate(@Nonnull final ObjectPool<IEvaluationContext> pool,
-			@Nonnull final IExternalContext externalContext) throws EvaluationException {
+			@Nullable final IExternalContext ex) throws EvaluationException {
 		final IEvaluationContext ec;
 		try {
 			ec = pool.borrowObject();
@@ -43,9 +51,11 @@ class FormExpression implements IFormExpression {
 		catch (final Exception exception) {
 			throw new CannotAcquireEvaluationContextException(exception);
 		}
-		ec.setExternalContext(externalContext);
+		if (ec == null) {
+			throw new CannotAcquireEvaluationContextException(new NullPointerException(CmnCnst.Error.EC_POOL_RETURNED_NULL));
+		}
 		try {
-			return EvaluateVisitor.evaluateCode(node, ec);
+			return evaluate(ec, ex);
 		}
 		finally {
 			try {
@@ -57,8 +67,9 @@ class FormExpression implements IFormExpression {
 		}
 	}
 
+	@Nonnull
 	@Override
-	public String unparse(final UnparseVisitorConfig config) {
+	public String unparse(@Nullable final UnparseVisitorConfig config) {
 		if (unparse != null) return unparse;
 		return unparse = UnparseVisitor.unparse(node, config == null ? UnparseVisitorConfig.getDefaultConfig() : config);
 	}

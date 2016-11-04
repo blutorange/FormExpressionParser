@@ -15,16 +15,6 @@ import de.xima.fc.form.expression.exception.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.NoSuchAttrAssignerException;
 import de.xima.fc.form.expression.exception.NoSuchMethodException;
-import de.xima.fc.form.expression.type.ArrayType;
-import de.xima.fc.form.expression.type.BooleanType;
-import de.xima.fc.form.expression.type.ExceptionType;
-import de.xima.fc.form.expression.type.FunctionType;
-import de.xima.fc.form.expression.type.HashType;
-import de.xima.fc.form.expression.type.IVariableType;
-import de.xima.fc.form.expression.type.NumberType;
-import de.xima.fc.form.expression.type.RegexType;
-import de.xima.fc.form.expression.type.StringType;
-import de.xima.fc.form.expression.type.VoidType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
@@ -163,62 +153,15 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	private static AtomicLong ID_COUNTER = new AtomicLong();
 
 	public static enum Type {
-		NULL(NullLangObject.class, 0) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return VoidType.INSTANCE;
-			}
-		},
-		BOOLEAN(BooleanLangObject.class, 1) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return BooleanType.INSTANCE;
-			}
-		},
-		NUMBER(NumberLangObject.class, 2) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return NumberType.INSTANCE;
-			}
-		},
-		STRING(StringLangObject.class, 3) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return StringType.INSTANCE;
-			}
-		},
-		REGEX(RegexLangObject.class, 4) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return RegexType.INSTANCE;
-			}
-		},
-		FUNCTION(FunctionLangObject.class, 5) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				final IVariableType[] argType = new IVariableType[children.length-1];
-				System.arraycopy(children, 1, argType, 0, argType.length);
-				return new FunctionType(children[0], argType);
-			}
-		},
-		EXCEPTION(ExceptionLangObject.class, 6) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return ExceptionType.INSTANCE;
-			}
-		},
-		ARRAY(ArrayLangObject.class, 7) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return new ArrayType(children[0]);
-			}
-		},
-		HASH(HashLangObject.class, 8) {
-			@Override
-			public IVariableType asVariableType(final IVariableType[] children) {
-				return new HashType(children[0], children[1]);
-			}
-		},
+		NULL(NullLangObject.class, 0),
+		BOOLEAN(BooleanLangObject.class, 1),
+		NUMBER(NumberLangObject.class, 2),
+		STRING(StringLangObject.class, 3),
+		REGEX(RegexLangObject.class, 4),
+		FUNCTION(FunctionLangObject.class, 5),
+		EXCEPTION(ExceptionLangObject.class, 6),
+		ARRAY(ArrayLangObject.class, 7),
+		HASH(HashLangObject.class, 8),
 		;
 
 		public final Class<? extends ALangObject> clazz;
@@ -228,8 +171,6 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 			this.clazz = clazz;
 			this.order = order;
 		}
-
-		public abstract IVariableType asVariableType(IVariableType[] children);
 	}
 
 	public abstract ALangObject shallowClone();

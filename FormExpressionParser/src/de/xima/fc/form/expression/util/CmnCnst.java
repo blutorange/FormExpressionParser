@@ -254,6 +254,7 @@ public final class CmnCnst {
 		@Nonnull public static final String INVALID_EQUAL_METHOD = "Invalid enum for equal method: %s.";
 		@Nonnull public static final String INVALID_COMPARISON_METHOD = "Invalid enum for comparison method: %s";
 		@Nonnull public static final String NULL_ERROR_VARIABLE_NAME = "Catch clause must specifiy a variable name. " + INTERNAL_ERROR;
+		@Nonnull public static final String EC_POOL_RETURNED_NULL = "Pool returned null";
 	}
 
 	public static final class ToString {

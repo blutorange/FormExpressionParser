@@ -8,24 +8,18 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTFunctionNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	private boolean hasReturnTypeDeclaration;
-
 	public ASTFunctionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	public void init(final EMethod method, final boolean hasReturnTypeDeclaration) throws ParseException {
-		assertChildrenAtLeast(hasReturnTypeDeclaration ? 2 : 1);
+	@Override
+	public void init(final EMethod method) throws ParseException {
+		assertChildrenAtLeast(1);
 		super.init(method);
-		this.hasReturnTypeDeclaration = hasReturnTypeDeclaration;
 	}
 
 	@Override
 	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionParserVisitor<R, T, E> visitor, final T data) throws E {
 		return visitor.visit(this, data);
-	}
-
-	public boolean isHasReturnTypeDeclaration() {
-		return hasReturnTypeDeclaration;
 	}
 }

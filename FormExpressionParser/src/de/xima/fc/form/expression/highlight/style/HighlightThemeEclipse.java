@@ -90,8 +90,4 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 	public static IHighlightTheme getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
-	@Override
-	protected Style getStyleTypeDeclaration() {
-		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
-	}
 }

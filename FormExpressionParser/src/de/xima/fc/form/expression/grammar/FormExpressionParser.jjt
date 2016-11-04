@@ -128,36 +128,6 @@ TOKEN:
   < IdentifierAfterDot : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* > : CODE
 }
 
-< TYPEDECL >
-TOKEN :
-{
-  < __TypeHash : "Hash" >
-| < __TypeVoid : "Void" >
-| < __TypeRegex : "Regex" >
-| < __TypeArray : "Array" >
-| < __TypeNumber : "Number" >
-| < __TypeString : "String" >
-| < __TypeBoolean : "Boolean" >
-| < __TypeFunction : "Function" >
-| < __TypeException : "Exception" >
-| < TypeComma : "," >
-| < TypeAngleOpen : "<" > { ++nestLevelTypeDecl; }
-| < TypeAngleClose : ">" > {
-    --nestLevelTypeDecl;
-    if (nestLevelTypeDecl == 0)
-      SwitchTo(CODE);
-  }
-}
-
-< TYPEDECL >
-SKIP :
-{
-  " "
-| "\t"
-| "\n"
-| "\r"
-}
-
 < CODE >
 SKIP :
 {
@@ -310,13 +280,9 @@ TOKEN :
 | 
   < With : "with" >
 | 
-  < __Void : "Void" >
-| 
   < Else : "else" >
 | 
   < Case : "case" >
-| 
-  < __Hash : "Hash" > { nestLevelTypeDecl = 0; }: TYPEDECL
 |
   < True : "true" >
 | 
@@ -324,29 +290,19 @@ TOKEN :
 | 
   < Break : "break" >
 | 
-  < __Regex : "Regex" >
-| 
-  < __Array : "Array" > { nestLevelTypeDecl = 0; } : TYPEDECL
-| 
   < While : "while" >
 | 
   < Catch : "catch" >
-| 
+|
   < __Error : "error" >
 | 
   < Throw : "throw" >
 | 
   < False : "false" >
 | 
-  < __Number : "Number" >
-| 
   < Return : "return" >
 | 
-  < __String : "String" >
-| 
   < Switch : "switch" >
-| 
-  < __Boolean : "Boolean" >
 | 
   < LogInfo : "loginfo" >
 | 
@@ -358,13 +314,9 @@ TOKEN :
 | 
   < Function : "function" >
 | 
-  < __Function : "Function" > { nestLevelTypeDecl = 0; } : TYPEDECL
-| 
   < LogError : "logerror" >
 | 
   < LogDebug : "logdebug" >
-| 
-  < __Exception : "Exception" >
 | 
   < Identifier : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
 | 
@@ -563,11 +515,11 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
 }
 {
   (
-    < Function > (TypeDeclaredVariableWithOptionalScope(null) | VariableWithOptionalScope(null)) < ParenOpen >
+    < Function > VariableWithOptionalScope(null) < ParenOpen >
     (
-      [ IdentifierNameWithOptionalTypeDeclaration(null) ]
+      [ IdentifierName(null) ]
       (
-        < Comma > IdentifierNameWithOptionalTypeDeclaration(null)
+        < Comma > IdentifierName(null)
       )*
     )
     < ParenClose >
@@ -907,7 +859,7 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
 }
 {
   (
-    ( TernaryExpression(method) | TypeDeclaredVariableWithOptionalScope(method) )
+    TernaryExpression(method)
     (
       (
         < Equal >
@@ -1418,21 +1370,6 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
   }
 }
 
-void IdentifierNameWithOptionalTypeDeclaration(EMethod method) #IdentifierNameNode :
-{
-  Token t;
-  
-}
-{
-  (
-    [VariableTypeDeclaration(null)] t = < Identifier >
-  )
-  {
-    jjtThis.init(method, t.image);
-    
-  }
-}
-
 void FunctionArgumentList(EMethod method) #ArrayNode :
 {
   
@@ -1691,29 +1628,22 @@ void Exception(EMethod method) #ExceptionNode :
 
 void Function(EMethod method) #FunctionNode :
 {
-  boolean hasReturnTypeDeclaration = false;
 }
 {
   (
     < LambdaArrow >
-    [
-      VariableTypeDeclaration(null)
-      {
-        hasReturnTypeDeclaration = true;
-      }
-    ]
     < ParenOpen >
     (
-      [ IdentifierNameWithOptionalTypeDeclaration(null) ]
+      [ IdentifierName(null) ]
       (
-        < Comma > IdentifierNameWithOptionalTypeDeclaration(null)
+        < Comma > IdentifierName(null)
       )*
     )
     < ParenClose > 
     Block(null)
   )
   {
-    jjtThis.init(method, hasReturnTypeDeclaration);
+    jjtThis.init(method);
   }
 }
 
@@ -1750,134 +1680,7 @@ void Literal(EMethod method) #void :
 | Exception(method)
 }
 
-void VariableTypeDeclaration(EMethod method) #void :
-{
-}
-{
-  (
-    BooleanTypeDeclaration(method)
-  | NumberTypeDeclaration(method)
-  | StringTypeDeclaration(method)
-  | RegexTypeDeclaration(method)
-  | ExceptionTypeDeclaration(method)
-  | HashTypeDeclaration(method)
-  | FunctionTypeDeclaration(method)
-  | ArrayTypeDeclaration(method)
-  )
-}
-
-void BooleanTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (< __Boolean > | < __TypeBoolean >)
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.BOOLEAN);
-  }
-}
-
-void NumberTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (< __Number > | < __TypeNumber >)
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.NUMBER);
-  }
-}
-
-void StringTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (< __String > | < __TypeString >)
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.STRING);
-  }
-}
-
-void RegexTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (< __Regex > | < __TypeRegex >)
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.REGEX);
-  }
-}
-
-void VoidTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (< __Void > | < __TypeVoid >)
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.NULL);
-  }
-}
-
-void ExceptionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (< __Exception > | < __TypeException >)
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.EXCEPTION);
-  }
-}
-
-void HashTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (
-    (< __Hash > | < __TypeHash >)
-    < TypeAngleOpen >
-    VariableTypeDeclaration(null)
-    < TypeComma >
-    VariableTypeDeclaration(null)
-    < TypeAngleClose >
-  )
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.HASH);
-  }
-}
-
-void ArrayTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (
-    (< __Array > | < __TypeArray >)
-    < TypeAngleOpen >
-    VariableTypeDeclaration(null)
-    < TypeAngleClose >
-  )
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.ARRAY);
-  }
-}
-
-void FunctionTypeDeclaration(EMethod method) #VariableTypeDeclarationNode :
-{
-}
-{
-  (
-    (< __Function > | < __TypeFunction >)
-    < TypeAngleOpen >
-    [
-      (VariableTypeDeclaration(null) | VoidTypeDeclaration(null))
-      (
-        < TypeComma > VariableTypeDeclaration(null)
-      )*
-    ]
-    < TypeAngleClose >
-  )
-  {
-    jjtThis.init(method, de.xima.fc.form.expression.object.ALangObject.Type.FUNCTION);
-  }
-}
-
+/*
 void TypeDeclaredVariableWithOptionalScope(EMethod method) #VariableNode :
 {
   Token part1;
@@ -1894,3 +1697,4 @@ void TypeDeclaredVariableWithOptionalScope(EMethod method) #VariableNode :
     jjtThis.init(method, part1.image, part2.image);
   }
 }
+*/

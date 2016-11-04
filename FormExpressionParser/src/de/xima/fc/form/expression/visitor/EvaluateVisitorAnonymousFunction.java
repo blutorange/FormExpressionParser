@@ -30,7 +30,7 @@ class EvaluateVisitorAnonymousFunction implements IFunction<NullLangObject> {
 		this.visitor = visitor;
 		body = b;
 		argList = new String[node.jjtGetNumChildren() - 1];
-		for (int i = node.isHasReturnTypeDeclaration() ? 1 : 0; i != argList.length; ++i)
+		for (int i = 0; i != argList.length; ++i)
 			argList[i] = node.jjtGetChild(i).jjtAccept(visitor, ec).coerceString(ec).stringValue();
 	}
 

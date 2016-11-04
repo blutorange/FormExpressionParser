@@ -8,7 +8,6 @@ import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.IReset;
-import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 
 /**
  * @author madgaksha
