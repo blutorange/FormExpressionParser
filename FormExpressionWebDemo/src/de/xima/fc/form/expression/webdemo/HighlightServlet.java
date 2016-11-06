@@ -35,16 +35,16 @@ public class HighlightServlet extends AFormExpressionServlet {
 			@SuppressWarnings("unchecked")
 			@Override
 			public JSONObject call() throws Exception {
-				final String code = request.getParameter("code");
-				final String cssClassPrefix = request.getParameter("prefix");
-				final String type = request.getParameter("type");
+				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
+				final String cssClassPrefix = request.getParameter(CmnCnst.URL_PARAM_KEY_PREFIX);
+				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
 				final JSONObject json = new JSONObject();
 				if (code == null) {
-					json.put("error", "Parameter code must be given.");
+					json.put(CmnCnst.RESPONSE_ERROR, CmnCnst.RESPONSE_ERROR_PARAM_CODE_REQUIRED);
 				}
 				else {
 					try (final Writer html = new StringBuilderWriter(); final Writer css = new StringBuilderWriter()) {
-						if ("program".equalsIgnoreCase(type)) {
+						if (CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM.equalsIgnoreCase(type)) {
 							FormExpressionHighlightingUtil.Program.highlightHtml(code,
 									HighlightThemeEclipse.getInstance(), cssClassPrefix, true, html, css);
 						}
@@ -52,12 +52,13 @@ public class HighlightServlet extends AFormExpressionServlet {
 							FormExpressionHighlightingUtil.Template.highlightHtml(code,
 									HighlightThemeEclipse.getInstance(), cssClassPrefix, true, html, css);
 						}
-						json.put("html", html.toString());
-						json.put("css", css.toString());
+						json.put(CmnCnst.RESPONSE_HTML, html.toString());
+						json.put(CmnCnst.RESPONSE_CSS, css.toString());
 
 					}
 					catch (ParseException | TokenMgrError | IOException e) {
-						json.put("error", "Could not parse code: " + e.getMessage());
+						json.put(CmnCnst.RESPONSE_ERROR,
+								String.format(CmnCnst.RESPONSE_ERROR_PARSING_FAILED, e.getMessage()));
 					}
 				}
 				return json;

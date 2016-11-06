@@ -58,6 +58,10 @@ public final class UnparseVisitorConfig {
 			if (linefeed.isEmpty()) linefeed = StringUtils.LF;
 			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
 		}
+		public Builder setLinefeed(final char linefeed) {
+			this.linefeed = Character.toString(linefeed);
+			return this;
+		}
 	}
 
 	private final static class InstanceHolder {

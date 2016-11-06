@@ -53,30 +53,30 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		}
 		catch (final TimeoutException e) {
 			json = new JSONObject();
-			json.put("error", String.format("Could not complete task, reached timeout of %s %s. %s", new Integer(CmnCnst.TIMEOUT), CmnCnst.TIMEOUT_UNIT, getErrorMessage(e)));
+			json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_TIMEOUT_REACHED, new Integer(CmnCnst.TIMEOUT), CmnCnst.TIMEOUT_UNIT, getErrorMessage(e)));
 		}
 		catch (final CancellationException e) {
 			json = new JSONObject();
-			json.put("error", String.format("Could not complete task, it was cancelled. %s", getErrorMessage(e)));
+			json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_TASK_CANCELLED, getErrorMessage(e)));
 		}
 		catch (final InterruptedException e) {
 			json = new JSONObject();
-			json.put("error", String.format("Could not complete task, an interruption occurred. %s", getErrorMessage(e)));
+			json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_TASK_INTERRUPTED, getErrorMessage(e)));
 		}
 		catch (final ExecutionException e) {
 			json = new JSONObject();
-			json.put("error", String.format("Could not complete task, some unknown error occurred. That is all I know. %s", getErrorMessage(e)));
+			json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_UNKNOWN, getErrorMessage(e)));
 		}
 		response.setStatus(200);
 		response.getWriter().append(json.toJSONString());
 		this.request = null;
 	}
 
-	private Object getErrorMessage(final Throwable e) {
+	private static Object getErrorMessage(final Throwable e) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(e.getMessage()).append("\n");
+		sb.append(e.getMessage()).append('\n');
 		for (final StackTraceElement el : e.getStackTrace()) {
-			sb.append(el.toString()).append("\n");
+			sb.append(el.toString()).append('\n');
 		}
 		return sb.toString();
 	}

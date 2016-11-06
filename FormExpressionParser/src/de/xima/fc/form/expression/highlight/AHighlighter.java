@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.grammar.AToken;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public abstract class AHighlighter {
 	private final Pattern splitter = Pattern.compile("(\\r)?\\n"); //$NON-NLS-1$
@@ -107,10 +108,10 @@ public abstract class AHighlighter {
 		}
 		// Get lines and style lines.
 		final String[] lines = splitter.split(token.image);
-		if (lines.length > 0) writeStyledText(lines[0], style);
+		if (lines.length > 0) writeStyledText(NullUtil.toString(lines[0]), style);
 		for (int i=1; i<lines.length; ++i) {
 			writeNewline(1);
-			if (!lines[i].isEmpty()) writeStyledText(lines[i], style);
+			if (!lines[i].isEmpty()) writeStyledText(NullUtil.toString(lines[i]), style);
 		}
 		// Keep track of line and column count.
 		currentColumn = token.endColumn;

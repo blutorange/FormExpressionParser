@@ -16,9 +16,11 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
+import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
+import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
+import de.xima.fc.form.expression.impl.pool.GenericEcFactory;
 import de.xima.fc.form.expression.impl.writer.DummyWriter;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
-import de.xima.fc.form.expression.util.FormExpressionEvaluationUtil;
 
 /**
  * Servlet implementation class HighlightServlet
@@ -36,56 +38,61 @@ public class EvaluateServlet extends AFormExpressionServlet {
 
 	@Override
 	protected Callable<JSONObject> getCallable() {
-		return new Callable<JSONObject>(){
+		return new Callable<JSONObject>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public JSONObject call() throws Exception {
 				final JSONObject json = new JSONObject();
-				final String code = request.getParameter("code");
-				final String type = request.getParameter("type");
-				final String context = request.getParameter("context");
+				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
+				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
+				final String context = request.getParameter(CmnCnst.URL_PARAM_KEY_CONTEXT);
 				if (code == null) {
-					json.put("error", "Parameter code must be given.");
+					json.put(CmnCnst.RESPONSE_ERROR, CmnCnst.RESPONSE_ERROR_PARAM_CODE_REQUIRED);
 				}
 				else {
 					try {
 						final String res;
-						if ("program".equalsIgnoreCase(type)) {
-							if ("formcycle".equalsIgnoreCase(context)) {
-								res = FormExpressionEvaluationUtil.Formcycle
-										.evalProgram(code, new FormcycleExternalContext(DummyWriter.getInstance())).toString();
+						if (CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM.equalsIgnoreCase(type)) {
+							if (CmnCnst.URL_PARAM_VALUE_CONTEXT_FORMCYCLE.equalsIgnoreCase(context)) {
+								res = FormExpressionFactory.Program.parse(code)
+										.evaluate(FormcycleEcFactory.getPoolInstance(),
+												new FormcycleExternalContext(DummyWriter.getInstance()))
+										.toString();
 							}
 							else {
-								res = FormExpressionEvaluationUtil.Generic.evalProgram(code, DummyExternalContext.INSTANCE)
+								res = FormExpressionFactory.Program.parse(code)
+										.evaluate(GenericEcFactory.getPoolInstance(), DummyExternalContext.INSTANCE)
 										.toString();
 							}
 						}
 						else {
 							try (final Writer writer = new StringBuilderWriter()) {
-								if ("formcycle".equalsIgnoreCase(context)) {
-									FormExpressionEvaluationUtil.Formcycle.evalTemplate(code,
-											new FormcycleExternalContext(writer));
+								if (CmnCnst.URL_PARAM_VALUE_CONTEXT_FORMCYCLE.equalsIgnoreCase(context)) {
+									FormExpressionFactory.Template.parse(code).evaluate(
+											FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext(writer));
 								}
 								else {
-									FormExpressionEvaluationUtil.Generic.evalTemplate(code,
-											new WriterOnlyExternalContext(writer));
+									FormExpressionFactory.Template.parse(code).evaluate(
+											GenericEcFactory.getPoolInstance(), new WriterOnlyExternalContext(writer));
 
 								}
 								res = writer.toString();
 							}
 						}
-						json.put("text", res.toString());
+						json.put(CmnCnst.RESPONSE_TEXT, res.toString());
 					}
 					catch (ParseException | TokenMgrError | IOException e) {
-						json.put("error", "Could not parse code: " + e.getMessage());
+						json.put(CmnCnst.RESPONSE_ERROR,
+								String.format(CmnCnst.RESPONSE_ERROR_PARSING_FAILED, e.getMessage()));
 					}
 					catch (final EvaluationException e) {
 						final StringBuilder sb = new StringBuilder();
-						sb.append("Could not evaluate code: ").append(e.getMessage()).append(StringUtils.LF);
+						sb.append(String.format(CmnCnst.RESPONSE_ERROR_EVALUATION_FAILED, e.getMessage()))
+						.append(StringUtils.LF);
 						for (final StackTraceElement el : e.getStackTrace()) {
 							sb.append(el.toString()).append(StringUtils.LF);
 						}
-						json.put("error", sb.toString());
+						json.put(CmnCnst.RESPONSE_ERROR, sb.toString());
 					}
 				}
 				return json;
