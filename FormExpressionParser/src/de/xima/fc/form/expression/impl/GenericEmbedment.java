@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -145,7 +146,8 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	private static void output(@Nonnull final String data, @Nonnull final IEvaluationContext ec) throws EmbedmentOutputException {
-		final IExternalContext external = ec.getExternalContext();
-		if (external != null) external.write(data);
+		final Optional<IExternalContext> ex = ec.getExternalContext();
+		if (ex.isPresent())
+			ex.get().write(data);
 	}
 }

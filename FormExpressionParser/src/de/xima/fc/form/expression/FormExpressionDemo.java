@@ -81,7 +81,7 @@ public class FormExpressionDemo {
 		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
-			tokenArray = FormExpressionFactory.Program.asTokenArray(code);
+			tokenArray = FormExpressionFactory.Template.asTokenArray(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final TokenMgrError e) {
@@ -121,7 +121,7 @@ public class FormExpressionDemo {
 		final IFormExpression ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = FormExpressionFactory.Program.parse(code);
+			ex = FormExpressionFactory.Template.parse(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final ParseException e) {
@@ -136,7 +136,7 @@ public class FormExpressionDemo {
 	private static Node showParseTree(@Nonnull final String code) {
 		final Node node;
 		try {
-			node = FormExpressionFactory.Program.asNode(code);
+			node = FormExpressionFactory.Template.asNode(code);
 		} catch (final ParseException e) {
 			e.printStackTrace();
 			System.exit(-1);

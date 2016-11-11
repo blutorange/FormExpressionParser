@@ -3,6 +3,8 @@ package de.xima.fc.form.expression.context;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Optional;
+
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -38,8 +40,8 @@ public interface IEvaluationContext extends IReset {
 	@Nonnull
 	public IEmbedment getEmbedment();
 
-	@Nullable
-	public IExternalContext getExternalContext();
+	@Nonnull
+	public Optional<IExternalContext> getExternalContext();
 	public void setExternalContext(@Nullable IExternalContext externalContext);
 
 	/**

@@ -10,6 +10,7 @@ import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.context.ICustomScope;
@@ -47,8 +48,8 @@ public class GenericScope implements IScope {
 			final ICustomScope customScope = custom.get(scope);
 			value = customScope != null ? customScope.fetch(name) : null;
 		}
-		final IExternalContext ex = ec.getExternalContext();
-		return value != null ? value : ex != null ? ex.fetchScopedVariable(scope, name, ec) : null;
+		final Optional<IExternalContext> ex = ec.getExternalContext();
+		return value != null ? value : ex.isPresent() ? ex.get().fetchScopedVariable(scope, name, ec) : null;
 	}
 
 	@Override

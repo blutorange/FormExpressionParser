@@ -1,8 +1,12 @@
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
@@ -16,26 +20,30 @@ public class EvaluationException extends RuntimeException {
 	public EvaluationException(final EvaluationException exception) {
 		super(exception);
 		if (exception != null) {
-			final IEvaluationContext tmpEc = exception.ec;
-			ec = tmpEc;
-			externalContext = tmpEc == null ? null : tmpEc.getExternalContext();
+			ec = exception.ec;
+			externalContext = exception.ec.transform(new Function<IEvaluationContext, Optional<IExternalContext>>(){
+				@Override
+				public Optional<IExternalContext> apply(final IEvaluationContext ec) {
+					return ec != null ? ec.getExternalContext() : Optional.<IExternalContext>absent();
+				}
+			}).or(Optional.<IExternalContext>absent());
 		}
 		else {
-			ec = null;
-			externalContext = null;
+			ec = Optional.absent();
+			externalContext = Optional.absent();
 		}
 	}
 
-	public EvaluationException(final IEvaluationContext ec) {
+	public EvaluationException(@Nonnull final IEvaluationContext ec) {
 		super(msgWithContext(StringUtils.EMPTY, ec));
-		this.ec = ec;
-		externalContext = ec == null ? null : ec.getExternalContext();
+		this.ec = Optional.fromNullable(ec);
+		externalContext = ec.getExternalContext();
 	}
 
-	public EvaluationException(final IEvaluationContext ec, final String msg) {
+	public EvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
 		super(msgWithContext(msg, ec));
-		this.ec = ec;
-		externalContext = ec == null ? null : ec.getExternalContext();
+		this.ec = Optional.fromNullable(ec);
+		externalContext = ec.getExternalContext();
 	}
 
 	/**
@@ -43,22 +51,24 @@ public class EvaluationException extends RuntimeException {
 	 * @param msg Message.
 	 * @param throwable Throwable.
 	 */
-	protected EvaluationException(final String msg, final Throwable throwable) {
+	protected EvaluationException(@Nonnull final String msg, @Nonnull final Throwable throwable) {
 		super(msg, throwable);
-		ec = null;
-		externalContext = null;
+		ec = Optional.absent();
+		externalContext = Optional.absent();
 	}
 
-	protected EvaluationException(final IExternalContext externalContext, final String msg, final Throwable throwable) {
+	protected EvaluationException(@Nonnull final IExternalContext externalContext, @Nonnull final String msg,
+			@Nonnull final Throwable throwable) {
 		super(msg, throwable);
-		ec = null;
-		this.externalContext = externalContext;
+		ec = Optional.absent();
+		this.externalContext = Optional.fromNullable(externalContext);
 	}
 
-	public EvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
+	public EvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg,
+			@Nonnull final Throwable throwable) {
 		super(msgWithContext(msg, ec), throwable);
-		this.ec = ec;
-		externalContext = ec == null ? null : ec.getExternalContext();
+		this.ec = Optional.fromNullable(ec);
+		externalContext = ec.getExternalContext();
 	}
 
 	/**
@@ -70,7 +80,7 @@ public class EvaluationException extends RuntimeException {
 	 *            Current context.
 	 * @return The message with the stack trace.
 	 */
-	private static String msgWithContext(final String msg, final IEvaluationContext ec) {
+	private static String msgWithContext(@Nullable final String msg, @Nullable final IEvaluationContext ec) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(msg).append(System.lineSeparator());
 		if (ec != null) {
@@ -92,17 +102,17 @@ public class EvaluationException extends RuntimeException {
 			.append(CmnCnst.Error.EVALUATION_EXCEPTION_EX)
 			.append(' ')
 			.append(ec.getExternalContext());
-			final IExternalContext ex = ec.getExternalContext();
-			if (ex != null) {
+			final Optional<IExternalContext> ex = ec.getExternalContext();
+			if (ex.isPresent()) {
 				sb.append('(')
-				.append(ex.getClass().getCanonicalName())
+				.append(ex.get().getClass().getCanonicalName())
 				.append(')');
 			}
 		}
 		return sb.toString();
 	}
 
-	private static void appendTraceElement(final StringBuilder sb, final ITraceElement el) {
+	private static void appendTraceElement(@Nonnull final StringBuilder sb, @Nullable final ITraceElement el) {
 		sb.append('\t')
 		.append(CmnCnst.Error.EVALUATION_EXCEPTION_AT)
 		.append(' ')
@@ -130,9 +140,9 @@ public class EvaluationException extends RuntimeException {
 	 * {@link NumberLangObject#divide(NumberLangObject)} etc. that do not have
 	 * access to the context.
 	 */
-	@Nullable
-	public final IEvaluationContext ec;
+	@Nonnull
+	public final Optional<IEvaluationContext> ec;
 
-	@Nullable
-	public final IExternalContext externalContext;
+	@Nonnull
+	public final Optional<IExternalContext> externalContext;
 }

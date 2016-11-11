@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import com.google.common.base.Optional;
 
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEmbedment;
@@ -23,7 +24,7 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	@Nonnull protected final ITracer<Node> tracer;
 	@Nonnull protected final IScope scope;
 	@Nonnull protected final IEmbedment embedment;
-	@Nullable protected IExternalContext externalContext;
+	@Nonnull protected Optional<IExternalContext> externalContext = Optional.absent();
 
 	/**
 	 * Creates a new evaluation context.
@@ -87,16 +88,16 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 		scope.reset();
 		embedment.reset();
 		tracer.reset();
-		externalContext = null;
+		externalContext = Optional.absent();
 	}
 
 	@Override
 	public void setExternalContext(final IExternalContext externalContext) {
-		this.externalContext = externalContext;
+		this.externalContext = Optional.fromNullable(externalContext);
 	}
 
 	@Override
-	public IExternalContext getExternalContext() {
+	public Optional<IExternalContext> getExternalContext() {
 		return externalContext;
 	}
 

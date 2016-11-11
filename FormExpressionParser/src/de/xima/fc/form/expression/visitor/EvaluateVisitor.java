@@ -8,6 +8,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Optional;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.IFunction;
@@ -96,13 +98,15 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	public static ALangObject evaluateCode(final Node node, final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor();
 		final ALangObject res;
-		final IExternalContext ex = ec.getExternalContext();
-		if (ex != null) ex.beginWriting();
+		final Optional<IExternalContext> ex = ec.getExternalContext();
+		if (ex.isPresent())
+			ex.get().beginWriting();
 		try {
 			res = node.jjtAccept(v, ec);
 		}
 		finally {
-			if (ex != null) ex.finishWriting();
+			if (ex.isPresent())
+				ex.get().finishWriting();
 		}
 		v.assertNoJumps(ec);
 		return res;
@@ -230,7 +234,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 						throw new ContinueClauseException(jumpLabel, ec);
 					default:
 						throw new EvaluationException(ec,
-								String.format(
+								NullUtil.format(
 										CmnCnst.Error.INVALID_JUMP_TYPE,
 										jumpType));
 					}
