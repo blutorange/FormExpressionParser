@@ -1,10 +1,20 @@
 package de.xima.fc.form.expression.impl;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.common.base.Optional;
+
 import de.xima.fc.form.expression.context.IExternalContextCommand;
 
 public abstract class AExternalContextCommand implements IExternalContextCommand {
+	@SuppressWarnings("unchecked") // We check the class beforehand.
 	@Override
-	public <T extends IExternalContextCommand> T castOrNull(Class<T> clazz) {
-		return this.getClass().isAssignableFrom(clazz) ? clazz.cast(this) : null;
+	@Nonnull
+	@ParametersAreNonnullByDefault // Optional factory method does not return null
+	public <T extends IExternalContextCommand> Optional<T> castTo(final Class<T> clazz) {
+		if (getClass().isAssignableFrom(clazz))
+			return Optional.of((T)this);
+		return Optional.absent();
 	}
 }

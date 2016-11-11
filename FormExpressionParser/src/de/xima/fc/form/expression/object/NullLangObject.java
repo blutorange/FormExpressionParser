@@ -54,7 +54,8 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
-	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+	public IFunction<NumberLangObject> expressionMethod(@Nonnull final EMethod method,
+			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		throw new NullObjectMethodException(method, ec);
 	}
 	@Override

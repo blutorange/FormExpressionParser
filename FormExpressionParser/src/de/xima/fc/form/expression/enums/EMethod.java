@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * Method names for operators internal to the language.
@@ -93,8 +94,8 @@ public enum EMethod {
 	SWITCHCLAUSE(CmnCnst.EMETHOD_SWITCHCLAUSE),
 	;
 
-	public final String methodName;
-	private EMethod(final String name) {
+	@Nonnull public final String methodName;
+	private EMethod(@Nonnull final String name) {
 		this.methodName = name;
 	}
 
@@ -122,7 +123,7 @@ public enum EMethod {
 		case CIRCUMFLEX_EQUAL: return EMethod.CIRCUMFLEX;
 		//$CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, String.format(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
+			throw new UncatchableEvaluationException(ec, NullUtil.format(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
 		}
 	}
 
@@ -137,7 +138,7 @@ public enum EMethod {
 		case EXCLAMATION_TILDE: return EMethod.EQUAL_TILDE;
 		//$CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, String.format(CmnCnst.Error.INVALID_COMPARISON_METHOD, this));
+			throw new UncatchableEvaluationException(ec, NullUtil.format(CmnCnst.Error.INVALID_COMPARISON_METHOD, this));
 		}
 	}
 

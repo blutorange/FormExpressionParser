@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -11,15 +12,15 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTLosNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	private String text = CmnCnst.EMPTY_STRING;
-	private String open;
+	@Nullable private String text;
+	@Nullable private String open;
 	private boolean hasClose;
 
-	public ASTLosNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTLosNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	public void init(final EMethod method, final String text, final String open, final boolean hasClose) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String text, @Nullable final String open, final boolean hasClose) throws ParseException {
 		assertChildrenExactly(0);
 		super.init(method);
 		this.text = text;
@@ -44,8 +45,9 @@ public class ASTLosNode extends SimpleNode {
 		return text != null;
 	}
 
+	@Nonnull
 	public String getOpen() {
-		return open;
+		return open != null ? open : CmnCnst.EMPTY_STRING;
 	}
 
 	@Override

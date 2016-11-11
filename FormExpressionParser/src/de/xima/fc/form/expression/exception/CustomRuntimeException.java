@@ -2,8 +2,11 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * This exception is thrown by a throw block .
@@ -12,8 +15,8 @@ public class CustomRuntimeException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 
-	public CustomRuntimeException(final String message, final IEvaluationContext ec) {
-		super(ec, String.format(CmnCnst.Error.CUSTOM_RUNTIME_EXCEPTION,message));
+	public CustomRuntimeException(@Nonnull final String message, @Nonnull final IEvaluationContext ec) {
+		super(ec, NullUtil.format(CmnCnst.Error.CUSTOM_RUNTIME_EXCEPTION,message));
 		this.message = message;
 	}
 

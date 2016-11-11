@@ -79,7 +79,7 @@ public final class TestUtil {
 					exception.printStackTrace();
 					msg = String.format(
 							"Code was expected to throw an Exception of type %s, but it threw %s.",
-							test.getExpectedException());
+							test.getExpectedException(), exception);
 				}
 				else if (test.getErrorBegin() != null) {
 					String em = exception.getMessage();

@@ -72,6 +72,7 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class EvaluateVisitor
 implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
@@ -123,7 +124,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 		jumpLabel = null;
 	}
 
-	private void assertNoJumps(final IEvaluationContext ec) throws UncatchableEvaluationException {
+	private void assertNoJumps(@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
 		if (mustJump) {
 			switch (jumpType) {
 			case BREAK:
@@ -133,7 +134,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			case RETURN:
 				throw new ReturnClauseException(ec);
 			default:
-				throw new UncatchableEvaluationException(ec, String.format(
+				throw new UncatchableEvaluationException(ec, NullUtil.format(
 						CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
 			}
 		}
@@ -154,7 +155,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	}
 
 	@Nonnull
-	private static ALangObject setVariable(@Nullable final ASTVariableNode var, @Nonnull final ALangObject val, final IEvaluationContext ec) {
+	private static ALangObject setVariable(@Nullable final ASTVariableNode var, @Nonnull final ALangObject val, @Nonnull final IEvaluationContext ec) {
 		if (var == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE);
 		final String scope = var.getScope();
@@ -238,7 +239,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						String.format(
+						NullUtil.format(
 								CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION,
 								n.getSiblingMethod()));
 			}
@@ -271,7 +272,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			final Node last = prop.getLastChild();
 			if (last == null)
 				throw new UncatchableEvaluationException(ec,
-						String.format(
+						NullUtil.format(
 								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 								null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
@@ -302,7 +303,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						String.format(
+						NullUtil.format(
 								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 								last.getSiblingMethod(), node.getClass().getSimpleName()));
 			}
@@ -310,7 +311,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			// $CASES-OMITTED$
 		default:
 			throw new UncatchableEvaluationException(ec,
-					String.format(
+					NullUtil.format(
 							CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 							child.getSiblingMethod(), node.getClass().getSimpleName()));
 		}
@@ -338,7 +339,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			final Node last = prop.getLastChild();
 			if (last == null)
 				throw new UncatchableEvaluationException(ec,
-						String.format(
+						NullUtil.format(
 								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 								null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
@@ -365,7 +366,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						String.format(
+						NullUtil.format(
 								CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 								last.getSiblingMethod(), node.getClass().getSimpleName()));
 			}
@@ -373,7 +374,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			// $CASES-OMITTED$
 		default:
 			throw new UncatchableEvaluationException(ec,
-					String.format(
+					NullUtil.format(
 							CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 							child.getSiblingMethod(), node.getClass().getSimpleName()));
 		}
@@ -696,7 +697,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 					//$CASES-OMITTED$
 				default:
 					throw new UncatchableEvaluationException(ec,
-							String.format(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, children[i].getSiblingMethod()));
+							NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, children[i].getSiblingMethod()));
 				}
 			}
 		}
@@ -766,7 +767,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			break;
 		default:
 			throw new UncatchableEvaluationException(ec,
-					String.format(CmnCnst.Error.ILLEGAL_ENUM_LOGLEVEL, node.getLogLevel()));
+					NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_LOGLEVEL, node.getLogLevel()));
 		}
 		return message;
 	}
@@ -922,7 +923,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				//$CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						String.format(CmnCnst.Error.ILLEGAL_ENUM_EQUAL,	childrenArray[i].getSiblingMethod()));
+						NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_EQUAL,	childrenArray[i].getSiblingMethod()));
 			}
 		}
 		return res;

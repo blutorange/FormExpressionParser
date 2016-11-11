@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
 
@@ -10,18 +12,18 @@ import de.xima.fc.form.expression.context.IExternalContext;
 public class CatchableEvaluationException extends EvaluationException {
 	private static final long serialVersionUID = 1L;
 
-	public CatchableEvaluationException(final IEvaluationContext ec) {
+	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec) {
 		super(ec);
 	}
-	public CatchableEvaluationException(final IEvaluationContext ec, final String msg) {
+	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
 		super(ec, msg);
 	}
 
-	public CatchableEvaluationException(final IExternalContext externalContext, final String msg, final Throwable throwable) {
+	public CatchableEvaluationException(@Nonnull final IExternalContext externalContext, @Nonnull final String msg, @Nonnull final Throwable throwable) {
 		super(externalContext, msg, throwable);
 	}
 
-	public CatchableEvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
+	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg, @Nonnull final Throwable throwable) {
 		super(ec, msg, throwable);
 	}
 

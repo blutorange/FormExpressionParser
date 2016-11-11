@@ -3,6 +3,9 @@ package de.xima.fc.form.expression.impl;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -15,6 +18,7 @@ import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * <b>Not thread-safe!</b>
@@ -32,6 +36,7 @@ public class GenericScope implements IScope {
 		this.custom = custom;
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public ALangObject getVariable(final String scope, final String name, final IEvaluationContext ec)
 			throws EvaluationException {
@@ -52,8 +57,8 @@ public class GenericScope implements IScope {
 	}
 
 	public final static class Builder {
-		private MultiKeyMap<String, ALangObject> map;
-		private com.google.common.collect.ImmutableMap.Builder<String, ICustomScope> custom;
+		@Nullable private MultiKeyMap<String, ALangObject> map;
+		@Nullable private com.google.common.collect.ImmutableMap.Builder<String, ICustomScope> custom;
 		private boolean useCustomScope = false;
 		private final int initialSize;
 
@@ -61,6 +66,7 @@ public class GenericScope implements IScope {
 			this(16);
 		}
 
+		@Nonnull
 		public Builder(final int initialSize) {
 			this.initialSize = initialSize;
 			init();
@@ -72,25 +78,30 @@ public class GenericScope implements IScope {
 			useCustomScope = false;
 		}
 
+		@Nonnull
 		private MultiKeyMap<String, ALangObject> getMap() {
-			if (map == null)
-				map = MultiKeyMap.multiKeyMap(new HashedMap<MultiKey<? extends String>, ALangObject>(initialSize));
-			return map;
+			if (map != null)
+				return map;
+			return map = NullUtil.checkNotNull(
+					MultiKeyMap.multiKeyMap(new HashedMap<MultiKey<? extends String>, ALangObject>(initialSize)));
 		}
 
+		@Nonnull
 		private com.google.common.collect.ImmutableMap.Builder<String, ICustomScope> getCustom() {
-			if (custom == null)
-				custom = new com.google.common.collect.ImmutableMap.Builder<>();
-			return custom;
+			if (custom != null)
+				return custom;
+			return custom = new com.google.common.collect.ImmutableMap.Builder<>();
 		}
 
-		public Builder addObjects(final String scope, final Map<String, ALangObject> objects) {
+		@Nonnull
+		public Builder addObjects(@Nonnull final String scope, @Nonnull final Map<String, ALangObject> objects) {
 			for (final Entry<String, ALangObject> entry : objects.entrySet())
 				getMap().put(scope, entry.getKey(), entry.getValue());
 			return this;
 		}
 
-		public Builder addCustomScope(final ICustomScope customScope) {
+		@Nonnull
+		public Builder addCustomScope(@Nullable final ICustomScope customScope) {
 			if (customScope == null)
 				return this;
 			useCustomScope = true;
@@ -98,6 +109,7 @@ public class GenericScope implements IScope {
 			return this;
 		}
 
+		@Nonnull
 		public IScope build() {
 			final IScope scope = new GenericScope(getMap(), useCustomScope ? getCustom().build() : null);
 			init();
@@ -105,10 +117,12 @@ public class GenericScope implements IScope {
 		}
 	}
 
+	@Nonnull
 	public static IScope getNewEmptyScope() {
 		return getNewEmptyScope(16);
 	}
 
+	@Nonnull
 	public static IScope getNewEmptyScope(final int initialSize) {
 		final MultiKeyMap<String, ALangObject> map = MultiKeyMap
 				.multiKeyMap(new HashedMap<MultiKey<? extends String>, ALangObject>(initialSize));

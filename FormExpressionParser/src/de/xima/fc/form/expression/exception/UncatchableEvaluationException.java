@@ -1,27 +1,32 @@
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 
 /**
- * An evaluation exception that cannot be caught by the program itself via try-catch-clauses.
+ * An evaluation exception that cannot be caught by the program itself via
+ * try-catch-clauses.
+ *
  * @author awa
  */
 public class UncatchableEvaluationException extends EvaluationException {
 	private static final long serialVersionUID = 1L;
 
-	public UncatchableEvaluationException(final IEvaluationContext ec) {
+	public UncatchableEvaluationException(@Nonnull final IEvaluationContext ec) {
 		super(ec);
 	}
 
-	public UncatchableEvaluationException(final IEvaluationContext ec, final String msg) {
+	public UncatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
 		super(ec, msg);
 	}
 
-	protected UncatchableEvaluationException(final String msg, final Throwable throwable) {
+	protected UncatchableEvaluationException(@Nonnull final String msg, @Nonnull final Throwable throwable) {
 		super(msg, throwable);
 	}
 
-	public UncatchableEvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
+	public UncatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg,
+			@Nonnull final Throwable throwable) {
 		super(ec, msg, throwable);
 	}
 }

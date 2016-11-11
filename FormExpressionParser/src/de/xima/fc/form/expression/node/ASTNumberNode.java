@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -10,7 +13,7 @@ public class ASTNumberNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 	private double doubleValue;
 
-	public ASTNumberNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTNumberNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -18,7 +21,8 @@ public class ASTNumberNode extends SimpleNode {
 	 * @param string String representing the number.
 	 * @param isInt Whether it is an integer or float.
 	 */
-	public void init(final EMethod method, final String string, final boolean isInt) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String string, final boolean isInt) throws ParseException {
+		assertChildrenExactly(0);
 		try {
 			doubleValue = Double.parseDouble(string);
 		}

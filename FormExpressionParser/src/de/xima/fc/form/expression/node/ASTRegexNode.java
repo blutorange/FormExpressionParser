@@ -3,31 +3,36 @@ package de.xima.fc.form.expression.node;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.google.common.base.Preconditions;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTRegexNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	private Pattern pattern;
+	@Nonnull private Pattern pattern = CmnCnst.EMPTY_PATTERN;
 
-	public ASTRegexNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTRegexNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	public void init(final EMethod method, final String regex) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nonnull final String regex) throws ParseException {
 		assertChildrenExactly(0);
-		if (regex == null)
-			throw new ParseException(CmnCnst.Error.NODE_NULL_REGEX);
+		Preconditions.checkNotNull(regex, new ParseException(CmnCnst.Error.NODE_NULL_REGEX));
 		if (regex.length() < 2)
 			throw new ParseException(String.format(CmnCnst.Error.NODE_IMPROPER_REGEX_TERMINATION, regex));
 		super.init(method);
 		final int lastHash = regex.lastIndexOf('#');
 		try {
-			pattern = Pattern.compile(regex.substring(1, lastHash), flags(regex, lastHash+1));
+			pattern = NullUtil.checkNotNull(Pattern.compile(regex.substring(1, lastHash), flags(regex, lastHash+1)));
 		}
 		catch (final PatternSyntaxException e) {
 			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_REGEX,
@@ -45,11 +50,12 @@ public class ASTRegexNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
+	@Nonnull
 	public Pattern getPattern() {
 		return pattern;
 	}
 
-	private static int flags(final String flagString, final int beginIndex) {
+	private static int flags(@Nonnull final String flagString, final int beginIndex) {
 		final int len = flagString.length();
 		int flags = 0;
 		for (int i = beginIndex; i < len; ++i) {

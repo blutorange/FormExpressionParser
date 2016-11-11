@@ -8,6 +8,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
@@ -48,6 +49,7 @@ public class FunctionLangObject extends ALangObject {
 		this.value = value;
 	}
 
+	@Nonnull
 	public IFunction<ALangObject> functionValue() {
 		return value;
 	}
@@ -83,8 +85,8 @@ public class FunctionLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return new StringBuilder().append(CmnCnst.ToString.INSPECT_FUNCTION_LANG_OBJECT).append('(')
-				.append(value.getDeclaredName()).append(')').toString();
+		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_FUNCTION_LANG_OBJECT).append('(')
+				.append(value.getDeclaredName()).append(')'));
 	}
 
 	@Override

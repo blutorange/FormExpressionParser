@@ -1,8 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.StringUtils;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
@@ -12,6 +11,7 @@ import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class ExceptionLangObject extends ALangObject {
 
@@ -41,8 +41,8 @@ public class ExceptionLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return new StringBuilder().append(CmnCnst.ToString.INSPECT_EXCEPTION_LANG_OBJECT).append('(')
-				.append(value.getMessage()).append(')').toString();
+		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_EXCEPTION_LANG_OBJECT).append('(')
+				.append(value.getMessage()).append(')'));
 	}
 
 	@Override
@@ -108,19 +108,23 @@ public class ExceptionLangObject extends ALangObject {
 		return this;
 	}
 
+	@Nonnull
 	public EvaluationException exceptionValue() {
 		return value;
 	}
 
 	@Nonnull
-	public static ExceptionLangObject create(final CatchableEvaluationException value, final IEvaluationContext ec) {
-		if (value == null || value.getMessage() == null) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
+	public static ExceptionLangObject create(@Nullable final CatchableEvaluationException value,
+			@Nonnull final IEvaluationContext ec) {
+		if (value == null || value.getMessage() == null)
+			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.EMPTY_STRING, ec));
 		return new ExceptionLangObject(value);
 	}
 
 	@Nonnull
-	public static ExceptionLangObject create(final String message, final IEvaluationContext ec) {
-		if (message == null) return new ExceptionLangObject(new CustomRuntimeException(StringUtils.EMPTY, ec));
+	public static ExceptionLangObject create(@Nullable final String message, @Nonnull final IEvaluationContext ec) {
+		if (message == null)
+			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.EMPTY_STRING, ec));
 		return new ExceptionLangObject(new CustomRuntimeException(message, ec));
 	}
 }

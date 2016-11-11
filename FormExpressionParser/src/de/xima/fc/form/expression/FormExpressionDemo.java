@@ -3,7 +3,6 @@ package de.xima.fc.form.expression;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 
 import javax.annotation.Nonnull;
 
@@ -30,9 +29,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  * - optional variable types
  */
 public class FormExpressionDemo {
-
-	private static Writer writer;
-
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
 		if (code == null)
@@ -57,15 +53,6 @@ public class FormExpressionDemo {
 
 		showEvaluatedResult(expression);
 
-		if (writer != null)
-			try {
-				writer.write('\n');
-				writer.flush();
-				writer.close();
-			}
-		catch (final IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private static String readArgs(final String[] args) {

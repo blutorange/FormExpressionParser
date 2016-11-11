@@ -10,17 +10,13 @@ import de.xima.fc.form.expression.util.CmnCnst;
  * @author madgaksha
  *
  */
-public class DummyEmbedment implements IEmbedment {
-	private final static class InstanceHolder {
-		public final static DummyEmbedment INSTANCE = new DummyEmbedment();
-	}
+public enum DummyEmbedment implements IEmbedment {
+	INSTANCE;
+
 	@Override
 	public void reset() {
 	}
 
-	public static IEmbedment getInstance() {
-		return InstanceHolder.INSTANCE;
-	}
 	@Override
 	public void setCurrentEmbedment(final String name) {
 	}

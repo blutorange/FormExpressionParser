@@ -16,6 +16,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class ArrayLangObject extends ALangObject {
 
@@ -127,7 +128,7 @@ public class ArrayLangObject extends ALangObject {
 		for (final ALangObject o : value) sb.append(o.inspect()).append(',');
 		if (sb.length() > 16) sb.setLength(sb.length()-1);
 		sb.append(']');
-		return sb.toString();
+		return NullUtil.toString(sb);
 	}
 
 	@Override

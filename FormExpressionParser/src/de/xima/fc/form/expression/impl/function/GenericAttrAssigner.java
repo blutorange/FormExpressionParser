@@ -22,6 +22,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * A set of generic attribute assigners for object. Each object has got a
@@ -75,7 +76,7 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
 			if (((BooleanLangObject) args[1]).booleanValue())
-				throw new NoSuchAttrAccessorException(args[0].toString(), true, ec);
+				throw new NoSuchAttrAccessorException(NullUtil.toString(args[0]), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue(ec);
 			final int len = thisContext.length();
 			if (index >= len || index < -len)
@@ -117,8 +118,8 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAssigner<RegexLangObject>(
-			Type.REGEX, "genericAttrAssignerRegex", null) { //$NON-NLS-1$
+	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAssigner<RegexLangObject>(Type.REGEX,
+			"genericAttrAssignerRegex", null) { //$NON-NLS-1$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -174,12 +175,17 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 		}
 	};
 
-	@Nonnull private final String name;
-	@Nonnull private final String[] argList;
-	@Nullable private final String varArgsName;
-	@Nonnull private final Type type;
+	@Nonnull
+	private final String name;
+	@Nonnull
+	private final String[] argList;
+	@Nullable
+	private final String varArgsName;
+	@Nonnull
+	private final Type type;
 
-	private GenericAttrAssigner(@Nonnull final Type type, @Nonnull final String name, @Nullable final String varArgsName, @Nonnull final String... argList) {
+	private GenericAttrAssigner(@Nonnull final Type type, @Nonnull final String name,
+			@Nullable final String varArgsName, @Nonnull final String... argList) {
 		this.type = type;
 		this.name = name;
 		this.argList = argList;

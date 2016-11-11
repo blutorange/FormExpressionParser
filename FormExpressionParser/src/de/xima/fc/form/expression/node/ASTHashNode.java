@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -8,7 +10,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTHashNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTHashNode(final FormExpressionParser parser, final int id) {
+	public ASTHashNode(@Nonnull final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 

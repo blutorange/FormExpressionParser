@@ -39,7 +39,7 @@ public interface Node extends Serializable, ITraceElement {
 	 * children.
 	 * @throws ParseException
 	 */
-	public void jjtAddChild(Node n, int i) throws IndexOutOfBoundsException;
+	public void jjtAddChild(@Nonnull Node n, int i);
 
 	/**
 	 * This method returns a child node. The children are numbered from zero,
@@ -95,6 +95,9 @@ public interface Node extends Serializable, ITraceElement {
 	 * @throws ParseException When the number of children is not inside the specified range.
 	 */
 	public void assertChildrenBetween(final int atLeast, final int atMost) throws ParseException;
+
+	@Nonnull
+	public <T> T assertNonNull(@Nullable T param, @Nonnull String errorMessage) throws ParseException;
 
 	/**
 	 * @param count The number of children this node must have.

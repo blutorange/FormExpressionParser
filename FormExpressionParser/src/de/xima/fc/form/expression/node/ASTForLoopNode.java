@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -11,9 +14,9 @@ public class ASTForLoopNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 	private String iteratingLoopVariable;
 
-	private String label;
+	@Nullable private String label;
 
-	public ASTForLoopNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTForLoopNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -22,13 +25,14 @@ public class ASTForLoopNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final EMethod method, final String iteratingLoopVariable, final String label) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String iteratingLoopVariable, @Nullable final String label) throws ParseException {
 		assertChildrenExactly(iteratingLoopVariable != null ? 2 : 4);
 		super.init(method);
 		this.iteratingLoopVariable = iteratingLoopVariable;
 		this.label = label;
 	}
 
+	@Nullable
 	public String getIteratingLoopVariable() {
 		return iteratingLoopVariable;
 	}
@@ -44,6 +48,7 @@ public class ASTForLoopNode extends SimpleNode {
 		return iteratingLoopVariable != null ? CmnCnst.NAME_FOR_ITERATING_NODE : CmnCnst.NAME_FOR_PLAIN_NODE;
 	}
 
+	@Nullable
 	public String getLabel() {
 		return label;
 	}

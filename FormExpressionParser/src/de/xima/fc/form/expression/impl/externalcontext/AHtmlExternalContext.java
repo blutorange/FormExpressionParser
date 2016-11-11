@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.base.Optional;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.IExternalContextCommand;
@@ -67,9 +69,9 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 	public void process(final IExternalContextCommand command, final IEvaluationContext ec) {
 		if (docCommandList == null)
 			docCommandList = new ArrayList<>();
-		final DocumentCommand docCommand = command.castOrNull(DocumentCommand.class);
-		if (docCommand != null)
-			docCommandList.add(new PositionedDocumentCommand(docCommand, builder.length(), ++priority));
+		final Optional<DocumentCommand> docCommand = command.castTo(DocumentCommand.class);
+		if (docCommand.isPresent())
+			docCommandList.add(new PositionedDocumentCommand(docCommand.get(), builder.length(), ++priority));
 		else
 			ec.getLogger().info(String.format(CmnCnst.Error.UNKNOWN_COMMAND_FOR_HTML_CONTEXT,
 					command.getClass().getCanonicalName(), command));

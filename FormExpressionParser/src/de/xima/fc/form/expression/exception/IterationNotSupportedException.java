@@ -2,9 +2,12 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * This exception is thrown when an object is coerced to another type
@@ -15,8 +18,8 @@ public class IterationNotSupportedException extends CatchableEvaluationException
 
 	private static final long serialVersionUID = 1L;
 
-	public IterationNotSupportedException(final ALangObject thisContext, final IEvaluationContext ec) {
-		super(ec, String.format(CmnCnst.Error.ITERATION_NOT_SUPPORTED, thisContext.toString(), thisContext.getType()));
+	public IterationNotSupportedException(@Nonnull final ALangObject thisContext, @Nonnull final IEvaluationContext ec) {
+		super(ec, NullUtil.format(CmnCnst.Error.ITERATION_NOT_SUPPORTED, thisContext.toString(), thisContext.getType()));
 		this.thisContext = thisContext;
 	}
 

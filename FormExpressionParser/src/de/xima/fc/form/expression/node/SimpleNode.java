@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public abstract class SimpleNode implements Node {
 	private static final long serialVersionUID = 1L;
@@ -49,7 +50,7 @@ public abstract class SimpleNode implements Node {
 	 * @param nodeId
 	 *            Node id. Not needed (yet).
 	 */
-	public SimpleNode(final FormExpressionParser parser, final int nodeId) {
+	public SimpleNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
@@ -96,8 +97,7 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public void jjtAddChild(final Node n, final int i) throws IndexOutOfBoundsException {
-		if (n == null) throw new IndexOutOfBoundsException(CmnCnst.Error.NULL_CHILD_NODE);
+	public void jjtAddChild(@Nonnull final Node n, final int i) {
 		if (i >= children.length) {
 			final Node c[] = new Node[i + 1];
 			System.arraycopy(children, 0, c, 0, children.length);
@@ -330,11 +330,12 @@ public abstract class SimpleNode implements Node {
 	 * @param sb
 	 *            String builder to use.
 	 */
-	protected void additionalToStringFields(final StringBuilder sb) {
+	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
 	}
 
+	@Nonnull
 	protected String nodeName() {
-		return getClass().getSimpleName();
+		return NullUtil.checkNotNull(getClass().getSimpleName());
 	}
 
 	/**
@@ -367,7 +368,16 @@ public abstract class SimpleNode implements Node {
 		}
 	}
 
-	public void init(final EMethod method) throws ParseException {
+	public void init(@Nullable final EMethod method) throws ParseException {
 		this.siblingMethod = method;
 	}
+
+	@Override
+	@Nonnull
+	public <T> T assertNonNull(@Nullable final T object, @Nonnull final String errMessage) throws ParseException {
+		if (object == null)
+			throw new ParseException(errMessage);
+		return object;
+	}
+
 }

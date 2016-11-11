@@ -21,6 +21,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * A set of generic attribute accessors for elements. Each object has got a
@@ -44,119 +45,160 @@ import de.xima.fc.form.expression.object.StringLangObject;
  */
 public abstract class GenericAttrAccessor<T extends ALangObject> implements IFunction<T> {
 	/**
-	 * @param index {@link NumberLangObject} The index of the character to get from the string. May be negative to address elements from the end of the array, eg. <code>-1</code> for the last element.
+	 * @param index
+	 *            {@link NumberLangObject} The index of the character to get
+	 *            from the string. May be negative to address elements from the
+	 *            end of the array, eg. <code>-1</code> for the last element.
 	 * @return {@link StringLangObject}. The character at the given position.
-	 * @NullLangObject When there is no element at the given position, ie. either when <code>index&gt;=string.length</code> or <code>index &lt; -string.length</code>.
-	 * @throws MathException When the index is too large or too small to be represented as an <code>int</code>.
+	 * @NullLangObject When there is no element at the given position, ie.
+	 *                 either when <code>index&gt;=string.length</code> or
+	 *                 <code>index &lt; -string.length</code>.
+	 * @throws MathException
+	 *             When the index is too large or too small to be represented as
+	 *             an <code>int</code>.
 	 */
 	public final static IFunction<StringLangObject> STRING = new GenericAttrAccessor<StringLangObject>(Type.STRING,
 			"genericAttrAccessorString", null, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
-				throws EvaluationException, MathException {
-			if (((BooleanLangObject)args[1]).booleanValue()) throw new NoSuchAttrAccessorException(args[0].toString(), true, ec);
+		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+				final ALangObject... args) throws EvaluationException, MathException {
+			if (((BooleanLangObject) args[1]).booleanValue())
+				throw new NoSuchAttrAccessorException(NullUtil.toString(args[0]), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue(ec);
 			final int len = thisContext.length();
-			if (index >= len || index < -len) return NullLangObject.getInstance();
-			return StringLangObject.create(thisContext.stringValue().charAt(index < 0 ? index+len : index));
+			if (index >= len || index < -len)
+				return NullLangObject.getInstance();
+			return StringLangObject.create(thisContext.stringValue().charAt(index < 0 ? index + len : index));
 		}
 	};
 
 	/**
-	 * @param index {@link NumberLangObject} The index of the character to get from the array. May be negative to address elements from the end of the array, eg. <code>-1</code> for the last element.
+	 * @param index
+	 *            {@link NumberLangObject} The index of the character to get
+	 *            from the array. May be negative to address elements from the
+	 *            end of the array, eg. <code>-1</code> for the last element.
 	 * @return {@link ALangObject}. The element at the given position.
-	 * @NullLangObject When there is no element at the given position, ie. either when <code>index&gt;=string.length</code> or <code>index &lt; -string.length</code>.
-	 * @throws MathException When the index is too large or too small to be represented as an <code>int</code>.
+	 * @NullLangObject When there is no element at the given position, ie.
+	 *                 either when <code>index&gt;=string.length</code> or
+	 *                 <code>index &lt; -string.length</code>.
+	 * @throws MathException
+	 *             When the index is too large or too small to be represented as
+	 *             an <code>int</code>.
 	 */
 	public final static IFunction<ArrayLangObject> ARRAY = new GenericAttrAccessor<ArrayLangObject>(Type.ARRAY,
 			"genericAttrAccessorArray", null, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
-				throws EvaluationException, MathException {
-			if (((BooleanLangObject)args[1]).booleanValue()) throw new NoSuchAttrAccessorException(args[0].toString(),true, ec);
+		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
+				final ALangObject... args) throws EvaluationException, MathException {
+			if (((BooleanLangObject) args[1]).booleanValue())
+				throw new NoSuchAttrAccessorException(NullUtil.toString(args[0]), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue(ec);
 			final int len = thisContext.length();
-			if (index >= len || index < -len) throw new ArrayIndexOutOfBoundsException(thisContext, index, ec);
+			if (index >= len || index < -len)
+				throw new ArrayIndexOutOfBoundsException(thisContext, index, ec);
 			return thisContext.get(index < 0 ? index + len : index);
 		}
 	};
 
 	/**
-	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
+	 * @throws NoSuchAttrAccessorException
+	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<BooleanLangObject> BOOLEAN = new GenericAttrAccessor<BooleanLangObject>(Type.BOOLEAN,
 			"genericAttrAccessorBoolean", null) { //$NON-NLS-1$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, args[1].coerceBoolean(ec).booleanValue(), ec);
+		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
 		}
 	};
 
 	/**
-	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
+	 * @throws NoSuchAttrAccessorException
+	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAccessor<ExceptionLangObject>(Type.EXCEPTION,
-			"genericAttrAccessorException", null) { //$NON-NLS-1$
+	public final static IFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAccessor<ExceptionLangObject>(
+			Type.EXCEPTION, "genericAttrAccessorException", null) { //$NON-NLS-1$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, args[1].coerceBoolean(ec).booleanValue(), ec);		}
+		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
 	};
 
 	/**
-	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
+	 * @throws NoSuchAttrAccessorException
+	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAccessor<RegexLangObject>(Type.REGEX,
 			"genericAttrAccessorRegex", null) { //$NON-NLS-1$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, args[1].coerceBoolean(ec).booleanValue(), ec);		}
+		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
 	};
 
 	/**
-	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
+	 * @throws NoSuchAttrAccessorException
+	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<FunctionLangObject> FUNCTION = new GenericAttrAccessor<FunctionLangObject>(Type.FUNCTION,
-			"genericAttrAccessorFunction", null) { //$NON-NLS-1$
+	public final static IFunction<FunctionLangObject> FUNCTION = new GenericAttrAccessor<FunctionLangObject>(
+			Type.FUNCTION, "genericAttrAccessorFunction", null) { //$NON-NLS-1$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, args[1].coerceBoolean(ec).booleanValue(), ec);		}
+		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
 	};
 
 	/**
-	 * @throws NoSuchAttrAccessorException No generic attribute accessors.
+	 * @throws NoSuchAttrAccessorException
+	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<NumberLangObject> NUMBER = new GenericAttrAccessor<NumberLangObject>(Type.NUMBER,
 			"genericAttrAccessorNumber", null) { //$NON-NLS-1$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, args[1].coerceBoolean(ec).booleanValue(), ec);		}
+		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
 	};
 
 	/**
-	 * @param key {@link ALangObject} The key. When not specified, {@link NullLangObject} is assumed.
+	 * @param key
+	 *            {@link ALangObject} The key. When not specified,
+	 *            {@link NullLangObject} is assumed.
 	 * @return {@link ALangObject} The object that is mapped to the given key.
-	 * @NullLangObject When the map does not contain any value for the key, or the key is mapped to {@link NullLangObject}. Use {@link EAttrAccessorHash#contains} to check.
+	 * @NullLangObject When the map does not contain any value for the key, or
+	 *                 the key is mapped to {@link NullLangObject}. Use
+	 *                 {@link EAttrAccessorHash#contains} to check.
 	 */
 	public final static IFunction<HashLangObject> HASH = new GenericAttrAccessor<HashLangObject>(Type.HASH,
 			"genericAttrAccessorHash", null, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext, final ALangObject... args)
-				throws EvaluationException {
+		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
 			return thisContext.get(args[0]);
 		}
 	};
 
-	@Nonnull private final String name;
-	@Nonnull private final String[] argList;
-	@Nullable private final String varArgsName;
-	@Nonnull private final Type type;
+	@Nonnull
+	private final String name;
+	@Nonnull
+	private final String[] argList;
+	@Nullable
+	private final String varArgsName;
+	@Nonnull
+	private final Type type;
 
-	private GenericAttrAccessor(@Nonnull final Type type, @Nonnull final String name, @Nullable final String varArgsName, @Nonnull final String... argList) {
+	private GenericAttrAccessor(@Nonnull final Type type, @Nonnull final String name,
+			@Nullable final String varArgsName, @Nonnull final String... argList) {
 		this.type = type;
 		this.name = name;
 		this.argList = argList;

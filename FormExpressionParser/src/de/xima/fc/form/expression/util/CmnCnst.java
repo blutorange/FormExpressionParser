@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.util;
 
+import java.util.regex.Pattern;
+
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.grammar.Node;
@@ -158,6 +160,7 @@ public final class CmnCnst {
 	@Nonnull public static final String SYSTEM_LOGGER_FORMAT = "[%s] (%s) %s %s";
 	@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
 	@Nonnull public static final String EMPTY_STRING = "";
+	@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
 	@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 	@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
 

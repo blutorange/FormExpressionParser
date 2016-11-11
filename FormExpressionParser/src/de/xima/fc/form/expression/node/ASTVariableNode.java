@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTVariableNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTVariableNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTVariableNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -38,9 +38,9 @@ public class ASTVariableNode extends SimpleNode {
 		return scope != null;
 	}
 
-	public void init(final EMethod method, final String scope, final String name) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String scope, @Nonnull final String name) throws ParseException {
 		assertChildrenAtMost(1);
-		if (name == null) throw new ParseException(CmnCnst.Error.VARIABLE_NODE_NULL_NAME);
+		assertNonNull(name, CmnCnst.Error.VARIABLE_NODE_NULL_NAME);
 		super.init(method);
 		this.name =  name;
 		this.scope = scope;

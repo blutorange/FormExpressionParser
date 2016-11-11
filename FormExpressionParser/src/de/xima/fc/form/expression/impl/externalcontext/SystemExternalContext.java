@@ -1,11 +1,13 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
+import com.google.common.base.Optional;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.context.IExternalContextCommand;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
-import de.xima.fc.form.expression.impl.writer.SystemOutWriter;
+import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -27,7 +29,7 @@ public enum SystemExternalContext implements IExternalContext {
 
 	@Override
 	public void finishWriting() throws EmbedmentOutputException {
-		SystemOutWriter.getInstance().flush();
+		SystemWriter.getSystemOutInstance().flush();
 	}
 
 	@Override
@@ -40,9 +42,9 @@ public enum SystemExternalContext implements IExternalContext {
 
 	@Override
 	public void process(final IExternalContextCommand command, final IEvaluationContext ec) {
-		final ESystemOutCommand c = command.castOrNull(ESystemOutCommand.class);
-		if (c != null) {
-			switch (c) {
+		final Optional<ESystemOutCommand> c = command.castTo(ESystemOutCommand.class);
+		if (c.isPresent()) {
+			switch (c.get()) {
 			case DISABLE_OUTPUT:
 				outputDisabled = true;
 				break;
@@ -60,6 +62,6 @@ public enum SystemExternalContext implements IExternalContext {
 	}
 	@Override
 	public void beginWriting() throws EmbedmentOutputException {
-		SystemOutWriter.getInstance().flush();
+		SystemWriter.getSystemOutInstance().flush();
 	}
 }

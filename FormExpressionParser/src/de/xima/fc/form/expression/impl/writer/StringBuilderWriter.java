@@ -3,8 +3,10 @@ package de.xima.fc.form.expression.impl.writer;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.annotation.Nonnull;
+
 public class StringBuilderWriter extends Writer {
-	private final StringBuilder sb;
+	@Nonnull private final StringBuilder sb;
 
 	public StringBuilderWriter() {
 		sb = new StringBuilder();

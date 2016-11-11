@@ -2,6 +2,8 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -9,20 +11,24 @@ import de.xima.fc.form.expression.util.CmnCnst;
 public class NoSuchAttrAccessorException extends NoSuchFunctionException {
 	private static final long serialVersionUID = 1L;
 
-	public NoSuchAttrAccessorException(final String name, final IEvaluationContext ec) {
+	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final IEvaluationContext ec) {
 		super(CmnCnst.NAME_ATTRIBUTE_ACCESSOR, name, ec);
 	}
 
-	public NoSuchAttrAccessorException(final String name, final boolean accessedViaDot, final IEvaluationContext ec) {
+	public NoSuchAttrAccessorException(@Nonnull final String name, final boolean accessedViaDot,
+			@Nonnull final IEvaluationContext ec) {
 		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name, ec);
 	}
 
-	public NoSuchAttrAccessorException(final String name, final ALangObject thisContext, final IEvaluationContext ec) {
+	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final ALangObject thisContext,
+			@Nonnull final IEvaluationContext ec) {
 		super(CmnCnst.NAME_ATTRIBUTE_ACCESSOR, name, thisContext, ec);
 	}
 
-	public NoSuchAttrAccessorException(final String name, final ALangObject thisContext, final boolean accessedViaDot, final IEvaluationContext ec) {
-		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name, thisContext, ec);
+	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final ALangObject thisContext,
+			final boolean accessedViaDot, @Nonnull final IEvaluationContext ec) {
+		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name,
+				thisContext, ec);
 	}
 
 }

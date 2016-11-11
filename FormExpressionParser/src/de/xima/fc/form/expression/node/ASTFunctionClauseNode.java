@@ -13,7 +13,7 @@ public class ASTFunctionClauseNode extends SimpleNode {
 
 	@Nonnull private String functionName = CmnCnst.EMPTY_STRING;
 
-	public ASTFunctionClauseNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 

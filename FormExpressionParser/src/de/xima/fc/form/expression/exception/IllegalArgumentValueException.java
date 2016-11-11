@@ -2,10 +2,14 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * This exception is thrown when an object support the division
@@ -16,8 +20,10 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 
 	private static final long serialVersionUID = 1L;
 
-	public IllegalArgumentValueException(final IFunction<?> function, final String functionName, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
-		super(ec, String.format(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index, functionName, argument.inspect()));
+	public IllegalArgumentValueException(@Nullable final IFunction<?> function, @Nonnull final String functionName,
+			@Nonnull final ALangObject thisContext, @Nonnull final ALangObject argument, final int index,
+			@Nonnull final IEvaluationContext ec) {
+		super(ec, NullUtil.format(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index, functionName, argument.inspect()));
 		this.functionName = functionName;
 		this.thisContext = thisContext;
 		this.index = index;
@@ -25,17 +31,13 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 		this.function = function;
 	}
 
-	public IllegalArgumentValueException(final String functionName, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
-		this(null, functionName, thisContext, argument, index, ec);
-	}
-
-	public IllegalArgumentValueException(final IFunction<?> function, final ALangObject thisContext, final ALangObject argument, final int index, final IEvaluationContext ec) {
+	public IllegalArgumentValueException(@Nonnull final IFunction<?> function, @Nonnull final ALangObject thisContext, @Nonnull final ALangObject argument, final int index, @Nonnull final IEvaluationContext ec) {
 		this(function, function.getDeclaredName(), thisContext, argument, index, ec);
 	}
 
-	public final ALangObject thisContext;
-	public final ALangObject argument;
+	public final @Nonnull ALangObject thisContext;
+	public final @Nonnull ALangObject argument;
 	public final int index;
-	public final String functionName;
-	public final IFunction<?> function;
+	public final @Nonnull String functionName;
+	public final @Nullable IFunction<?> function;
 }

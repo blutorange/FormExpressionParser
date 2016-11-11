@@ -1,11 +1,14 @@
 package de.xima.fc.form.expression.highlight;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @Immutable
 public class Style {
@@ -27,7 +30,7 @@ public class Style {
 	public Style(final Color color, final Weight weight) {
 		this(color, weight, Size.DEFAULT);
 	}
-	public Style(Color color, Weight weight, Size size, final Feature... featureList) {
+	public Style(@Nullable Color color, @Nullable Weight weight, @Nullable Size size, @Nonnull final Feature... featureList) {
 		if (color == null) color = Color.BLACK;
 		if (size == null) size = Size.DEFAULT;
 		if (weight == null) weight = Weight.DEFAULT;
@@ -38,7 +41,7 @@ public class Style {
 			this.featureSet = ImmutableSet.of();
 		}
 		else {
-			this.featureSet = Sets.immutableEnumSet(featureList[0], featureList);
+			this.featureSet = Sets.immutableEnumSet(NullUtil.checkNotNull(featureList[0]), featureList);
 		}
 	}
 	@Override

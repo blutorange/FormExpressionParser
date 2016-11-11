@@ -2,9 +2,12 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * This exception is thrown when an object is coerced to another type
@@ -15,8 +18,8 @@ public class CoercionException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 
-	public CoercionException(final ALangObject from, final ALangObject.Type to, final IEvaluationContext ec) {
-		super(ec, String.format(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
+	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ALangObject.Type to, @Nonnull final IEvaluationContext ec) {
+		super(ec, NullUtil.format(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
 		this.from = from;
 		this.to = to;
 	}

@@ -2,6 +2,8 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 
@@ -12,7 +14,7 @@ public class DivisionByZeroException extends IllegalDividendException {
 
 	private static final long serialVersionUID = 1L;
 
-	public DivisionByZeroException(final ALangObject divisor, final ALangObject dividend, final int index, final IEvaluationContext ec) {
+	public DivisionByZeroException(@Nonnull final ALangObject divisor, @Nonnull final ALangObject dividend, final int index, @Nonnull final IEvaluationContext ec) {
 		super(divisor, dividend, index, ec);
 	}
 }

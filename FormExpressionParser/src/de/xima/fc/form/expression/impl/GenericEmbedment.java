@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import de.xima.fc.form.expression.context.IEmbedment;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
@@ -15,7 +17,6 @@ import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleFormcycle;
 import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleGeneral;
 import de.xima.fc.form.expression.util.CmnCnst;
-
 /**
  * Generic embedment allowing you to inject different implementations.
  * @author madgaksha
@@ -32,14 +33,19 @@ public class GenericEmbedment implements IEmbedment {
 	@Nullable
 	private String handlerEmbedment;
 
+	@SuppressWarnings("all")
 	private final static class InstanceHolder {
-		@Nonnull public final static GenericEmbedment GENERIC = new Builder()
-				.addHandler(EmbedmentHandlerBundleGeneral.values())
-				.build();
-		@Nonnull public final static GenericEmbedment FORMCYCLE = new Builder()
-				.addHandler(EmbedmentHandlerBundleGeneral.values())
-				.addHandler(EmbedmentHandlerBundleFormcycle.values())
-				.build();
+		@Nonnull public final static GenericEmbedment GENERIC;
+		@Nonnull public final static GenericEmbedment FORMCYCLE;
+		static {
+			GENERIC = new Builder()
+					.addHandler(EmbedmentHandlerBundleGeneral.values())
+					.build();
+			FORMCYCLE = new Builder()
+					.addHandler(EmbedmentHandlerBundleGeneral.values())
+					.addHandler(EmbedmentHandlerBundleFormcycle.values())
+					.build();
+		}
 	}
 
 	private GenericEmbedment(final ImmutableMap<String, IEmbedmentHandler> map) throws IllegalArgumentException {
@@ -59,26 +65,27 @@ public class GenericEmbedment implements IEmbedment {
 			if (map == null) map = new com.google.common.collect.ImmutableMap.Builder<>();
 			return map;
 		}
-		public Builder addHandler(final String name, final IEmbedmentHandler handler) {
-			if (handler!= null)
+		public Builder addHandler(@Nonnull final String name, @Nonnull final IEmbedmentHandler handler) {
+			getMap().put(checkNotNull(name), checkNotNull(handler));
+			return this;
+		}
+		@SuppressWarnings("null")
+		public Builder addHandler(@Nonnull final String name, @Nonnull final IEmbedmentHandler[] handlerList) {
+			checkNotNull(name);
+			checkNotNull(handlerList);
+			for (@Nonnull final IEmbedmentHandler handler : handlerList)
 				getMap().put(name, handler);
 			return this;
 		}
-		public Builder addHandler(final String name, final IEmbedmentHandler[] handlerList) {
-			if (handlerList != null)
-				for (final IEmbedmentHandler handler : handlerList)
-					getMap().put(name, handler);
+		public Builder addHandler(@Nonnull final IEmbedmentHandlerNamed handler) {
+			checkNotNull(handler);
+			getMap().put(handler.getEmbedmentName(), handler);
 			return this;
 		}
-		public Builder addHandler(final IEmbedmentHandlerNamed handler) {
-			if (handler != null)
+		public Builder addHandler(@Nonnull final IEmbedmentHandlerNamed[] handlerList) {
+			checkNotNull(handlerList);
+			for (final IEmbedmentHandlerNamed handler : handlerList)
 				getMap().put(handler.getEmbedmentName(), handler);
-			return this;
-		}
-		public Builder addHandler(final IEmbedmentHandlerNamed[] handlerList) {
-			if (handlerList != null)
-				for (final IEmbedmentHandlerNamed handler : handlerList)
-					getMap().put(handler.getEmbedmentName(), handler);
 			return this;
 		}
 		@Nonnull
@@ -94,6 +101,7 @@ public class GenericEmbedment implements IEmbedment {
 		currentEmbedment = embedment;
 	}
 
+	@Nullable
 	private IEmbedmentHandler getHandler() {
 		final String e = currentEmbedment;
 		if (e == null) return null;

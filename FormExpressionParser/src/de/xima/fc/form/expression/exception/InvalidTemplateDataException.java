@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 
 /**
@@ -10,7 +12,7 @@ import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 public class InvalidTemplateDataException extends UncatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
-	public InvalidTemplateDataException(final String msg, final Throwable throwable) {
+	public InvalidTemplateDataException(@Nonnull final String msg, @Nonnull final Throwable throwable) {
 		super(msg, throwable);
 	}
 }

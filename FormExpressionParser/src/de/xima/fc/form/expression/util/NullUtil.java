@@ -7,8 +7,19 @@ public class NullUtil {
 	private NullUtil() {}
 	@Nonnull
 	public static String toString(@Nullable final Object o) {
-		final String s = String.valueOf(o);
-		return s != null ? s : CmnCnst.EMPTY_STRING;
+		return checkNotNull(String.valueOf(o));
+	}
+
+	@Nonnull
+	public static <T> T checkNotNull(final T o) {
+		if (o == null)
+			throw new NullPointerException();
+		return o;
+	}
+
+	@Nonnull
+	public static String format(@Nonnull final String format, @Nonnull final Object... params) {
+		return checkNotNull(String.format(format, params));
 	}
 
 	public static void main(final String[] args) {

@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -11,15 +12,16 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTUnaryExpressionNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTUnaryExpressionNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTUnaryExpressionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
 	@Nonnull
 	private EMethod unaryMethod = EMethod.PLUS_UNARY;
 
-	public final void init(final EMethod method, @Nonnull final EMethod unary) throws ParseException {
+	public final void init(@Nullable final EMethod method, @Nonnull final EMethod unary) throws ParseException {
 		assertChildrenExactly(1);
+		assertNonNull(unary, CmnCnst.Error.NULL_METHOD);
 		if (unary.isAssigning())
 			assertChildrenAssignable(0, 1, CmnCnst.NAME_PREFIX_OPERATION);
 		super.init(method);

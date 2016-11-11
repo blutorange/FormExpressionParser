@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.ComparatorEntryByKey;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class HashLangObject extends ALangObject {
 
@@ -68,7 +69,7 @@ public class HashLangObject extends ALangObject {
 			sb.append(v.getKey().inspect()).append(':').append(v.getValue().inspect()).append(',');
 		if (sb.length() > 15) sb.setLength(sb.length()-1);
 		sb.append('}');
-		return sb.toString();
+		return NullUtil.toString(sb);
 	}
 
 

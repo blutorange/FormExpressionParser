@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.exception.MathException;
 import de.xima.fc.form.expression.exception.NumberTooLongForIntException;
 import de.xima.fc.form.expression.exception.NumberTooLongForLongException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * Number objects are immutable. Performing any operations on a number object
@@ -46,6 +47,8 @@ public class NumberLangObject extends ALangObject {
 		@Nonnull public final static NumberLangObject ZERO = NumberLangObject.create(0);
 		@Nonnull public final static NumberLangObject ONE = NumberLangObject.create(1);
 		@Nonnull public static final NumberLangObject FOURTY_TWO = NumberLangObject.create(42);
+		@Nonnull public static final NumberLangObject PI = NumberLangObject.create(Math.PI);
+		@Nonnull public static final NumberLangObject E = NumberLangObject.create(Math.E);
 	}
 
 	private NumberLangObject(final double value) {
@@ -57,13 +60,13 @@ public class NumberLangObject extends ALangObject {
 		return value;
 	}
 
-	public long longValue(final IEvaluationContext ec) throws MathException {
+	public long longValue(@Nonnull final IEvaluationContext ec) throws MathException {
 		if (Double.isNaN(value) || value > 9007199254740993f || value < -9007199254740993f)
 			throw new NumberTooLongForLongException(value, ec);
 		return (long) value;
 	}
 
-	public int intValue(final IEvaluationContext ec) throws MathException {
+	public int intValue(@Nonnull final IEvaluationContext ec) throws MathException {
 		if (Double.isNaN(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE)
 			throw new NumberTooLongForIntException(value, ec);
 		return (int) value;
@@ -215,7 +218,8 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('"').append(value).append(')').toString();
+		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('"')
+				.append(value).append(')'));
 	}
 
 	@Override
@@ -360,6 +364,16 @@ public class NumberLangObject extends ALangObject {
 		return InstanceHolder.FOURTY_TWO;
 	}
 
+	@Nonnull
+	public static ALangObject getPiInstance() {
+		return InstanceHolder.PI;
+	}
+
+	@Nonnull
+	public static ALangObject getEInstance() {
+		return InstanceHolder.E;
+	}
+
 	private class Itr implements NonNullIterator<ALangObject> {
 		private double i = 0.0;
 		@Override
@@ -377,4 +391,5 @@ public class NumberLangObject extends ALangObject {
 			throw new UnsupportedOperationException(CmnCnst.Error.NUMBER_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
 		}
 	}
+
 }

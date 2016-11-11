@@ -90,19 +90,6 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 		externalContext = null;
 	}
 
-	/**
-	 * To help you get started, use this method to acquire a new
-	 * basic evaluation context. Details are subject to change,
-	 * so this should only be used for testing purposes.
-	 * @return Some evaluation context.
-	 */
-	public static  IEvaluationContext getNewBasicEvaluationContext() {
-		final Builder b = new Builder();
-		b.setBinding(new OnDemandLookUpBinding());
-		b.setScope(GenericScope.getNewEmptyScope());
-		return b.build();
-	}
-
 	@Override
 	public void setExternalContext(final IExternalContext externalContext) {
 		this.externalContext = externalContext;
@@ -111,5 +98,19 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	@Override
 	public IExternalContext getExternalContext() {
 		return externalContext;
+	}
+
+	/**
+	 * To help you get started, use this method to acquire a new
+	 * basic evaluation context. Details are subject to change,
+	 * so this should only be used for testing purposes.
+	 * @return Some evaluation context.
+	 */
+	@Nonnull
+	public static IEvaluationContext getNewBasicEvaluationContext() {
+		final Builder b = new Builder();
+		b.setBinding(new OnDemandLookUpBinding());
+		b.setScope(GenericScope.getNewEmptyScope());
+		return b.build();
 	}
 }

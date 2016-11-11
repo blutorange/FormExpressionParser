@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -11,12 +14,12 @@ public class ASTBooleanNode extends SimpleNode {
 
 	private boolean booleanValue;
 
-	public ASTBooleanNode(final FormExpressionParser parser, final int id) {
+	public ASTBooleanNode(@Nonnull final FormExpressionParser parser, final int id) {
 		super(parser, id);
 	}
 
 	@Override
-	protected void additionalToStringFields(final StringBuilder sb) {
+	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
 		sb.append(booleanValue ? CmnCnst.ToString.BOOLEAN_TRUE : CmnCnst.ToString.BOOLEAN_FALSE).append(',');
 	}
 
@@ -25,7 +28,8 @@ public class ASTBooleanNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final EMethod method, final boolean b) throws ParseException {
+	public void init(@Nullable final EMethod method, final boolean b) throws ParseException {
+		assertChildrenExactly(0);
 		booleanValue = b;
 		super.init(method);
 	}

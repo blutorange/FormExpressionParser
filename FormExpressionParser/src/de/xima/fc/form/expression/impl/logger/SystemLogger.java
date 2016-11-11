@@ -12,8 +12,8 @@ import de.xima.fc.form.expression.util.CmnCnst;
 
 public class SystemLogger implements ILogger {
 
-	private final Level level;
-	private final String prefix;
+	@Nonnull private final Level level;
+	@Nonnull private final String prefix;
 
 	private static class InstanceHolder {
 		@Nonnull public final static SystemLogger ERROR = new SystemLogger(Level.ERROR, CmnCnst.NAME_SYSTEM_LOGGER);
@@ -36,11 +36,11 @@ public class SystemLogger implements ILogger {
 		}
 	}
 
-	public SystemLogger(final Level level) {
-		this(level, StringUtils.EMPTY);
+	public SystemLogger(@Nonnull final Level level) {
+		this(level, CmnCnst.EMPTY_STRING);
 	}
 
-	public SystemLogger(final Level level, final String prefix) {
+	public SystemLogger(@Nonnull final Level level, @Nonnull final String prefix) {
 		this.level = level;
 		this.prefix = prefix;
 	}
@@ -89,6 +89,7 @@ public class SystemLogger implements ILogger {
 		return InstanceHolder.INFO;
 	}
 
+	@Nonnull
 	private static String getCurrentDate() {
 		final Date now = new Date();
 		return DateFormat.getDateInstance().format(now) + StringUtils.SPACE + DateFormat.getTimeInstance().format(now);

@@ -2,6 +2,8 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package de.xima.fc.form.expression.exception;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -16,12 +18,12 @@ public class IllegalDividendException extends IllegalArgumentValueException {
 
 	private static final long serialVersionUID = 1L;
 
-	public IllegalDividendException(final ALangObject divisor, final ALangObject dividend, final int index, final IEvaluationContext ec) {
-		super(EMethod.SLASH.methodName, divisor, dividend, index, ec);
+	public IllegalDividendException(@Nonnull final ALangObject divisor, @Nonnull final ALangObject dividend, final int index, @Nonnull final IEvaluationContext ec) {
+		super(divisor.expressionMethod(EMethod.SLASH, ec), EMethod.SLASH.methodName, divisor, dividend, index, ec);
 		this.dividend = dividend;
 		this.divisor = divisor;
 	}
 
-	public final ALangObject divisor;
-	public final ALangObject dividend;
+	public final @Nonnull ALangObject divisor;
+	public final @Nonnull ALangObject dividend;
 }

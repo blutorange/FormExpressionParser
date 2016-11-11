@@ -85,7 +85,7 @@ public interface IBinding extends IReset {
 	 * must be undone.
 	 * @return The parent binding. Undefined behaviour when there is no such binding.
 	 */
-	public void unnest(IEvaluationContext ec);
+	public void unnest(@Nonnull IEvaluationContext ec);
 
 	/**
 	 * The limit on nesting. Each if-clause, loop, try-clause, switch,

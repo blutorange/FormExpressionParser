@@ -3,12 +3,15 @@ package de.xima.fc.form.expression.impl.externalcontext;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.impl.writer.SystemOutWriter;
+import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -41,7 +44,7 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 
 	public FormcycleExternalContext() {
 		// Write to stdout for debugging.
-		this.writer = SystemOutWriter.getInstance();
+		this.writer = SystemWriter.getSystemOutInstance();
 	}
 
 	public FormcycleExternalContext(final Writer writer) {
@@ -92,9 +95,10 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 	private final static ImmutableMap<String, ScopeImpl> scopeMap;
 	private static enum ScopeImpl {
 		FORM_FIELD {
+			@SuppressWarnings({ "null", "unused" })
 			@Override
 			public ALangObject fetch(final String name, final Object myObject) {
-				final String value = aliasMap.get(name);
+				@Nullable final String value = aliasMap.get(name);
 				if (value != null) return StringLangObject.create(value);
 				return StringLangObject.create(nameMap.get(name));
 			}
@@ -107,8 +111,9 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 				.build();
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec) {
+	public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name, @Nonnull final IEvaluationContext ec) {
 		final ScopeImpl s = scopeMap.get(scope);
 		return s != null ? s.fetch(name, null) : null;
 	}

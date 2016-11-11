@@ -1,14 +1,27 @@
 package de.xima.fc.form.expression.impl.contextcommand;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.common.base.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import de.xima.fc.form.expression.context.IExternalContextCommand;
 
 public enum ESystemOutCommand implements IExternalContextCommand {
 	DISABLE_OUTPUT,
 	ENABLE_OUTPUT;
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends IExternalContextCommand> T castOrNull(final Class<T> clazz) {
-		return this.getClass().isAssignableFrom(clazz) ? clazz.cast(this) : null;
+	@Nonnull
+	@ParametersAreNonnullByDefault
+	public <T extends IExternalContextCommand> Optional<T> castTo(@Nonnull final Class<T> clazz) {
+		checkNotNull(clazz);
+		if (getClass().isAssignableFrom(clazz))
+			return Optional.of((T)this);
+		return Optional.absent();
 	}
 
 	@Override

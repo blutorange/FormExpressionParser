@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -11,7 +12,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 public class ASTTryClauseNode extends SimpleNode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTTryClauseNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTTryClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -23,11 +24,10 @@ public class ASTTryClauseNode extends SimpleNode {
 		return visitor.visit(this, data);
 	}
 
-	public void init(final EMethod method, final String errorVariableName) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nonnull final String errorVariableName) throws ParseException {
 		assertChildrenExactly(2);
+		assertNonNull(errorVariableName, CmnCnst.Error.NULL_ERROR_VARIABLE_NAME);
 		super.init(method);
-		if (errorVariableName == null)
-			throw new ParseException(CmnCnst.Error.NULL_ERROR_VARIABLE_NAME);
 		this.errorVariableName = errorVariableName;
 	}
 

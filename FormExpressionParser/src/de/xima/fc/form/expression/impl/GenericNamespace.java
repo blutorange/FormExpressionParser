@@ -1,13 +1,15 @@
 package de.xima.fc.form.expression.impl;
-
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.context.IMethod2Function;
@@ -118,50 +120,50 @@ public class GenericNamespace implements INamespace {
 
 	public static class Builder {
 		private final static int FIELDS_TO_FILL = 5*8;
-		private EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString;
-		private EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray;
-		private EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
-		private EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber;
-		private EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash;
-		private EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
-		private EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
-		private EnumMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex;
+		@Nullable private EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString;
+		@Nullable private EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray;
+		@Nullable private EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean;
+		@Nullable private EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber;
+		@Nullable private EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash;
+		@Nullable private EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException;
+		@Nullable private EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction;
+		@Nullable private EnumMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex;
 
-		private Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString;
-		private Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray;
-		private Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean;
-		private Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber;
-		private Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash;
-		private Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException;
-		private Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction;
-		private Map<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex;
+		@Nullable private Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString;
+		@Nullable private Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray;
+		@Nullable private Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean;
+		@Nullable private Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber;
+		@Nullable private Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash;
+		@Nullable private Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException;
+		@Nullable private Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction;
+		@Nullable private Map<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex;
 
-		private Map<StringLangObject, IFunction<StringLangObject>> attrAssignerString;
-		private Map<StringLangObject, IFunction<ArrayLangObject>> attrAssignerArray;
-		private Map<StringLangObject, IFunction<BooleanLangObject>> attrAssignerBoolean;
-		private Map<StringLangObject, IFunction<NumberLangObject>> attrAssignerNumber;
-		private Map<StringLangObject, IFunction<HashLangObject>> attrAssignerHash;
-		private Map<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException;
-		private Map<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction;
-		private Map<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex;
+		@Nullable private Map<StringLangObject, IFunction<StringLangObject>> attrAssignerString;
+		@Nullable private Map<StringLangObject, IFunction<ArrayLangObject>> attrAssignerArray;
+		@Nullable private Map<StringLangObject, IFunction<BooleanLangObject>> attrAssignerBoolean;
+		@Nullable private Map<StringLangObject, IFunction<NumberLangObject>> attrAssignerNumber;
+		@Nullable private Map<StringLangObject, IFunction<HashLangObject>> attrAssignerHash;
+		@Nullable private Map<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException;
+		@Nullable private Map<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction;
+		@Nullable private Map<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex;
 
-		private IFunction<StringLangObject> genericAttrAccessorString;
-		private IFunction<NumberLangObject> genericAttrAccessorNumber;
-		private IFunction<BooleanLangObject> genericAttrAccessorBoolean;
-		private IFunction<ArrayLangObject> genericAttrAccessorArray;
-		private IFunction<HashLangObject> genericAttrAccessorHash;
-		private IFunction<FunctionLangObject> genericAttrAccessorFunction;
-		private IFunction<ExceptionLangObject> genericAttrAccessorException;
-		private IFunction<RegexLangObject> genericAttrAccessorRegex;
+		@Nullable private IFunction<StringLangObject> genericAttrAccessorString;
+		@Nullable private IFunction<NumberLangObject> genericAttrAccessorNumber;
+		@Nullable private IFunction<BooleanLangObject> genericAttrAccessorBoolean;
+		@Nullable private IFunction<ArrayLangObject> genericAttrAccessorArray;
+		@Nullable private IFunction<HashLangObject> genericAttrAccessorHash;
+		@Nullable private IFunction<FunctionLangObject> genericAttrAccessorFunction;
+		@Nullable private IFunction<ExceptionLangObject> genericAttrAccessorException;
+		@Nullable private IFunction<RegexLangObject> genericAttrAccessorRegex;
 
-		private IFunction<StringLangObject> genericAttrAssignerString;
-		private IFunction<NumberLangObject> genericAttrAssignerNumber;
-		private IFunction<BooleanLangObject> genericAttrAssignerBoolean;
-		private IFunction<ArrayLangObject> genericAttrAssignerArray;
-		private IFunction<HashLangObject> genericAttrAssignerHash;
-		private IFunction<FunctionLangObject> genericAttrAssignerFunction;
-		private IFunction<ExceptionLangObject> genericAttrAssignerException;
-		private IFunction<RegexLangObject> genericAttrAssignerRegex;
+		@Nullable private IFunction<StringLangObject> genericAttrAssignerString;
+		@Nullable private IFunction<NumberLangObject> genericAttrAssignerNumber;
+		@Nullable private IFunction<BooleanLangObject> genericAttrAssignerBoolean;
+		@Nullable private IFunction<ArrayLangObject> genericAttrAssignerArray;
+		@Nullable private IFunction<HashLangObject> genericAttrAssignerHash;
+		@Nullable private IFunction<FunctionLangObject> genericAttrAssignerFunction;
+		@Nullable private IFunction<ExceptionLangObject> genericAttrAssignerException;
+		@Nullable private IFunction<RegexLangObject> genericAttrAssignerRegex;
 
 		private int count = 0;
 
@@ -199,196 +201,232 @@ public class GenericNamespace implements INamespace {
 			return map;
 		}
 
+		@Nonnull
 		public final Builder addExpressionMethodString(final IMethod2Function<StringLangObject>[] m) {
 			expressionMethodString = addExpressionMethod(m, expressionMethodString);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodBoolean(final IMethod2Function<BooleanLangObject>[] m) {
 			expressionMethodBoolean = addExpressionMethod(m, expressionMethodBoolean);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodNumber(final IMethod2Function<NumberLangObject>[] m) {
 			expressionMethodNumber = addExpressionMethod(m, expressionMethodNumber);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodHash(final IMethod2Function<HashLangObject>[] m) {
 			expressionMethodHash = addExpressionMethod(m, expressionMethodHash);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodArray(final IMethod2Function<ArrayLangObject>[] m) {
 			expressionMethodArray = addExpressionMethod(m, expressionMethodArray);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodException(final IMethod2Function<ExceptionLangObject>[] m) {
 			expressionMethodException = addExpressionMethod(m, expressionMethodException);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodFunction(final IMethod2Function<FunctionLangObject>[] m) {
 			expressionMethodFunction = addExpressionMethod(m, expressionMethodFunction);
 			return this;
 		}
+		@Nonnull
 		public final Builder addExpressionMethodRegex(final IMethod2Function<RegexLangObject>[] m) {
 			expressionMethodRegex = addExpressionMethod(m, expressionMethodRegex);
 			return this;
 		}
-
+		@Nonnull
 		public final Builder addAttrAccessorString(final IFunction<StringLangObject>[] m) {
 			attrAccessorString = addAttrAccessor(m, attrAccessorString);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorFunction(final IFunction<FunctionLangObject>[] m) {
 			attrAccessorFunction = addAttrAccessor(m, attrAccessorFunction);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorBoolean(final IFunction<BooleanLangObject>[] m) {
 			attrAccessorBoolean = addAttrAccessor(m, attrAccessorBoolean);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorNumber(final IFunction<NumberLangObject>[] m) {
 			attrAccessorNumber = addAttrAccessor(m, attrAccessorNumber);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorHash(final IFunction<HashLangObject>[] m) {
 			attrAccessorHash = addAttrAccessor(m, attrAccessorHash);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorArray(final IFunction<ArrayLangObject>[] m) {
 			attrAccessorArray = addAttrAccessor(m, attrAccessorArray);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorException(final IFunction<ExceptionLangObject>[] m) {
 			attrAccessorException = addAttrAccessor(m, attrAccessorException);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAccessorRegex(final IFunction<RegexLangObject>[] m) {
 			attrAccessorRegex = addAttrAccessor(m, attrAccessorRegex);
 			return this;
 		}
-
+		@Nonnull
 		public final Builder addAttrAssignerString(final IFunction<StringLangObject>[] m) {
 			attrAssignerString = addAttrAssigner(m, attrAssignerString);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerFunction(final IFunction<FunctionLangObject>[] m) {
 			attrAssignerFunction = addAttrAssigner(m, attrAssignerFunction);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerBoolean(final IFunction<BooleanLangObject>[] m) {
 			attrAssignerBoolean = addAttrAssigner(m, attrAssignerBoolean);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerNumber(final IFunction<NumberLangObject>[] m) {
 			attrAssignerNumber = addAttrAssigner(m, attrAssignerNumber);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerHash(final IFunction<HashLangObject>[] m) {
 			attrAssignerHash = addAttrAssigner(m, attrAssignerHash);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerArray(final IFunction<ArrayLangObject>[] m) {
 			attrAssignerArray = addAttrAssigner(m, attrAssignerArray);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerException(final IFunction<ExceptionLangObject>[] m) {
 			attrAssignerException = addAttrAssigner(m, attrAssignerException);
 			return this;
 		}
+		@Nonnull
 		public final Builder addAttrAssignerRegex(final IFunction<RegexLangObject>[] m) {
 			attrAssignerRegex = addAttrAssigner(m, attrAssignerRegex);
 			return this;
 		}
-
+		@Nonnull
 		public final Builder setGenericAttrAccessorString(final IFunction<StringLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorString == null) ++ count;
 			genericAttrAccessorString = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorNumber(final IFunction<NumberLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorNumber == null) ++ count;
 			genericAttrAccessorNumber = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorBoolean(final IFunction<BooleanLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorBoolean == null) ++ count;
 			genericAttrAccessorBoolean = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorHash(final IFunction<HashLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorHash == null) ++ count;
 			genericAttrAccessorHash = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorArray(final IFunction<ArrayLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorArray == null) ++ count;
 			genericAttrAccessorArray = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorException(final IFunction<ExceptionLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorException == null) ++ count;
 			genericAttrAccessorException = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorFunction(final IFunction<FunctionLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorFunction == null) ++ count;
 			genericAttrAccessorFunction = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAccessorRegex(final IFunction<RegexLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAccessorRegex == null) ++ count;
 			genericAttrAccessorRegex = func;
 			return this;
 		}
-
+		@Nonnull
 		public final Builder setGenericAttrAssignerString(final IFunction<StringLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerString == null) ++ count;
 			genericAttrAssignerString = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerNumber(final IFunction<NumberLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerNumber == null) ++ count;
 			genericAttrAssignerNumber = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerBoolean(final IFunction<BooleanLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerBoolean == null) ++ count;
 			genericAttrAssignerBoolean = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerHash(final IFunction<HashLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerHash == null) ++ count;
 			genericAttrAssignerHash = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerArray(final IFunction<ArrayLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerArray == null) ++ count;
 			genericAttrAssignerArray = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerException(final IFunction<ExceptionLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerException == null) ++ count;
 			genericAttrAssignerException = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerFunction(final IFunction<FunctionLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerFunction == null) ++ count;
 			genericAttrAssignerFunction = func;
 			return this;
 		}
+		@Nonnull
 		public final Builder setGenericAttrAssignerRegex(final IFunction<RegexLangObject> func) {
 			if (func == null) return this;
 			if (genericAttrAssignerRegex == null) ++ count;
@@ -445,100 +483,100 @@ public class GenericNamespace implements INamespace {
 			if (count != FIELDS_TO_FILL)
 				throw new IllegalStateException(CmnCnst.Error.ILLEGAL_STATE_NAMESPACE_BUILDER);
 			final GenericNamespace retVal = new GenericNamespace(
-					expressionMethodBoolean,
-					expressionMethodNumber,
-					expressionMethodString,
-					expressionMethodArray,
-					expressionMethodHash,
-					expressionMethodException,
-					expressionMethodFunction,
-					expressionMethodRegex,
+					checkNotNull(expressionMethodBoolean),
+					checkNotNull(expressionMethodNumber),
+					checkNotNull(expressionMethodString),
+					checkNotNull(expressionMethodArray),
+					checkNotNull(expressionMethodHash),
+					checkNotNull(expressionMethodException),
+					checkNotNull(expressionMethodFunction),
+					checkNotNull(expressionMethodRegex),
 
-					attrAccessorBoolean,
-					attrAccessorNumber,
-					attrAccessorString,
-					attrAccessorArray,
-					attrAccessorHash,
-					attrAccessorException,
-					attrAccessorFunction,
-					attrAccessorRegex,
+					checkNotNull(attrAccessorBoolean),
+					checkNotNull(attrAccessorNumber),
+					checkNotNull(attrAccessorString),
+					checkNotNull(attrAccessorArray),
+					checkNotNull(attrAccessorHash),
+					checkNotNull(attrAccessorException),
+					checkNotNull(attrAccessorFunction),
+					checkNotNull(attrAccessorRegex),
 
-					attrAssignerBoolean,
-					attrAssignerNumber,
-					attrAssignerString,
-					attrAssignerArray,
-					attrAssignerHash,
-					attrAssignerException,
-					attrAssignerFunction,
-					attrAssignerRegex,
+					checkNotNull(attrAssignerBoolean),
+					checkNotNull(attrAssignerNumber),
+					checkNotNull(attrAssignerString),
+					checkNotNull(attrAssignerArray),
+					checkNotNull(attrAssignerHash),
+					checkNotNull(attrAssignerException),
+					checkNotNull(attrAssignerFunction),
+					checkNotNull(attrAssignerRegex),
 
-					genericAttrAccessorBoolean,
-					genericAttrAccessorNumber,
-					genericAttrAccessorString,
-					genericAttrAccessorArray,
-					genericAttrAccessorHash,
-					genericAttrAccessorException,
-					genericAttrAccessorFunction,
-					genericAttrAccessorRegex,
+					checkNotNull(genericAttrAccessorBoolean),
+					checkNotNull(genericAttrAccessorNumber),
+					checkNotNull(genericAttrAccessorString),
+					checkNotNull(genericAttrAccessorArray),
+					checkNotNull(genericAttrAccessorHash),
+					checkNotNull(genericAttrAccessorException),
+					checkNotNull(genericAttrAccessorFunction),
+					checkNotNull(genericAttrAccessorRegex),
 
-					genericAttrAssignerBoolean,
-					genericAttrAssignerNumber,
-					genericAttrAssignerString,
-					genericAttrAssignerArray,
-					genericAttrAssignerHash,
-					genericAttrAssignerException,
-					genericAttrAssignerFunction,
-					genericAttrAssignerRegex);
+					checkNotNull(genericAttrAssignerBoolean),
+					checkNotNull(genericAttrAssignerNumber),
+					checkNotNull(genericAttrAssignerString),
+					checkNotNull(genericAttrAssignerArray),
+					checkNotNull(genericAttrAssignerHash),
+					checkNotNull(genericAttrAssignerException),
+					checkNotNull(genericAttrAssignerFunction),
+					checkNotNull(genericAttrAssignerRegex));
 			init();
 			return retVal;
 		}
 	}
 
 	private GenericNamespace(
-			final EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean,
-			final EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber,
-			final EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString,
-			final EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray,
-			final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash,
-			final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException,
-			final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction,
-			final EnumMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex,
+			@Nonnull final EnumMap<EMethod, IFunction<BooleanLangObject>> expressionMethodBoolean,
+			@Nonnull final EnumMap<EMethod, IFunction<NumberLangObject>> expressionMethodNumber,
+			@Nonnull final EnumMap<EMethod, IFunction<StringLangObject>> expressionMethodString,
+			@Nonnull final EnumMap<EMethod, IFunction<ArrayLangObject>> expressionMethodArray,
+			@Nonnull final EnumMap<EMethod, IFunction<HashLangObject>> expressionMethodHash,
+			@Nonnull final EnumMap<EMethod, IFunction<ExceptionLangObject>> expressionMethodException,
+			@Nonnull final EnumMap<EMethod, IFunction<FunctionLangObject>> expressionMethodFunction,
+			@Nonnull final EnumMap<EMethod, IFunction<RegexLangObject>> expressionMethodRegex,
 
-			final Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean,
-			final Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber,
-			final Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString,
-			final Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray,
-			final Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash,
-			final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException,
-			final Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction,
-			final Map<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex,
+			@Nonnull final Map<StringLangObject, IFunction<BooleanLangObject>> attrAccessorBoolean,
+			@Nonnull final Map<StringLangObject, IFunction<NumberLangObject>> attrAccessorNumber,
+			@Nonnull final Map<StringLangObject, IFunction<StringLangObject>> attrAccessorString,
+			@Nonnull final Map<StringLangObject, IFunction<ArrayLangObject>> attrAccessorArray,
+			@Nonnull final Map<StringLangObject, IFunction<HashLangObject>> attrAccessorHash,
+			@Nonnull final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAccessorException,
+			@Nonnull final Map<StringLangObject, IFunction<FunctionLangObject>> attrAccessorFunction,
+			@Nonnull final Map<StringLangObject, IFunction<RegexLangObject>> attrAccessorRegex,
 
-			final Map<StringLangObject, IFunction<BooleanLangObject>> attrAssignerBoolean,
-			final Map<StringLangObject, IFunction<NumberLangObject>> attrAssignerNumber,
-			final Map<StringLangObject, IFunction<StringLangObject>> attrAssignerString,
-			final Map<StringLangObject, IFunction<ArrayLangObject>> attrAssignerArray,
-			final Map<StringLangObject, IFunction<HashLangObject>> attrAssignerHash,
-			final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException,
-			final Map<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction,
-			final Map<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex,
+			@Nonnull final Map<StringLangObject, IFunction<BooleanLangObject>> attrAssignerBoolean,
+			@Nonnull final Map<StringLangObject, IFunction<NumberLangObject>> attrAssignerNumber,
+			@Nonnull final Map<StringLangObject, IFunction<StringLangObject>> attrAssignerString,
+			@Nonnull final Map<StringLangObject, IFunction<ArrayLangObject>> attrAssignerArray,
+			@Nonnull final Map<StringLangObject, IFunction<HashLangObject>> attrAssignerHash,
+			@Nonnull final Map<StringLangObject, IFunction<ExceptionLangObject>> attrAssignerException,
+			@Nonnull final Map<StringLangObject, IFunction<FunctionLangObject>> attrAssignerFunction,
+			@Nonnull final Map<StringLangObject, IFunction<RegexLangObject>> attrAssignerRegex,
 
-			final IFunction<BooleanLangObject> genericAttrAccessorBoolean,
-			final IFunction<NumberLangObject> genericAttrAccessorNumber,
-			final IFunction<StringLangObject> genericAttrAccessorString,
-			final IFunction<ArrayLangObject> genericAttrAccessorArray,
-			final IFunction<HashLangObject> genericAttrAccessorHash,
-			final IFunction<ExceptionLangObject> genericAttrAccessorExcepton,
-			final IFunction<FunctionLangObject> genericAttrAccessorFunction,
-			final IFunction<RegexLangObject> genericAttrAccessorRegex,
+			@Nonnull final IFunction<BooleanLangObject> genericAttrAccessorBoolean,
+			@Nonnull final IFunction<NumberLangObject> genericAttrAccessorNumber,
+			@Nonnull final IFunction<StringLangObject> genericAttrAccessorString,
+			@Nonnull final IFunction<ArrayLangObject> genericAttrAccessorArray,
+			@Nonnull final IFunction<HashLangObject> genericAttrAccessorHash,
+			@Nonnull final IFunction<ExceptionLangObject> genericAttrAccessorExcepton,
+			@Nonnull final IFunction<FunctionLangObject> genericAttrAccessorFunction,
+			@Nonnull final IFunction<RegexLangObject> genericAttrAccessorRegex,
 
-			final IFunction<BooleanLangObject> genericAttrAssignerBoolean,
-			final IFunction<NumberLangObject> genericAttrAssignerNumber,
-			final IFunction<StringLangObject> genericAttrAssignerString,
-			final IFunction<ArrayLangObject> genericAttrAssignerArray,
-			final IFunction<HashLangObject> genericAttrAssignerHash,
-			final IFunction<ExceptionLangObject> genericAttrAssignerExcepton,
-			final IFunction<FunctionLangObject> genericAttrAssignerFunction,
-			final IFunction<RegexLangObject> genericAttrAssignerRegex) {
+			@Nonnull final IFunction<BooleanLangObject> genericAttrAssignerBoolean,
+			@Nonnull final IFunction<NumberLangObject> genericAttrAssignerNumber,
+			@Nonnull final IFunction<StringLangObject> genericAttrAssignerString,
+			@Nonnull final IFunction<ArrayLangObject> genericAttrAssignerArray,
+			@Nonnull final IFunction<HashLangObject> genericAttrAssignerHash,
+			@Nonnull final IFunction<ExceptionLangObject> genericAttrAssignerExcepton,
+			@Nonnull final IFunction<FunctionLangObject> genericAttrAssignerFunction,
+			@Nonnull final IFunction<RegexLangObject> genericAttrAssignerRegex) {
 
 		this.expressionMethodBoolean = Maps.immutableEnumMap(expressionMethodBoolean);
 		this.expressionMethodNumber = Maps.immutableEnumMap(expressionMethodNumber);
@@ -619,18 +657,21 @@ public class GenericNamespace implements INamespace {
 		return expressionMethodRegex.get(method);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<StringLangObject> attrAccessorString(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<StringLangObject> func = attrAccessorString.get(name);
 		return func != null ? func : genericAttrAccessorString;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<NumberLangObject> attrAccessorNumber(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<NumberLangObject> func = attrAccessorNumber.get(name);
 		return func != null ? func : genericAttrAccessorNumber;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<ArrayLangObject> attrAccessorArray(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -638,6 +679,7 @@ public class GenericNamespace implements INamespace {
 		return func != null ? func : genericAttrAccessorArray;
 
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<HashLangObject> attrAccessorHash(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -645,42 +687,49 @@ public class GenericNamespace implements INamespace {
 		return func != null ? func : genericAttrAccessorHash;
 
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<BooleanLangObject> attrAccessorBoolean(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<BooleanLangObject> func = attrAccessorBoolean.get(name);
 		return func != null ? func : genericAttrAccessorBoolean;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<ExceptionLangObject> attrAccessorException(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<ExceptionLangObject> func = attrAccessorException.get(name);
 		return func != null ? func : genericAttrAccessorException;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<FunctionLangObject> attrAccessorFunction(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<FunctionLangObject> func = attrAccessorFunction.get(name);
 		return func != null ? func : genericAttrAccessorFunction;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<RegexLangObject> attrAccessorRegex(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<RegexLangObject> func = attrAccessorRegex.get(name);
 		return func != null ? func : genericAttrAccessorRegex;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<StringLangObject> attrAssignerString(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<StringLangObject> func = attrAssignerString.get(name);
 		return func != null ? func : genericAttrAssignerString;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<NumberLangObject> attrAssignerNumber(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<NumberLangObject> func = attrAssignerNumber.get(name);
 		return func != null ? func : genericAttrAssignerNumber;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<ArrayLangObject> attrAssignerArray(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -688,6 +737,7 @@ public class GenericNamespace implements INamespace {
 		return func != null ? func : genericAttrAssignerArray;
 
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<HashLangObject> attrAssignerHash(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
@@ -695,24 +745,28 @@ public class GenericNamespace implements INamespace {
 		return func != null ? func : genericAttrAssignerHash;
 
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<BooleanLangObject> attrAssignerBoolean(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<BooleanLangObject> func = attrAssignerBoolean.get(name);
 		return func != null ? func : genericAttrAssignerBoolean;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<ExceptionLangObject> attrAssignerException(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<ExceptionLangObject> func = attrAssignerException.get(name);
 		return func != null ? func : genericAttrAssignerException;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<FunctionLangObject> attrAssignerFunction(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {
 		final IFunction<FunctionLangObject> func = attrAssignerFunction.get(name);
 		return func != null ? func : genericAttrAssignerFunction;
 	}
+	@SuppressWarnings("null")
 	@Override
 	public IFunction<RegexLangObject> attrAssignerRegex(final ALangObject name, final boolean accessedViaDot)
 			throws EvaluationException {

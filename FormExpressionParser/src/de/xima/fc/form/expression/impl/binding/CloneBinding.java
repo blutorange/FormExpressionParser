@@ -3,6 +3,9 @@ package de.xima.fc.form.expression.impl.binding;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -62,8 +65,8 @@ public class CloneBinding implements IBinding {
 
 	private class Impl {
 		private final Map<String, ALangObject> map;
-		private final Impl parent;
-		private final Impl top;
+		@Nullable private final Impl parent;
+		@Nonnull private final Impl top;
 		private final boolean isBreakpoint;
 
 		public Impl() {
@@ -77,57 +80,66 @@ public class CloneBinding implements IBinding {
 			isBreakpoint = true;
 		}
 
-		private Impl(final Impl parent, final Impl top, final boolean isBreakpoint) {
+		private Impl(@Nonnull final Impl parent, @Nonnull final Impl top, final boolean isBreakpoint) {
 			map = new HashMap<>(parent.map);
 			this.parent = parent;
 			this.top = top;
 			this.isBreakpoint = isBreakpoint;
 		}
 
-		public final ALangObject getVariable(final String name) throws EvaluationException {
+		@Nullable
+		public final ALangObject getVariable(@Nonnull final String name) throws EvaluationException {
 			final ALangObject res = getVariableInternal(name);
 			return res != null ? res : top.map.get(name);
 		}
 
-		private ALangObject getVariableInternal(final String name) throws EvaluationException {
+		@Nullable
+		private ALangObject getVariableInternal(@Nonnull final String name) throws EvaluationException {
 			final ALangObject res = map.get(name);
 			if (res != null)
 				return res;
-			return isBreakpoint ? res : parent.getVariable(name);
+			final Impl p = parent;
+			return isBreakpoint || p == null ? res : p.getVariable(name);
 		}
 
-		public final void setVariable(final String name, final ALangObject value) throws EvaluationException {
+		public final void setVariable(@Nonnull final String name, @Nonnull final ALangObject value) throws EvaluationException {
 			if (!setVariableInternal(name, value))
 				map.put(name, value);
 		}
 
-		private boolean setVariableInternal(final String name, final ALangObject value) throws EvaluationException {
-			if (isBreakpoint) {
+		private boolean setVariableInternal(@Nonnull final String name, @Nonnull final ALangObject value) throws EvaluationException {
+			final Impl p = parent;
+			if (isBreakpoint || p == null) {
 				if (map.containsKey(name)) {
 					map.put(name, value);
 					return true;
 				}
 				return false;
 			}
-			return parent.setVariableInternal(name, value);
+			return p.setVariableInternal(name, value);
 		}
 
+		@Nonnull
 		public final Impl nest() throws NestingLevelTooDeepException {
 			return new Impl(this, top, false);
 		}
 
-		public final Impl unnest(final IEvaluationContext ec) {
-			if (parent == null)
+		@Nonnull
+		public final Impl unnest(@Nonnull final IEvaluationContext ec) {
+			final Impl p = parent;
+			if (p == null)
 				throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
 			map.clear();
-			return parent;
+			return p;
 		}
 
+		@Nonnull
 		public Impl reset() {
 			map.clear();
 			return parent != null ? parent.reset() : this;
 		}
 
+		@Nonnull
 		public Impl nestLocal() {
 			return new Impl(this, top, true);
 		}

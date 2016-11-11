@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.context.IBinding;
 import de.xima.fc.form.expression.context.IEmbedment;
@@ -132,42 +133,49 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 			embedment = null;
 		}
 
-		public Builder setNamespace(final INamespace namespace) {
+		@Nonnull
+		public Builder setNamespace(@Nullable final INamespace namespace) {
 			if (namespace != null)
 				this.namespace = namespace;
 			return this;
 		}
 
-		public Builder setBinding(final IBinding binding) {
+		@Nonnull
+		public Builder setBinding(@Nullable final IBinding binding) {
 			if (binding != null)
 				this.binding = binding;
 			return this;
 		}
 
-		public Builder setScope(final IScope scope) {
+		@Nonnull
+		public Builder setScope(@Nullable final IScope scope) {
 			if (scope != null)
 				this.scope = scope;
 			return this;
 		}
 
-		public Builder setLogger(final ILogger logger) {
+		@Nonnull
+		public Builder setLogger(@Nullable final ILogger logger) {
 			if (logger != null)
 				this.logger = logger;
 			return this;
 		}
 
-		public Builder setTracer(final ITracer<Node> tracer) {
+		@Nonnull
+		public Builder setTracer(@Nullable final ITracer<Node> tracer) {
 			if (tracer != null)
 				this.tracer = tracer;
 			return this;
 		}
 
-		public Builder setEmbedment(final IEmbedment embedment) {
+		@Nonnull
+		public Builder setEmbedment(@Nullable final IEmbedment embedment) {
 			if (embedment != null)
 				this.embedment = embedment;
 			return this;
 		}
 
+		@Nonnull
 		public IEvaluationContext build() throws IllegalStateException {
 			final IBinding binding = this.binding;
 			final IScope scope = this.scope;

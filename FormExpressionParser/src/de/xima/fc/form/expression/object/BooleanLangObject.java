@@ -8,6 +8,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class BooleanLangObject extends ALangObject {
 	private final boolean value;
@@ -138,8 +139,8 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return new StringBuilder().append(CmnCnst.ToString.INSPECT_BOOLEAN_LANG_OBJECT).append('(').append(value)
-				.append(')').toString();
+		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_BOOLEAN_LANG_OBJECT).append('(')
+				.append(value).append(')'));
 	}
 
 	@Override

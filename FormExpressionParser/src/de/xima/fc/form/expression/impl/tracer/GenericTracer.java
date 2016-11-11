@@ -2,12 +2,15 @@ package de.xima.fc.form.expression.impl.tracer;
 
 import java.util.Arrays;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
 
 public class GenericTracer implements ITracer<Node> {
-	private Node processed;
-	private Node[] stackTrace;
+	@Nullable private Node processed;
+	@Nonnull private Node[] stackTrace;
 	private int pos;
 	private final int initialSize;
 
@@ -24,7 +27,7 @@ public class GenericTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public void setCurrentlyProcessed(final Node object) {
+	public void setCurrentlyProcessed(@Nullable final Node object) {
 		processed = object;
 	}
 
@@ -33,6 +36,7 @@ public class GenericTracer implements ITracer<Node> {
 		return processed;
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public void descend(final Node node) {
 		if (pos >= stackTrace.length - 1)

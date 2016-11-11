@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -8,9 +10,9 @@ public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
 	VERBOSE("[%%=", true), //$NON-NLS-1$
 	;
 
-	private final String name;
+	@Nonnull private final String name;
 	private final boolean doOutput;
-	private EmbedmentHandlerBundleGeneral(final String name, final boolean doOutput) {
+	private EmbedmentHandlerBundleGeneral(@Nonnull final String name, final boolean doOutput) {
 		this.name = name;
 		this.doOutput = doOutput;
 	}

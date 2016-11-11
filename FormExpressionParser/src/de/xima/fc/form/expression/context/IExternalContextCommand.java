@@ -1,10 +1,13 @@
 package de.xima.fc.form.expression.context;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Optional;
+
 public interface IExternalContextCommand {
-	@Nullable
-	public <T extends IExternalContextCommand> T castOrNull(Class<T> clazz);
+	@Nonnull
+	public <T extends IExternalContextCommand> 	Optional<T> castTo(@Nonnull Class<T> clazz);
 
 	/**
 	 *

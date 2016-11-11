@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.node;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -9,7 +11,7 @@ public class ASTThrowClauseNode extends SimpleNode {
 
 	private static final long serialVersionUID = 1L;
 
-	public ASTThrowClauseNode(final FormExpressionParser parser, final int nodeId) {
+	public ASTThrowClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 

@@ -1,6 +1,9 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -14,10 +17,11 @@ public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 	TEMPLATE_VERBOSE(CmnCnst.CUSTOM_SCOPE_PREFIX_TEMPLATE_VERBOSE, true, CmnCnst.CUSTOM_SCOPE_TEMPLATE),
 	;
 
-	private final String name;
+	@Nonnull private final String name;
 	@Nonnull private final String[] scopeList;
 	private final boolean doOutput;
-	private EmbedmentHandlerBundleFormcycle(final String name, final boolean doOutput, final String... scopeList) {
+	private EmbedmentHandlerBundleFormcycle(@Nonnull final String name, final boolean doOutput, @Nullable final String... scopeList) {
+		checkNotNull(name);
 		this.name = name;
 		this.doOutput = doOutput;
 		this.scopeList = scopeList == null ? CmnCnst.EMPTY_STRING_ARRAY : scopeList;
