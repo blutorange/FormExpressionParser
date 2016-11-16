@@ -2,10 +2,10 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import com.google.common.base.Optional;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.IExternalContextCommand;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.object.ALangObject;

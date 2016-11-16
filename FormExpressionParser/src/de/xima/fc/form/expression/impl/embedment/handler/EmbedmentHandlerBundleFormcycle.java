@@ -7,14 +7,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.CustomScope;
 
 public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
-	FORM_FIELD_SILENT(CmnCnst.CUSTOM_SCOPE_PREFIX_FORM_FIELD_SILENT, false, CmnCnst.CUSTOM_SCOPE_FORM_FIELD),
-	SYSTEM_SILENT(CmnCnst.CUSTOM_SCOPE_PREFIX_FC_SYSTEM_SILENT, false, CmnCnst.CUSTOM_SCOPE_FC_SYSTEM),
-	TEMPLATE_SILENT(CmnCnst.CUSTOM_SCOPE_PREFIX_TEMPLATE_SILENT, false, CmnCnst.CUSTOM_SCOPE_TEMPLATE),
-	FORM_FIELD_VERBOSE(CmnCnst.CUSTOM_SCOPE_PREFIX_FORM_FIELD_VERBOSE, true, CmnCnst.CUSTOM_SCOPE_FORM_FIELD),
-	SYSTEM_VERBOSE(CmnCnst.CUSTOM_SCOPE_PREFIX_FC_SYSTEM_VERBOSE, true, CmnCnst.CUSTOM_SCOPE_FC_SYSTEM),
-	TEMPLATE_VERBOSE(CmnCnst.CUSTOM_SCOPE_PREFIX_TEMPLATE_VERBOSE, true, CmnCnst.CUSTOM_SCOPE_TEMPLATE),
+	FORM_FIELD_SILENT(CustomScope.PREFIX_FORM_FIELD_SILENT, false, CustomScope.FORM_FIELD),
+	SYSTEM_SILENT(CustomScope.PREFIX_FC_SYSTEM_SILENT, false, CustomScope.FC_SYSTEM),
+	TEMPLATE_SILENT(CustomScope.PREFIX_TEMPLATE_SILENT, false, CustomScope.TEMPLATE),
+	FORM_FIELD_VERBOSE(CustomScope.PREFIX_FORM_FIELD_VERBOSE, true, CustomScope.FORM_FIELD),
+	SYSTEM_VERBOSE(CustomScope.PREFIX_FC_SYSTEM_VERBOSE, true, CustomScope.FC_SYSTEM),
+	TEMPLATE_VERBOSE(CustomScope.PREFIX_TEMPLATE_VERBOSE, true, CustomScope.TEMPLATE),
 	;
 
 	@Nonnull private final String name;

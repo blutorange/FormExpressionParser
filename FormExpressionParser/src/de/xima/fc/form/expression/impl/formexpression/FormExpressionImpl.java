@@ -9,13 +9,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.exception.CannotAcquireEvaluationContextException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.parsed.IComment;
-import de.xima.fc.form.expression.iface.parsed.IFormExpression;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.parse.IComment;
+import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;

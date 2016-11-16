@@ -8,11 +8,11 @@ import com.google.common.collect.ImmutableMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import de.xima.fc.form.expression.context.IEmbedment;
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IEmbedment;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandler;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleFormcycle;

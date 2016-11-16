@@ -11,11 +11,11 @@ import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import de.xima.fc.form.expression.context.IFunction;
-import de.xima.fc.form.expression.context.IMethod2Function;
-import de.xima.fc.form.expression.context.INamespace;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IFunction;
+import de.xima.fc.form.expression.iface.context.IMethod2Function;
+import de.xima.fc.form.expression.iface.context.INamespace;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorException;

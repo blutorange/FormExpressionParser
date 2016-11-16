@@ -8,12 +8,12 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 
-import de.xima.fc.form.expression.context.IBinding;
-import de.xima.fc.form.expression.context.IEmbedment;
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IScope;
-import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.context.IEmbedment;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IScope;
+import de.xima.fc.form.expression.iface.context.ITracer;
 import de.xima.fc.form.expression.impl.GenericEmbedment;
 import de.xima.fc.form.expression.impl.GenericScope;
 import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext.Builder;

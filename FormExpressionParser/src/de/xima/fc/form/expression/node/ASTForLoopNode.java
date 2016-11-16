@@ -45,7 +45,7 @@ public class ASTForLoopNode extends ANode {
 
 	@Override
 	protected String nodeName() {
-		return iteratingLoopVariable != null ? CmnCnst.NAME_FOR_ITERATING_NODE : CmnCnst.NAME_FOR_PLAIN_NODE;
+		return iteratingLoopVariable != null ? CmnCnst.Name.FOR_ITERATING_NODE : CmnCnst.Name.FOR_PLAIN_NODE;
 	}
 
 	@Nullable

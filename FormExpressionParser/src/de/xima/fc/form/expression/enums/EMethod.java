@@ -2,9 +2,10 @@ package de.xima.fc.form.expression.enums;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.ExpressionMethod;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
@@ -14,84 +15,84 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author madgaksha
  */
 public enum EMethod {
-	PLUS(CmnCnst.EMETHOD_PLUS), // +
-	PLUS_UNARY(CmnCnst.EMETHOD_PLUS), // +
-	DOUBLE_PLUS_PREFIX(CmnCnst.EMETHOD_DOUBLE_PLUS), // ++i
-	DASH(CmnCnst.EMETHOD_DASH), // -
-	DASH_UNARY(CmnCnst.EMETHOD_DASH), // -
-	DOUBLE_DASH_PREFIX(CmnCnst.EMETHOD_DOUBLE_DASH), // --i
+	PLUS(ExpressionMethod.PLUS), // +
+	PLUS_UNARY(ExpressionMethod.PLUS), // +
+	DOUBLE_PLUS_PREFIX(ExpressionMethod.DOUBLE_PLUS), // ++i
+	DASH(ExpressionMethod.DASH), // -
+	DASH_UNARY(ExpressionMethod.DASH), // -
+	DOUBLE_DASH_PREFIX(ExpressionMethod.DOUBLE_DASH), // --i
 
 	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_PLUS_PREFIX} */
-	DOUBLE_PLUS_SUFFIX(CmnCnst.EMETHOD_DOUBLE_PLUS), // i++
+	DOUBLE_PLUS_SUFFIX(ExpressionMethod.DOUBLE_PLUS), // i++
 	/** During evaluation, this gets mapped to {@link #EMethod#DOUBLE_DASH_PREFIX} */
-	DOUBLE_DASH_SUFFIX(CmnCnst.EMETHOD_DASH), // i--
+	DOUBLE_DASH_SUFFIX(ExpressionMethod.DASH), // i--
 
-	STAR(CmnCnst.EMETHOD_STAR), // *
-	DOUBLE_STAR(CmnCnst.EMETHOD_DOUBLE_STAR), // **
-	SLASH(CmnCnst.EMETHOD_SLASH), // /
-	PERCENT(CmnCnst.EMETHOD_PERCENT), // %
+	STAR(ExpressionMethod.STAR), // *
+	DOUBLE_STAR(ExpressionMethod.DOUBLE_STAR), // **
+	SLASH(ExpressionMethod.SLASH), // /
+	PERCENT(ExpressionMethod.PERCENT), // %
 
-	AMPERSAND(CmnCnst.EMETHOD_AMPERSAND), // &
-	DOUBLE_AMPERSAND(CmnCnst.EMETHOD_DOUBLE_AMPERSAND), // &&
+	AMPERSAND(ExpressionMethod.AMPERSAND), // &
+	DOUBLE_AMPERSAND(ExpressionMethod.DOUBLE_AMPERSAND), // &&
 
-	BAR(CmnCnst.EMETHOD_BAR), // |
-	DOUBLE_BAR(CmnCnst.EMETHOD_DOUBLE_BAR), // ||
+	BAR(ExpressionMethod.BAR), // |
+	DOUBLE_BAR(ExpressionMethod.DOUBLE_BAR), // ||
 
-	CIRCUMFLEX(CmnCnst.EMETHOD_CIRCUMFLEX), // ^
+	CIRCUMFLEX(ExpressionMethod.CIRCUMFLEX), // ^
 
-	TILDE(CmnCnst.EMETHOD_TILDE), // ~
-	EQUAL_TILDE(CmnCnst.EMETHOD_EQUAL_TILDE), // =~
-	EXCLAMATION_TILDE(CmnCnst.EMETHOD_EXCLAMATION_TILDE), // !~
+	TILDE(ExpressionMethod.TILDE), // ~
+	EQUAL_TILDE(ExpressionMethod.EQUAL_TILDE), // =~
+	EXCLAMATION_TILDE(ExpressionMethod.EXCLAMATION_TILDE), // !~
 
 	// These cannot be overridden, these operators use the non-equal
 	// versions during evaluation.
 	// Eg. a+=b is evaluated as if it were a=a+b
-	PLUS_EQUAL(CmnCnst.EMETHOD_PLUS_EQUAL), // +=
-	DASH_EQUAL(CmnCnst.EMETHOD_DASH_EQUAL), // -=
-	STAR_EQUAL(CmnCnst.EMETHOD_STAR_EQUAL), // *=
-	DOUBLE_STAR_EQUAL(CmnCnst.EMETHOD_DOUBLE_STAR_EQUAL), // **=
-	SLASH_EQUAL(CmnCnst.EMETHOD_SLASH_EQUAL), // /=
-	PERCENT_EQUAL(CmnCnst.EMETHOD_PERCENT_EQUAL), // %=
-	AMPERSAND_EQUAL(CmnCnst.EMETHOD_AMPERSAND_EQUAL), // &=
-	DOUBLE_ANGLE_OPEN_EQUAL(CmnCnst.EMETHOD_DOUBLE_ANGLE_OPEN_EQUAL), // <<=
-	TRIPLE_ANGLE_OPEN_EQUAL(CmnCnst.EMETHOD_TRIPLE_ANGLE_OPEN_EQUAL), // <<<=
-	DOUBLE_ANGLE_CLOSE_EQUAL(CmnCnst.EMETHOD_DOUBLE_ANGLE_CLOSE_EQUAL), // >>=
-	TRIPLE_ANGLE_CLOSE_EQUAL(CmnCnst.EMETHOD_TRIPLE_ANGLE_CLOSE_EQUAL), // >>>=
-	DOUBLE_AMPERSAND_EQUAL(CmnCnst.EMETHOD_DOUBLE_AMPERSAND_EQUAL), // &&=
-	BAR_EQUAL(CmnCnst.EMETHOD_BAR_EQUAL), // |=
-	DOUBLE_BAR_EQUAL(CmnCnst.EMETHOD_DOUBLE_BAR_EQUAL), // ||=
-	CIRCUMFLEX_EQUAL(CmnCnst.EMETHOD_AMPERSAND_EQUAL), // ^=
+	PLUS_EQUAL(ExpressionMethod.PLUS_EQUAL), // +=
+	DASH_EQUAL(ExpressionMethod.DASH_EQUAL), // -=
+	STAR_EQUAL(ExpressionMethod.STAR_EQUAL), // *=
+	DOUBLE_STAR_EQUAL(ExpressionMethod.DOUBLE_STAR_EQUAL), // **=
+	SLASH_EQUAL(ExpressionMethod.SLASH_EQUAL), // /=
+	PERCENT_EQUAL(ExpressionMethod.PERCENT_EQUAL), // %=
+	AMPERSAND_EQUAL(ExpressionMethod.AMPERSAND_EQUAL), // &=
+	DOUBLE_ANGLE_OPEN_EQUAL(ExpressionMethod.DOUBLE_ANGLE_OPEN_EQUAL), // <<=
+	TRIPLE_ANGLE_OPEN_EQUAL(ExpressionMethod.TRIPLE_ANGLE_OPEN_EQUAL), // <<<=
+	DOUBLE_ANGLE_CLOSE_EQUAL(ExpressionMethod.DOUBLE_ANGLE_CLOSE_EQUAL), // >>=
+	TRIPLE_ANGLE_CLOSE_EQUAL(ExpressionMethod.TRIPLE_ANGLE_CLOSE_EQUAL), // >>>=
+	DOUBLE_AMPERSAND_EQUAL(ExpressionMethod.DOUBLE_AMPERSAND_EQUAL), // &&=
+	BAR_EQUAL(ExpressionMethod.BAR_EQUAL), // |=
+	DOUBLE_BAR_EQUAL(ExpressionMethod.DOUBLE_BAR_EQUAL), // ||=
+	CIRCUMFLEX_EQUAL(ExpressionMethod.AMPERSAND_EQUAL), // ^=
 
-	EQUAL(CmnCnst.EMETHOD_EQUAL), // =
-	EXCLAMATION(CmnCnst.EMETHOD_EXCLAMATION), // !
+	EQUAL(ExpressionMethod.EQUAL), // =
+	EXCLAMATION(ExpressionMethod.EXCLAMATION), // !
 
 	// These cannot be overridden, they use ALangObject#equals
-	DOUBLE_EQUAL(CmnCnst.EMETHOD_DOUBLE_EQUAL), // ==
-	TRIPLE_EQUAL(CmnCnst.EMETHOD_TRIPLE_EQUAL), // ===
-	EXCLAMATION_EQUAL(CmnCnst.EMETHOD_EXCLAMATION_EQUAL), // !=
-	EXCLAMATION_DOUBLE_EQUAL(CmnCnst.EMETHOD_EXCLAMATION_DOUBLE_EQUAL), // !==
+	DOUBLE_EQUAL(ExpressionMethod.DOUBLE_EQUAL), // ==
+	TRIPLE_EQUAL(ExpressionMethod.TRIPLE_EQUAL), // ===
+	EXCLAMATION_EQUAL(ExpressionMethod.EXCLAMATION_EQUAL), // !=
+	EXCLAMATION_DOUBLE_EQUAL(ExpressionMethod.EXCLAMATION_DOUBLE_EQUAL), // !==
 
 	// These cannot be overridden, they use ALangObject#compareTo
-	ANGLE_OPEN(CmnCnst.EMETHOD_ANGLE_OPEN), // <
-	ANGLE_CLOSE(CmnCnst.EMETHOD_ANGLE_CLOSE), // >
-	ANGLE_OPEN_EQUAL(CmnCnst.EMETHOD_ANGLE_OPEN_EQUAL),// <=
-	ANGLE_CLOSE_EQUAL(CmnCnst.EMETHOD_ANGLE_CLOSE_EQUAL), // >=
+	ANGLE_OPEN(ExpressionMethod.ANGLE_OPEN), // <
+	ANGLE_CLOSE(ExpressionMethod.ANGLE_CLOSE), // >
+	ANGLE_OPEN_EQUAL(ExpressionMethod.ANGLE_OPEN_EQUAL),// <=
+	ANGLE_CLOSE_EQUAL(ExpressionMethod.ANGLE_CLOSE_EQUAL), // >=
 
-	DOUBLE_ANGLE_OPEN(CmnCnst.EMETHOD_DOUBLE_ANGLE_OPEN), // <<
-	TRIPLE_ANGLE_OPEN(CmnCnst.EMETHOD_TRIPLE_ANGLE_OPEN), // <<<
-	DOUBLE_ANGLE_CLOSE(CmnCnst.EMETHOD_DOUBLE_ANGLE_CLOSE), // >>
-	TRIPLE_ANGLE_CLOSE(CmnCnst.EMETHOD_TRIPLE_ANGLE_CLOSE), // >>>
+	DOUBLE_ANGLE_OPEN(ExpressionMethod.DOUBLE_ANGLE_OPEN), // <<
+	TRIPLE_ANGLE_OPEN(ExpressionMethod.TRIPLE_ANGLE_OPEN), // <<<
+	DOUBLE_ANGLE_CLOSE(ExpressionMethod.DOUBLE_ANGLE_CLOSE), // >>
+	TRIPLE_ANGLE_CLOSE(ExpressionMethod.TRIPLE_ANGLE_CLOSE), // >>>
 
-	COERCE(CmnCnst.EMETHOD_COERCE),
+	COERCE(ExpressionMethod.COERCE),
 
-	DOT(CmnCnst.EMETHOD_DOT),
-	BRACKET(CmnCnst.EMETHOD_BRACKET),
-	PARENTHESIS(CmnCnst.EMETHOD_PARENTHESIS),
+	DOT(ExpressionMethod.DOT),
+	BRACKET(ExpressionMethod.BRACKET),
+	PARENTHESIS(ExpressionMethod.PARENTHESIS),
 
 	//Special do not use
-	SWITCHCASE(CmnCnst.EMETHOD_SWITCHCASE),
-	SWITCHDEFAULT(CmnCnst.EMETHOD_SWITCHDEFAULT),
-	SWITCHCLAUSE(CmnCnst.EMETHOD_SWITCHCLAUSE),
+	SWITCHCASE(ExpressionMethod.SWITCHCASE),
+	SWITCHDEFAULT(ExpressionMethod.SWITCHDEFAULT),
+	SWITCHCLAUSE(ExpressionMethod.SWITCHCLAUSE),
 	NONE(CmnCnst.EMPTY_STRING),
 	;
 

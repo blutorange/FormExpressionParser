@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.xima.fc.form.expression.context.ILogger;
+import de.xima.fc.form.expression.iface.context.ILogger;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class Slf4jLogger implements ILogger {

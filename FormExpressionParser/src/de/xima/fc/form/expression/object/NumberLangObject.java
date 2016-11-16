@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
@@ -16,6 +14,8 @@ import de.xima.fc.form.expression.exception.MathDivisionByZeroException;
 import de.xima.fc.form.expression.exception.MathException;
 import de.xima.fc.form.expression.exception.NumberTooLongForIntException;
 import de.xima.fc.form.expression.exception.NumberTooLongForLongException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -218,7 +218,7 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('"')
+		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('(')
 				.append(value).append(')'));
 	}
 

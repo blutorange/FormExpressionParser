@@ -2,12 +2,13 @@ package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
@@ -66,21 +67,21 @@ public class FunctionLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(CmnCnst.SYNTAX_LAMBDA_ARROW).append(CmnCnst.SYNTAX_PAREN_OPEN);
+		builder.append(Syntax.LAMBDA_ARROW).append(Syntax.PAREN_OPEN);
 		// Add arguments.
-		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(CmnCnst.SYNTAX_COMMA);
+		for (final String arg : value.getDeclaredArgumentList()) builder.append(arg).append(Syntax.COMMA);
 		// Remove final comma
 		if (builder.length()>3) builder.setLength(builder.length()-1);
-		builder.append(CmnCnst.SYNTAX_PAREN_CLOSE).append(CmnCnst.SYNTAX_BRACE_OPEN);
+		builder.append(Syntax.PAREN_CLOSE).append(Syntax.BRACE_OPEN);
 		// Convert body.
 		final Node n = value.getNode();
 		if (n == null)
-			builder.append(CmnCnst.SYNTAX_NATIVE_CODE);
+			builder.append(Syntax.NATIVE_CODE);
 		else {
 			final String unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithoutCommentsConfig());
 			builder.append(unparse);
 		}
-		builder.append(CmnCnst.SYNTAX_BRACE_CLOSE).append(CmnCnst.SYNTAX_SEMI_COLON);
+		builder.append(Syntax.BRACE_CLOSE).append(Syntax.SEMI_COLON);
 	}
 
 	@Override

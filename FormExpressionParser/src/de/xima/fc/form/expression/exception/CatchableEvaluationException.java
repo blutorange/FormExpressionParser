@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.exception;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
 
 /**
  * An evaluation exception that can be caught by the program itself via try-catch-clauses.

@@ -8,79 +8,7 @@ import de.xima.fc.form.expression.grammar.Node;
 
 @SuppressWarnings("nls")
 public final class CmnCnst {
-	public static final class Variable {
-		@Nonnull public static final String ARGUMENTS = "arguments";
-		@Nonnull public static final String THIS = "this";
-	}
-
-	/** Scope with variables for form field variables/placeholders. */
-	@Nonnull public static final String CUSTOM_SCOPE_FORM_FIELD = "field";
-	@Nonnull public static final String CUSTOM_SCOPE_PREFIX_FORM_FIELD_SILENT = "[%@";
-	@Nonnull public static final String CUSTOM_SCOPE_PREFIX_FORM_FIELD_VERBOSE = "[%";
-	/** Scope with variables for system variables/placeholders. */
-	@Nonnull public static final String CUSTOM_SCOPE_FC_SYSTEM = "fcsystem";
-	@Nonnull public static final String CUSTOM_SCOPE_PREFIX_FC_SYSTEM_SILENT = "[%$@";
-	@Nonnull public static final String CUSTOM_SCOPE_PREFIX_FC_SYSTEM_VERBOSE = "[%$";
-	/** Scope with variables for system variables/placeholders. */
-	@Nonnull public static final String CUSTOM_SCOPE_TEMPLATE = "template";
-	@Nonnull public static final String CUSTOM_SCOPE_PREFIX_TEMPLATE_SILENT = "[%$$@";
-	@Nonnull public static final String CUSTOM_SCOPE_PREFIX_TEMPLATE_VERBOSE = "[%$$";
-	/** Scope with functions for retrieving form field values etc. */
-	@Nonnull public static final String CUSTOM_SCOPE_FORM_FUNCTIONS = "form";
-	/** Scope for math-related utilities. */
-	@Nonnull public static final String CUSTOM_SCOPE_MATH = "math";
-
-	@Nonnull public static final String EMETHOD_PLUS = "+";
-	@Nonnull public static final String EMETHOD_DOUBLE_PLUS = "++";
-	@Nonnull public static final String EMETHOD_DASH = "-";
-	@Nonnull public static final String EMETHOD_DOUBLE_DASH = "--";
-	@Nonnull public static final String EMETHOD_STAR = "*";
-	@Nonnull public static final String EMETHOD_DOUBLE_STAR = "**";
-	@Nonnull public static final String EMETHOD_PERCENT = "%";
-	@Nonnull public static final String EMETHOD_SLASH = "/";
-	@Nonnull public static final String EMETHOD_CIRCUMFLEX = "^";
-	@Nonnull public static final String EMETHOD_EXCLAMATION = "!";
-	@Nonnull public static final String EMETHOD_EQUAL = "=";
-	@Nonnull public static final String EMETHOD_DOUBLE_EQUAL = "==";
-	@Nonnull public static final String EMETHOD_TRIPLE_EQUAL = "===";
-	@Nonnull public static final String EMETHOD_EXCLAMATION_EQUAL = "!=";
-	@Nonnull public static final String EMETHOD_EXCLAMATION_DOUBLE_EQUAL = "!==";
-	@Nonnull public static final String EMETHOD_BAR = "|";
-	@Nonnull public static final String EMETHOD_DOUBLE_BAR = "||";
-	@Nonnull public static final String EMETHOD_AMPERSAND = "&";
-	@Nonnull public static final String EMETHOD_DOUBLE_AMPERSAND = "&&";
-	@Nonnull public static final String EMETHOD_TILDE = "~";
-	@Nonnull public static final String EMETHOD_EXCLAMATION_TILDE = "!~";
-	@Nonnull public static final String EMETHOD_EQUAL_TILDE = "=~";
-	@Nonnull public static final String EMETHOD_PLUS_EQUAL = "+=";
-	@Nonnull public static final String EMETHOD_DASH_EQUAL = "-=";
-	@Nonnull public static final String EMETHOD_STAR_EQUAL = "*=";
-	@Nonnull public static final String EMETHOD_SLASH_EQUAL = "/=";
-	@Nonnull public static final String EMETHOD_PERCENT_EQUAL = "%=";
-	@Nonnull public static final String EMETHOD_DOUBLE_STAR_EQUAL = "**=";
-	@Nonnull public static final String EMETHOD_AMPERSAND_EQUAL = "&=";
-	@Nonnull public static final String EMETHOD_BAR_EQUAL = "|=";
-	@Nonnull public static final String EMETHOD_DOUBLE_BAR_EQUAL = "||=";
-	@Nonnull public static final String EMETHOD_DOUBLE_AMPERSAND_EQUAL = "&&=";
-	@Nonnull public static final String EMETHOD_ANGLE_OPEN_EQUAL = "<=";
-	@Nonnull public static final String EMETHOD_ANGLE_CLOSE_EQUAL = ">=";
-	@Nonnull public static final String EMETHOD_DOUBLE_ANGLE_OPEN_EQUAL = "<<=";
-	@Nonnull public static final String EMETHOD_TRIPLE_ANGLE_OPEN_EQUAL = "<<<=";
-	@Nonnull public static final String EMETHOD_DOUBLE_ANGLE_CLOSE_EQUAL = ">>=";
-	@Nonnull public static final String EMETHOD_TRIPLE_ANGLE_CLOSE_EQUAL = ">>>=";
-	@Nonnull public static final String EMETHOD_COERCE = "=>";
-	@Nonnull public static final String EMETHOD_DOT = ".";
-	@Nonnull public static final String EMETHOD_BRACKET = "[]";
-	@Nonnull public static final String EMETHOD_PARENTHESIS = "()";
-	@Nonnull public static final String EMETHOD_SWITCHCASE = "SWITCHCASE";
-	@Nonnull public static final String EMETHOD_SWITCHDEFAULT = "SWITCHDEFAULT";
-	@Nonnull public static final String EMETHOD_SWITCHCLAUSE = "SWITCHCLAUSE";
-	@Nonnull public static final String EMETHOD_ANGLE_OPEN = "<";
-	@Nonnull public static final String EMETHOD_ANGLE_CLOSE = ">";
-	@Nonnull public static final String EMETHOD_DOUBLE_ANGLE_OPEN = "<<";
-	@Nonnull public static final String EMETHOD_TRIPLE_ANGLE_OPEN = "<<<";
-	@Nonnull public static final String EMETHOD_DOUBLE_ANGLE_CLOSE = ">>";
-	@Nonnull public static final String EMETHOD_TRIPLE_ANGLE_CLOSE = ">>>";
+	private CmnCnst() {}
 
 
 	// Used when constructing the stack trace.
@@ -89,86 +17,169 @@ public final class CmnCnst {
 	@Nonnull public static final String TRACER_POSITION_UNKNOWN = "unknown line";
 	@Nonnull public static final String TRACER_POSITION_NAME_UNKNOWN = "unknown";
 
-	@Nonnull public static final String SYNTAX_SWITCH = "switch";
-	@Nonnull public static final String SYNTAX_CASE = "case";
-	@Nonnull public static final String SYNTAX_DEFAULT = "default";
-	@Nonnull public static final String SYNTAX_FOR = "for";
-	@Nonnull public static final String SYNTAX_WHILE = "while";
-	@Nonnull public static final String SYNTAX_DO = "do";
-	@Nonnull public static final String SYNTAX_WITH = "with";
-	@Nonnull public static final String SYNTAX_EXCEPTION = "exception";
-	@Nonnull public static final String SYNTAX_THROW = "throw";
-	@Nonnull public static final String SYNTAX_TRY = "try";
-	@Nonnull public static final String SYNTAX_CATCH = "catch";
-	@Nonnull public static final String SYNTAX_IF = "if";
-	@Nonnull public static final String SYNTAX_ELSE = "else";
-	@Nonnull public static final String SYNTAX_FUNCTION = "function";
-	@Nonnull public static final String SYNTAX_RETURN = "return";
-	@Nonnull public static final String SYNTAX_CONTINUE = "continue";
-	@Nonnull public static final String SYNTAX_BREAK = "break";
-	@Nonnull public static final String SYNTAX_LOG_DEBUG = "logdebug";
-	@Nonnull public static final String SYNTAX_LOG_ERROR = "logerror";
-	@Nonnull public static final String SYNTAX_LOG_INFO = "loginfo";
-	@Nonnull public static final String SYNTAX_LOG_WARN = "logwarn";
-	@Nonnull public static final String SYNTAX_LOS_CLOSE = "%]";
-	@Nonnull public static final String SYNTAX_LAMBDA_ARROW = "->";
-	@Nonnull public static final String SYNTAX_BRACE_OPEN = "{";
-	@Nonnull public static final String SYNTAX_BRACE_CLOSE = "}";
-	@Nonnull public static final String SYNTAX_PAREN_OPEN = "(";
-	@Nonnull public static final String SYNTAX_PAREN_CLOSE = ")";
-	@Nonnull public static final String SYNTAX_BRACKET_OPEN = "[";
-	@Nonnull public static final String SYNTAX_BRACKET_CLOSE = "]";
-	@Nonnull public static final String SYNTAX_QUESTION_MARK = "?";
-	@Nonnull public static final String SYNTAX_ANGLE_OPEN = "<";
-	@Nonnull public static final String SYNTAX_ANGLE_CLOSE = ">";
-	@Nonnull public static final String SYNTAX_DOT = ".";
-	@Nonnull public static final String SYNTAX_COMMA = ",";
-	@Nonnull public static final String SYNTAX_COLON = ":";
-	@Nonnull public static final String SYNTAX_SEMI_COLON = ";";
-	@Nonnull public static final String SYNTAX_SCOPE_SEPARATOR = "::";
-	@Nonnull public static final String SYNTAX_ENHANCED_FOR_LOOP_SEPARATOR = ":";
-	@Nonnull public static final String SYNTAX_LINEFEED = "\n";
-	@Nonnull public static final String SYNTAX_INDENT = "  ";
-	@Nonnull public static final String SYNTAX_ERROR = "error";
-	@Nonnull public static final String SYNTAX_TRUE = "true";
-	@Nonnull public static final String SYNTAX_FALSE = "false";
-	@Nonnull public static final String SYNTAX_NULL = "null";
-	@Nonnull public static final String SYNTAX_NATIVE_CODE = "'[native code]'";
-	@Nonnull public static final String SYNTAX_FAILED_TO_UNPARSE_LAMBDA = "'[error during unparsing]'";
-	@Nonnull public static final String SYNTAX_QUOTE = "\"";
-	@Nonnull public static final String SYNTAX_SINGLE_LINE_COMMENT_START = "//";
-	@Nonnull public static final String SYNTAX_MULTI_LINE_COMMENT_START = "/*";
-	@Nonnull public static final String SYNTAX_MULTI_LINE_COMMENT_END = "*/";
-
-	@Nonnull public static final String NAME_ATTRIBUTE_ACCESSOR = "attribute accessor";
-	@Nonnull public static final String NAME_DOT_ATTRIBUTE_ACCESSOR = "dot attribute accessor";
-	@Nonnull public static final String NAME_BRACKET_ATTRIBUTE_ACCESSOR = "bracket attribute accessor";
-	@Nonnull public static final String NAME_ATTRIBUTE_ASSIGNER = "attribute assigner";
-	@Nonnull public static final String NAME_DOT_ATTRIBUTE_ASSIGNER = "dot attribute assigner";
-	@Nonnull public static final String NAME_BRACKET_ATTRIBUTE_ASSIGNER = "bracket attribute assigner";
-	@Nonnull public static final String NAME_METHOD = "method";
-	@Nonnull public static final String NAME_PREFIX_OPERATION = "prefix operation";
-	@Nonnull public static final String NAME_SUFFIX_OPERATION = "suffix operation";
-	@Nonnull public static final String NAME_FOR_ITERATING_NODE = "ForIteratingLoopNode";
-	@Nonnull public static final String NAME_FOR_PLAIN_NODE = "ForPlainLoopNode";
-	@Nonnull public static final String NAME_ASSIGNMENT = "assignment";
-	@Nonnull public static final String NAME_SYSTEM_LOGGER = "SystemLogger:";
-	@Nonnull public static final String NAME_ARRAY = "array";
-	@Nonnull public static final String NAME_ELEMENT = "element";
-	@Nonnull public static final String NAME_KEY = "key";
-	@Nonnull public static final String NAME_HASH = "hash";
-	@Nonnull public static final String NAME_VALUE = "value";
-
-
 	@Nonnull public static final String SYSTEM_LOGGER_FORMAT = "[%s] (%s) %s %s";
+
 	@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
 	@Nonnull public static final String EMPTY_STRING = "";
 	@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
 	@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 	@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
 
+	public final static class CustomScope {
+		private CustomScope() {}
+		/** Scope with variables for form field variables/placeholders. */
+		@Nonnull public static final String FORM_FIELD = "field";
+		@Nonnull public static final String PREFIX_FORM_FIELD_SILENT = "[%@";
+		@Nonnull public static final String PREFIX_FORM_FIELD_VERBOSE = "[%";
+		/** Scope with variables for system variables/placeholders. */
+		@Nonnull public static final String FC_SYSTEM = "fcsystem";
+		@Nonnull public static final String PREFIX_FC_SYSTEM_SILENT = "[%$@";
+		@Nonnull public static final String PREFIX_FC_SYSTEM_VERBOSE = "[%$";
+		/** Scope with variables for system variables/placeholders. */
+		@Nonnull public static final String TEMPLATE = "template";
+		@Nonnull public static final String PREFIX_TEMPLATE_SILENT = "[%$$@";
+		@Nonnull public static final String PREFIX_TEMPLATE_VERBOSE = "[%$$";
+		/** Scope with functions for retrieving form field values etc. */
+		@Nonnull public static final String FORM_FUNCTIONS = "form";
+		/** Scope for math-related utilities. */
+		@Nonnull public static final String MATH = "math";
+	}
+
+	public final static class Name {
+		private Name() {}
+		@Nonnull public static final String VARIABLE_ARGUMENTS = "arguments";
+		@Nonnull public static final String VARIABLE_THIS = "this";
+		@Nonnull public static final String ATTRIBUTE_ACCESSOR = "attribute accessor";
+		@Nonnull public static final String DOT_ATTRIBUTE_ACCESSOR = "dot attribute accessor";
+		@Nonnull public static final String BRACKET_ATTRIBUTE_ACCESSOR = "bracket attribute accessor";
+		@Nonnull public static final String ATTRIBUTE_ASSIGNER = "attribute assigner";
+		@Nonnull public static final String DOT_ATTRIBUTE_ASSIGNER = "dot attribute assigner";
+		@Nonnull public static final String BRACKET_ATTRIBUTE_ASSIGNER = "bracket attribute assigner";
+		@Nonnull public static final String METHOD = "method";
+		@Nonnull public static final String PREFIX_OPERATION = "prefix operation";
+		@Nonnull public static final String SUFFIX_OPERATION = "suffix operation";
+		@Nonnull public static final String FOR_ITERATING_NODE = "ForIteratingLoopNode";
+		@Nonnull public static final String FOR_PLAIN_NODE = "ForPlainLoopNode";
+		@Nonnull public static final String ASSIGNMENT = "assignment";
+		@Nonnull public static final String SYSTEM_LOGGER = "SystemLogger:";
+		@Nonnull public static final String ARRAY = "array";
+		@Nonnull public static final String ELEMENT = "element";
+		@Nonnull public static final String KEY = "key";
+		@Nonnull public static final String HASH = "hash";
+		@Nonnull public static final String VALUE = "value";
+	}
+
+	public final static class ExpressionMethod {
+		private ExpressionMethod() {}
+		@Nonnull public static final String PLUS = "+";
+		@Nonnull public static final String DOUBLE_PLUS = "++";
+		@Nonnull public static final String DASH = "-";
+		@Nonnull public static final String DOUBLE_DASH = "--";
+		@Nonnull public static final String STAR = "*";
+		@Nonnull public static final String DOUBLE_STAR = "**";
+		@Nonnull public static final String PERCENT = "%";
+		@Nonnull public static final String SLASH = "/";
+		@Nonnull public static final String CIRCUMFLEX = "^";
+		@Nonnull public static final String EXCLAMATION = "!";
+		@Nonnull public static final String EQUAL = "=";
+		@Nonnull public static final String DOUBLE_EQUAL = "==";
+		@Nonnull public static final String TRIPLE_EQUAL = "===";
+		@Nonnull public static final String EXCLAMATION_EQUAL = "!=";
+		@Nonnull public static final String EXCLAMATION_DOUBLE_EQUAL = "!==";
+		@Nonnull public static final String BAR = "|";
+		@Nonnull public static final String DOUBLE_BAR = "||";
+		@Nonnull public static final String AMPERSAND = "&";
+		@Nonnull public static final String DOUBLE_AMPERSAND = "&&";
+		@Nonnull public static final String TILDE = "~";
+		@Nonnull public static final String EXCLAMATION_TILDE = "!~";
+		@Nonnull public static final String EQUAL_TILDE = "=~";
+		@Nonnull public static final String PLUS_EQUAL = "+=";
+		@Nonnull public static final String DASH_EQUAL = "-=";
+		@Nonnull public static final String STAR_EQUAL = "*=";
+		@Nonnull public static final String SLASH_EQUAL = "/=";
+		@Nonnull public static final String PERCENT_EQUAL = "%=";
+		@Nonnull public static final String DOUBLE_STAR_EQUAL = "**=";
+		@Nonnull public static final String AMPERSAND_EQUAL = "&=";
+		@Nonnull public static final String BAR_EQUAL = "|=";
+		@Nonnull public static final String DOUBLE_BAR_EQUAL = "||=";
+		@Nonnull public static final String DOUBLE_AMPERSAND_EQUAL = "&&=";
+		@Nonnull public static final String ANGLE_OPEN_EQUAL = "<=";
+		@Nonnull public static final String ANGLE_CLOSE_EQUAL = ">=";
+		@Nonnull public static final String DOUBLE_ANGLE_OPEN_EQUAL = "<<=";
+		@Nonnull public static final String TRIPLE_ANGLE_OPEN_EQUAL = "<<<=";
+		@Nonnull public static final String DOUBLE_ANGLE_CLOSE_EQUAL = ">>=";
+		@Nonnull public static final String TRIPLE_ANGLE_CLOSE_EQUAL = ">>>=";
+		@Nonnull public static final String COERCE = "=>";
+		@Nonnull public static final String DOT = ".";
+		@Nonnull public static final String BRACKET = "[]";
+		@Nonnull public static final String PARENTHESIS = "()";
+		@Nonnull public static final String SWITCHCASE = "SWITCHCASE";
+		@Nonnull public static final String SWITCHDEFAULT = "SWITCHDEFAULT";
+		@Nonnull public static final String SWITCHCLAUSE = "SWITCHCLAUSE";
+		@Nonnull public static final String ANGLE_OPEN = "<";
+		@Nonnull public static final String ANGLE_CLOSE = ">";
+		@Nonnull public static final String DOUBLE_ANGLE_OPEN = "<<";
+		@Nonnull public static final String TRIPLE_ANGLE_OPEN = "<<<";
+		@Nonnull public static final String DOUBLE_ANGLE_CLOSE = ">>";
+		@Nonnull public static final String TRIPLE_ANGLE_CLOSE = ">>>";
+	}
+
+	public final static class Syntax {
+		private Syntax() {}
+		@Nonnull public static final String SWITCH = "switch";
+		@Nonnull public static final String CASE = "case";
+		@Nonnull public static final String DEFAULT = "default";
+		@Nonnull public static final String FOR = "for";
+		@Nonnull public static final String WHILE = "while";
+		@Nonnull public static final String DO = "do";
+		@Nonnull public static final String WITH = "with";
+		@Nonnull public static final String EXCEPTION = "exception";
+		@Nonnull public static final String THROW = "throw";
+		@Nonnull public static final String TRY = "try";
+		@Nonnull public static final String CATCH = "catch";
+		@Nonnull public static final String IF = "if";
+		@Nonnull public static final String ELSE = "else";
+		@Nonnull public static final String FUNCTION = "function";
+		@Nonnull public static final String RETURN = "return";
+		@Nonnull public static final String CONTINUE = "continue";
+		@Nonnull public static final String BREAK = "break";
+		@Nonnull public static final String LOG_DEBUG = "logdebug";
+		@Nonnull public static final String LOG_ERROR = "logerror";
+		@Nonnull public static final String LOG_INFO = "loginfo";
+		@Nonnull public static final String LOG_WARN = "logwarn";
+		@Nonnull public static final String LOS_CLOSE = "%]";
+		@Nonnull public static final String LAMBDA_ARROW = "->";
+		@Nonnull public static final String BRACE_OPEN = "{";
+		@Nonnull public static final String BRACE_CLOSE = "}";
+		@Nonnull public static final String PAREN_OPEN = "(";
+		@Nonnull public static final String PAREN_CLOSE = ")";
+		@Nonnull public static final String BRACKET_OPEN = "[";
+		@Nonnull public static final String BRACKET_CLOSE = "]";
+		@Nonnull public static final String QUESTION_MARK = "?";
+		@Nonnull public static final String ANGLE_OPEN = "<";
+		@Nonnull public static final String ANGLE_CLOSE = ">";
+		@Nonnull public static final String DOT = ".";
+		@Nonnull public static final String COMMA = ",";
+		@Nonnull public static final String COLON = ":";
+		@Nonnull public static final String SEMI_COLON = ";";
+		@Nonnull public static final String SCOPE_SEPARATOR = "::";
+		@Nonnull public static final String ENHANCED_FOR_LOOP_SEPARATOR = ":";
+		@Nonnull public static final String LINEFEED = "\n";
+		@Nonnull public static final String INDENT = "  ";
+		@Nonnull public static final String ERROR = "error";
+		@Nonnull public static final String TRUE = "true";
+		@Nonnull public static final String FALSE = "false";
+		@Nonnull public static final String NULL = "null";
+		@Nonnull public static final String NATIVE_CODE = "'[native code]'";
+		@Nonnull public static final String FAILED_TO_UNPARSE_LAMBDA = "'[error during unparsing]'";
+		@Nonnull public static final String QUOTE = "\"";
+		@Nonnull public static final String SINGLE_LINE_COMMENT_START = "//";
+		@Nonnull public static final String MULTI_LINE_COMMENT_START = "/*";
+		@Nonnull public static final String MULTI_LINE_COMMENT_END = "*/";
+	}
 
 	public static final class Error {
+		private Error() {}
 		@Nonnull public static final String ARRAY_INDEX_OUT_OF_BOUNDS = "Index %s out of bounds for array %s.";
 		@Nonnull public static final String BREAK_CLAUSE = "Break used outside of loop or switch, or label does not match any loop or switch.";
 		@Nonnull public static final String CANNOT_ACQUIRE_EVALUATION_CONTEXT = "Failed to acquire evaluation context.";
@@ -265,30 +276,31 @@ public final class CmnCnst {
 		@Nonnull public static final String NULL_ERROR_VARIABLE_NAME = "Catch clause must specifiy a variable name. " + INTERNAL_ERROR;
 		@Nonnull public static final String EC_POOL_RETURNED_NULL = "Pool returned null";
 		@Nonnull public static final String EXPRESSION_METHOD_NULL_INTERNAL = "Expression method must not be null here. " + INTERNAL_ERROR;
-		public static final String NOT_A_COMMENT_TOKEN = "Token kind is not a comment token, but %s.";
+		@Nonnull public static final String NOT_A_COMMENT_TOKEN = "Token kind is not a comment token, but %s.";
 	}
 
 	public static final class ToString {
+		private ToString() {}
 		@Nonnull public static final String COLOR = "Color(%s)";
 		@Nonnull public static final String STYLE = "Style(%s,%s,%s,%s)";
 		@Nonnull public static final String BOOLEAN_TRUE = "true";
 		@Nonnull public static final String BOOLEAN_FALSE = "false";
-		public static final char[] INSPECT_A_LANG_OBJECT = "ALangObject@".toCharArray();
-		public static final char[] INSPECT_ARRAY_LANG_OBJECT = "ArrayLangObject".toCharArray();
-		public static final char[] INSPECT_BOOLEAN_LANG_OBJECT = "BooleanLangObject".toCharArray();
-		public static final char[] INSPECT_EXCEPTION_LANG_OBJECT = "ExceptionLangObject".toCharArray();
-		public static final char[] INSPECT_FUNCTION_LANG_OBJECT = "FunctionLangObject".toCharArray();
-		public static final char[] INSPECT_HASH_LANG_OBJECT = "HashLangObject".toCharArray();
-		public static final char[] INSPECT_NUMBER_LANG_OBJECT = "NumberLangObject".toCharArray();
-		public static final char[] INSPECT_REGEX_LANG_OBJECT = "RegexLangObject".toCharArray();
-		public static final char[] INSPECT_STRING_LANG_OBJECT = "StringLangObject".toCharArray();
+		@Nonnull public static final char[] INSPECT_A_LANG_OBJECT = NullUtil.checkNotNull("ALangObject@".toCharArray());
+		@Nonnull public static final char[] INSPECT_ARRAY_LANG_OBJECT = NullUtil.checkNotNull("ArrayLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_BOOLEAN_LANG_OBJECT = NullUtil.checkNotNull("BooleanLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_EXCEPTION_LANG_OBJECT = NullUtil.checkNotNull("ExceptionLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_FUNCTION_LANG_OBJECT = NullUtil.checkNotNull("FunctionLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_HASH_LANG_OBJECT = NullUtil.checkNotNull("HashLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_NUMBER_LANG_OBJECT = NullUtil.checkNotNull("NumberLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_REGEX_LANG_OBJECT = NullUtil.checkNotNull("RegexLangObject".toCharArray());
+		@Nonnull public static final char[] INSPECT_STRING_LANG_OBJECT = NullUtil.checkNotNull("StringLangObject".toCharArray());
 		@Nonnull public static final String INSPECT_NULL_LANG_OBJECT = "NullLangObject";
 		@Nonnull public static final String DOCUMENT_COMMAND = "%s(%s)";
 		@Nonnull public static final String POSITIONED_DOCUMENT_COMMAND = "%s@%s(%s)";
 	}
 
 	public static final class Html {
-
+		private Html() {}
 		@Nonnull public static final String A = "a";
 		@Nonnull public static final String HREF = "href";
 		@Nonnull public static final String TARGET = "target";

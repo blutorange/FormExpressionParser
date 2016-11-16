@@ -17,7 +17,7 @@ public class ASTAssignmentExpressionNode extends ANode {
 	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
-		assertChildrenAssignable(0, jjtGetNumChildren()-1, CmnCnst.NAME_ASSIGNMENT);
+		assertChildrenAssignable(0, jjtGetNumChildren()-1, CmnCnst.Name.ASSIGNMENT);
 		super.init(method);
 	}
 

@@ -4,14 +4,15 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NullObjectAccessException;
 import de.xima.fc.form.expression.exception.NullObjectAssignException;
 import de.xima.fc.form.expression.exception.NullObjectMethodException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 public class NullLangObject extends ALangObject {
 	private NullLangObject() {
@@ -109,11 +110,11 @@ public class NullLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(CmnCnst.SYNTAX_NULL);
+		builder.append(Syntax.NULL);
 	}
 
 	public static String toExpression() {
-		return CmnCnst.SYNTAX_NULL;
+		return Syntax.NULL;
 	}
 
 	@Override

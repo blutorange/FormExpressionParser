@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.context.ILogger;
+import de.xima.fc.form.expression.iface.context.ILogger;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class JavaLogger implements ILogger {

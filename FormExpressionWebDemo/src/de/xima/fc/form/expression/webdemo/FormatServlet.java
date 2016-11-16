@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
-import de.xima.fc.form.expression.iface.parsed.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;

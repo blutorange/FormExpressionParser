@@ -1,8 +1,8 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.object.ALangObject;
 
 public enum DummyExternalContext implements IExternalContext {

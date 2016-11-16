@@ -4,15 +4,15 @@ import javax.annotation.Nonnull;
 
 import com.google.common.base.Optional;
 
-import de.xima.fc.form.expression.context.IBinding;
-import de.xima.fc.form.expression.context.IEmbedment;
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.ILogger;
-import de.xima.fc.form.expression.context.INamespace;
-import de.xima.fc.form.expression.context.IScope;
-import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.context.IEmbedment;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.ILogger;
+import de.xima.fc.form.expression.iface.context.INamespace;
+import de.xima.fc.form.expression.iface.context.IScope;
+import de.xima.fc.form.expression.iface.context.ITracer;
 import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext.Builder;
 import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 

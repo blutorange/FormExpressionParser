@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.tracer;
 
-import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.ITracer;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 /**

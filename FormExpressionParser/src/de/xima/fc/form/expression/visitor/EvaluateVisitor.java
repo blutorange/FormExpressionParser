@@ -10,10 +10,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.IFunction;
-import de.xima.fc.form.expression.context.ILogger;
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.BreakClauseException;
@@ -25,6 +21,10 @@ import de.xima.fc.form.expression.exception.ReturnClauseException;
 import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
+import de.xima.fc.form.expression.iface.context.ILogger;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;

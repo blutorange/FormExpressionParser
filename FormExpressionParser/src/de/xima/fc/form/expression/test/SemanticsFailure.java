@@ -23,7 +23,8 @@ enum SemanticsFailure implements ITestCase {
 	TEST005("if (true) k=0;k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
 	TEST006("for(i:2) k=0;k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
 	TEST007("try{k=0;}catch(e){k=0;};k;", VariableNotDefinedException.class,"Variable k not resolvable to a defined variable."),
-	TEST008("h={'f':''.toLowerCase};h.f();", IllegalThisContextException.class),
+	TEST008("h={'f':''.toLowerCase};h.f();", IllegalThisContextException.class, "Provided this context <{\"f\":->(locale){'[native code]'};}> of type HASH does not match the expected type STRING for function <toLowerCase>."),
+	TEST009("foo=''.toLowerCase;foo.call();", IllegalThisContextException.class, "Provided this context <null> of type NULL does not match the expected type STRING for function <toLowerCase>."),
 	;
 
 	@Nonnull private final String code;

@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
-import de.xima.fc.form.expression.iface.parsed.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public final class FormExpressionFactory {

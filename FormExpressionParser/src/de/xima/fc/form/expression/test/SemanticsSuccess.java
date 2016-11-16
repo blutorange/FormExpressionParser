@@ -113,7 +113,10 @@ enum SemanticsSuccess implements ITestCase {
 			)),
 	ASSIGNMENT004("a=41;++a;++a;--a;a;",Tests.N42),
 
-
+	FUNCTION001("function foo(){arguments.length;}foo(1,2,3);", NumberLangObject.create(3)),
+	FUNCTION002("function foo(){this;}foo();", NullLangObject.getInstance()),
+	FUNCTION003("foo=''.toLowerCase;foo.call('BAR');", StringLangObject.create("bar")),
+	FUNCTION004("foo=->(){42;};foo();", Tests.N42),
 
 	//General
 	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci

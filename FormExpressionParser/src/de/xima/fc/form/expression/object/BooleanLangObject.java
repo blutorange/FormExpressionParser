@@ -2,12 +2,13 @@ package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class BooleanLangObject extends ALangObject {
@@ -150,7 +151,7 @@ public class BooleanLangObject extends ALangObject {
 
 	@Nonnull
 	public static String toExpression(final boolean value) {
-		return value ? CmnCnst.SYNTAX_TRUE : CmnCnst.SYNTAX_FALSE;
+		return value ? Syntax.TRUE : Syntax.FALSE;
 	}
 
 	@Nonnull

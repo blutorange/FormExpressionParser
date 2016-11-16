@@ -8,9 +8,6 @@ import javax.annotation.Nonnull;
 
 import com.google.common.base.Optional;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.IExternalContextCommand;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
 import de.xima.fc.form.expression.grammar.html.HtmlParserConstants;
@@ -18,6 +15,9 @@ import de.xima.fc.form.expression.grammar.html.HtmlParserTokenManager;
 import de.xima.fc.form.expression.grammar.html.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.html.Token;
 import de.xima.fc.form.expression.grammar.html.TokenMgrError;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.contextcommand.PositionedDocumentCommand;
 import de.xima.fc.form.expression.util.CmnCnst;

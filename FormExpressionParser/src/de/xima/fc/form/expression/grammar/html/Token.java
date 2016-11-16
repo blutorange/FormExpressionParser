@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 /**
  * Describes the input token stream.
@@ -144,7 +145,7 @@ public class Token implements java.io.Serializable {
 
 	public Token insertDoubleString(final String string) {
 		return insertToken(HtmlParserConstants.attvDoubleString,
-				CmnCnst.SYNTAX_QUOTE + StringEscapeUtils.escapeHtml4(string) + CmnCnst.SYNTAX_QUOTE);
+				Syntax.QUOTE + StringEscapeUtils.escapeHtml4(string) + Syntax.QUOTE);
 	}
 
 	/**

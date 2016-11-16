@@ -10,12 +10,13 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.ComparatorEntryByKey;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -54,11 +55,11 @@ public class HashLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(CmnCnst.SYNTAX_BRACE_OPEN);
+		builder.append(Syntax.BRACE_OPEN);
 		for (final Entry<ALangObject, ALangObject> v : value.entrySet())
-			builder.append(v.getKey().toString()).append(CmnCnst.SYNTAX_COLON).append(v.getValue().toString()).append(CmnCnst.SYNTAX_COMMA);
+			builder.append(v.getKey().toString()).append(Syntax.COLON).append(v.getValue().toString()).append(Syntax.COMMA);
 		if (builder.length() > 1) builder.setLength(builder.length()-1);
-		builder.append(CmnCnst.SYNTAX_BRACE_CLOSE);
+		builder.append(Syntax.BRACE_CLOSE);
 	}
 
 	@Override

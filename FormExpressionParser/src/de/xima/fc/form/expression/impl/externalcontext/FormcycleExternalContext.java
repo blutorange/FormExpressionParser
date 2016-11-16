@@ -9,12 +9,12 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.CustomScope;
 
 // Dummy for illustration, remove this and use the real FORMCYCLE class FormVersion.
 public class FormcycleExternalContext extends AHtmlExternalContext {
@@ -107,7 +107,7 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 	}
 	static {
 		scopeMap = new Builder<String, ScopeImpl>()
-				.put(CmnCnst.CUSTOM_SCOPE_FORM_FIELD, ScopeImpl.FORM_FIELD)
+				.put(CustomScope.FORM_FIELD, ScopeImpl.FORM_FIELD)
 				.build();
 	}
 

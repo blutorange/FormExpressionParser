@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 public final class UnparseVisitorConfig {
 	public final String indentPrefix;
@@ -66,15 +66,15 @@ public final class UnparseVisitorConfig {
 
 	private final static class InstanceHolder {
 		@Nonnull public final static UnparseVisitorConfig STYLED = new Builder()
-				.setLinefeed(CmnCnst.SYNTAX_LINEFEED)
-				.setIndentPrefix(CmnCnst.SYNTAX_INDENT)
+				.setLinefeed(Syntax.LINEFEED)
+				.setIndentPrefix(Syntax.INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(true)
 				.build();
 		@Nonnull public final static UnparseVisitorConfig STYLED_WITHOUT_COMMENTS = new Builder()
-				.setLinefeed(CmnCnst.SYNTAX_LINEFEED)
-				.setIndentPrefix(CmnCnst.SYNTAX_INDENT)
+				.setLinefeed(Syntax.LINEFEED)
+				.setIndentPrefix(Syntax.INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(false)

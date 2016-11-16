@@ -23,7 +23,7 @@ public class ASTUnaryExpressionNode extends ANode {
 		assertChildrenExactly(1);
 		assertNonNull(unary, CmnCnst.Error.NULL_METHOD);
 		if (unary.isAssigning())
-			assertChildrenAssignable(0, 1, CmnCnst.NAME_PREFIX_OPERATION);
+			assertChildrenAssignable(0, 1, CmnCnst.Name.PREFIX_OPERATION);
 		super.init(method);
 		unaryMethod = unary;
 	}

@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.enums.ECommentType;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
-import de.xima.fc.form.expression.iface.parsed.IComment;
+import de.xima.fc.form.expression.iface.parse.IComment;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 

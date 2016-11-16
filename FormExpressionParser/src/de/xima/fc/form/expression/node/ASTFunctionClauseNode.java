@@ -6,6 +6,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
 public class ASTFunctionClauseNode extends ANode {
@@ -22,7 +23,7 @@ public class ASTFunctionClauseNode extends ANode {
 		assertChildrenAtLeast(2);
 		super.init(method);
 		final ASTVariableNode var = getNthChildAs(0, ASTVariableNode.class);
-		functionName = var.getScope() != null ? var.getScope() + CmnCnst.SYNTAX_SCOPE_SEPARATOR + var.getName() : var.getName();
+		functionName = var.getScope() != null ? var.getScope() + Syntax.SCOPE_SEPARATOR + var.getName() : var.getName();
 	}
 
 	@Nonnull

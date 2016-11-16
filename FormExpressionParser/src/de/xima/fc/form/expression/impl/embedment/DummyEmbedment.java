@@ -1,8 +1,8 @@
 package de.xima.fc.form.expression.impl.embedment;
 
-import de.xima.fc.form.expression.context.IEmbedment;
-import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.iface.context.IEmbedment;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 /**

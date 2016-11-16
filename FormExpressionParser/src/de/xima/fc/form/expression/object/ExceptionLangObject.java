@@ -3,14 +3,15 @@ package de.xima.fc.form.expression.object;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class ExceptionLangObject extends ALangObject {
@@ -34,9 +35,9 @@ public class ExceptionLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(CmnCnst.SYNTAX_ERROR).append(CmnCnst.SYNTAX_PAREN_OPEN);
+		builder.append(Syntax.ERROR).append(Syntax.PAREN_OPEN);
 		StringLangObject.toExpression(value.getMessage(), builder);
-		builder.append(CmnCnst.SYNTAX_PAREN_CLOSE);
+		builder.append(Syntax.PAREN_CLOSE);
 	}
 
 	@Override

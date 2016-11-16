@@ -22,7 +22,7 @@ public class ASTPostUnaryExpressionNode extends ANode {
 		assertChildrenExactly(1);
 		Preconditions.checkNotNull(unary);
 		if (unary.isAssigning())
-			assertChildrenAssignable(0, 1, CmnCnst.NAME_SUFFIX_OPERATION);
+			assertChildrenAssignable(0, 1, CmnCnst.Name.SUFFIX_OPERATION);
 		super.init(method);
 		unaryMethod = unary;
 	}

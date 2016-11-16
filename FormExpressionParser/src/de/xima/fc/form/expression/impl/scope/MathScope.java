@@ -2,10 +2,10 @@ package de.xima.fc.form.expression.impl.scope;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.xima.fc.form.expression.context.ICustomScope;
+import de.xima.fc.form.expression.iface.context.ICustomScope;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.CustomScope;
 
 public enum MathScope implements ICustomScope {
 	INSTANCE
@@ -22,6 +22,6 @@ public enum MathScope implements ICustomScope {
 
 	@Override
 	public String getScopeName() {
-		return CmnCnst.CUSTOM_SCOPE_MATH;
+		return CustomScope.MATH;
 	}
 }

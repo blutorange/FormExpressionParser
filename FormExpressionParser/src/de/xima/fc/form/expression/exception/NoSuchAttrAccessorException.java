@@ -4,7 +4,7 @@ package de.xima.fc.form.expression.exception;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -12,22 +12,22 @@ public class NoSuchAttrAccessorException extends NoSuchFunctionException {
 	private static final long serialVersionUID = 1L;
 
 	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final IEvaluationContext ec) {
-		super(CmnCnst.NAME_ATTRIBUTE_ACCESSOR, name, ec);
+		super(CmnCnst.Name.ATTRIBUTE_ACCESSOR, name, ec);
 	}
 
 	public NoSuchAttrAccessorException(@Nonnull final String name, final boolean accessedViaDot,
 			@Nonnull final IEvaluationContext ec) {
-		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name, ec);
+		super(accessedViaDot ? CmnCnst.Name.DOT_ATTRIBUTE_ACCESSOR : CmnCnst.Name.BRACKET_ATTRIBUTE_ACCESSOR, name, ec);
 	}
 
 	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final ALangObject thisContext,
 			@Nonnull final IEvaluationContext ec) {
-		super(CmnCnst.NAME_ATTRIBUTE_ACCESSOR, name, thisContext, ec);
+		super(CmnCnst.Name.ATTRIBUTE_ACCESSOR, name, thisContext, ec);
 	}
 
 	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final ALangObject thisContext,
 			final boolean accessedViaDot, @Nonnull final IEvaluationContext ec) {
-		super(accessedViaDot ? CmnCnst.NAME_DOT_ATTRIBUTE_ACCESSOR : CmnCnst.NAME_BRACKET_ATTRIBUTE_ACCESSOR, name,
+		super(accessedViaDot ? CmnCnst.Name.DOT_ATTRIBUTE_ACCESSOR : CmnCnst.Name.BRACKET_ATTRIBUTE_ACCESSOR, name,
 				thisContext, ec);
 	}
 

@@ -10,12 +10,13 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class StringLangObject extends ALangObject {
@@ -26,9 +27,9 @@ public class StringLangObject extends ALangObject {
 		@Nonnull public final static StringLangObject SPACE = StringLangObject.create(StringUtils.SPACE);
 		@Nonnull public final static StringLangObject LF = StringLangObject.create(StringUtils.LF);
 		@Nonnull public final static StringLangObject CR = StringLangObject.create(StringUtils.CR);
-		@Nonnull public final static StringLangObject TRUE = StringLangObject.create(CmnCnst.SYNTAX_TRUE);
-		@Nonnull public final static StringLangObject FALSE = StringLangObject.create(CmnCnst.SYNTAX_FALSE);
-		@Nonnull public final static StringLangObject NULL = StringLangObject.create(CmnCnst.SYNTAX_NULL);
+		@Nonnull public final static StringLangObject TRUE = StringLangObject.create(Syntax.TRUE);
+		@Nonnull public final static StringLangObject FALSE = StringLangObject.create(Syntax.FALSE);
+		@Nonnull public final static StringLangObject NULL = StringLangObject.create(Syntax.NULL);
 	}
 
 	private StringLangObject(@Nonnull final String value) {
@@ -114,7 +115,7 @@ public class StringLangObject extends ALangObject {
 	}
 
 	public static void toExpression(final String value, final StringBuilder builder) {
-		builder.append(CmnCnst.SYNTAX_QUOTE).append(StringEscapeUtils.escapeJava(value)).append(CmnCnst.SYNTAX_QUOTE);
+		builder.append(Syntax.QUOTE).append(StringEscapeUtils.escapeJava(value)).append(Syntax.QUOTE);
 	}
 
 	public static void toExpression(final String value, final Writer writer) throws IOException {
@@ -210,7 +211,7 @@ public class StringLangObject extends ALangObject {
 
 	@Nonnull
 	public static StringLangObject create(final boolean value) {
-		return StringLangObject.create(value ? CmnCnst.SYNTAX_TRUE : CmnCnst.SYNTAX_FALSE);
+		return StringLangObject.create(value ? Syntax.TRUE : Syntax.FALSE);
 	}
 
 	@Nonnull

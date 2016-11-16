@@ -10,12 +10,13 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IFunction;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.CoercionException;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class ArrayLangObject extends ALangObject {
@@ -169,10 +170,10 @@ public class ArrayLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(CmnCnst.SYNTAX_BRACE_OPEN);
-		for (final ALangObject o : value) builder.append(o.toString()).append(CmnCnst.SYNTAX_COMMA);
+		builder.append(Syntax.BRACE_OPEN);
+		for (final ALangObject o : value) builder.append(o.toString()).append(Syntax.COMMA);
 		if (builder.length() > 1) builder.setLength(builder.length()-1);
-		builder.append(CmnCnst.SYNTAX_BRACKET_CLOSE);
+		builder.append(Syntax.BRACKET_CLOSE);
 	}
 
 	@Override

@@ -13,11 +13,11 @@ import org.apache.commons.collections4.map.MultiKeyMap;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import de.xima.fc.form.expression.context.ICustomScope;
-import de.xima.fc.form.expression.context.IEvaluationContext;
-import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.IScope;
 import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.iface.context.ICustomScope;
+import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.context.IScope;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 

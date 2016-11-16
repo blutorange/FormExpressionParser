@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.context.ILogger;
+import de.xima.fc.form.expression.iface.context.ILogger;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class SystemLogger implements ILogger {
@@ -16,10 +16,10 @@ public class SystemLogger implements ILogger {
 	@Nonnull private final String prefix;
 
 	private static class InstanceHolder {
-		@Nonnull public final static SystemLogger ERROR = new SystemLogger(Level.ERROR, CmnCnst.NAME_SYSTEM_LOGGER);
-		@Nonnull public final static SystemLogger WARN = new SystemLogger(Level.WARN, CmnCnst.NAME_SYSTEM_LOGGER);
-		@Nonnull public final static SystemLogger INFO = new SystemLogger(Level.INFO, CmnCnst.NAME_SYSTEM_LOGGER);
-		@Nonnull public final static SystemLogger DEBUG = new SystemLogger(Level.DEBUG, CmnCnst.NAME_SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger ERROR = new SystemLogger(Level.ERROR, CmnCnst.Name.SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger WARN = new SystemLogger(Level.WARN, CmnCnst.Name.SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger INFO = new SystemLogger(Level.INFO, CmnCnst.Name.SYSTEM_LOGGER);
+		@Nonnull public final static SystemLogger DEBUG = new SystemLogger(Level.DEBUG, CmnCnst.Name.SYSTEM_LOGGER);
 	}
 
 	public static enum Level {

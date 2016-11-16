@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.formexpression;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.ECommentType;
-import de.xima.fc.form.expression.iface.parsed.IComment;
+import de.xima.fc.form.expression.iface.parse.IComment;
 
 public class CommentImpl implements IComment {
 

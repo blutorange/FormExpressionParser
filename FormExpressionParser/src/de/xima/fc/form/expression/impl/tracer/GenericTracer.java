@@ -5,8 +5,8 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.context.ITracer;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.ITracer;
 
 public class GenericTracer implements ITracer<Node> {
 	@Nullable private Node processed;
