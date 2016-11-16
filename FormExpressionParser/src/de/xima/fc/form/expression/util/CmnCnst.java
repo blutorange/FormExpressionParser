@@ -274,9 +274,11 @@ public final class CmnCnst {
 		@Nonnull public static final String INVALID_EQUAL_METHOD = "Invalid enum for equal method: %s.";
 		@Nonnull public static final String INVALID_COMPARISON_METHOD = "Invalid enum for comparison method: %s";
 		@Nonnull public static final String NULL_ERROR_VARIABLE_NAME = "Catch clause must specifiy a variable name. " + INTERNAL_ERROR;
-		@Nonnull public static final String EC_POOL_RETURNED_NULL = "Pool returned null";
+		@Nonnull public static final String EC_POOL_RETURNED_NULL = "Pool returned null evaluation context.";
+		@Nonnull public static final String EC_FACTORY_RETURNED_NULL = "Factory returned null evaluation context.";
 		@Nonnull public static final String EXPRESSION_METHOD_NULL_INTERNAL = "Expression method must not be null here. " + INTERNAL_ERROR;
 		@Nonnull public static final String NOT_A_COMMENT_TOKEN = "Token kind is not a comment token, but %s.";
+		@Nonnull public static final String FACTORY_FAILED_TO_CREATE_EC = "Evaluation context factory %s failed to create context.";
 	}
 
 	public static final class ToString {

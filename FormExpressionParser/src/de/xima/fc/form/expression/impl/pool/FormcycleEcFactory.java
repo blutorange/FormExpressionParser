@@ -22,15 +22,20 @@ import de.xima.fc.form.expression.impl.scope.MathScope;
 import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 
 public class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
-
 	private final static class InstanceHolder {
-		@Nonnull public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new FormcycleEcFactory());
+		@Nonnull
+		public final static BasePooledObjectFactory<IEvaluationContext> FACTORY_INSTANCE = new FormcycleEcFactory();
+		@Nonnull
+		public final static ObjectPool<IEvaluationContext> POOL_INSTANCE = new GenericObjectPool<>(FACTORY_INSTANCE);
 	}
 
+	private FormcycleEcFactory(){}
+
 	@Override
-	public void passivateObject(final PooledObject<IEvaluationContext> ec) throws Exception {
-		if (ec.getObject() == null) return;
-		ec.getObject().reset();
+	public void passivateObject(final PooledObject<IEvaluationContext> pooledEc) throws Exception {
+		final IEvaluationContext ec = pooledEc.getObject();
+		if (ec != null)
+			ec.reset();
 	}
 
 	@Override
@@ -45,9 +50,7 @@ public class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationConte
 
 	private static IScope makeScope() {
 		final ICustomScope mathScope = MathScope.INSTANCE;
-		return new GenericScope.Builder()
-				.addCustomScope(mathScope)
-				.build();
+		return new GenericScope.Builder().addCustomScope(mathScope).build();
 	}
 
 	private static IEvaluationContext makeEc() {
@@ -63,7 +66,12 @@ public class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationConte
 	}
 
 	@Nonnull
+	public static BasePooledObjectFactory<IEvaluationContext> getFactoryInstance() {
+		return InstanceHolder.FACTORY_INSTANCE;
+	}
+
+	@Nonnull
 	public static ObjectPool<IEvaluationContext> getPoolInstance() {
-		return InstanceHolder.INSTANCE;
+		return InstanceHolder.POOL_INSTANCE;
 	}
 }

@@ -1,6 +1,8 @@
-package de.xima.fc.form.expression.test;
+package de.xima.fc.form.expression.test.lang;
 
 import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -10,9 +12,10 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.test.TestUtil.EContextType;
-import de.xima.fc.form.expression.test.TestUtil.ETestType;
-import de.xima.fc.form.expression.test.TestUtil.ITestCase;
+import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
+import de.xima.fc.form.expression.test.lang.TestUtil.ETestType;
+import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @SuppressWarnings("nls")
 enum SemanticsSuccess implements ITestCase {
@@ -124,6 +127,7 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL003("true ? 42 : 0;", Tests.N42), // Ternary
 	GENERAL004("function foo(){return 42;};foo();", Tests.N42), // Function return
 	GENERAL005("42;;;;;", Tests.N42), // Empty node is throughpass
+	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // should not take too long
 
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),

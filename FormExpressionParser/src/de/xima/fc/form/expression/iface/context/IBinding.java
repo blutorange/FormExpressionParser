@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.iface.context;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
@@ -20,9 +21,10 @@ import de.xima.fc.form.expression.util.IReset;
 public interface IBinding extends IReset {
 
 	/**
-	 * Resets this binding and all children, if any, created by {@link #nest()}.
-	 * Must also reset any parents that created this binding and return the
-	 * binding at nesting depth 0.
+	 * Resets this binding. This means that {@link #isGlobal()} now returns <code>false</code>
+	 * and {@link #getVariable(String)} now returns <code>null</code> for all variable names.
+	 * No call that has been made to any method of this instance before the call to this method
+	 * may affect the return value of any subsequent call to any method.
 	 */
 	@Override
 	public void reset();
@@ -61,31 +63,29 @@ public interface IBinding extends IReset {
 	public void setVariable(@Nonnull String name, @Nonnull ALangObject value) throws EvaluationException;
 
 	/**
-	 * Creates a new binding derived from the this binding. {@link #getVariable(String)}
-	 * must return the same value unless #{@link #setVariable(String, ALangObject)} was called.
-	 * <br><br>
-	 * Implementations are not required to return a new object, merely a binding that
-	 * behaves as specified.
-	 * @return An {@link IBinding} that keeps the current variables and can be unnested to
-	 * the current binding undoing all changes made to the nested binding.
+	 * Modifies this binding. {@link #getVariable(String)} must return the same value
+	 * unless #{@link #setVariable(String, ALangObject)} was called.
+	 * @throws NestingLevelTooDeepException When the nesting level has been reached.
 	 */
 	public void nest(@Nonnull IEvaluationContext ec) throws NestingLevelTooDeepException;
 
 	/**
-	 * Same as {@link #nest()}, but without falling back to the parent binding.
-	 * The returned binding must be empty. However, {@link #unnest()} must still
-	 * return the previous binding (a binding equivalent to this one).
-	 * @return
+	 * Same as {@link #nest()}, but without falling back to any parent bindings other than
+	 * the global binding.
+	 * The returned binding must otherwise be empty. {@link #unnest()} must still
+	 * be able to unnest the nesting.
+	 * @throws NestingLevelTooDeepException When the nesting level has been reached.
 	 */
-	public void nestLocal(@Nonnull IEvaluationContext ec);
+	public void nestLocal(@Nonnull IEvaluationContext ec) throws NestingLevelTooDeepException;
 
 	/**
 	 * Gets the previous binding from which this binding was derived.
 	 * All side effects of {@link #setVariable(String, ALangObject)}
 	 * must be undone.
 	 * @return The parent binding. Undefined behaviour when there is no such binding.
+	 * @throws CannotUnnestGlobalNestingException When this binding is at the global level.
 	 */
-	public void unnest(@Nonnull IEvaluationContext ec);
+	public void unnest(@Nonnull IEvaluationContext ec) throws CannotUnnestGlobalNestingException;
 
 	/**
 	 * The limit on nesting. Each if-clause, loop, try-clause, switch,
@@ -97,4 +97,16 @@ public interface IBinding extends IReset {
 	 * <code>-1</code>.
 	 */
 	public int getNestingLimit();
+
+	/**
+	 * @return Whether the nesting limit has been reached and a call to {@link #nest(IEvaluationContext)}
+	 * or {@link #nestLocal(IEvaluationContext)} will throw an error.
+	 */
+	public boolean isAtMaximumNestingLimit();
+
+	/**
+	 * @return Whether this binding is currently at the global scope, ie. at a nesting level of 0. Calling
+	 * {@link #unnest(IEvaluationContext)} when at the global scope throws an error.
+	 */
+	public boolean isGlobal();
 }

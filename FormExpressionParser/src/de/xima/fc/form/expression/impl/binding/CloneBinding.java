@@ -63,6 +63,16 @@ public class CloneBinding implements IBinding {
 		impl = impl.unnest(ec);
 	}
 
+	@Override
+	public boolean isGlobal() {
+		return impl.isGlobal();
+	}
+
+	@Override
+	public boolean isAtMaximumNestingLimit() {
+		return false;
+	}
+
 	private class Impl {
 		private final Map<String, ALangObject> map;
 		@Nullable private final Impl parent;
@@ -81,7 +91,7 @@ public class CloneBinding implements IBinding {
 		}
 
 		private Impl(@Nonnull final Impl parent, @Nonnull final Impl top, final boolean isBreakpoint) {
-			map = new HashMap<>(parent.map);
+			map = new HashMap<>();
 			this.parent = parent;
 			this.top = top;
 			this.isBreakpoint = isBreakpoint;
@@ -108,14 +118,13 @@ public class CloneBinding implements IBinding {
 		}
 
 		private boolean setVariableInternal(@Nonnull final String name, @Nonnull final ALangObject value) throws EvaluationException {
-			final Impl p = parent;
-			if (isBreakpoint || p == null) {
-				if (map.containsKey(name)) {
-					map.put(name, value);
-					return true;
-				}
-				return false;
+			if (map.containsKey(name)) {
+				map.put(name, value);
+				return true;
 			}
+			final Impl p = parent;
+			if (isBreakpoint || p == null)
+				return false;
 			return p.setVariableInternal(name, value);
 		}
 
@@ -143,5 +152,10 @@ public class CloneBinding implements IBinding {
 		public Impl nestLocal() {
 			return new Impl(this, top, true);
 		}
+
+		public boolean isGlobal() {
+			return parent == null;
+		}
 	}
+
 }

@@ -1,8 +1,9 @@
-package de.xima.fc.form.expression.test;
+package de.xima.fc.form.expression.test.lang;
 
 import static org.junit.Assert.fail;
 
 import java.io.Writer;
+import java.util.Date;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -114,43 +115,61 @@ public final class TestUtil {
 	}
 
 	private static ALangObject evaluate(@Nonnull final IFormExpression fe, @Nonnull final EContextType context, @Nonnull final ETestType type) throws EvaluationException {
+		final ALangObject res;
+		final Date t1 = new Date();
 		switch(context) {
 		case GENERIC:
 			switch (type) {
 			case PROGRAM:
-				return fe.evaluate(GenericEcFactory.getPoolInstance(), DummyExternalContext.INSTANCE);
+				res = fe.evaluate(GenericEcFactory.getFactoryInstance(), DummyExternalContext.INSTANCE);
+				break;
 			case TEMPLATE:
 				final WriterOnlyExternalContext woec = new WriterOnlyExternalContext(new StringBuilderWriter());
-				fe.evaluate(GenericEcFactory.getPoolInstance(), woec);
-				return StringLangObject.create(woec.toString());
+				fe.evaluate(GenericEcFactory.getFactoryInstance(), woec);
+				res = StringLangObject.create(woec.toString());
+				break;
 			default:
 				throw new RuntimeException("Unkown enum: " + type);
 			}
+			break;
 		case FORMCYCLE:
 			switch (type) {
 			case PROGRAM:
-				return fe.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext());
+				res = fe.evaluate(FormcycleEcFactory.getFactoryInstance(), new FormcycleExternalContext());
+				break;
 			case TEMPLATE:
 				final Writer sbw = new StringBuilderWriter();
-				fe.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext(sbw));
-				return StringLangObject.create(sbw.toString());
+				fe.evaluate(FormcycleEcFactory.getFactoryInstance(), new FormcycleExternalContext(sbw));
+				res = StringLangObject.create(sbw.toString());
+				break;
 			default:
 				throw new RuntimeException("Unkown enum: " + type);
 			}
+			break;
 		default:
 			throw new RuntimeException("Unknown enum: " + type);
 		}
+		final Date t2 = new Date();
+		System.out.println(String.format("Evaluation took %s ms.", t2.getTime()-t1.getTime()));
+		return res;
 	}
 
 	@Nonnull
 	private static IFormExpression parse(@Nonnull final String code, @Nonnull final ETestType type) throws ParseException, TokenMgrError {
+		final IFormExpression res;
+		final Date t1 = new Date();
 		switch (type) {
 		case PROGRAM:
-			return FormExpressionFactory.Program.parse(code);
+			res = FormExpressionFactory.Program.parse(code);
+			break;
 		case TEMPLATE:
-			return FormExpressionFactory.Template.parse(code);
+			res = FormExpressionFactory.Template.parse(code);
+			break;
 		default:
 			throw new ParseException("Unkown enum: " + type);
 		}
+		final Date t2 = new Date();
+		System.out.println(String.format("Parsing took %s ms.", t2.getTime()-t1.getTime()));
+		return res;
 	}
 }

@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.test;
+package de.xima.fc.form.expression.test.lang;
 
 import static org.junit.Assert.fail;
 

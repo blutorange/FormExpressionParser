@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.test;
+package de.xima.fc.form.expression.test.lang;
 
 import javax.annotation.Nonnull;
 
@@ -10,9 +10,9 @@ import de.xima.fc.form.expression.exception.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
-import de.xima.fc.form.expression.test.TestUtil.EContextType;
-import de.xima.fc.form.expression.test.TestUtil.ETestType;
-import de.xima.fc.form.expression.test.TestUtil.ITestCase;
+import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
+import de.xima.fc.form.expression.test.lang.TestUtil.ETestType;
+import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
 
 @SuppressWarnings("nls")
 enum SemanticsFailure implements ITestCase {

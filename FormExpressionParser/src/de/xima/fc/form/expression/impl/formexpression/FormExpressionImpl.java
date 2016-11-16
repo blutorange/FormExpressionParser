@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl.formexpression;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,26 @@ class FormExpressionImpl implements IFormExpression {
 
 	@Override
 	@Nonnull
-	public ALangObject evaluate(@Nonnull final ObjectPool<IEvaluationContext> pool,
-			@Nullable final IExternalContext ex) throws EvaluationException {
+	public ALangObject evaluate(final BasePooledObjectFactory<IEvaluationContext> factory, final IExternalContext ex)
+			throws EvaluationException {
+		final IEvaluationContext ec;
+		try {
+			ec = factory.create();
+		}
+		catch (final Exception e) {
+			LOG.error(String.format(CmnCnst.Error.FACTORY_FAILED_TO_CREATE_EC, factory), e);
+			throw new CannotAcquireEvaluationContextException(e);
+		}
+		if (ec == null)
+			throw new CannotAcquireEvaluationContextException(
+					new NullPointerException(CmnCnst.Error.EC_FACTORY_RETURNED_NULL));
+		return evaluate(ec, ex);
+	}
+
+	@Override
+	@Nonnull
+	public ALangObject evaluate(@Nonnull final ObjectPool<IEvaluationContext> pool, @Nullable final IExternalContext ex)
+			throws EvaluationException {
 		final IEvaluationContext ec;
 		try {
 			ec = pool.borrowObject();
@@ -58,9 +77,9 @@ class FormExpressionImpl implements IFormExpression {
 		catch (final Exception exception) {
 			throw new CannotAcquireEvaluationContextException(exception);
 		}
-		if (ec == null) {
-			throw new CannotAcquireEvaluationContextException(new NullPointerException(CmnCnst.Error.EC_POOL_RETURNED_NULL));
-		}
+		if (ec == null)
+			throw new CannotAcquireEvaluationContextException(
+					new NullPointerException(CmnCnst.Error.EC_POOL_RETURNED_NULL));
 		try {
 			return evaluate(ec, ex);
 		}
@@ -77,7 +96,8 @@ class FormExpressionImpl implements IFormExpression {
 	@Nonnull
 	@Override
 	public String unparse(@Nullable final UnparseVisitorConfig config) {
-		if (unparse != null) return unparse;
+		if (unparse != null)
+			return unparse;
 		return unparse = UnparseVisitor.unparse(node, comments,
 				config != null ? config : UnparseVisitorConfig.getDefaultConfig());
 	}
@@ -86,4 +106,5 @@ class FormExpressionImpl implements IFormExpression {
 	public ImmutableList<IComment> getComments() {
 		return comments;
 	}
+
 }

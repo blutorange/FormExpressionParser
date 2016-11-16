@@ -23,7 +23,8 @@ import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
 
 	private final static class InstanceHolder {
-		@Nonnull public final static ObjectPool<IEvaluationContext> INSTANCE = new GenericObjectPool<>(new GenericEcFactory());
+		@Nonnull public final static BasePooledObjectFactory<IEvaluationContext> FACTORY_INSTANCE = new GenericEcFactory();
+		@Nonnull public final static ObjectPool<IEvaluationContext> POOL_INSTANCE = new GenericObjectPool<>(FACTORY_INSTANCE);
 	}
 
 	@Override
@@ -43,6 +44,7 @@ public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext
 	}
 
 	private static IEvaluationContext makeEc() {
+		System.out.println("creating");
 		final IBinding binding = new OnDemandLookUpBinding();
 		final ITracer<Node> tracer = new GenericTracer();
 		final IEmbedment embedment = GenericEmbedment.getGenericEmbedment();
@@ -57,6 +59,11 @@ public class GenericEcFactory extends BasePooledObjectFactory<IEvaluationContext
 
 	@Nonnull
 	public static ObjectPool<IEvaluationContext> getPoolInstance() {
-		return InstanceHolder.INSTANCE;
+		return InstanceHolder.POOL_INSTANCE;
+	}
+
+	@Nonnull
+	public static BasePooledObjectFactory<IEvaluationContext> getFactoryInstance() {
+		return InstanceHolder.FACTORY_INSTANCE;
 	}
 }

@@ -165,7 +165,7 @@ public class FormExpressionDemo {
 		final ALangObject result;
 		try {
 			// Do it once so we don't measure setup times.
-			ex.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext());
+			ex.evaluate(FormcycleEcFactory.getFactoryInstance(), new FormcycleExternalContext());
 
 			// Measure how long it takes in practice.
 			final long t1 = System.nanoTime();

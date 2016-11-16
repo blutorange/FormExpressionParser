@@ -109,4 +109,14 @@ public class LookUpBinding implements IBinding {
 	public int getNestingLimit() {
 		return mapArray.length - 1;
 	}
+
+	@Override
+	public boolean isAtMaximumNestingLimit() {
+		return currentDepth >= getNestingLimit();
+	}
+
+	@Override
+	public boolean isGlobal() {
+		return currentDepth <= 0;
+	}
 }

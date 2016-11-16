@@ -15,6 +15,13 @@
 			<scope />
 		</dependency>
 
+        <!-- Used for junit tests. http://www.wtfpl.net/ -->
+		<dependency>
+		    <groupId>org.reflections</groupId>
+		    <artifactId>reflections</artifactId>
+		    <version>0.9.10</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

@@ -105,4 +105,14 @@ public class LookUpBindingAlternative implements IBinding {
 	public int getNestingLimit() {
 		return -1;
 	}
+
+	@Override
+	public boolean isAtMaximumNestingLimit() {
+		return false;
+	}
+
+	@Override
+	public boolean isGlobal() {
+		return currentDepth <= 0;
+	}
 }
