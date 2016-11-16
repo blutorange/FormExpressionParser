@@ -57,9 +57,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.L
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosBodyClose;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosChar;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineCommentChar;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineCommentClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineCommentOpen;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineComment;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Null;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenClose;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenOpen;
@@ -216,9 +214,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 			return getStyleLosSeparator();
 
 		case SingleLineComment:
-		case MultiLineCommentOpen:
-		case MultiLineCommentChar:
-		case MultiLineCommentClose:
+		case MultiLineComment:
 			return getStyleComment();
 
 		default:

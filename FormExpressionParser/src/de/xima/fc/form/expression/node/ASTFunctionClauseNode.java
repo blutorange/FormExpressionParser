@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTFunctionClauseNode extends SimpleNode {
+public class ASTFunctionClauseNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull private String functionName = CmnCnst.EMPTY_STRING;

@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTPostUnaryExpressionNode extends SimpleNode {
+public class ASTPostUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	@Nonnull private EMethod unaryMethod = EMethod.PLUS_UNARY;
 

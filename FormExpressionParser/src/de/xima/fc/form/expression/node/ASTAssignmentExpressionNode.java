@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTAssignmentExpressionNode extends SimpleNode {
+public class ASTAssignmentExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	public ASTAssignmentExpressionNode(@Nonnull final FormExpressionParser parser, final int id) {
 		super(parser, id);
@@ -17,7 +17,7 @@ public class ASTAssignmentExpressionNode extends SimpleNode {
 	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
-		assertChildrenAssignable(0, children.length-1, CmnCnst.NAME_ASSIGNMENT);
+		assertChildrenAssignable(0, jjtGetNumChildren()-1, CmnCnst.NAME_ASSIGNMENT);
 		super.init(method);
 	}
 

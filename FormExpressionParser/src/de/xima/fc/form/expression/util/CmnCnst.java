@@ -136,6 +136,9 @@ public final class CmnCnst {
 	@Nonnull public static final String SYNTAX_NATIVE_CODE = "'[native code]'";
 	@Nonnull public static final String SYNTAX_FAILED_TO_UNPARSE_LAMBDA = "'[error during unparsing]'";
 	@Nonnull public static final String SYNTAX_QUOTE = "\"";
+	@Nonnull public static final String SYNTAX_SINGLE_LINE_COMMENT_START = "//";
+	@Nonnull public static final String SYNTAX_MULTI_LINE_COMMENT_START = "/*";
+	@Nonnull public static final String SYNTAX_MULTI_LINE_COMMENT_END = "*/";
 
 	@Nonnull public static final String NAME_ATTRIBUTE_ACCESSOR = "attribute accessor";
 	@Nonnull public static final String NAME_DOT_ATTRIBUTE_ACCESSOR = "dot attribute accessor";
@@ -163,6 +166,7 @@ public final class CmnCnst {
 	@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
 	@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 	@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
+
 
 	public static final class Error {
 		@Nonnull public static final String ARRAY_INDEX_OUT_OF_BOUNDS = "Index %s out of bounds for array %s.";
@@ -245,7 +249,9 @@ public final class CmnCnst {
 		@Nonnull public static final String UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT = "Command %s cannot be processed by SystemOutExternalContext.";
 		@Nonnull public static final String NULL_CHILD_NODE = "Child node must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String NULL_METHOD = "Method must not be null. " + INTERNAL_ERROR;
-		@Nonnull public static final String NULL_NODE = "Node must not be null." + INTERNAL_ERROR;
+		@Nonnull public static final String NULL_NODE_INTERNAL = "Node must not be null." + INTERNAL_ERROR;
+		@Nonnull public static final String NULL_NODE = "Node must not be null.";
+		@Nonnull public static final String NULL_PARSER_CONFIG = "Parser config must not be null.";
 		@Nonnull public static final String PARSER_RETURNED_NULL_NODE = "Failed to parse code: parser returned null node.";
 		@Nonnull public static final String FUNCTION_MISSING_RETURN_TYPE = "Functions must declare their return type.";
 		@Nonnull public static final String ILLEGAL_VARIABLE_TYPE = "Encountered incompatible variable type at line %d, column %d: %s";
@@ -258,6 +264,8 @@ public final class CmnCnst {
 		@Nonnull public static final String INVALID_COMPARISON_METHOD = "Invalid enum for comparison method: %s";
 		@Nonnull public static final String NULL_ERROR_VARIABLE_NAME = "Catch clause must specifiy a variable name. " + INTERNAL_ERROR;
 		@Nonnull public static final String EC_POOL_RETURNED_NULL = "Pool returned null";
+		@Nonnull public static final String EXPRESSION_METHOD_NULL_INTERNAL = "Expression method must not be null here. " + INTERNAL_ERROR;
+		public static final String NOT_A_COMMENT_TOKEN = "Token kind is not a comment token, but %s.";
 	}
 
 	public static final class ToString {

@@ -77,7 +77,7 @@ public class FunctionLangObject extends ALangObject {
 		if (n == null)
 			builder.append(CmnCnst.SYNTAX_NATIVE_CODE);
 		else {
-			final String unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithCommentsConfig());
+			final String unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithoutCommentsConfig());
 			builder.append(unparse);
 		}
 		builder.append(CmnCnst.SYNTAX_BRACE_CLOSE).append(CmnCnst.SYNTAX_SEMI_COLON);

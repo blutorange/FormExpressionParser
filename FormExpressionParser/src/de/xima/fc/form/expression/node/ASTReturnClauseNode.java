@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTReturnClauseNode extends SimpleNode {
+public class ASTReturnClauseNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	public ASTReturnClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

@@ -27,7 +27,7 @@ enum SyntaxFailure implements ITestCase {
 	TEST014("42 = 42;", "Encountered illegal LVALUE ASTNumberNode in assignment at line 1, column 1."),
 	TEST015("\"\\\";", "Lexical error at line 1, column 5.  Encountered: <EOF> after : \"\\\"\\\\\\\";\"", TokenMgrError.class),
 	TEST016("++(1+2);", "Encountered illegal LVALUE ASTParenthesisExpressionNode in prefix operation at line 1, column 1."),
-	TEST017("++a.b();", "Encountered illegal LVALUE (function call) ASTPropertyExpressionNode(null,null,1:3-1:7,) in prefix operation at line 1, column 1."),
+	TEST017("++a.b();", "Encountered illegal LVALUE (function call) ASTPropertyExpressionNode(null,NONE,1:3-1:7,) in prefix operation at line 1, column 1."),
 	TEST018("++--a;", "Encountered illegal LVALUE ASTUnaryExpressionNode in prefix operation at line 1, column 1."),
 
 	TEMPLATE001("<foo>[% i = %]</foo> [% 42; %]", ETestType.TEMPLATE,"Encountered \" \"%]\" \"%] \"\" at line 1, column 13."),

@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTStringNode extends SimpleNode {
+public class ASTStringNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	public ASTStringNode(@Nonnull final FormExpressionParser parser, final int nodeId) {

@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTUnaryExpressionNode extends SimpleNode {
+public class ASTUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	public ASTUnaryExpressionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {

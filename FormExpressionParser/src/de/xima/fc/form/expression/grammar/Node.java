@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.grammar;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -141,6 +140,7 @@ public interface Node extends Serializable, ITraceElement {
 	/**
 	 * @return The method by which this node is linked to the previous sibling, or null.
 	 */
+	@Nonnull
 	public EMethod getSiblingMethod();
 
 	@Nonnull
@@ -157,13 +157,8 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public int jjtGetNodeId();
 
+	@Nullable
 	public String getEmbedment();
-
-	/**
-	 * @return A list of all comments in the program. Do not use with
-	 * until parsing is done.
-	 */
-	public List<Token> getComments();
 
 	public void jjtSetFirstToken(Token token);
 	public void jjtSetLastToken(Token token);

@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTForLoopNode extends SimpleNode {
+public class ASTForLoopNode extends ANode {
 
 	private static final long serialVersionUID = 1L;
 	private String iteratingLoopVariable;

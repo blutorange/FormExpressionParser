@@ -7,29 +7,36 @@ import org.apache.commons.pool2.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
+
 import de.xima.fc.form.expression.context.IEvaluationContext;
 import de.xima.fc.form.expression.context.IExternalContext;
-import de.xima.fc.form.expression.context.IFormExpression;
 import de.xima.fc.form.expression.exception.CannotAcquireEvaluationContextException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.parsed.IComment;
+import de.xima.fc.form.expression.iface.parsed.IFormExpression;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
-class FormExpression implements IFormExpression {
-	private final static Logger LOG = LoggerFactory.getLogger(FormExpression.class);
+class FormExpressionImpl implements IFormExpression {
+	private final static Logger LOG = LoggerFactory.getLogger(FormExpressionImpl.class);
 	private static final long serialVersionUID = 1L;
 
 	@Nullable
 	private transient String unparse;
+
 	@Nonnull
 	private final Node node;
+	@Nonnull
+	private final ImmutableList<IComment> comments;
 
-	public FormExpression(@Nonnull final Node node) {
+	FormExpressionImpl(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments) {
 		this.node = node;
+		this.comments = comments;
 	}
 
 	@Override
@@ -71,6 +78,12 @@ class FormExpression implements IFormExpression {
 	@Override
 	public String unparse(@Nullable final UnparseVisitorConfig config) {
 		if (unparse != null) return unparse;
-		return unparse = UnparseVisitor.unparse(node, config == null ? UnparseVisitorConfig.getDefaultConfig() : config);
+		return unparse = UnparseVisitor.unparse(node, comments,
+				config != null ? config : UnparseVisitorConfig.getDefaultConfig());
+	}
+
+	@Override
+	public ImmutableList<IComment> getComments() {
+		return comments;
 	}
 }

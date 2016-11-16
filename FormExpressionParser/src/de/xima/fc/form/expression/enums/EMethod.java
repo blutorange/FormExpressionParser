@@ -92,6 +92,7 @@ public enum EMethod {
 	SWITCHCASE(CmnCnst.EMETHOD_SWITCHCASE),
 	SWITCHDEFAULT(CmnCnst.EMETHOD_SWITCHDEFAULT),
 	SWITCHCLAUSE(CmnCnst.EMETHOD_SWITCHCLAUSE),
+	NONE(CmnCnst.EMPTY_STRING),
 	;
 
 	@Nonnull public final String methodName;

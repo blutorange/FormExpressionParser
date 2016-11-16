@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTRegexNode extends SimpleNode {
+public class ASTRegexNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull private Pattern pattern = CmnCnst.EMPTY_PATTERN;

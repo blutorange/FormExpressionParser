@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTIdentifierNameNode extends SimpleNode {
+public class ASTIdentifierNameNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull private String name = CmnCnst.EMPTY_STRING;

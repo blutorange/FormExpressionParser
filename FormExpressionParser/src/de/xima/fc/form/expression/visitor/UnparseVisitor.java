@@ -29,16 +29,20 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.grammar.Token;
+import de.xima.fc.form.expression.iface.parsed.IComment;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -85,26 +89,51 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.Void;
 
 public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String, IOException> {
+	private final static Logger LOG = LoggerFactory.getLogger(UnparseVisitor.class);
 
 	private final Writer writer;
 	private final UnparseVisitorConfig config;
-	private final List<Token> comments;
-	private Token commentToken;
+	private final ImmutableList<IComment> comments;
+	private IComment commentToken;
 	private int commentPos;
 
-	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node) throws IOException {
-		unparse(writer, node, UnparseVisitorConfig.getDefaultConfig());
+	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
+			@Nonnull final ImmutableList<IComment> comments) throws IOException {
+		unparse(writer, node, comments, UnparseVisitorConfig.getDefaultConfig());
+	}
+
+	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
+			@Nonnull final ImmutableList<IComment> comments, @Nonnull final UnparseVisitorConfig config)
+					throws IOException {
+		Preconditions.checkNotNull(writer, CmnCnst.Error.NULL_WRITER);
+		Preconditions.checkNotNull(node, CmnCnst.Error.NULL_NODE);
+		Preconditions.checkNotNull(config, CmnCnst.Error.NULL_PARSER_CONFIG);
+		final UnparseVisitor unparser = new UnparseVisitor(writer, comments, config);
+		unparser.blockOrClause(node, CmnCnst.EMPTY_STRING);
+		unparser.writeRemainingComments();
+		writer.flush();
 	}
 
 	@Nonnull
 	public static String unparse(@Nonnull final Node node) {
-		return unparse(node, UnparseVisitorConfig.getDefaultConfig());
+		return unparse(node, ImmutableList.<IComment>of());
+	}
+
+	@Nonnull
+	public static String unparse(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments) {
+		return unparse(node, comments, UnparseVisitorConfig.getDefaultConfig());
 	}
 
 	@Nonnull
 	public static String unparse(@Nonnull final Node node, @Nonnull final UnparseVisitorConfig config) {
+		return unparse(node, ImmutableList.<IComment>of(), config);
+	}
+
+	@Nonnull
+	public static String unparse(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments,
+			@Nonnull final UnparseVisitorConfig config) {
 		try (final Writer writer = new StringBuilderWriter()) {
-			unparse(writer, node, config);
+			unparse(writer, node, comments, config);
 			final String s = writer.toString();
 			return s != null ? s : CmnCnst.EMPTY_STRING;
 		}
@@ -114,39 +143,26 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		}
 	}
 
-	public static void unparse(@Nonnull  final Writer writer, @Nonnull  final Node node, @Nonnull final UnparseVisitorConfig config)
-			throws IOException {
-		final UnparseVisitor unparser = new UnparseVisitor(writer, node.getComments(), config);
-		unparser.blockOrClause(node, CmnCnst.EMPTY_STRING);
-		unparser.writeRemainingComments();
-		writer.flush();
-	}
-
-	private UnparseVisitor(final Writer writer, final List<Token> comments, final UnparseVisitorConfig config) {
-		if (writer == null)
-			throw new IllegalArgumentException(CmnCnst.Error.NULL_WRITER);
+	private UnparseVisitor(@Nonnull final Writer writer, @Nonnull final ImmutableList<IComment> comments,
+			@Nonnull final UnparseVisitorConfig config) {
 		this.config = config;
 		this.writer = writer;
 		this.comments = comments;
 		this.commentPos = 0;
-		this.commentToken = (comments != null && commentPos < comments.size()) ? comments.get(commentPos) : null;
+		this.commentToken = (commentPos < comments.size()) ? comments.get(commentPos) : null;
 	}
 
 	private void writeComment(final String prefix, final boolean isBlock) throws IOException {
 		if (!config.keepComments)
 			return;
 		// Write the comment
-		writer.write(commentToken.image);
-		if (commentToken.image.charAt(1) == '/') {
-			// Single line comment ends with a newline (unless it is the last
-			// line)
-			// Add indentation.
-			if (commentToken.image.charAt(commentToken.image.length() - 1) == '\n')
-				writer.write(prefix);
-		}
-		else {
-			// When a multiline comment appears before a block or
-			// statement, we add newline.
+		switch (commentToken.getCommentType()) {
+		case MULTI_LINE:
+			writer.write(CmnCnst.SYNTAX_MULTI_LINE_COMMENT_START);
+			writer.write(commentToken.getText());
+			writer.write(CmnCnst.SYNTAX_MULTI_LINE_COMMENT_END);
+			// When a multi-line comment appears before a block or
+			// a statement, we add a newline.
 			if (isBlock) {
 				writer.write(config.linefeed);
 				writer.write(prefix);
@@ -155,6 +171,18 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 			else {
 				writer.write(config.optionalSpace);
 			}
+			break;
+		case SINGLE_LINE:
+			writer.write(CmnCnst.SYNTAX_SINGLE_LINE_COMMENT_START);
+			writer.write(commentToken.getText());
+			// Single line comment ends with a newline (unless it is the last
+			// line). We need to add the proper indentation.
+			if (commentToken.getText().charAt(commentToken.getText().length() - 1) == '\n')
+				writer.write(prefix);
+			break;
+		default:
+			LOG.error("Unknown enum: " + commentToken.getCommentType());
+			break;
 		}
 		// Get the next comment
 		++commentPos;
@@ -178,8 +206,8 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		// as a comment token cannot be at the same position as a non-comment
 		// node.
 		while (commentToken != null
-				&& (node.getStartLine() > commentToken.beginLine || node.getStartLine() == commentToken.beginLine
-				&& node.getStartColumn() >= commentToken.beginColumn)) {
+				&& (node.getStartLine() > commentToken.getLine() || node.getStartLine() == commentToken.getLine()
+				&& node.getStartColumn() >= commentToken.getColumn())) {
 			writeComment(prefix, isBlock);
 		}
 	}

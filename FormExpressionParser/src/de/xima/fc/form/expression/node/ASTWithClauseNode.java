@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
 
-public class ASTWithClauseNode extends SimpleNode {
+public class ASTWithClauseNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	public ASTWithClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {

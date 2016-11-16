@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.context;
+package de.xima.fc.form.expression.iface.parsed;
 
 import java.io.Serializable;
 
@@ -7,6 +7,10 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.pool2.ObjectPool;
 
+import com.google.common.collect.ImmutableList;
+
+import de.xima.fc.form.expression.context.IEvaluationContext;
+import de.xima.fc.form.expression.context.IExternalContext;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
@@ -27,4 +31,8 @@ public interface IFormExpression extends Serializable {
 	 */
 	@Nonnull
 	public String unparse(@Nullable UnparseVisitorConfig config);
+
+	@Nonnull
+	public ImmutableList<IComment> getComments();
+
 }

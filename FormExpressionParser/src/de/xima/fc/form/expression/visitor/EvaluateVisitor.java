@@ -161,7 +161,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	@Nonnull
 	private static ALangObject setVariable(@Nullable final ASTVariableNode var, @Nonnull final ALangObject val, @Nonnull final IEvaluationContext ec) {
 		if (var == null)
-			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE);
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
 		final String scope = var.getScope();
 		if (scope != null)
 			ec.getScope().setVariable(scope, var.getName(), val);
@@ -423,10 +423,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 			final Node arg = childrenArray[i];
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
-			final EMethod m = arg.getSiblingMethod();
-			if (m == null)
-				throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_METHOD);
-			res = res.evaluateExpressionMethod(m, ec, jjtAccept(node, arg, ec));
+			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, jjtAccept(node, arg, ec));
 		}
 
 		return res;

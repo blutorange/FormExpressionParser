@@ -54,29 +54,34 @@ import java.util.List;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import org.apache.commons.lang3.StringUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
+import de.xima.fc.form.expression.iface.parsed.IComment;
+import de.xima.fc.form.expression.impl.formexpression.CommentFactory;
 import de.xima.fc.form.expression.node.*;
 
 public class FormExpressionParser
 {
   private boolean _customLosAllowed = false;
   /** A list of all the comments occurring in the program. */
-  private List<Token> _comments = new ArrayList<Token>();
+  @Nonnull private ImmutableList.Builder<IComment> _comments = new ImmutableList.Builder<IComment>();
   /** Current embedment context, or null when not in template mode. */
-  private String _currentEmbedmentContext;
+  @Nullable private String _currentEmbedmentContext;
   void setCurrentEmbedmentContext(String currentEmbedmentContext) {
     this._currentEmbedmentContext = currentEmbedmentContext;
   }
-  void addComment(Token commentToken) {
-    _comments.add(commentToken);
+  void addComment(@Nonnull Token commentToken) {
+    _comments.add(CommentFactory.fromToken(commentToken));
   }
-  public String getCurrentEmbedmentContext() {
+  @Nullable public String getCurrentEmbedmentContext() {
     return _currentEmbedmentContext;
   }
   public void setLosAllowed(boolean losAllowed) {
     this._customLosAllowed = losAllowed;
   }
-  public List<Token> getComments() {
-    return _comments;
+  @Nonnull public ImmutableList<IComment> buildComments() {
+    return _comments.build();
   }
 }
 PARSER_END(FormExpressionParser)
@@ -113,13 +118,13 @@ TOKEN :
 < MULTI_LINE_COMMENT >
 SPECIAL_TOKEN :
 {
-  < MultiLineCommentClose: "*/" > : CODE
+  < MultiLineComment: "*/" > : CODE
 }
 
 < MULTI_LINE_COMMENT >
 MORE :
 {
-  < MultiLineCommentChar : ~[ ] >
+  < ~[ ] >
 }
 
 < AFTER_DOT >
@@ -140,7 +145,7 @@ SKIP :
 < CODE >
 MORE:
 { 
-  < MultiLineCommentOpen: "/*" > : MULTI_LINE_COMMENT
+  < "/*" > : MULTI_LINE_COMMENT
 }
 
 < CODE >

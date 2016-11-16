@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.node;
 
 import java.lang.reflect.Array;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public abstract class SimpleNode implements Node {
+public abstract class ANode implements Node {
 	private static final long serialVersionUID = 1L;
 	private final static AtomicInteger ID_PROVIDER = new AtomicInteger();
 
@@ -26,38 +26,47 @@ public abstract class SimpleNode implements Node {
 	 * parse trees. Does not need to be the same for multiple runs of the
 	 * program.
 	 */
-	protected final int uniqueId;
+	private final int uniqueId;
 
-	/** Reference to the list of all comments. It is set when
-	 * the node is created, but might be filled later, but it will
-	 * be filled once parsing is done.
+	/**
+	 * The embedment type of this node. When using templates, code can embedded
+	 * in a plain text document with different embedment contexts, eg. [%code%] or
+	 * [%$$code%]. <code>null</code> when there is no embedment.
 	 */
-	private final List<Token> comments;
-	protected String embedment;
+	@Nullable private final String embedment;
+
 	/** ID of the node type. See {@link FormExpressionParserTreeConstants#jjtNodeName}. */
-	protected int nodeId;
-	/** Parent of this node, or <code>null</code>. */
-	protected Node parent;
-	/** Children of this node, non-null. */
-	@Nonnull
-	protected Node[] children = CmnCnst.EMPTY_NODE_ARRAY;
-	/** Used during evaluation. */
-	private EMethod siblingMethod;
-	/** Line numbers for tracing etc. */
-	private int beginLine=1,beginColumn=1,endLine=1,endColumn=1;
+	private final int nodeId;
+
+	/** Parent of this node. <code>null</code> iff this is the top level node. */
+	@Nullable private Node parent;
+
+	/** List of this node's children. */
+	@Nonnull private Node[] children = CmnCnst.EMPTY_NODE_ARRAY;
+
+	/** Used during evaluation, stores operator information. */
+	@Nonnull private EMethod siblingMethod = EMethod.NONE;
+
+	/** Line and column numbers for tracing, debugging etc. */
+	private int beginLine = 1;
+	/** Line and column numbers for tracing, debugging etc. */
+	private int beginColumn = 1;
+	/** Line and column numbers for tracing, debugging etc. */
+	private int endLine = 1;
+	/** Line and column numbers for tracing, debugging etc. */
+	private int endColumn = 1;
 
 	/**
 	 * @param nodeId
 	 *            Node id. Not needed (yet).
 	 */
-	public SimpleNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ANode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
 		// by itself would raise many other issues...
 		uniqueId = ID_PROVIDER.incrementAndGet();
 		this.nodeId = nodeId;
-		this.comments = parser.getComments();
 		this.embedment = parser.getCurrentEmbedmentContext();
 	}
 
@@ -271,11 +280,6 @@ public abstract class SimpleNode implements Node {
 	}
 
 	@Override
-	public final List<Token> getComments() {
-		return comments;
-	}
-
-	@Override
 	public final int getStartLine() {
 		return beginLine;
 	}
@@ -315,7 +319,7 @@ public abstract class SimpleNode implements Node {
 		} else if (this instanceof ASTFunctionNode) {
 			return CmnCnst.TRACER_POSITION_NAME_ANONYMOUS_FUNCTION;
 		}
-		return parent == null ? CmnCnst.TRACER_POSITION_NAME_GLOBAL : parent.getMethodName();
+		return parent != null ? parent.getMethodName() : CmnCnst.TRACER_POSITION_NAME_GLOBAL;
 	}
 
 	@Override
@@ -368,8 +372,10 @@ public abstract class SimpleNode implements Node {
 		}
 	}
 
+	@OverridingMethodsMustInvokeSuper
 	public void init(@Nullable final EMethod method) throws ParseException {
-		this.siblingMethod = method;
+		if (method != null)
+			this.siblingMethod = method;
 	}
 
 	@Override
@@ -379,5 +385,4 @@ public abstract class SimpleNode implements Node {
 			throw new ParseException(errMessage);
 		return object;
 	}
-
 }
