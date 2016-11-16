@@ -27,6 +27,11 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  * todo
  * - unparse: los nicer
  * - optional variable types
+ * - revise binding policy:
+ *     i = 9; if (true) i = 10;
+ *   This sets the outer variable i to 9. What if I want to create a new local variable that shadows the other one?
+ * - Hoist global variables to the scope, same for scope.
+ * - Check variable scope.
  */
 public class FormExpressionDemo {
 	public static void main(final String args[]) {
