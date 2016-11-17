@@ -27,12 +27,12 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	private final String name;
 
 	public EvaluateVisitorNamedFunction(@Nonnull final EvaluateVisitor visitor,
-			@Nonnull final ASTFunctionClauseNode node, @Nonnull final IEvaluationContext ec) {
+			@Nonnull final ASTFunctionClauseNode node, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		this(visitor, node, node.getFunctionName(), getArgList(visitor, node, ec), ec);
 	}
 
 	protected EvaluateVisitorNamedFunction(@Nonnull final EvaluateVisitor visitor, @Nonnull final Node node,
-			@Nonnull final String name, @Nonnull final String[] argList, @Nonnull final IEvaluationContext ec) {
+			@Nonnull final String name, @Nonnull final String[] argList, @Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
 		final Node b = node.getLastChild();
 		if (b == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
@@ -93,7 +93,7 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 
 	@Nonnull
 	private static String[] getArgList(@Nonnull final EvaluateVisitor visitor, @Nonnull final Node node,
-			@Nonnull final IEvaluationContext ec) {
+			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		final String[] argList = new String[node.jjtGetNumChildren() - 2];
 		for (int i = 0; i != argList.length; ++i)
 			argList[i] = node.jjtGetChild(i + 1).jjtAccept(visitor, ec).coerceString(ec).stringValue();

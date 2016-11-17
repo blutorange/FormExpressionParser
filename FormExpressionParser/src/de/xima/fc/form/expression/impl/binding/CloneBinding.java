@@ -6,13 +6,12 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.context.IBinding;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Create a new binding instance with a new map for each nesting level. May not
@@ -59,7 +58,7 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public void unnest(final IEvaluationContext ec) {
+	public void unnest(final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
 		impl = impl.unnest(ec);
 	}
 
@@ -134,10 +133,10 @@ public class CloneBinding implements IBinding {
 		}
 
 		@Nonnull
-		public final Impl unnest(@Nonnull final IEvaluationContext ec) {
+		public final Impl unnest(@Nonnull final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
 			final Impl p = parent;
 			if (p == null)
-				throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
+				throw new CannotUnnestGlobalNestingException(ec);
 			map.clear();
 			return p;
 		}

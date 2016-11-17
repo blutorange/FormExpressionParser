@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.exception.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTokenManager;
@@ -18,6 +19,7 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
 
 public final class FormExpressionFactory {
 
@@ -42,15 +44,17 @@ public final class FormExpressionFactory {
 		 * the tokens cannot be parsed as a valid program.
 		 * @throws TokenMgrError When the code is not a valid program. Specifically, when
 		 * the code cannot be parsed into valid tokens.
+		 * @throws SemanticsException When the code did not technically fail to parse, but
+		 * is semantically invalid. This is a subclass of {@link ParseException}.
 		 */
 		@Nonnull
-		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError, SemanticsException {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				final Node node = parser.CompleteProgram(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return new FormExpressionImpl(node, parser.buildComments());
+				return postProcess(node, parser);
 			}
 		}
 
@@ -148,6 +152,18 @@ public final class FormExpressionFactory {
 			}
 		}
 
+		/**
+		 * Parses the given string and returns the top level node of the parse
+		 * tree.
+		 *
+		 * @return Top level node of the parse tree.
+		 * @throws ParseException When the code is not a valid program. Specifically, when
+		 * the tokens cannot be parsed as a valid program.
+		 * @throws TokenMgrError When the code is not a valid program. Specifically, when
+		 * the code cannot be parsed into valid tokens.
+		 * @throws SemanticsException When the code did not technically fail to parse, but
+		 * is semantically invalid. This is a subclass of {@link ParseException}.
+		 */
 		@Nonnull
 		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
@@ -156,7 +172,7 @@ public final class FormExpressionFactory {
 				final Node node = parser.Template(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return new FormExpressionImpl(node, parser.buildComments());
+				return postProcess(node, parser);
 			}
 		}
 
@@ -219,6 +235,13 @@ public final class FormExpressionFactory {
 	}
 
 	@Nonnull
+	public static IFormExpression postProcess(final @Nonnull Node node, @Nonnull final FormExpressionParser parser)
+			throws SemanticsException {
+		collectScopeDefinitions(node);
+		return new FormExpressionImpl(node, parser.buildComments());
+	}
+
+	@Nonnull
 	private static FormExpressionParser asParser(@Nonnull final FormExpressionParserTokenManager tm) {
 		final FormExpressionParser parser = new FormExpressionParser(tm);
 		tm.parser = parser;
@@ -234,5 +257,10 @@ public final class FormExpressionFactory {
 		final Token[] res = new Token[list.size()];
 		list.toArray(res);
 		return res;
+	}
+
+
+	private static void collectScopeDefinitions(@Nonnull final Node node) throws SemanticsException {
+		ScopeCollectVisitor.collect(node);
 	}
 }

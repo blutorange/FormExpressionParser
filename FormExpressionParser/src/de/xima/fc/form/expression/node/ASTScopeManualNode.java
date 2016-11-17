@@ -1,33 +1,37 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTLogNode extends ANode {
+public class ASTScopeManualNode extends ANode {
 	private static final long serialVersionUID = 1L;
-	@Nonnull
-	private ELogLevel logLevel = ELogLevel.DEBUG;
 
-	public ASTLogNode(@Nonnull final FormExpressionParser parser, final int id) {
-		super(parser, id);
+	@Nonnull
+	private String scopeName = CmnCnst.EMPTY_STRING;
+
+	public ASTScopeManualNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+		super(parser, nodeId);
 	}
 
-	/**
-	 * @param delimiter Character which delimits the string. " or '
-	 */
-	public void init(@Nullable final EMethod method, @Nonnull final ELogLevel logLevel) throws ParseException {
-		assertChildrenExactly(1);
+	public void init(final EMethod method, final String scopeName) throws ParseException {
+		assertNonNull(scopeName, CmnCnst.Error.MANUAL_SCOPE_NODE_NULL_NAME);
 		super.init(method);
-		this.logLevel = logLevel;
+		if (scopeName != null)
+			this.scopeName = scopeName;
+	}
+
+	@Override
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data)
+			throws E {
+		return visitor.visit(this, data);
 	}
 
 	@Override
@@ -45,20 +49,13 @@ public class ASTLogNode extends ANode {
 		visitor.visit(this);
 	}
 
-	@Override
-	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
-		return visitor.visit(this, data);
-	}
-
-
-	@Override
-	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(logLevel).append(',');
-	}
-
 	@Nonnull
-	public ELogLevel getLogLevel() {
-		return logLevel;
+	public String getScopeName() {
+		return scopeName;
 	}
 
+	@Override
+	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
+		sb.append(scopeName).append(',');
+	}
 }

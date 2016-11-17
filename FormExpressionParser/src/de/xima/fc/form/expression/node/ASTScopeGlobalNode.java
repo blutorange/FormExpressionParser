@@ -1,9 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -12,22 +10,21 @@ import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTLogNode extends ANode {
+public class ASTScopeGlobalNode extends ANode {
 	private static final long serialVersionUID = 1L;
-	@Nonnull
-	private ELogLevel logLevel = ELogLevel.DEBUG;
 
-	public ASTLogNode(@Nonnull final FormExpressionParser parser, final int id) {
-		super(parser, id);
+	public ASTScopeGlobalNode(final @Nonnull FormExpressionParser parser, final int nodeId) {
+		super(parser, nodeId);
 	}
 
-	/**
-	 * @param delimiter Character which delimits the string. " or '
-	 */
-	public void init(@Nullable final EMethod method, @Nonnull final ELogLevel logLevel) throws ParseException {
-		assertChildrenExactly(1);
+	@Override
+	public void init(final EMethod method) throws ParseException {
 		super.init(method);
-		this.logLevel = logLevel;
+	}
+
+	@Override
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
+		return visitor.visit(this, data);
 	}
 
 	@Override
@@ -44,21 +41,4 @@ public class ASTLogNode extends ANode {
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
 	}
-
-	@Override
-	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
-		return visitor.visit(this, data);
-	}
-
-
-	@Override
-	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(logLevel).append(',');
-	}
-
-	@Nonnull
-	public ELogLevel getLogLevel() {
-		return logLevel;
-	}
-
 }

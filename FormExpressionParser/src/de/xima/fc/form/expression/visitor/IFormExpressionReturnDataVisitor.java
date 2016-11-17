@@ -28,6 +28,9 @@ import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
+import de.xima.fc.form.expression.node.ASTScopeExternalNode;
+import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
+import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -35,11 +38,12 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
-public interface IFormExpressionParserVisitor<R,T,E extends Throwable>
+public interface IFormExpressionReturnDataVisitor<R,T,E extends Throwable>
 {
 	@Nonnull public R visit(@Nonnull ASTExpressionNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTAssignmentExpressionNode node, @Nonnull T data) throws E;
@@ -77,4 +81,8 @@ public interface IFormExpressionParserVisitor<R,T,E extends Throwable>
 	@Nonnull public R visit(@Nonnull ASTEqualExpressionNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTPostUnaryExpressionNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTComparisonExpressionNode node, @Nonnull T data) throws E;
+	@Nonnull public R visit(@Nonnull ASTScopeExternalNode node, @Nonnull T data) throws E;
+	@Nonnull public R visit(@Nonnull ASTVariableDeclarationNode node, @Nonnull T data) throws E;
+	@Nonnull public R visit(@Nonnull ASTScopeManualNode node, @Nonnull T data) throws E;
+	@Nonnull public R visit(@Nonnull ASTScopeGlobalNode node, @Nonnull T data) throws E;
 }

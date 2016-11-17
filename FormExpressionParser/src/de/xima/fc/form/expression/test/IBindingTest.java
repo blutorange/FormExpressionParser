@@ -22,6 +22,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
+import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
@@ -116,7 +117,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testSettingAndGettingVariableWithoutScoping() {
+	public final void testSettingAndGettingVariableWithoutScoping() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		binding.setVariable("foo", NumberLangObject.create(42));
 		final ALangObject foo = binding.getVariable("foo");
@@ -125,7 +126,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testNestingLocallyDoesNotBlockGlobalVariable() {
+	public final void testNestingLocallyDoesNotBlockGlobalVariable() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		binding.setVariable("foo", NumberLangObject.create(0));
 		binding.nestLocal(ec);
@@ -135,7 +136,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testNestingAndUnnestingSwitchBetweenLevels() {
+	public final void testNestingAndUnnestingSwitchBetweenLevels() throws NestingLevelTooDeepException, CannotUnnestGlobalNestingException {
 		assertTrue(binding.isGlobal());
 		binding.nest(ec);
 		assertFalse(binding.isGlobal());
@@ -148,7 +149,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testUnnestingDoesNotRememberVariables() {
+	public final void testUnnestingDoesNotRememberVariables() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		binding.nest(ec);
 		binding.setVariable("foo", NumberLangObject.create(1));
@@ -164,7 +165,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testScopingShadowsVariable() {
+	public final void testScopingShadowsVariable() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		binding.setVariable("foo", NumberLangObject.create(0));
 		binding.nest(ec);
@@ -174,7 +175,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testFallsBackToHigherNestingLevel() {
+	public final void testFallsBackToHigherNestingLevel() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		binding.nest(ec);
 		binding.setVariable("foo", NumberLangObject.create(0));
@@ -183,14 +184,14 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testDoesNotThrowWhenVariableHasNotBeenSet() {
+	public final void testDoesNotThrowWhenVariableHasNotBeenSet() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		final ALangObject foo = binding.getVariable("foo");
 		assertNull(foo);
 	}
 
 	@Test
-	public final void testDoesNotFallBackAfterNestingLocally() {
+	public final void testDoesNotFallBackAfterNestingLocally() throws EvaluationException {
 		assertTrue(binding.isGlobal());
 		binding.nest(ec);
 		binding.setVariable("foo", NumberLangObject.create(0));
@@ -199,7 +200,7 @@ public class IBindingTest {
 	}
 
 	@Test
-	public final void testNestingDepthLimit() {
+	public final void testNestingDepthLimit() throws NestingLevelTooDeepException {
 		assertTrue(binding.isGlobal());
 		final int limit = binding.getNestingLimit();
 		if (limit >= 0) {
@@ -222,7 +223,7 @@ public class IBindingTest {
 		}
 	}
 
-	private void assertVariableEquals(final String name, final ALangObject object) {
+	private void assertVariableEquals(final String name, final ALangObject object) throws EvaluationException {
 		final ALangObject res = binding.getVariable(name);
 		assertNotNull(res);
 		assertTrue(res.equals(object));

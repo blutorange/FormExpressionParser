@@ -7,7 +7,10 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.context.ITraceElement;
-import de.xima.fc.form.expression.visitor.IFormExpressionParserVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
@@ -132,7 +135,14 @@ public interface Node extends Serializable, ITraceElement {
 	 * @return The return value of the visitor.
 	 */
 	@Nonnull
-	public <R, T, E extends Throwable> R jjtAccept(@Nonnull final IFormExpressionParserVisitor<R, T, E> visitor, @Nonnull final T data)
+	public <R, T, E extends Throwable> R jjtAccept(@Nonnull final IFormExpressionReturnDataVisitor<R, T, E> visitor, @Nonnull final T data)
+			throws E;
+	@Nonnull
+	public <R, E extends Throwable> R jjtAccept(@Nonnull final IFormExpressionReturnVoidVisitor<R,E> visitor)
+			throws E;
+	public <T, E extends Throwable> void jjtAccept(@Nonnull final IFormExpressionVoidDataVisitor<T, E> visitor, @Nonnull final T data)
+			throws E;
+	public <E extends Throwable> void jjtAccept(@Nonnull final IFormExpressionVoidVoidVisitor<E> visitor)
 			throws E;
 
 	public int getId();
@@ -162,5 +172,16 @@ public interface Node extends Serializable, ITraceElement {
 
 	public void jjtSetFirstToken(Token token);
 	public void jjtSetLastToken(Token token);
+
+	/**
+	 * Detaches this node from the parent. Does nothing if this is the top-level node.
+	 */
+	public void detach();
+
+	/**
+	 * Removes the child at the given index. Does nothing if the index is out-of-bounds.
+	 * @param i Index of the child to remove.
+	 */
+	public void removeChild(int i);
 
 }

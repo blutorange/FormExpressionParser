@@ -57,7 +57,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import de.xima.fc.form.expression.iface.parsed.IComment;
+import de.xima.fc.form.expression.iface.parse.IComment;
 import de.xima.fc.form.expression.impl.formexpression.CommentFactory;
 import de.xima.fc.form.expression.node.*;
 
@@ -283,6 +283,8 @@ TOKEN :
 | 
   < Try : "try" >
 | 
+  < Var : "var" >
+| 
   < With : "with" >
 | 
   < Else : "else" >
@@ -303,11 +305,17 @@ TOKEN :
 | 
   < Throw : "throw" >
 | 
+  < Scope : "scope" >
+| 
   < False : "false" >
 | 
   < Return : "return" >
 | 
   < Switch : "switch" >
+| 
+  < Global : "global" >
+| 
+  < Require : "require" >
 | 
   < LogInfo : "loginfo" >
 | 
@@ -456,13 +464,13 @@ void LosBody(EMethod method) #LosNode :
 
 Node CompleteProgram(EMethod method) #StatementListNode :
 {
-  
 }
 {
   (
     (
       (
         ClauseOrStatement(null)
+      | ScopeDefinition(null)
       )+
       < EOF >
     )
@@ -477,12 +485,12 @@ Node CompleteProgram(EMethod method) #StatementListNode :
 
 void TemplateProgram(EMethod method) #StatementListNode :
 {
-  
 }
 {
   (
     (
       ClauseOrStatement(null)
+    | ScopeDefinition(null)
     | LosBody(null)
     )+
   )
@@ -491,6 +499,75 @@ void TemplateProgram(EMethod method) #StatementListNode :
     
   }
 }
+
+void ScopeDefinition(EMethod method) #void :
+{
+}
+{
+  (      ScopeExternal(method)
+    | ScopeGlobal(method)
+    | ScopeManual(method)
+  )
+}
+
+void ScopeGlobal(EMethod method) #ScopeGlobalNode :
+{
+}
+{
+  (
+    < Global > < Scope > < BracesOpen >
+    (
+      VariableDeclaration(null)
+    )*
+    < BracesClose >
+  )
+  {
+    jjtThis.init(method);
+  }
+}
+
+void ScopeManual(EMethod method) #ScopeManualNode :
+{
+  Token t;
+}
+{
+  (
+    < Scope > t = < Identifier > < BracesOpen >
+    (
+      VariableDeclaration(method)
+    )*
+    < BracesClose >
+  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
+
+void ScopeExternal(EMethod method) #ScopeExternalNode :
+{
+  Token t;
+}
+{
+  (
+  < Require > < Scope > t = < Identifier > < SemiColon >
+  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
+
+void VariableDeclaration(EMethod method) #VariableDeclarationNode :
+{
+  Token t;
+}
+{
+  (
+    < Var > t = < Identifier > [ < Equal > Expression(null) ] < SemiColon >  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
+  
 
 void ClauseOrStatement(EMethod method) #void :
 {
@@ -718,7 +795,6 @@ void ForLoop(EMethod method) #ForLoopNode :
 {
   Token label = null;
   Token iteratingLoopVariable = null;
-  
 }
 {
   (

@@ -70,6 +70,9 @@ import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
+import de.xima.fc.form.expression.node.ASTScopeExternalNode;
+import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
+import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -77,6 +80,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -89,7 +93,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.Void;
 
-public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String, IOException> {
+public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, String, IOException> {
 	private final static Logger LOG = LoggerFactory.getLogger(UnparseVisitor.class);
 
 	private final Writer writer;
@@ -931,6 +935,78 @@ public class UnparseVisitor implements IFormExpressionParserVisitor<Void, String
 		writer.write(Syntax.PAREN_OPEN);
 		expression(node.getFirstChild(), prefix);
 		writer.write(Syntax.PAREN_CLOSE);
+		return Void.NULL;
+	}
+
+	@Override
+	public Void visit(final ASTScopeExternalNode node, final String prefix) throws IOException {
+		writer.write(Syntax.REQUIRE);
+		writer.write(config.requiredSpace);
+		writer.write(Syntax.SCOPE);
+		writer.write(config.requiredSpace);
+		writer.write(node.getScopeName());
+		writer.write(Syntax.SEMI_COLON);
+		return Void.NULL;
+	}
+
+	@Override
+	public Void visit(final ASTVariableDeclarationNode node, final String prefix) throws IOException {
+		writer.write(Syntax.VAR);
+		writer.write(config.requiredSpace);
+		writer.write(node.getVariableName());
+		writer.write(config.optionalSpace);
+		writer.write(Syntax.EQUAL);
+		writer.write(config.optionalSpace);
+		if (node.jjtGetNumChildren() == 1) {
+			expression(node.getFirstChild(), prefix);
+		}
+		else {
+			writer.write(Syntax.NULL);
+		}
+		writer.write(Syntax.SEMI_COLON);
+		return Void.NULL;
+	}
+
+	@Override
+	public Void visit(final ASTScopeManualNode node, final String prefix) throws IOException {
+		final String next = prefix + config.indentPrefix;
+		writer.write(Syntax.SCOPE);
+		writer.write(config.optionalSpace);
+		writer.write(node.getScopeName());
+		writer.write(config.optionalSpace);
+		writer.write(Syntax.BRACE_OPEN);
+		writer.write(config.linefeed);
+		writer.write(prefix);
+		writer.write(config.indentPrefix);
+		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
+			blockOrClause(node.jjtGetChild(i), next);
+			writer.write(config.linefeed);
+			if (i != node.jjtGetNumChildren()-1)
+				writer.write(config.indentPrefix);
+		}
+		writer.write(Syntax.BRACE_CLOSE);
+		return Void.NULL;
+	}
+
+	@Override
+	public Void visit(final ASTScopeGlobalNode node, final String prefix) throws IOException {
+		final String next = prefix + config.indentPrefix;
+		writer.write(Syntax.GLOBAL);
+		writer.write(config.requiredSpace);
+		writer.write(Syntax.SCOPE);
+		writer.write(config.optionalSpace);
+		writer.write(Syntax.BRACE_OPEN);
+		writer.write(config.linefeed);
+		writer.write(prefix);
+		writer.write(config.indentPrefix);
+		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
+			blockOrClause(node.jjtGetChild(i), next);
+			writer.write(config.linefeed);
+			if (i != node.jjtGetNumChildren()-1)
+				writer.write(config.indentPrefix);
+		}
+		writer.write(config.linefeed);
+		writer.write(Syntax.BRACE_CLOSE);
 		return Void.NULL;
 	}
 }

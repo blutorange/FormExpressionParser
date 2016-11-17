@@ -4,13 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.context.IBinding;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Similar to {@link OnDemandLookUpBinding}, but uses a map of arrays (
@@ -85,7 +84,7 @@ public class LookUpBindingAlternative implements IBinding {
 	}
 
 	@Override
-	public void nestLocal(final IEvaluationContext ec) {
+	public void nestLocal(final IEvaluationContext ec) throws NestingLevelTooDeepException {
 		if (currentDepth >= breakpoints.length)
 			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth+1);
 		breakpoints[currentDepth] = true;
@@ -93,10 +92,10 @@ public class LookUpBindingAlternative implements IBinding {
 	}
 
 	@Override
-	public void unnest(final IEvaluationContext ec) {
+	public void unnest(final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
 		for (final ALangObject[] values : map.values())
 			if (currentDepth < values.length) values[currentDepth] = null;
-		if (currentDepth <= 0) throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
+		if (currentDepth <= 0) throw new CannotUnnestGlobalNestingException(ec);
 		--currentDepth;
 		breakpoints[currentDepth] = false;
 	}

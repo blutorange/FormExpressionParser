@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
 import de.xima.fc.form.expression.iface.context.IEmbedment;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
@@ -98,7 +98,7 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	@Override
-	public void setCurrentEmbedment(final String embedment) throws EvaluationException {
+	public void setCurrentEmbedment(final String embedment) {
 		currentEmbedment = embedment;
 	}
 
@@ -111,12 +111,12 @@ public class GenericEmbedment implements IEmbedment {
 	}
 
 	@Override
-	public void outputText(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
+	public void outputText(final String data, final IEvaluationContext ec) throws EmbedmentOutputException, InvalidTemplateDataException {
 		output(data, ec);
 	}
 
 	@Override
-	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
+	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException, InvalidTemplateDataException {
 		final IEmbedmentHandler handler = getHandler();
 		if ((handler != null && !handler.isDoOutput())) return;
 		output(data, ec);
@@ -145,7 +145,7 @@ public class GenericEmbedment implements IEmbedment {
 		return handler != null ? handler.getScopeList() : CmnCnst.EMPTY_STRING_ARRAY;
 	}
 
-	private static void output(@Nonnull final String data, @Nonnull final IEvaluationContext ec) throws EmbedmentOutputException {
+	private static void output(@Nonnull final String data, @Nonnull final IEvaluationContext ec) throws EmbedmentOutputException, InvalidTemplateDataException {
 		final Optional<IExternalContext> ex = ec.getExternalContext();
 		if (ex.isPresent())
 			ex.get().write(data);

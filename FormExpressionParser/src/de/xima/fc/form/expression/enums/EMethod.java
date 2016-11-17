@@ -102,7 +102,7 @@ public enum EMethod {
 	}
 
 	@Nonnull
-	public EMethod equalMethod(@Nonnull final IEvaluationContext ec) {
+	public EMethod equalMethod(@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
 		switch (this) {
 		case DOUBLE_PLUS_PREFIX: return EMethod.DOUBLE_PLUS_PREFIX;
 		case DOUBLE_DASH_PREFIX: return EMethod.DOUBLE_DASH_PREFIX;
@@ -130,7 +130,7 @@ public enum EMethod {
 	}
 
 	@Nonnull
-	public EMethod comparisonMethod(@Nonnull final IEvaluationContext ec) {
+	public EMethod comparisonMethod(@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
 		switch (this) {
 		case TRIPLE_EQUAL:
 		case EXCLAMATION_DOUBLE_EQUAL: return EMethod.TRIPLE_EQUAL;

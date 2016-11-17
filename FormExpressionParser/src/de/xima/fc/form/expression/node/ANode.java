@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
@@ -142,7 +144,6 @@ public abstract class ANode implements Node {
 		.append(getEndLine())
 		.append(':')
 		.append(getEndColumn())
-		.append(',')
 		.append(',');
 		additionalToStringFields(sb);
 		sb.setLength(sb.length() - 1);
@@ -384,5 +385,26 @@ public abstract class ANode implements Node {
 		if (object == null)
 			throw new ParseException(errMessage);
 		return object;
+	}
+
+	@Override
+	public final void detach() {
+		final Node p = parent;
+		if (p != null) {
+			for (int i = p.jjtGetNumChildren(); i --> 0;) {
+				if (p.jjtGetChild(i).getId() == uniqueId) {
+					p.removeChild(i);
+					parent = null;
+					return;
+				}
+			}
+		}
+	}
+
+	@SuppressWarnings("null") // ArrayUtils.remove does not return null.
+	@Override
+	public final void removeChild(final int i) {
+		if (i >= 0 && i < children.length)
+			children = ArrayUtils.remove(children, i);
 	}
 }

@@ -126,6 +126,9 @@ public final class CmnCnst {
 
 	public final static class Syntax {
 		private Syntax() {}
+		@Nonnull public static final String GLOBAL = "global";
+		@Nonnull public static final String REQUIRE = "require";
+		@Nonnull public static final String SCOPE = "scope";
 		@Nonnull public static final String SWITCH = "switch";
 		@Nonnull public static final String CASE = "case";
 		@Nonnull public static final String DEFAULT = "default";
@@ -147,6 +150,7 @@ public final class CmnCnst {
 		@Nonnull public static final String LOG_ERROR = "logerror";
 		@Nonnull public static final String LOG_INFO = "loginfo";
 		@Nonnull public static final String LOG_WARN = "logwarn";
+		@Nonnull public static final String VAR = "var";
 		@Nonnull public static final String LOS_CLOSE = "%]";
 		@Nonnull public static final String LAMBDA_ARROW = "->";
 		@Nonnull public static final String BRACE_OPEN = "{";
@@ -160,6 +164,7 @@ public final class CmnCnst {
 		@Nonnull public static final String ANGLE_CLOSE = ">";
 		@Nonnull public static final String DOT = ".";
 		@Nonnull public static final String COMMA = ",";
+		@Nonnull public static final String EQUAL = "=";
 		@Nonnull public static final String COLON = ":";
 		@Nonnull public static final String SEMI_COLON = ";";
 		@Nonnull public static final String SCOPE_SEPARATOR = "::";
@@ -212,6 +217,8 @@ public final class CmnCnst {
 
 		@Nonnull public static final String INTERNAL_ERROR = "This is likely an error with the program. Contact support.";
 		@Nonnull public static final String VARIABLE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
+		@Nonnull public static final String EXTERNAL_SCOPE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
+		@Nonnull public static final String MANUAL_SCOPE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_LVALUE_FUNCTION = "Encountered illegal LVALUE (function call) %s in %s at line %s, column %s.";
 		@Nonnull public static final String ILLEGAL_LVALUE = "Encountered illegal LVALUE %s in %s at line %s, column %s.";
 		@Nonnull public static final String NODE_COUNT_NOT_ODD = "Node count is not odd: %d. " + INTERNAL_ERROR;

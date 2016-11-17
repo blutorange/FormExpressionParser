@@ -51,6 +51,9 @@ import de.xima.fc.form.expression.node.ASTPostUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTPropertyExpressionNode;
 import de.xima.fc.form.expression.node.ASTRegexNode;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
+import de.xima.fc.form.expression.node.ASTScopeExternalNode;
+import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
+import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
@@ -58,6 +61,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -77,7 +81,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class EvaluateVisitor
-implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, EvaluationException> {
+implements IFormExpressionReturnDataVisitor<ALangObject, IEvaluationContext, EvaluationException> {
 
 	/**
 	 * Evaluates the given node as a complete program with the given context.
@@ -117,7 +121,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	private EJump jumpType;
 	private String jumpLabel;
 
-	private EvaluateVisitor() {
+	private EvaluateVisitor() throws EvaluationException {
 		reinit();
 	}
 
@@ -145,7 +149,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	}
 
 	@Nonnull
-	private ALangObject jjtAccept(@Nonnull final Node parentNode, @Nullable final Node node, @Nonnull final IEvaluationContext ec) {
+	private ALangObject jjtAccept(@Nonnull final Node parentNode, @Nullable final Node node, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		ec.getTracer().setCurrentlyProcessed(node);
@@ -159,7 +163,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	}
 
 	@Nonnull
-	private static ALangObject setVariable(@Nullable final ASTVariableNode var, @Nonnull final ALangObject val, @Nonnull final IEvaluationContext ec) {
+	private static ALangObject setVariable(@Nullable final ASTVariableNode var, @Nonnull final ALangObject val, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		if (var == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
 		final String scope = var.getScope();
@@ -171,7 +175,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	}
 
 	@Nonnull
-	private ALangObject[] evaluateChildren(@Nonnull final Node node, @Nonnull final IEvaluationContext ec) {
+	private ALangObject[] evaluateChildren(@Nonnull final Node node, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		final int len = node.jjtGetNumChildren();
 		final ALangObject[] res = new ALangObject[len];
 		for (int i = 0; i != len; ++i)
@@ -181,7 +185,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 
 	@Nonnull
 	private ALangObject evaluatePropertyExpression(@Nonnull final Node parentNode, final int indexOneAfterEnd,
-			@Nonnull final IEvaluationContext ec) {
+			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
 		@Nonnull ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0), ec);
@@ -253,7 +257,7 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 
 	@Nonnull
 	private ALangObject performAssignment(@Nonnull final Node node, @Nullable final Node child,
-			@Nullable final EMethod method, @Nullable ALangObject assignee, @Nonnull final IEvaluationContext ec) {
+			@Nullable final EMethod method, @Nullable ALangObject assignee, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		if (child == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		if (method == null)
@@ -323,7 +327,8 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 	}
 
 	@Nonnull
-	private ALangObject performPostUnaryAssignment(@Nonnull final Node node, @Nullable final Node child, @Nonnull final EMethod method, @Nonnull final IEvaluationContext ec) {
+	private ALangObject performPostUnaryAssignment(@Nonnull final Node node, @Nullable final Node child,
+			@Nonnull final EMethod method, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		if (child == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		final ALangObject res, tmp;
@@ -924,9 +929,33 @@ implements IFormExpressionParserVisitor<ALangObject, IEvaluationContext, Evaluat
 				//$CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_EQUAL,	childrenArray[i].getSiblingMethod()));
+						NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_EQUAL, childrenArray[i].getSiblingMethod()));
 			}
 		}
 		return res;
+	}
+
+	@Override
+	public ALangObject visit(final ASTScopeExternalNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
+	}
+
+	@Override
+	public ALangObject visit(final ASTVariableDeclarationNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
+	}
+
+	@Override
+	public ALangObject visit(final ASTScopeManualNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
+	}
+
+	@Override
+	public ALangObject visit(final ASTScopeGlobalNode node, final IEvaluationContext data) throws EvaluationException {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
 	}
 }

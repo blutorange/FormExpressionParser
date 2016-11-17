@@ -3,13 +3,12 @@ package de.xima.fc.form.expression.impl.binding;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.context.IBinding;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * A binding that creates a {@link Map} when instantiated for each nesting
@@ -84,23 +83,23 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public void nest(final IEvaluationContext ec) {
+	public void nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
 		if (currentDepth >= mapArray.length - 1)
 			throw new NestingLevelTooDeepException(currentDepth+1, ec);
 		++currentDepth;
 	}
 
 	@Override
-	public void unnest(final IEvaluationContext ec) {
+	public void unnest(final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
 		mapArray[currentDepth].clear();
 		if (currentDepth <= 0)
-			throw new UncatchableEvaluationException(ec, CmnCnst.Error.CANNOT_UNNEST_GLOBAL_BINDING);
+			throw new CannotUnnestGlobalNestingException(ec);
 		--currentDepth;
 		breakpointArray[currentDepth] = false;
 	}
 
 	@Override
-	public void nestLocal(final IEvaluationContext ec) {
+	public void nestLocal(final IEvaluationContext ec) throws NestingLevelTooDeepException {
 		breakpointArray[currentDepth] = true;
 		nest(ec);
 	}

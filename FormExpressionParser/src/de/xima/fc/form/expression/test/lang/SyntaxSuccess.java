@@ -45,7 +45,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST033("with (foo, bar) foobar;"),
 	TEST034("a.b.c=foobar=4+2;"),
 	TEST035("myscope::myvar;"),
-	TEST036("scoped::var.works['great']();"),
+	TEST036("scoped::variable.works['great']();"),
 	TEST037("foo::bar = baz = 'hello';"),
 	TEST038("<foo></foo>", ETestType.TEMPLATE),
 	TEST039("<foo>[% a+b;%]</foo>", ETestType.TEMPLATE),
@@ -65,6 +65,11 @@ enum SyntaxSuccess implements ITestCase {
 	TEST053("++r;"),
 	TEST054("a+b;//comment"),
 	TEST055("a + /* comment \n end */ b;"),
+	TEST056("global scope{}"),
+	TEST057("global scope{var i; var j = 5+3;}"),
+	TEST058("scope myScope{var i; var j = 5+3;}"),
+	TEST059("require scope math;"),
+	TEST060("a = 8;require scope math;"),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

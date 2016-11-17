@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.iface.context.ITraceElement;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class EvaluationException extends RuntimeException {
+public class EvaluationException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public EvaluationException(final EvaluationException exception) {

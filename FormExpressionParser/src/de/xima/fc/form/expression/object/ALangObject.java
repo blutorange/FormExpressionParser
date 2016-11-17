@@ -401,7 +401,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 			@Nonnull final IEvaluationContext ec, @Nonnull final ALangObject... args) throws EvaluationException;
 
 	@Nonnull
-	public NonNullIterable<ALangObject> getIterable(@Nonnull final IEvaluationContext ec) {
+	public NonNullIterable<ALangObject> getIterable(@Nonnull final IEvaluationContext ec) throws IterationNotSupportedException {
 		throw new IterationNotSupportedException(this, ec);
 	}
 
@@ -409,7 +409,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	@Override
 	@Nonnull
 	@Deprecated
-	public NonNullIterator<ALangObject> iterator() throws EvaluationException, UnsupportedOperationException {
+	public NonNullIterator<ALangObject> iterator() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException(CmnCnst.Error.DEPRECATED_ALANGOBJECT_ITERATOR);
 	}
 
