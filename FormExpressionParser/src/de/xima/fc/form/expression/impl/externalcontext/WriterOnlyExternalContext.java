@@ -8,21 +8,20 @@ import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
-import de.xima.fc.form.expression.object.ALangObject;
 
-public class WriterOnlyExternalContext implements IExternalContext {
-	private Writer writer;
+public class WriterOnlyExternalContext extends AGenericExternalContext implements IExternalContext {
+	private final Writer writer;
 
 	public WriterOnlyExternalContext(final Writer writer) {
 		this.writer = writer;
 	}
 
 	@Override
-	public void write(String data) throws EmbedmentOutputException {
+	public void write(final String data) throws EmbedmentOutputException {
 		try {
 			writer.write(data);
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new EmbedmentOutputException(e, this);
 		}
 	}
@@ -32,16 +31,11 @@ public class WriterOnlyExternalContext implements IExternalContext {
 		try {
 			writer.flush();
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new EmbedmentOutputException(e, this);
 		}
 	}
 
-	@Override
-	public ALangObject fetchScopedVariable(String scope, String name, IEvaluationContext ec) {
-		return null;
-	}	
-	
 	/** @return The return value of the toString method of the writer. Useful for {@link StringBuilderWriter}. */
 	@Override
 	public String toString() {
@@ -49,7 +43,7 @@ public class WriterOnlyExternalContext implements IExternalContext {
 	}
 
 	@Override
-	public void process(IExternalContextCommand command, IEvaluationContext ec) {
+	public void process(final IExternalContextCommand command, final IEvaluationContext ec) {
 	}
 
 	@Override

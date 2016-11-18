@@ -16,9 +16,9 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
+import de.xima.fc.form.expression.impl.factory.FormcycleEcFactory;
+import de.xima.fc.form.expression.impl.factory.GenericEcFactory;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
-import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
-import de.xima.fc.form.expression.impl.pool.GenericEcFactory;
 import de.xima.fc.form.expression.impl.writer.DummyWriter;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 

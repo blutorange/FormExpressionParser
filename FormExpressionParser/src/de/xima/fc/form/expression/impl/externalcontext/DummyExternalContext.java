@@ -3,24 +3,30 @@ package de.xima.fc.form.expression.impl.externalcontext;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
-import de.xima.fc.form.expression.object.ALangObject;
 
-public enum DummyExternalContext implements IExternalContext {
-	INSTANCE;
+public class DummyExternalContext extends AGenericExternalContext implements IExternalContext {
+
+	private static class InstanceHolder {
+		public final static DummyExternalContext INSTANCE = new DummyExternalContext();
+	}
+
 	@Override
 	public void finishWriting() {
 	}
+
 	@Override
-	public void write(String data) {
+	public void write(final String data) {
 	}
+
 	@Override
-	public ALangObject fetchScopedVariable(String scope, String name, IEvaluationContext ec) {
-		return null;
+	public void process(final IExternalContextCommand command, final IEvaluationContext ec) {
 	}
-	@Override
-	public void process(IExternalContextCommand command, IEvaluationContext ec) {
-	}
+
 	@Override
 	public void beginWriting() {
+	}
+
+	public static AGenericExternalContext getInstance() {
+		return InstanceHolder.INSTANCE;
 	}
 }

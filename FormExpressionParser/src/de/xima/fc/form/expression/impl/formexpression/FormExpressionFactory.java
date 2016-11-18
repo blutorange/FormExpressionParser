@@ -17,6 +17,8 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextProvider;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
@@ -48,13 +50,15 @@ public final class FormExpressionFactory {
 		 * is semantically invalid. This is a subclass of {@link ParseException}.
 		 */
 		@Nonnull
-		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError, SemanticsException {
+		public static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
+				@Nonnull final IEvaluationContextProvider<T> factory)
+						throws ParseException, TokenMgrError, SemanticsException {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				final Node node = parser.CompleteProgram(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return postProcess(node, parser);
+				return postProcess(node, parser, factory);
 			}
 		}
 
@@ -165,14 +169,15 @@ public final class FormExpressionFactory {
 		 * is semantically invalid. This is a subclass of {@link ParseException}.
 		 */
 		@Nonnull
-		public static IFormExpression parse(@Nonnull final String code) throws ParseException, TokenMgrError {
+		public static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
+				@Nonnull final IEvaluationContextProvider<T> factory) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
 				final Node node = parser.Template(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return postProcess(node, parser);
+				return postProcess(node, parser, factory);
 			}
 		}
 
@@ -235,10 +240,10 @@ public final class FormExpressionFactory {
 	}
 
 	@Nonnull
-	public static IFormExpression postProcess(final @Nonnull Node node, @Nonnull final FormExpressionParser parser)
+	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node, @Nonnull final FormExpressionParser parser, @Nonnull final IEvaluationContextProvider<T> factory)
 			throws SemanticsException {
 		collectScopeDefinitions(node);
-		return new FormExpressionImpl(node, parser.buildComments());
+		return new FormExpressionImpl<T>(node, parser.buildComments(), factory);
 	}
 
 	@Nonnull

@@ -16,8 +16,8 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
+import de.xima.fc.form.expression.impl.factory.FormcycleEcProvider;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
-import de.xima.fc.form.expression.impl.pool.FormcycleEcFactory;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
@@ -45,7 +45,7 @@ public class FormExpressionDemo {
 
 		showHighlighting(tokenArray);
 
-		final IFormExpression expression = parseCode(code);
+		final IFormExpression<FormcycleExternalContext> expression = parseCode(code);
 		if (expression == null)
 			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
 
@@ -122,11 +122,11 @@ public class FormExpressionDemo {
 		System.out.println();
 	}
 
-	private static IFormExpression parseCode(@Nonnull final String code) {
-		final IFormExpression ex;
+	private static IFormExpression<FormcycleExternalContext> parseCode(@Nonnull final String code) {
+		final IFormExpression<FormcycleExternalContext> ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = FormExpressionFactory.Program.parse(code);
+			ex = FormExpressionFactory.Program.parse(code, FormcycleEcProvider.INSTANCE);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final ParseException e) {
@@ -160,21 +160,21 @@ public class FormExpressionDemo {
 		return node;
 	}
 
-	private static void showUnparsed(@Nonnull final IFormExpression ex) {
+	private static void showUnparsed(@Nonnull final IFormExpression<FormcycleExternalContext> ex) {
 		System.out.println("===Unparse==="); //$NON-NLS-1$
 		System.out.println(ex.unparse(null));
 		System.out.println();
 	}
 
-	private static void showEvaluatedResult(@Nonnull final IFormExpression ex) {
+	private static void showEvaluatedResult(@Nonnull final IFormExpression<FormcycleExternalContext> ex) {
 		final ALangObject result;
 		try {
 			// Do it once so we don't measure setup times.
-			ex.evaluate(FormcycleEcFactory.getFactoryInstance(), new FormcycleExternalContext());
+			ex.evaluate(new FormcycleExternalContext());
 
 			// Measure how long it takes in practice.
 			final long t1 = System.nanoTime();
-			result = ex.evaluate(FormcycleEcFactory.getPoolInstance(), new FormcycleExternalContext());
+			result = ex.evaluate(new FormcycleExternalContext());
 			final long t2 = System.nanoTime();
 
 			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$

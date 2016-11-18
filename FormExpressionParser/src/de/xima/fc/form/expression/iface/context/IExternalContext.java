@@ -1,9 +1,9 @@
 package de.xima.fc.form.expression.iface.context;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
@@ -66,6 +66,6 @@ public interface IExternalContext {
 	 *         return some default value instead, eg. the empty string. Otherwise,
 	 *         the program will throw a {@link VariableNotDefinedException}.
 	 */
-	@Nullable
-	public ALangObject fetchScopedVariable(@Nonnull String scope, @Nonnull String name, @Nonnull IEvaluationContext ec);
+	@Nonnull
+	public ALangObject fetchScopedVariable(@Nonnull String scope, @Nonnull String name, @Nonnull IEvaluationContext ec) throws EvaluationException;
 }

@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
+import java.io.PrintStream;
+
 import com.google.common.base.Optional;
 
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
@@ -8,24 +10,20 @@ import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
-import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public enum SystemExternalContext implements IExternalContext {
-	OUT {
-		@Override
-		public void write(final String data) {
-			if (!outputDisabled) System.out.print(data);
-		}
-	},
-	ERR {
-		@Override
-		public void write(final String data) {
-			if (!outputDisabled) System.err.print(data);
-		}
-	};
-
+public final class SystemExternalContext extends AGenericExternalContext implements IExternalContext {
+	private final PrintStream printStream;
 	protected boolean outputDisabled = false;
+
+	private static class InstanceHolder {
+		public final static SystemExternalContext OUT = new SystemExternalContext(System.out);
+		public final static SystemExternalContext ERR = new SystemExternalContext(System.err);
+	}
+
+	private SystemExternalContext(final PrintStream printStream) {
+		this.printStream = printStream;
+	}
 
 	@Override
 	public void finishWriting() throws EmbedmentOutputException {
@@ -33,11 +31,8 @@ public enum SystemExternalContext implements IExternalContext {
 	}
 
 	@Override
-	public abstract void write(String data);
-
-	@Override
-	public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec) {
-		return null;
+	public void write(final String data) {
+		if (!outputDisabled) printStream.print(data);
 	}
 
 	@Override
@@ -63,5 +58,12 @@ public enum SystemExternalContext implements IExternalContext {
 	@Override
 	public void beginWriting() throws EmbedmentOutputException {
 		SystemWriter.getSystemOutInstance().flush();
+	}
+
+	public static AGenericExternalContext getSystemOutInstance() {
+		return InstanceHolder.OUT;
+	}
+	public static AGenericExternalContext getSystemErrInstance() {
+		return InstanceHolder.ERR;
 	}
 }

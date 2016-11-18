@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl.pool;
+package de.xima.fc.form.expression.impl.factory;
 
 import javax.annotation.Nonnull;
 
@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 import de.xima.fc.form.expression.impl.scope.MathScope;
 import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 
-public class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
+class FormcycleEcFactory extends BasePooledObjectFactory<IEvaluationContext> {
 	private final static class InstanceHolder {
 		@Nonnull
 		public final static BasePooledObjectFactory<IEvaluationContext> FACTORY_INSTANCE = new FormcycleEcFactory();
