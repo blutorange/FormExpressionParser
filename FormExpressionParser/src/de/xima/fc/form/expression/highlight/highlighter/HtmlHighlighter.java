@@ -318,10 +318,10 @@ public class HtmlHighlighter extends AHighlighter {
 	@Nonnull
 	public static String sanitizeCssClassPrefix(@Nullable String cssClassPrefix) {
 		@Nonnull
-		final String pref = cssClassPrefix == null ? CmnCnst.EMPTY_STRING : cssClassPrefix;
-		final String p = pref.replaceAll("[^-a-zA-Z0-9_]", CmnCnst.EMPTY_STRING);
+		final String pref = cssClassPrefix == null ? CmnCnst.NonnullConstant.EMPTY_STRING : cssClassPrefix;
+		final String p = pref.replaceAll("[^-a-zA-Z0-9_]", CmnCnst.NonnullConstant.EMPTY_STRING);
 		if (p == null)
-			return CmnCnst.EMPTY_STRING;
+			return CmnCnst.NonnullConstant.EMPTY_STRING;
 		if (p.isEmpty()) cssClassPrefix = "hglt";
 		return p;
 	}

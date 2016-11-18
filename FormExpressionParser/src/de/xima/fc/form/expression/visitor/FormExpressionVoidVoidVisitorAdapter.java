@@ -39,7 +39,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -70,7 +70,6 @@ implements IFormExpressionVoidVoidVisitor<E> {
 	@Override
 	public void visit(final ASTArrayNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
@@ -82,43 +81,36 @@ implements IFormExpressionVoidVoidVisitor<E> {
 	@Override
 	public void visit(final ASTNullNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
 	public void visit(final ASTBooleanNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
 	public void visit(final ASTVariableNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
 	public void visit(final ASTStringNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
 	public void visit(final ASTStatementListNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
 	public void visit(final ASTIfClauseNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
 	public void visit(final ASTForLoopNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
@@ -205,7 +197,6 @@ implements IFormExpressionVoidVoidVisitor<E> {
 	@Override
 	public void visit(final ASTEmptyNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
@@ -216,7 +207,6 @@ implements IFormExpressionVoidVoidVisitor<E> {
 	@Override
 	public void visit(final ASTRegexNode node) throws E {
 		visitChildren(node);
-
 	}
 
 	@Override
@@ -250,7 +240,7 @@ implements IFormExpressionVoidVoidVisitor<E> {
 	}
 
 	@Override
-	public void visit(final ASTVariableDeclarationNode node) throws E {
+	public void visit(final ASTVariableDeclarationClauseNode node) throws E {
 		visitChildren(node);
 	}
 

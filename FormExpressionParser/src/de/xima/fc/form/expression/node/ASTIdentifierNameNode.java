@@ -9,15 +9,15 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
 public class ASTIdentifierNameNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	@Nonnull private String name = CmnCnst.EMPTY_STRING;
+	@Nonnull private String name = CmnCnst.NonnullConstant.EMPTY_STRING;
 
 	public ASTIdentifierNameNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

@@ -25,7 +25,7 @@ public class DocumentCommand extends AExternalContextCommand {
 	 */
 	private DocumentCommand(@Nonnull final EDocumentCommandType type, @Nullable final String... data)
 			throws IllegalArgumentException {
-		final String[] dataArray = data != null ? data : CmnCnst.EMPTY_STRING_ARRAY;
+		final String[] dataArray = data != null ? data : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 		assertArguments(type, dataArray);
 		this.type = type;
 		this.data = dataArray;

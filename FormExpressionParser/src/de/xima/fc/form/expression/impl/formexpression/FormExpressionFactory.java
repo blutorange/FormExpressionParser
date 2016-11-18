@@ -18,10 +18,14 @@ import de.xima.fc.form.expression.grammar.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextProvider;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
+import de.xima.fc.form.expression.visitor.VariableDeclarationCheckVisitor;
+import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
 
 public final class FormExpressionFactory {
 
@@ -42,23 +46,27 @@ public final class FormExpressionFactory {
 		 * tree.
 		 *
 		 * @return Top level node of the parse tree.
-		 * @throws ParseException When the code is not a valid program. Specifically, when
-		 * the tokens cannot be parsed as a valid program.
-		 * @throws TokenMgrError When the code is not a valid program. Specifically, when
-		 * the code cannot be parsed into valid tokens.
-		 * @throws SemanticsException When the code did not technically fail to parse, but
-		 * is semantically invalid. This is a subclass of {@link ParseException}.
+		 * @throws ParseException
+		 *             When the code is not a valid program. Specifically, when
+		 *             the tokens cannot be parsed as a valid program.
+		 * @throws TokenMgrError
+		 *             When the code is not a valid program. Specifically, when
+		 *             the code cannot be parsed into valid tokens.
+		 * @throws SemanticsException
+		 *             When the code did not technically fail to parse, but is
+		 *             semantically invalid. This is a subclass of
+		 *             {@link ParseException}.
 		 */
 		@Nonnull
 		public static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
-				@Nonnull final IEvaluationContextProvider<T> factory)
+				@Nonnull final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
 						throws ParseException, TokenMgrError, SemanticsException {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				final Node node = parser.CompleteProgram(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return postProcess(node, parser, factory);
+				return postProcess(node, parser, factory, strictMode);
 			}
 		}
 
@@ -73,12 +81,13 @@ public final class FormExpressionFactory {
 		}
 
 		/**
-		 * @param reader Reader to read from.
+		 * @param reader
+		 *            Reader to read from.
 		 * @return A token manager for tokenizing the stream.
 		 */
 		@Nonnull
 		public static FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
-			return tokenManagerForState(reader,	FormExpressionParserTokenManager.CODE);
+			return tokenManagerForState(reader, FormExpressionParserTokenManager.CODE);
 		}
 
 		/**
@@ -161,23 +170,28 @@ public final class FormExpressionFactory {
 		 * tree.
 		 *
 		 * @return Top level node of the parse tree.
-		 * @throws ParseException When the code is not a valid program. Specifically, when
-		 * the tokens cannot be parsed as a valid program.
-		 * @throws TokenMgrError When the code is not a valid program. Specifically, when
-		 * the code cannot be parsed into valid tokens.
-		 * @throws SemanticsException When the code did not technically fail to parse, but
-		 * is semantically invalid. This is a subclass of {@link ParseException}.
+		 * @throws ParseException
+		 *             When the code is not a valid program. Specifically, when
+		 *             the tokens cannot be parsed as a valid program.
+		 * @throws TokenMgrError
+		 *             When the code is not a valid program. Specifically, when
+		 *             the code cannot be parsed into valid tokens.
+		 * @throws SemanticsException
+		 *             When the code did not technically fail to parse, but is
+		 *             semantically invalid. This is a subclass of
+		 *             {@link ParseException}.
 		 */
 		@Nonnull
 		public static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
-				@Nonnull final IEvaluationContextProvider<T> factory) throws ParseException, TokenMgrError {
+				@Nonnull final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
+						throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
 				parser.setLosAllowed(true);
 				final Node node = parser.Template(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return postProcess(node, parser, factory);
+				return postProcess(node, parser, factory, strictMode);
 			}
 		}
 
@@ -195,7 +209,7 @@ public final class FormExpressionFactory {
 
 		@Nonnull
 		public static FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
-			return tokenManagerForState(reader,	FormExpressionParserTokenManager.LOS);
+			return tokenManagerForState(reader, FormExpressionParserTokenManager.LOS);
 		}
 	}
 
@@ -240,13 +254,6 @@ public final class FormExpressionFactory {
 	}
 
 	@Nonnull
-	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node, @Nonnull final FormExpressionParser parser, @Nonnull final IEvaluationContextProvider<T> factory)
-			throws SemanticsException {
-		collectScopeDefinitions(node);
-		return new FormExpressionImpl<T>(node, parser.buildComments(), factory);
-	}
-
-	@Nonnull
 	private static FormExpressionParser asParser(@Nonnull final FormExpressionParserTokenManager tm) {
 		final FormExpressionParser parser = new FormExpressionParser(tm);
 		tm.parser = parser;
@@ -254,7 +261,8 @@ public final class FormExpressionFactory {
 	}
 
 	@Nonnull
-	private static Token[] tokenManagerToArray(@Nonnull final FormExpressionParserTokenManager tm) throws TokenMgrError {
+	private static Token[] tokenManagerToArray(@Nonnull final FormExpressionParserTokenManager tm)
+			throws TokenMgrError {
 		final List<Token> list = new ArrayList<>();
 		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm
 				.getNextToken())
@@ -264,8 +272,14 @@ public final class FormExpressionFactory {
 		return res;
 	}
 
-
-	private static void collectScopeDefinitions(@Nonnull final Node node) throws SemanticsException {
-		ScopeCollectVisitor.collect(node);
+	@Nonnull
+	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node,
+			@Nonnull final FormExpressionParser parser, @Nonnull final IEvaluationContextContractFactory<T> contractFactory,
+			final boolean strictMode) throws SemanticsException {
+		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node);
+		VariableDeclarationCheckVisitor.check(node, scopeDefBuilder, contractFactory, strictMode);
+		final IScopeDefinitions scopeDef = scopeDefBuilder.build();
+		VariableResolveVisitor.resolve(node, scopeDef);
+		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDef, contractFactory);
 	}
 }

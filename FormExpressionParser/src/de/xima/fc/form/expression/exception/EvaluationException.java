@@ -141,8 +141,8 @@ public class EvaluationException extends Exception {
 	 * access to the context.
 	 */
 	@Nonnull
-	public final Optional<IEvaluationContext> ec;
+	public final transient Optional<IEvaluationContext> ec;
 
 	@Nonnull
-	public final Optional<IExternalContext> externalContext;
+	public final transient Optional<IExternalContext> externalContext;
 }

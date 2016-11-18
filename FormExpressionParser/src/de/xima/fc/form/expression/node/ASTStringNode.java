@@ -10,8 +10,8 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -22,7 +22,7 @@ public class ASTStringNode extends ANode {
 		super(parser, nodeId);
 	}
 
-	@Nonnull private String stringValue = CmnCnst.EMPTY_STRING;
+	@Nonnull private String stringValue = CmnCnst.NonnullConstant.EMPTY_STRING;
 
 	/**
 	 * @param delimiter

@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -10,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -91,7 +93,6 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 		}
 	}
 
-
 	private final static ImmutableMap<String, ScopeImpl> scopeMap;
 	private static enum ScopeImpl {
 		FORM_FIELD {
@@ -111,10 +112,20 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 				.build();
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings({ "unused", "null" })
+	@Nonnull
 	@Override
-	public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name, @Nonnull final IEvaluationContext ec) {
+	public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name, @Nonnull final IEvaluationContext ec) throws VariableNotDefinedException {
 		final ScopeImpl s = scopeMap.get(scope);
-		return s != null ? s.fetch(name, null) : null;
+		if (s == null)
+			throw new VariableNotDefinedException(scope, name, ec);
+		final ALangObject o = s.fetch(name, null);
+		if (o == null)
+			throw new VariableNotDefinedException(scope, name, ec);
+		return o;
+	}
+
+	public static Set<String> getScopeList() {
+		return scopeMap.keySet();
 	}
 }

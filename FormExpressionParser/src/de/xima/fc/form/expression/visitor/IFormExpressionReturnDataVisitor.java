@@ -38,7 +38,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -82,7 +82,7 @@ public interface IFormExpressionReturnDataVisitor<R,T,E extends Throwable>
 	@Nonnull public R visit(@Nonnull ASTPostUnaryExpressionNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTComparisonExpressionNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTScopeExternalNode node, @Nonnull T data) throws E;
-	@Nonnull public R visit(@Nonnull ASTVariableDeclarationNode node, @Nonnull T data) throws E;
+	@Nonnull public R visit(@Nonnull ASTVariableDeclarationClauseNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTScopeManualNode node, @Nonnull T data) throws E;
 	@Nonnull public R visit(@Nonnull ASTScopeGlobalNode node, @Nonnull T data) throws E;
 }

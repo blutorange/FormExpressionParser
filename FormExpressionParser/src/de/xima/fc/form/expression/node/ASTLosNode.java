@@ -7,8 +7,8 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -33,7 +33,7 @@ public class ASTLosNode extends ANode {
 
 	@Nonnull
 	public String getText() {
-		return text != null ? text : CmnCnst.EMPTY_STRING;
+		return text != null ? text : CmnCnst.NonnullConstant.EMPTY_STRING;
 	}
 
 	public boolean isHasOpen() {
@@ -50,7 +50,7 @@ public class ASTLosNode extends ANode {
 
 	@Nonnull
 	public String getOpen() {
-		return open != null ? open : CmnCnst.EMPTY_STRING;
+		return open != null ? open : CmnCnst.NonnullConstant.EMPTY_STRING;
 	}
 
 	@Override

@@ -80,7 +80,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -114,7 +114,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		Preconditions.checkNotNull(node, CmnCnst.Error.NULL_NODE);
 		Preconditions.checkNotNull(config, CmnCnst.Error.NULL_PARSER_CONFIG);
 		final UnparseVisitor unparser = new UnparseVisitor(writer, comments, config);
-		unparser.blockOrClause(node, CmnCnst.EMPTY_STRING);
+		unparser.blockOrClause(node, CmnCnst.NonnullConstant.EMPTY_STRING);
 		unparser.writeRemainingComments();
 		writer.flush();
 	}
@@ -140,11 +140,11 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		try (final Writer writer = new StringBuilderWriter()) {
 			unparse(writer, node, comments, config);
 			final String s = writer.toString();
-			return s != null ? s : CmnCnst.EMPTY_STRING;
+			return s != null ? s : CmnCnst.NonnullConstant.EMPTY_STRING;
 		}
 		// StringBuilderWriter does not throw.
 		catch (final IOException e) {
-			return CmnCnst.EMPTY_STRING;
+			return CmnCnst.NonnullConstant.EMPTY_STRING;
 		}
 	}
 
@@ -375,7 +375,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 			writer.write(node.getScope());
 			writer.write(Syntax.SCOPE_SEPARATOR);
 		}
-		writer.write(node.getName());
+		writer.write(node.getVariableName());
 		return Void.NULL;
 	}
 
@@ -950,7 +950,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 	}
 
 	@Override
-	public Void visit(final ASTVariableDeclarationNode node, final String prefix) throws IOException {
+	public Void visit(final ASTVariableDeclarationClauseNode node, final String prefix) throws IOException {
 		writer.write(Syntax.VAR);
 		writer.write(config.requiredSpace);
 		writer.write(node.getVariableName());

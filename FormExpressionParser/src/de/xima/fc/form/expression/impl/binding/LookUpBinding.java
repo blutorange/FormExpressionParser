@@ -4,11 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * A binding that creates a {@link Map} when instantiated for each nesting
@@ -28,13 +25,13 @@ import de.xima.fc.form.expression.object.ALangObject;
  * @author madgaksha
  *
  */
-public class LookUpBinding implements IBinding {
+public class LookUpBinding<T> implements IBinding<T> {
 
 	/** Subject to change. Do not rely on this being set to a certain value. */
 	public final static int DEFAULT_NESTING_DEPTH = 128;
 
 	protected boolean[] breakpointArray;
-	protected Map<String, ALangObject>[] mapArray;
+	protected Map<String, T>[] mapArray;
 	protected int currentDepth;
 
 	public LookUpBinding() {
@@ -48,7 +45,7 @@ public class LookUpBinding implements IBinding {
 		mapArray = new Map[nestingDepth];
 		breakpointArray = new boolean[nestingDepth];
 		for (int i = 0; i < nestingDepth; ++i) {
-			mapArray[i] = new HashMap<String, ALangObject>();
+			mapArray[i] = new HashMap<String, T>();
 		}
 		currentDepth = 0;
 	}
@@ -61,47 +58,35 @@ public class LookUpBinding implements IBinding {
 	}
 
 	@Override
-	public ALangObject getVariable(final String name) throws EvaluationException {
+	public T getVariable(final String name) {
 		for (int i = currentDepth; i > 0 && !breakpointArray[i]; --i) {
-			final ALangObject o = mapArray[i].get(name);
+			final T o = mapArray[i].get(name);
 			if (o != null)
 				return o;
 		}
-		return mapArray[0].get(name);
+		return null;
 	}
 
 	@Override
-	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
-		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
-			final ALangObject o = mapArray[i].get(name);
-			if (o != null) {
-				mapArray[i].put(name, value);
-				return;
-			}
-		}
-		mapArray[currentDepth].put(name, value);
-	}
-
-	@Override
-	public void nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
+	public void nest() throws NestingLevelTooDeepException {
 		if (currentDepth >= mapArray.length - 1)
-			throw new NestingLevelTooDeepException(currentDepth+1, ec);
+			throw new NestingLevelTooDeepException(currentDepth+1);
 		++currentDepth;
 	}
 
 	@Override
-	public void unnest(final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
+	public void unnest() throws CannotUnnestGlobalNestingException {
 		mapArray[currentDepth].clear();
 		if (currentDepth <= 0)
-			throw new CannotUnnestGlobalNestingException(ec);
+			throw new CannotUnnestGlobalNestingException();
 		--currentDepth;
 		breakpointArray[currentDepth] = false;
 	}
 
 	@Override
-	public void nestLocal(final IEvaluationContext ec) throws NestingLevelTooDeepException {
+	public void nestLocal() throws NestingLevelTooDeepException {
 		breakpointArray[currentDepth] = true;
-		nest(ec);
+		nest();
 	}
 
 	@Override
@@ -117,5 +102,15 @@ public class LookUpBinding implements IBinding {
 	@Override
 	public boolean isGlobal() {
 		return currentDepth <= 0;
+	}
+
+	@Override
+	public boolean hasVariableAtCurrentLevel(final String name) {
+		return mapArray[currentDepth].containsKey(name);
+	}
+
+	@Override
+	public void defineVariable(final String name, final T object) {
+		mapArray[currentDepth].put(name, object);
 	}
 }

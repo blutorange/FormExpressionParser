@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.IBinding;
 import de.xima.fc.form.expression.iface.context.IEmbedment;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.ILogger;
@@ -64,10 +63,10 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 	@Nonnull
 	private final List<String> defaultScopeList = new ArrayList<>(16);
 
-	private ReadScopedEvaluationContext(@Nonnull final IBinding binding, @Nonnull final IScope scope,
+	private ReadScopedEvaluationContext(@Nonnull final IScope scope,
 			@Nonnull final INamespace namespace, @Nonnull final ITracer<Node> tracer,
 			@Nonnull final IEmbedment embedment, @Nonnull final ILogger logger) {
-		super(binding, scope, namespace, tracer, embedment, logger);
+		super(scope, namespace, tracer, embedment, logger);
 	}
 
 	@Override
@@ -116,7 +115,6 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 		private ILogger logger;
 		private ITracer<Node> tracer;
 		private INamespace namespace;
-		private IBinding binding;
 		private IScope scope;
 		private IEmbedment embedment;
 
@@ -128,7 +126,6 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 			logger = null;
 			tracer = null;
 			namespace = null;
-			binding = null;
 			scope = null;
 			embedment = null;
 		}
@@ -140,12 +137,6 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 			return this;
 		}
 
-		@Nonnull
-		public Builder setBinding(@Nullable final IBinding binding) {
-			if (binding != null)
-				this.binding = binding;
-			return this;
-		}
 
 		@Nonnull
 		public Builder setScope(@Nullable final IScope scope) {
@@ -177,20 +168,17 @@ public class ReadScopedEvaluationContext extends GenericEvaluationContext {
 
 		@Nonnull
 		public IEvaluationContext build() throws IllegalStateException {
-			final IBinding binding = this.binding;
 			final IScope scope = this.scope;
 			ILogger logger = this.logger;
 			IEmbedment embedment = this.embedment;
 			ITracer<Node> tracer = this.tracer;
 			INamespace namespace = this.namespace;
-			if (binding == null) throw new IllegalStateException(CmnCnst.Error.ILLEGAL_STATE_EC_BUILDER_BINDING);
 			if (scope == null) throw new IllegalStateException(CmnCnst.Error.ILLEGAL_STATE_EC_BUILDER_SCOPE);
 			if (logger == null)	logger = SystemLogger.getInfoLogger();
-			if (embedment == null) embedment = GenericEmbedment.getGenericEmbedment();
+			if (embedment == null) embedment = GenericEmbedment.getNewGeneralEmbedment();
 			if (tracer == null) tracer = DummyTracer.INSTANCE;
 			if (namespace == null) namespace = GenericNamespace.getGenericNamespaceInstance();
-			final IEvaluationContext retVal = new ReadScopedEvaluationContext(binding, scope, namespace, tracer,
-					embedment, logger);
+			final IEvaluationContext retVal = new ReadScopedEvaluationContext(scope, namespace, tracer,	embedment, logger);
 			reinit();
 			return retVal;
 		}

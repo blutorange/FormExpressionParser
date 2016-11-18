@@ -30,8 +30,6 @@ public interface IEvaluationContext extends IReset {
 	@Nonnull
 	public IScope getScope();
 	@Nonnull
-	public IBinding getBinding();
-	@Nonnull
 	public INamespace getNamespace();
 	@Nonnull
 	public ILogger getLogger();

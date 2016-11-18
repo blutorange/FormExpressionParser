@@ -7,11 +7,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * Create a new binding instance with a new map for each nesting level. May not
@@ -20,11 +17,11 @@ import de.xima.fc.form.expression.object.ALangObject;
  *
  * @author madgaksha
  */
-public class CloneBinding implements IBinding {
-	private Impl impl;
+public class CloneBinding<T> implements IBinding<T> {
+	private Impl<T> impl;
 
 	public CloneBinding() {
-		impl = new Impl();
+		impl = new Impl<T>();
 	}
 
 	@Override
@@ -38,28 +35,29 @@ public class CloneBinding implements IBinding {
 	}
 
 	@Override
-	public ALangObject getVariable(final String name) throws EvaluationException {
+	public T getVariable(final String name) {
 		return impl.getVariable(name);
 	}
 
+
 	@Override
-	public void setVariable(final String name, final ALangObject value) throws EvaluationException {
-		impl.setVariable(name, value);
+	public void defineVariable(final String name, final T object) {
+		impl.defineVariable(name, object);
 	}
 
 	@Override
-	public void nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
+	public void nest() throws NestingLevelTooDeepException {
 		impl = impl.nest();
 	}
 
 	@Override
-	public void nestLocal(final IEvaluationContext ec) {
+	public void nestLocal() {
 		impl = impl.nestLocal();
 	}
 
 	@Override
-	public void unnest(final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
-		impl = impl.unnest(ec);
+	public void unnest() throws CannotUnnestGlobalNestingException {
+		impl = impl.unnest();
 	}
 
 	@Override
@@ -72,10 +70,9 @@ public class CloneBinding implements IBinding {
 		return false;
 	}
 
-	private class Impl {
-		private final Map<String, ALangObject> map;
-		@Nullable private final Impl parent;
-		@Nonnull private final Impl top;
+	private static class Impl<T> {
+		private final Map<String, T> map;
+		@Nullable private final Impl<T> parent;
 		private final boolean isBreakpoint;
 
 		public Impl() {
@@ -85,76 +82,64 @@ public class CloneBinding implements IBinding {
 		public Impl(final int initialCapacity) {
 			map = new HashMap<>(initialCapacity);
 			parent = null;
-			top = this;
 			isBreakpoint = true;
 		}
 
-		private Impl(@Nonnull final Impl parent, @Nonnull final Impl top, final boolean isBreakpoint) {
+		private Impl(@Nonnull final Impl<T> parent, final boolean isBreakpoint) {
 			map = new HashMap<>();
 			this.parent = parent;
-			this.top = top;
 			this.isBreakpoint = isBreakpoint;
 		}
 
 		@Nullable
-		public final ALangObject getVariable(@Nonnull final String name) throws EvaluationException {
-			final ALangObject res = getVariableInternal(name);
-			return res != null ? res : top.map.get(name);
-		}
-
-		@Nullable
-		private ALangObject getVariableInternal(@Nonnull final String name) throws EvaluationException {
-			final ALangObject res = map.get(name);
+		public final T getVariable(@Nonnull final String name) {
+			final T res = map.get(name);
 			if (res != null)
 				return res;
-			final Impl p = parent;
+			final Impl<T> p = parent;
 			return isBreakpoint || p == null ? res : p.getVariable(name);
 		}
 
-		public final void setVariable(@Nonnull final String name, @Nonnull final ALangObject value) throws EvaluationException {
-			if (!setVariableInternal(name, value))
-				map.put(name, value);
-		}
-
-		private boolean setVariableInternal(@Nonnull final String name, @Nonnull final ALangObject value) throws EvaluationException {
-			if (map.containsKey(name)) {
-				map.put(name, value);
-				return true;
-			}
-			final Impl p = parent;
-			if (isBreakpoint || p == null)
-				return false;
-			return p.setVariableInternal(name, value);
+		public final void defineVariable(@Nonnull final String name, @Nonnull final T object) {
+			map.put(name, object);
 		}
 
 		@Nonnull
-		public final Impl nest() throws NestingLevelTooDeepException {
-			return new Impl(this, top, false);
+		public final Impl<T> nest() throws NestingLevelTooDeepException {
+			return new Impl<T>(this, false);
 		}
 
 		@Nonnull
-		public final Impl unnest(@Nonnull final IEvaluationContext ec) throws CannotUnnestGlobalNestingException {
-			final Impl p = parent;
+		public final Impl<T> unnest() throws CannotUnnestGlobalNestingException {
+			final Impl<T> p = parent;
 			if (p == null)
-				throw new CannotUnnestGlobalNestingException(ec);
+				throw new CannotUnnestGlobalNestingException();
 			map.clear();
 			return p;
 		}
 
 		@Nonnull
-		public Impl reset() {
+		public Impl<T> reset() {
 			map.clear();
 			return parent != null ? parent.reset() : this;
 		}
 
 		@Nonnull
-		public Impl nestLocal() {
-			return new Impl(this, top, true);
+		public Impl<T> nestLocal() {
+			return new Impl<T>(this, true);
 		}
 
 		public boolean isGlobal() {
 			return parent == null;
 		}
+
+		public boolean hasVariableAtCurrentLevel(final String name) {
+			return map.get(name) != null;
+		}
 	}
 
+	@Override
+	public boolean hasVariableAtCurrentLevel(final String name) {
+		return impl.hasVariableAtCurrentLevel(name);
+	}
 }

@@ -24,7 +24,7 @@ public interface IFormExpression<T extends IExternalContext> extends Serializabl
 	@Nonnull
 	public ALangObject evaluate(@Nullable final T ex) throws EvaluationException;
 
-	public IEvaluationContextProvider<T> getFactory();
+	public IEvaluationContextContractFactory<T> getSpecs();
 
 	/**
 	 * A string that is a valid form expression program and is equivalent to this program.

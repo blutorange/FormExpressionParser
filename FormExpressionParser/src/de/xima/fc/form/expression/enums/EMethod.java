@@ -93,7 +93,7 @@ public enum EMethod {
 	SWITCHCASE(ExpressionMethod.SWITCHCASE),
 	SWITCHDEFAULT(ExpressionMethod.SWITCHDEFAULT),
 	SWITCHCLAUSE(ExpressionMethod.SWITCHCLAUSE),
-	NONE(CmnCnst.EMPTY_STRING),
+	NONE(CmnCnst.NonnullConstant.EMPTY_STRING),
 	;
 
 	@Nonnull public final String methodName;

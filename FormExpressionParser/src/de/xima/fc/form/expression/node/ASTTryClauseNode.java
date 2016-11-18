@@ -7,8 +7,8 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -19,7 +19,7 @@ public class ASTTryClauseNode extends ANode {
 		super(parser, nodeId);
 	}
 
-	@Nonnull private String errorVariableName = CmnCnst.EMPTY_STRING;
+	@Nonnull private String errorVariableName = CmnCnst.NonnullConstant.EMPTY_STRING;
 
 
 	@Override

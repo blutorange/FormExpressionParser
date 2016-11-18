@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 class EvaluateVisitorAnonymousFunction extends EvaluateVisitorNamedFunction {
 	public EvaluateVisitorAnonymousFunction(@Nonnull final EvaluateVisitor visitor, @Nonnull final ASTFunctionNode node,
 			@Nonnull final IEvaluationContext ec) throws EvaluationException {
-		super(visitor, node, CmnCnst.EMPTY_STRING, getArgList(visitor, node, ec), ec);
+		super(visitor, node, CmnCnst.NonnullConstant.EMPTY_STRING, getArgList(visitor, node, ec), ec);
 	}
 
 	@Nonnull

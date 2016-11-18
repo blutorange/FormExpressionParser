@@ -44,7 +44,7 @@ public abstract class ANode implements Node {
 	@Nullable private Node parent;
 
 	/** List of this node's children. */
-	@Nonnull private Node[] children = CmnCnst.EMPTY_NODE_ARRAY;
+	@Nonnull private Node[] children = CmnCnst.NonnullConstant.EMPTY_NODE_ARRAY;
 
 	/** Used during evaluation, stores operator information. */
 	@Nonnull private EMethod siblingMethod = EMethod.NONE;
@@ -63,14 +63,19 @@ public abstract class ANode implements Node {
 	 *            Node id. Not needed (yet).
 	 */
 	public ANode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+		this(parser.getCurrentEmbedmentContext(), nodeId);
+	}
+
+	public ANode(@Nullable final String embedmentContext, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
 		// by itself would raise many other issues...
 		uniqueId = ID_PROVIDER.incrementAndGet();
 		this.nodeId = nodeId;
-		this.embedment = parser.getCurrentEmbedmentContext();
+		this.embedment = embedmentContext;
 	}
+
 
 	// For performance, calls to this method may be removed.
 	// However, note that the files that call this method are

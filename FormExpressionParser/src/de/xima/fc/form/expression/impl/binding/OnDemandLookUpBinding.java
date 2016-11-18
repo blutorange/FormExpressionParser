@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * Same as {@link LookUpBinding}, but creates maps only when it reaches that
@@ -17,7 +15,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * @author madgaksha
  *
  */
-public class OnDemandLookUpBinding extends LookUpBinding {
+public class OnDemandLookUpBinding<T> extends LookUpBinding<T> {
 
 	/** Subject to change. Do not rely on this being set to a certain value. */
 	public final static int DEFAULT_NESTING_DEPTH = 512;
@@ -27,11 +25,11 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 	}
 
 	public OnDemandLookUpBinding(final int nestingDepth) {
-		this(nestingDepth, new HashMap<String, ALangObject>());
+		this(nestingDepth, new HashMap<String, T>());
 	}
 
 	@SuppressWarnings("unchecked")
-	protected OnDemandLookUpBinding(int nestingDepth, final Map<String, ALangObject> globalVariables) {
+	protected OnDemandLookUpBinding(int nestingDepth, final Map<String, T> globalVariables) {
 		if (nestingDepth < 1) nestingDepth = 1;
 		breakpointArray = new boolean[nestingDepth];
 		mapArray = new Map[nestingDepth];
@@ -49,9 +47,9 @@ public class OnDemandLookUpBinding extends LookUpBinding {
 	}
 
 	@Override
-	public void nest(final IEvaluationContext ec) throws NestingLevelTooDeepException {
-		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth+1, ec);
+	public void nest() throws NestingLevelTooDeepException {
+		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth+1);
 		++currentDepth;
-		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<String, ALangObject>();
+		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<String, T>();
 	}
 }

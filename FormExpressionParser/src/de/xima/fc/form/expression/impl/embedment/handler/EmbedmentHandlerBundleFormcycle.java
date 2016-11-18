@@ -25,7 +25,7 @@ public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 		checkNotNull(name);
 		this.name = name;
 		this.doOutput = doOutput;
-		this.scopeList = scopeList == null ? CmnCnst.EMPTY_STRING_ARRAY : scopeList;
+		this.scopeList = scopeList == null ? CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY : scopeList;
 	}
 
 	@Override

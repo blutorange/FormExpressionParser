@@ -19,7 +19,7 @@ public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
 
 	@Override
 	public String[] getScopeList() {
-		return CmnCnst.EMPTY_STRING_ARRAY;
+		return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 	}
 
 	@Override

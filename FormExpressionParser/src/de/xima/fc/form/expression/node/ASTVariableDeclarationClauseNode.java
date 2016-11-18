@@ -6,17 +6,17 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTVariableDeclarationNode extends ANode {
+public class ASTVariableDeclarationClauseNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	@Nonnull
-	private String variableName = CmnCnst.EMPTY_STRING;
+	private String variableName = CmnCnst.NonnullConstant.EMPTY_STRING;
 
-	public ASTVariableDeclarationNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTVariableDeclarationClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 

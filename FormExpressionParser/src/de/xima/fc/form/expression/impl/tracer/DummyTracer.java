@@ -32,7 +32,7 @@ public enum DummyTracer implements ITracer<Node> {
 
 	@Override
 	public Node[] getStackTrace() {
-		return CmnCnst.EMPTY_NODE_ARRAY;
+		return CmnCnst.NonnullConstant.EMPTY_NODE_ARRAY;
 	}
 
 	@Override

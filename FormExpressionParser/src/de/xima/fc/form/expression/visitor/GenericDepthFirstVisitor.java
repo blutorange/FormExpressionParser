@@ -39,7 +39,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -310,7 +310,7 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 	}
 
 	@Override
-	public R visit(final ASTVariableDeclarationNode node, final T data) throws E {
+	public R visit(final ASTVariableDeclarationClauseNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 

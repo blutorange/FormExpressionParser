@@ -64,7 +64,7 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IO
 				baos.write(headerAndFooter[i].getBytes(charset));
 			// Write body
 			v = new GraphvizVisitor(baos, charset, lineSeparator);
-			node.jjtAccept(v, CmnCnst.EMPTY_BYTE_ARRAY);
+			node.jjtAccept(v, CmnCnst.NonnullConstant.EMPTY_BYTE_ARRAY);
 			// Write footer
 			for (int i = footerBegin; i < headerAndFooter.length; ++i)
 				baos.write(headerAndFooter[i].getBytes(charset));
@@ -168,6 +168,6 @@ public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IO
 			outputStream.write(nodeId);
 			outputStream.write(lineSeparator);
 		}
-		return nodeId != null ? nodeId : CmnCnst.EMPTY_BYTE_ARRAY;
+		return nodeId != null ? nodeId : CmnCnst.NonnullConstant.EMPTY_BYTE_ARRAY;
 	}
 }

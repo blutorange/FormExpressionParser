@@ -517,7 +517,7 @@ void ScopeGlobal(EMethod method) #ScopeGlobalNode :
   (
     < Global > < Scope > < BracesOpen >
     (
-      VariableDeclaration(null)
+      VariableDeclarationClause(null)
     )*
     < BracesClose >
   )
@@ -534,7 +534,7 @@ void ScopeManual(EMethod method) #ScopeManualNode :
   (
     < Scope > t = < Identifier > < BracesOpen >
     (
-      VariableDeclaration(method)
+      VariableDeclarationClause(method)
     )*
     < BracesClose >
   )
@@ -556,19 +556,6 @@ void ScopeExternal(EMethod method) #ScopeExternalNode :
   }
 }
 
-void VariableDeclaration(EMethod method) #VariableDeclarationNode :
-{
-  Token t;
-}
-{
-  (
-    < Var > t = < Identifier > [ < Equal > Expression(null) ] < SemiColon >  )
-  {
-    jjtThis.init(method, t.image);
-  }
-}
-  
-
 void ClauseOrStatement(EMethod method) #void :
 {
 }
@@ -586,8 +573,35 @@ void ClauseOrStatement(EMethod method) #void :
   | BreakClause(method)
   | ContinueClause(method)
   | ReturnClause(method)
+  | VariableDeclarationClauseWithAssignment(method)
   | Statement(method)
   )
+}
+
+void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
+{
+  Token t;
+}
+{
+  (
+    < Var > t = < Identifier > < SemiColon >
+  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
+
+void VariableDeclarationClauseWithAssignment(EMethod method) #VariableDeclarationClauseNode :
+{
+  Token t;
+}
+{
+  (
+    < Var > t = < Identifier > [ < Equal > Expression(null) ] < SemiColon >
+  )
+  {
+    jjtThis.init(method, t.image);
+  }
 }
 
 void FunctionClause(EMethod method) #FunctionClauseNode :
@@ -1760,22 +1774,3 @@ void Literal(EMethod method) #void :
 | Function(method)
 | Exception(method)
 }
-
-/*
-void TypeDeclaredVariableWithOptionalScope(EMethod method) #VariableNode :
-{
-  Token part1;
-  Token part2 = null;
-}
-{
-  (
-    VariableTypeDeclaration(null) part1 = < Identifier > [ < ScopeSeparator > part2 = < Identifier > ]
-  )
-  {
-    if (part2 == null) 
-    jjtThis.init(method, null, part1.image);
-    else 
-    jjtThis.init(method, part1.image, part2.image);
-  }
-}
-*/

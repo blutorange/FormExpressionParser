@@ -4,21 +4,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.exception.VariableNotDefinedException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.IReset;
 
 /**
+ * A binding used when checking variable scoping.
  * @author madgaksha
- * @param <T>
- *            Class of the variables this binding stores. For evaluation this
- *            will be {@link ALangObject}, but there are some special purposes
- *            requiring other classes, such as the
- *            {@link VariableTypeCheckVisitor}.
+ * @param <T> Class of the objects this binding stores.
  */
-public interface IBinding extends IReset {
+public interface IBinding<T> extends IReset {
 
 	/**
 	 * Resets this binding. This means that {@link #isGlobal()} now returns <code>false</code>
@@ -42,32 +37,28 @@ public interface IBinding extends IReset {
 	 *            Variable name.
 	 * @return The value of the variable, or null when it does
 	 *         not exist.
-	 * @throws EvaluationException
-	 *             When the value of the variable cannot be retrieved for any
-	 *             reason other than that it does not exist. Must not throw
-	 *             an exception when the variable does not exist, but return
-	 *             <code>null</code> instead.
 	 */
 	@Nullable
-	public ALangObject getVariable(@Nonnull String name) throws EvaluationException;
+	public T getVariable(@Nonnull String name);
 
 	/**
-	 * Sets a local variable. Must never look it up in any scopes. When the variable
-	 * does not exist yet, it will be created. After it has been set,
-	 * {@link #getVariable(String)} must not throw a {@link VariableNotDefinedException}
-	 * anymore.
-	 * @param name Name of the variable.
-	 * @param value Value to set.
-	 * @throws EvaluationException When the variable cannot be set.
+	 * @param name Name of the variable to check.
+	 * @return Whether a variable with the given name exists at the current nesting level.
 	 */
-	public void setVariable(@Nonnull String name, @Nonnull ALangObject value) throws EvaluationException;
+	public boolean hasVariableAtCurrentLevel(@Nonnull String name);
+
+	/**
+	 * Defines a new variable at the current nesting level.
+	 * @param name
+	 */
+	public void defineVariable(@Nonnull String name, @Nonnull T object);
 
 	/**
 	 * Modifies this binding. {@link #getVariable(String)} must return the same value
 	 * unless #{@link #setVariable(String, ALangObject)} was called.
 	 * @throws NestingLevelTooDeepException When the nesting level has been reached.
 	 */
-	public void nest(@Nonnull IEvaluationContext ec) throws NestingLevelTooDeepException;
+	public void nest() throws NestingLevelTooDeepException;
 
 	/**
 	 * Same as {@link #nest()}, but without falling back to any parent bindings other than
@@ -76,7 +67,7 @@ public interface IBinding extends IReset {
 	 * be able to unnest the nesting.
 	 * @throws NestingLevelTooDeepException When the nesting level has been reached.
 	 */
-	public void nestLocal(@Nonnull IEvaluationContext ec) throws NestingLevelTooDeepException;
+	public void nestLocal() throws NestingLevelTooDeepException;
 
 	/**
 	 * Gets the previous binding from which this binding was derived.
@@ -85,7 +76,7 @@ public interface IBinding extends IReset {
 	 * @return The parent binding. Undefined behaviour when there is no such binding.
 	 * @throws CannotUnnestGlobalNestingException When this binding is at the global level.
 	 */
-	public void unnest(@Nonnull IEvaluationContext ec) throws CannotUnnestGlobalNestingException;
+	public void unnest() throws CannotUnnestGlobalNestingException;
 
 	/**
 	 * The limit on nesting. Each if-clause, loop, try-clause, switch,
@@ -99,14 +90,15 @@ public interface IBinding extends IReset {
 	public int getNestingLimit();
 
 	/**
-	 * @return Whether the nesting limit has been reached and a call to {@link #nest(IEvaluationContext)}
-	 * or {@link #nestLocal(IEvaluationContext)} will throw an error.
+	 * @return Whether the nesting limit has been reached and a call to {@link #nest()}
+	 * or {@link #nestLocal()} will throw an error.
 	 */
 	public boolean isAtMaximumNestingLimit();
 
 	/**
 	 * @return Whether this binding is currently at the global scope, ie. at a nesting level of 0. Calling
-	 * {@link #unnest(IEvaluationContext)} when at the global scope throws an error.
+	 * {@link #unnest()} when at the global scope throws an error.
 	 */
 	public boolean isGlobal();
+
 }

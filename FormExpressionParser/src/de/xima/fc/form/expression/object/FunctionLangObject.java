@@ -24,7 +24,7 @@ public class FunctionLangObject extends ALangObject {
 			}
 			@Override
 			public String[] getDeclaredArgumentList() {
-				return CmnCnst.EMPTY_STRING_ARRAY;
+				return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 			}
 			@Override
 			public Node getNode() {
@@ -32,7 +32,7 @@ public class FunctionLangObject extends ALangObject {
 			}
 			@Override
 			public String getDeclaredName() {
-				return CmnCnst.EMPTY_STRING;
+				return CmnCnst.NonnullConstant.EMPTY_STRING;
 			}
 			@Override
 			public Type getThisContextType() {

@@ -14,14 +14,14 @@ import de.xima.fc.form.expression.exception.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextProvider;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.externalcontext.AGenericExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
-import de.xima.fc.form.expression.impl.factory.FormcycleEcProvider;
-import de.xima.fc.form.expression.impl.factory.GenericEcProvider;
+import de.xima.fc.form.expression.impl.factory.FormcycleEcContractFactory;
+import de.xima.fc.form.expression.impl.factory.GenericEcContractFactory;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -62,11 +62,11 @@ public final class TestUtil {
 			try {
 				switch (test.getContextType()) {
 				case FORMCYCLE:
-					final IFormExpression<FormcycleExternalContext> feForm = parse(test.getCode(), test.getTestType(), FormcycleEcProvider.INSTANCE);
+					final IFormExpression<FormcycleExternalContext> feForm = parse(test.getCode(), test.getTestType(), FormcycleEcContractFactory.INSTANCE);
 					if (test.isPerformEvaluation()) res = evaluateFormcycle(feForm, test.getTestType());
 					break;
 				case GENERIC:
-					final IFormExpression<AGenericExternalContext> feGeneric = parse(test.getCode(), test.getTestType(), GenericEcProvider.INSTANCE);
+					final IFormExpression<AGenericExternalContext> feGeneric = parse(test.getCode(), test.getTestType(), GenericEcContractFactory.INSTANCE);
 					if (test.isPerformEvaluation()) res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
 				default:
@@ -167,7 +167,7 @@ public final class TestUtil {
 	}
 
 	@Nonnull
-	private static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final IEvaluationContextProvider<T> provider) throws ParseException, TokenMgrError {
+	private static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider) throws ParseException, TokenMgrError {
 		final IFormExpression<T> res;
 		final Date t1 = new Date();
 		switch (type) {

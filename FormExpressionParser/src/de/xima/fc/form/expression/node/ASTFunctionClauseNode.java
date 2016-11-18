@@ -7,15 +7,15 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
 public class ASTFunctionClauseNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	@Nonnull private String functionName = CmnCnst.EMPTY_STRING;
+	@Nonnull private String functionName = CmnCnst.NonnullConstant.EMPTY_STRING;
 
 	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -26,7 +26,7 @@ public class ASTFunctionClauseNode extends ANode {
 		assertChildrenAtLeast(2);
 		super.init(method);
 		final ASTVariableNode var = getNthChildAs(0, ASTVariableNode.class);
-		functionName = var.getScope() != null ? var.getScope() + Syntax.SCOPE_SEPARATOR + var.getName() : var.getName();
+		functionName = var.getScope() != null ? var.getScope() + Syntax.SCOPE_SEPARATOR + var.getVariableName() : var.getVariableName();
 	}
 
 	@Nonnull

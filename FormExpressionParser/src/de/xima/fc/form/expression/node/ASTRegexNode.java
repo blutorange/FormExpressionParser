@@ -13,15 +13,15 @@ import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
 public class ASTRegexNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	@Nonnull private Pattern pattern = CmnCnst.EMPTY_PATTERN;
+	@Nonnull private Pattern pattern = CmnCnst.NonnullConstant.EMPTY_PATTERN;
 
 	public ASTRegexNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

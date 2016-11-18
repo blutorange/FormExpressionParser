@@ -19,11 +19,16 @@ public final class CmnCnst {
 
 	@Nonnull public static final String SYSTEM_LOGGER_FORMAT = "[%s] (%s) %s %s";
 
-	@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
-	@Nonnull public static final String EMPTY_STRING = "";
-	@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
-	@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
-	@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
+	public final static class NonnullConstant {
+		private NonnullConstant() {}
+		@Nonnull public static final Boolean BOOLEAN_TRUE = new Boolean(true);
+		@Nonnull public static final Boolean BOOLEAN_FALSE = new Boolean(false);
+		@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
+		@Nonnull public static final String EMPTY_STRING = "";
+		@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
+		@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+		@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
+	}
 
 	public final static class CustomScope {
 		private CustomScope() {}
@@ -286,6 +291,9 @@ public final class CmnCnst {
 		@Nonnull public static final String EXPRESSION_METHOD_NULL_INTERNAL = "Expression method must not be null here. " + INTERNAL_ERROR;
 		@Nonnull public static final String NOT_A_COMMENT_TOKEN = "Token kind is not a comment token, but %s.";
 		@Nonnull public static final String FACTORY_FAILED_TO_CREATE_EC = "Evaluation context factory %s failed to create context.";
+		@Nonnull public static final String VARIABLE_DECLARATION_AT_GLOBAL_SCOPE = "Encountered variable declaration for %s at global scope. Global variable must be declared in a global{} block.";
+		@Nonnull public static final String VARIABLE_ALREADY_DECLARED_IN_NESTING_LEVEL = "Variable %s was already declared at the current nesting level.";
+		@Nonnull public static final String VARIABLE_USED_BEFORE_DECLARED = "Variable %s was not declared. Variables must be declared before they are used in strict mode.";
 	}
 
 	public static final class ToString {

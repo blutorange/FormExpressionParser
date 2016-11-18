@@ -10,8 +10,9 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextProvider;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
@@ -24,29 +25,33 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	private transient String unparse;
 
 	@Nonnull
-	private final IEvaluationContextProvider<T> factory;
+	private final IScopeDefinitions scopeDefs;
+	@Nonnull
+	private final IEvaluationContextContractFactory<T> specs;
 	@Nonnull
 	private final Node node;
 	@Nonnull
 	private final ImmutableList<IComment> comments;
 
-	FormExpressionImpl(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments, @Nonnull final IEvaluationContextProvider<T> factory) {
+	FormExpressionImpl(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments,
+			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final IEvaluationContextContractFactory<T> specs) {
 		this.node = node;
 		this.comments = comments;
-		this.factory = factory;
+		this.specs = specs;
+		this.scopeDefs = scopeDefs;
 	}
 
 	@Override
 	@Nonnull
-	public ALangObject evaluate(@Nullable final T ex)
-			throws EvaluationException {
-		final IEvaluationContext ec = factory.getContextWithExternal(ex);
+	public ALangObject evaluate(@Nullable final T ex) throws EvaluationException {
+		final IEvaluationContext ec = specs.getContextWithExternal(ex);
 		return EvaluateVisitor.evaluateCode(node, ec);
 	}
 
 	@Nonnull
 	@Override
 	public String unparse(@Nullable final UnparseVisitorConfig config) {
+		//TODO pass scopeDef to unparseVisitor so that they get unparsed as well.
 		if (unparse != null)
 			return unparse;
 		return unparse = UnparseVisitor.unparse(node, comments,
@@ -59,7 +64,7 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	}
 
 	@Override
-	public IEvaluationContextProvider<T> getFactory() {
-		return factory;
+	public IEvaluationContextContractFactory<T> getSpecs() {
+		return specs;
 	}
 }

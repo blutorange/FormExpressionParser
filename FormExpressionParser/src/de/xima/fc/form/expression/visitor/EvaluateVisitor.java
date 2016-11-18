@@ -61,7 +61,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -168,9 +168,9 @@ implements IFormExpressionReturnDataVisitor<ALangObject, IEvaluationContext, Eva
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
 		final String scope = var.getScope();
 		if (scope != null)
-			ec.getScope().setVariable(scope, var.getName(), val);
+			ec.getScope().setVariable(scope, var.getVariableName(), val);
 		else
-			ec.setUnqualifiedVariable(var.getName(), val);
+			ec.setUnqualifiedVariable(var.getVariableName(), val);
 		return val;
 	}
 
@@ -488,12 +488,12 @@ implements IFormExpressionReturnDataVisitor<ALangObject, IEvaluationContext, Eva
 	public ALangObject visit(final ASTVariableNode node, final IEvaluationContext ec) throws EvaluationException {
 		final String scope = node.getScope();
 		if (scope != null) {
-			final ALangObject value = ec.getScope().getVariable(scope, node.getName(), ec);
+			final ALangObject value = ec.getScope().getVariable(scope, node.getVariableName(), ec);
 			if (value == null)
-				throw new VariableNotDefinedException(scope, node.getName(), ec);
+				throw new VariableNotDefinedException(scope, node.getVariableName(), ec);
 			return value;
 		}
-		return ec.getUnqualifiedVariable(node.getName());
+		return ec.getUnqualifiedVariable(node.getVariableName());
 	}
 
 	@Override
@@ -942,7 +942,7 @@ implements IFormExpressionReturnDataVisitor<ALangObject, IEvaluationContext, Eva
 	}
 
 	@Override
-	public ALangObject visit(final ASTVariableDeclarationNode node, final IEvaluationContext data) throws EvaluationException {
+	public ALangObject visit(final ASTVariableDeclarationClauseNode node, final IEvaluationContext data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("TODO - not yet implemented");
 	}

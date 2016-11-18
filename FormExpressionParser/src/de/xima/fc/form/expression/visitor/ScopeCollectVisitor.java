@@ -14,12 +14,14 @@ import de.xima.fc.form.expression.exception.MultipleOccurencesOfRequireException
 import de.xima.fc.form.expression.exception.MultipleOccurencesOfScopedVariableException;
 import de.xima.fc.form.expression.exception.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
-public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<SemanticsException> {
+public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<SemanticsException> implements IScopeDefinitionsBuilder {
 
 	@Nullable
 	private String currentScope = null;
@@ -35,12 +37,13 @@ public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<Se
 	@Nonnull
 	private final Map<String, Map<String,Node>> manualMap;
 
-	public static void collect(final Node node) throws SemanticsException {
+	public static IScopeDefinitionsBuilder collect(final Node node) throws SemanticsException {
 		final ScopeCollectVisitor v = new ScopeCollectVisitor();
 		node.jjtAccept(v);
 		v.currentMap = null;
 		v.currentScope = null;
 		v.detachNodes();
+		return v;
 	}
 
 	private ScopeCollectVisitor() {
@@ -86,12 +89,59 @@ public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<Se
 	}
 
 	@Override
-	public void visit(final ASTVariableDeclarationNode node) throws SemanticsException {
+	public void visit(final ASTVariableDeclarationClauseNode node) throws SemanticsException {
 		final Map<String, Node> map = currentMap;
 		if (map != null) {
 			if (map.containsKey(node.getVariableName()))
 				throw new MultipleOccurencesOfScopedVariableException(node, currentScope);
 			map.put(node.getVariableName(), node);
 		}
+	}
+
+	@Override
+	public boolean hasGlobal(final String name) {
+		return globalMap.containsKey(name);
+	}
+
+	@Override
+	public boolean hasManual(final String scope, final String name) {
+		final Map<String,?> m = manualMap.get(scope);
+		return m == null ? false : m.containsKey(scope);
+	}
+
+	@Override
+	public boolean hasManual(final String scope) {
+		return manualMap.containsKey(scope);
+	}
+
+	@Override
+	public boolean hasExternal(final String name) {
+		return requiredSet.contains(name);
+	}
+
+	@Override
+	public void addGlobal(final String name, final Node node) {
+		globalMap.put(name, node);
+	}
+
+	@Override
+	public void addExternal(final String name) {
+		requiredSet.add(name);
+	}
+
+	@Override
+	public void addManual(final String scope, final String name, final Node node) {
+		Map<String,Node> m = manualMap.get(scope);
+		if (m == null) {
+			m = new HashMap<>();
+			manualMap.put(scope, m);
+		}
+		m.put(name, node);
+	}
+
+	@Override
+	public IScopeDefinitions build() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TODO - not yet implemented");
 	}
 }

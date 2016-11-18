@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 import com.google.common.base.Optional;
 
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.IBinding;
 import de.xima.fc.form.expression.iface.context.IEmbedment;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
@@ -14,11 +13,9 @@ import de.xima.fc.form.expression.iface.context.INamespace;
 import de.xima.fc.form.expression.iface.context.IScope;
 import de.xima.fc.form.expression.iface.context.ITracer;
 import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext.Builder;
-import de.xima.fc.form.expression.impl.binding.OnDemandLookUpBinding;
 
 public abstract class GenericEvaluationContext implements IEvaluationContext {
 
-	@Nonnull protected final IBinding binding;
 	@Nonnull protected final INamespace namespace;
 	@Nonnull protected final ILogger logger;
 	@Nonnull protected final ITracer<Node> tracer;
@@ -36,10 +33,9 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	 * @param logger
 	 *            The logger used for logging.
 	 */
-	public GenericEvaluationContext(@Nonnull final IBinding binding, @Nonnull final IScope scope,
+	public GenericEvaluationContext(@Nonnull final IScope scope,
 			@Nonnull final INamespace namespace, @Nonnull final ITracer<Node> tracer,
 			@Nonnull final IEmbedment embedment, @Nonnull final ILogger logger) {
-		this.binding = binding;
 		this.namespace = namespace;
 		this.scope = scope;
 		this.tracer = tracer;
@@ -50,11 +46,6 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	@Override
 	public INamespace getNamespace() {
 		return namespace;
-	}
-
-	@Override
-	public IBinding getBinding() {
-		return binding;
 	}
 
 	@Override
@@ -84,7 +75,6 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 
 	@Override
 	public void reset() {
-		binding.reset();
 		scope.reset();
 		embedment.reset();
 		tracer.reset();
@@ -102,15 +92,12 @@ public abstract class GenericEvaluationContext implements IEvaluationContext {
 	}
 
 	/**
-	 * To help you get started, use this method to acquire a new
-	 * basic evaluation context. Details are subject to change,
-	 * so this should only be used for testing purposes.
+	 * For testing / debugging only.
 	 * @return Some evaluation context.
 	 */
 	@Nonnull
 	public static IEvaluationContext getNewBasicEvaluationContext() {
 		final Builder b = new Builder();
-		b.setBinding(new OnDemandLookUpBinding());
 		b.setScope(GenericScope.getNewEmptyScope());
 		return b.build();
 	}

@@ -37,7 +37,7 @@ public class SystemLogger implements ILogger {
 	}
 
 	public SystemLogger(@Nonnull final Level level) {
-		this(level, CmnCnst.EMPTY_STRING);
+		this(level, CmnCnst.NonnullConstant.EMPTY_STRING);
 	}
 
 	public SystemLogger(@Nonnull final Level level, @Nonnull final String prefix) {

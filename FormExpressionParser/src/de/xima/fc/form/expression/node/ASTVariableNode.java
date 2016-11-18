@@ -7,8 +7,8 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -20,12 +20,12 @@ public class ASTVariableNode extends ANode {
 	}
 
 	@Nonnull
-	private String name = CmnCnst.EMPTY_STRING;
+	private String name = CmnCnst.NonnullConstant.EMPTY_STRING;
 	@Nullable
 	private String scope;
 
 	@Nonnull
-	public String getName() {
+	public String getVariableName() {
 		return name;
 	}
 

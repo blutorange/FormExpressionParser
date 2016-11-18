@@ -1,12 +1,14 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -15,6 +17,10 @@ public class ASTNullNode extends ANode {
 
 	public ASTNullNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
+	}
+
+	public ASTNullNode(@Nullable final String embedmentContext) {
+		super(embedmentContext, FormExpressionParserTreeConstants.JJTNULLNODE);
 	}
 
 	@Override

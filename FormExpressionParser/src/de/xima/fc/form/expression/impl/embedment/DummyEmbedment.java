@@ -22,7 +22,7 @@ public enum DummyEmbedment implements IEmbedment {
 	}
 	@Override
 	public String[] getScopeList() {
-		return CmnCnst.EMPTY_STRING_ARRAY;
+		return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 	}
 	@Override
 	public void outputCode(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
@@ -31,5 +31,10 @@ public enum DummyEmbedment implements IEmbedment {
 	@Override
 	public void outputText(final String data, final IEvaluationContext ec) throws EmbedmentOutputException {
 		System.out.print(data);
+	}
+
+	@Override
+	public String[] getScopeList(final String embedment) {
+		return getScopeList();
 	}
 }

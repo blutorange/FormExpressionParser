@@ -39,7 +39,7 @@ import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTThrowClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
-import de.xima.fc.form.expression.node.ASTVariableDeclarationNode;
+import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
@@ -254,7 +254,7 @@ implements IFormExpressionReturnDataVisitor<Void, T, E> {
 	}
 
 	@Override
-	public Void visit(final ASTVariableDeclarationNode node, final T data) throws E {
+	public Void visit(final ASTVariableDeclarationClauseNode node, final T data) throws E {
 		return visitChildren(node, data);
 	}
 

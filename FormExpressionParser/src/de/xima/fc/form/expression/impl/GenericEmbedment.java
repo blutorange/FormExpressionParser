@@ -34,21 +34,6 @@ public class GenericEmbedment implements IEmbedment {
 	@Nullable
 	private String handlerEmbedment;
 
-	@SuppressWarnings("all")
-	private final static class InstanceHolder {
-		@Nonnull public final static GenericEmbedment GENERIC;
-		@Nonnull public final static GenericEmbedment FORMCYCLE;
-		static {
-			GENERIC = new Builder()
-					.addHandler(EmbedmentHandlerBundleGeneral.values())
-					.build();
-			FORMCYCLE = new Builder()
-					.addHandler(EmbedmentHandlerBundleGeneral.values())
-					.addHandler(EmbedmentHandlerBundleFormcycle.values())
-					.build();
-		}
-	}
-
 	private GenericEmbedment(final ImmutableMap<String, IEmbedmentHandler> map) throws IllegalArgumentException {
 		if (map == null) throw new IllegalArgumentException(CmnCnst.Error.NULL_MAP);
 		this.map = map;
@@ -122,17 +107,6 @@ public class GenericEmbedment implements IEmbedment {
 		output(data, ec);
 	}
 
-	@Nonnull
-	public static IEmbedment getGenericEmbedment() {
-		return InstanceHolder.GENERIC;
-	}
-
-	@Nonnull
-	public static IEmbedment getFormcycleEmbedment() {
-		return InstanceHolder.FORMCYCLE;
-
-	}
-
 	@Override
 	public void reset() {
 		currentEmbedment = handlerEmbedment = null;
@@ -142,12 +116,36 @@ public class GenericEmbedment implements IEmbedment {
 	@Override
 	public String[] getScopeList() {
 		final IEmbedmentHandler handler = getHandler();
-		return handler != null ? handler.getScopeList() : CmnCnst.EMPTY_STRING_ARRAY;
+		return handler != null ? handler.getScopeList() : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+	}
+
+	@SuppressWarnings("null")
+	@Override
+	public String[] getScopeList(final String embedment) {
+		final IEmbedmentHandler handler = map.get(embedment);
+		return handler != null ? handler.getScopeList() : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 	}
 
 	private static void output(@Nonnull final String data, @Nonnull final IEvaluationContext ec) throws EmbedmentOutputException, InvalidTemplateDataException {
 		final Optional<IExternalContext> ex = ec.getExternalContext();
 		if (ex.isPresent())
 			ex.get().write(data);
+	}
+
+	@SuppressWarnings("all")
+	@Nonnull
+	public static IEmbedment getNewGeneralEmbedment() {
+		return new Builder()
+				.addHandler(EmbedmentHandlerBundleGeneral.values())
+				.build();
+	}
+
+	@SuppressWarnings("all")
+	@Nonnull
+	public static IEmbedment getNewFormcycleEmbedment() {
+		return new Builder()
+				.addHandler(EmbedmentHandlerBundleGeneral.values())
+				.addHandler(EmbedmentHandlerBundleFormcycle.values())
+				.build();
 	}
 }

@@ -118,14 +118,14 @@ public class ExceptionLangObject extends ALangObject {
 	public static ExceptionLangObject create(@Nullable final CatchableEvaluationException value,
 			@Nonnull final IEvaluationContext ec) {
 		if (value == null || value.getMessage() == null)
-			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.EMPTY_STRING, ec));
+			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.NonnullConstant.EMPTY_STRING, ec));
 		return new ExceptionLangObject(value);
 	}
 
 	@Nonnull
 	public static ExceptionLangObject create(@Nullable final String message, @Nonnull final IEvaluationContext ec) {
 		if (message == null)
-			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.EMPTY_STRING, ec));
+			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.NonnullConstant.EMPTY_STRING, ec));
 		return new ExceptionLangObject(new CustomRuntimeException(message, ec));
 	}
 }

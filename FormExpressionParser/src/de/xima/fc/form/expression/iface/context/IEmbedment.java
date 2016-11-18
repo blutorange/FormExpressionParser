@@ -2,11 +2,13 @@ package de.xima.fc.form.expression.iface.context;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.exception.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
 import de.xima.fc.form.expression.util.IReset;
 
+@Immutable
 public interface IEmbedment extends IReset {
 	/**
 	 * Sets the name of the current embedment. For code templates, code is
@@ -23,11 +25,14 @@ public interface IEmbedment extends IReset {
 	public void setCurrentEmbedment(@Nullable String name);
 
 	/**
-	 * @return List of scopes this embedment defines. Must not return any
+	 * @return List of scopes the current embedment defines. Must not return any
 	 *         <code>null</code> elements.
 	 */
 	@Nonnull
 	public String[] getScopeList();
+
+	@Nonnull
+	public String[] getScopeList(String embedment);
 
 	/**
 	 * Writes the output of an embedded code block with the current type to the
