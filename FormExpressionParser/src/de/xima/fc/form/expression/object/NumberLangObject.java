@@ -8,12 +8,12 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.CoercionException;
-import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.MathDivisionByZeroException;
-import de.xima.fc.form.expression.exception.MathException;
-import de.xima.fc.form.expression.exception.NumberTooLongForIntException;
-import de.xima.fc.form.expression.exception.NumberTooLongForLongException;
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.MathDivisionByZeroException;
+import de.xima.fc.form.expression.exception.evaluation.MathException;
+import de.xima.fc.form.expression.exception.evaluation.NumberTooLongForIntException;
+import de.xima.fc.form.expression.exception.evaluation.NumberTooLongForLongException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;

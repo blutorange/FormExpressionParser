@@ -2,12 +2,14 @@ package de.xima.fc.form.expression.impl.scope;
 
 import com.google.common.collect.ImmutableMap;
 
+import de.xima.fc.form.expression.enums.EScopeSource;
 import de.xima.fc.form.expression.iface.context.ICustomScope;
+import de.xima.fc.form.expression.iface.parse.IScopeInfo;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.CmnCnst.CustomScope;
 
-public enum MathScope implements ICustomScope {
+public enum MathScope implements ICustomScope, IScopeInfo {
 	INSTANCE
 	;
 	private final ImmutableMap<String, ALangObject> map = new ImmutableMap.Builder<String, ALangObject>()
@@ -23,5 +25,15 @@ public enum MathScope implements ICustomScope {
 	@Override
 	public String getScopeName() {
 		return CustomScope.MATH;
+	}
+
+	@Override
+	public boolean isProviding(final String variableName) {
+		return map.containsKey(variableName);
+	}
+
+	@Override
+	public EScopeSource getSource() {
+		return EScopeSource.LIBRARY;
 	}
 }

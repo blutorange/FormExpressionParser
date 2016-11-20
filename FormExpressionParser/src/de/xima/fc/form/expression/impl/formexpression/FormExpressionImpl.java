@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
@@ -24,6 +24,7 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	@Nullable
 	private transient String unparse;
 
+	private final int symbolTableSize;
 	@Nonnull
 	private final IScopeDefinitions scopeDefs;
 	@Nonnull
@@ -34,17 +35,22 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	private final ImmutableList<IComment> comments;
 
 	FormExpressionImpl(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments,
-			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final IEvaluationContextContractFactory<T> specs) {
+			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final IEvaluationContextContractFactory<T> specs,
+			final int heapSize) {
 		this.node = node;
 		this.comments = comments;
 		this.specs = specs;
 		this.scopeDefs = scopeDefs;
+		this.symbolTableSize = heapSize;
 	}
 
 	@Override
 	@Nonnull
-	public ALangObject evaluate(@Nullable final T ex) throws EvaluationException {
+	public ALangObject evaluate(@Nonnull final T ex) throws EvaluationException {
+		//TODO pass heap to evaluate visitor, or add to ec.
+		//TODO restore initial values for global, scopes, functions
 		final IEvaluationContext ec = specs.getContextWithExternal(ex);
+		ec.createSymbolTable(symbolTableSize);
 		return EvaluateVisitor.evaluateCode(node, ec);
 	}
 

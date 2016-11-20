@@ -3,8 +3,9 @@ package de.xima.fc.form.expression.iface.context;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.IReset;
 
@@ -77,7 +78,7 @@ public interface IBinding<T> extends IReset {
 	 * @throws CannotUnnestGlobalNestingException When this binding is at the global level.
 	 */
 	public void unnest() throws CannotUnnestGlobalNestingException;
-
+	
 	/**
 	 * The limit on nesting. Each if-clause, loop, try-clause, switch,
 	 * and function call will add an additional nesting. Thus, this places
@@ -100,5 +101,20 @@ public interface IBinding<T> extends IReset {
 	 * {@link #unnest()} when at the global scope throws an error.
 	 */
 	public boolean isGlobal();
+
+	/**
+	 * A bookmark to be used with {@link #gotoLevel(int)} to get
+	 * back to the current nesting level.
+	 * @return A bookmark.
+	 * @see #gotoLevel(int)
+	 */
+	public int getBookmark();
+
+	/**
+	 * Nests/unnests to the the level as returned by {@link #getBookmark()}.
+	 * @param bookmark Level to unnest to.
+	 * @throws NestingLevelException When we cannot return to the requested level (because nesting/unnesting cannot be performed). 
+	 */
+	public void gotoBookmark(int bookmark) throws NestingLevelException;
 
 }

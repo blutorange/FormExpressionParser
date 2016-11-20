@@ -11,8 +11,8 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.CoercionException;
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;

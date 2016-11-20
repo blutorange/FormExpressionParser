@@ -8,8 +8,8 @@ import com.google.common.collect.ImmutableMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
+import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.iface.context.IEmbedment;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;

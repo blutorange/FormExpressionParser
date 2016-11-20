@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
@@ -47,6 +48,16 @@ public class ASTTryClauseNode extends ANode {
 		assertNonNull(errorVariableName, CmnCnst.Error.NULL_ERROR_VARIABLE_NAME);
 		super.init(method);
 		this.errorVariableName = errorVariableName;
+	}
+	
+	@Nonnull
+	public Node getTryNode() {
+		return jjtGetChild(0);
+	}
+	
+	@Nonnull
+	public Node getCatchNode() {
+		return jjtGetChild(1);
 	}
 
 	@Nonnull

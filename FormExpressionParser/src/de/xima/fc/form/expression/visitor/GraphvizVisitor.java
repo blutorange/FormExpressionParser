@@ -9,7 +9,7 @@ import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IOException> {

@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 
-import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
+import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.grammar.html.HtmlParserConstants;
 import de.xima.fc.form.expression.grammar.html.HtmlParserTokenManager;
 import de.xima.fc.form.expression.grammar.html.SimpleCharStream;
@@ -39,7 +40,8 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 
 	@Override
 	public final void finishWriting() throws EmbedmentOutputException, InvalidTemplateDataException {
-		final String html = builder.toString();
+		@SuppressWarnings("null")
+		@Nonnull final String html = builder.toString();
 		if (docCommandList != null) {
 			// Parse HTML stream.
 			Token token;
@@ -356,6 +358,6 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 				&& t.kind == HtmlParserConstants.tagBegin;
 	}
 
-	protected abstract void output(String html) throws EmbedmentOutputException;
+	protected abstract void output(@Nullable String html) throws EmbedmentOutputException;
 	protected abstract void finishOutput() throws EmbedmentOutputException;
 }

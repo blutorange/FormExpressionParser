@@ -7,12 +7,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.CoercionException;
-import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.IterationNotSupportedException;
-import de.xima.fc.form.expression.exception.NoSuchAttrAccessorException;
-import de.xima.fc.form.expression.exception.NoSuchAttrAssignerException;
-import de.xima.fc.form.expression.exception.NoSuchMethodException;
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.IterationNotSupportedException;
+import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
+import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAssignerException;
+import de.xima.fc.form.expression.exception.evaluation.NoSuchMethodException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -148,10 +148,10 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 public abstract class ALangObject implements NonNullIterable<ALangObject>, Comparable<ALangObject> {
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
+	private static AtomicLong ID_COUNTER = new AtomicLong();
 
 	private final Type type;
 	private final long id;
-	private static AtomicLong ID_COUNTER = new AtomicLong();
 
 	public static enum Type {
 		NULL(NullLangObject.class, 0),

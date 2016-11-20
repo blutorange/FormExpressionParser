@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
 
 /**
@@ -112,5 +113,20 @@ public class LookUpBindingAlternative<T> implements IBinding<T> {
 		if (currentDepth >= array.length)
 			map.put(name, array = Arrays.copyOf(array, 2*currentDepth+1));
 		array[currentDepth] = object;
+	}
+	
+	@Override
+	public int getBookmark() {
+		return currentDepth;
+	}
+	
+	@Override
+	public void gotoBookmark(final int bookmark) throws NestingLevelException {
+		while (bookmark != currentDepth) {
+			if (bookmark > currentDepth)
+				nest();
+			else
+				unnest();
+		}
 	}
 }

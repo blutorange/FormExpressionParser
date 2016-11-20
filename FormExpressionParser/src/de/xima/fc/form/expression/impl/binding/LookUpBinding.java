@@ -3,8 +3,9 @@ package de.xima.fc.form.expression.impl.binding;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
 
 /**
@@ -112,5 +113,20 @@ public class LookUpBinding<T> implements IBinding<T> {
 	@Override
 	public void defineVariable(final String name, final T object) {
 		mapArray[currentDepth].put(name, object);
+	}
+	
+	@Override
+	public int getBookmark() {
+		return currentDepth;
+	}
+	
+	@Override
+	public void gotoBookmark(final int bookmark) throws NestingLevelException {
+		while (bookmark != currentDepth) {
+			if (bookmark > currentDepth)
+				nest();
+			else
+				unnest();
+		}
 	}
 }

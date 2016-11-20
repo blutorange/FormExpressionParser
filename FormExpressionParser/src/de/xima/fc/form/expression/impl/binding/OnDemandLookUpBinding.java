@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.binding;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 
 /**
  * Same as {@link LookUpBinding}, but creates maps only when it reaches that

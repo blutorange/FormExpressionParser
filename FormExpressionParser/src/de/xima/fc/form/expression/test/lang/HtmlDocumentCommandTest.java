@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.junit.Test;
 
-import de.xima.fc.form.expression.exception.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;

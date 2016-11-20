@@ -2,10 +2,9 @@ package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.UncatchableEvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.IBinding;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
@@ -28,12 +27,12 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 
 	public EvaluateVisitorNamedFunction(@Nonnull final EvaluateVisitor visitor,
 			@Nonnull final ASTFunctionClauseNode node, @Nonnull final IEvaluationContext ec) throws EvaluationException {
-		this(visitor, node, node.getFunctionName(), getArgList(visitor, node, ec), ec);
+		this(visitor, node, node.getCanonicalName(), getArgList(visitor, node, ec), ec);
 	}
 
 	protected EvaluateVisitorNamedFunction(@Nonnull final EvaluateVisitor visitor, @Nonnull final Node node,
 			@Nonnull final String name, @Nonnull final String[] argList, @Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
-		final Node b = node.getLastChild();
+		final Node b = node.getLastChildOrNull();
 		if (b == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		if (node.jjtGetNumChildren() == 0)
@@ -62,7 +61,6 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final NullLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
-		final IBinding binding = ec.getBinding();
 		final String[] names = getDeclaredArgumentList();
 		// Set special variables.
 		binding.setVariable(CmnCnst.Name.VARIABLE_ARGUMENTS, ArrayLangObject.create(args));
@@ -78,7 +76,7 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 			binding.setVariable(name, tmp);
 		}
 		// Evaluate function.
-		return body.jjtAccept(visitor, ec);
+		return body.jjtAccept(visitor);
 	}
 
 	@Override
@@ -96,7 +94,7 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		final String[] argList = new String[node.jjtGetNumChildren() - 2];
 		for (int i = 0; i != argList.length; ++i)
-			argList[i] = node.jjtGetChild(i + 1).jjtAccept(visitor, ec).coerceString(ec).stringValue();
+			argList[i] = node.jjtGetChild(i + 1).jjtAccept(visitor).coerceString(ec).stringValue();
 		return argList;
 	}
 }

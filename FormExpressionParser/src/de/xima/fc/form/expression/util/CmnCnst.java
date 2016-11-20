@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.parse.IVariableReference;
 
 @SuppressWarnings("nls")
 public final class CmnCnst {
@@ -28,6 +29,7 @@ public final class CmnCnst {
 		@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
 		@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 		@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
+		@Nonnull public static final IVariableReference[] EMPTY_SYMBOL_TABLE = new IVariableReference[0];
 	}
 
 	public final static class CustomScope {
@@ -294,6 +296,20 @@ public final class CmnCnst {
 		@Nonnull public static final String VARIABLE_DECLARATION_AT_GLOBAL_SCOPE = "Encountered variable declaration for %s at global scope. Global variable must be declared in a global{} block.";
 		@Nonnull public static final String VARIABLE_ALREADY_DECLARED_IN_NESTING_LEVEL = "Variable %s was already declared at the current nesting level.";
 		@Nonnull public static final String VARIABLE_USED_BEFORE_DECLARED = "Variable %s was not declared. Variables must be declared before they are used in strict mode.";
+		@Nonnull public static final String VARIABLE_NOT_RESOLVABLE = "Variable %s cannot be resolved to a defined variable.";
+		@Nonnull public static final String SCOPE_MISSING_VARIABLE = "Scope %s does not define the variable %s.";
+		@Nonnull public static final String BAD_AST_PARENT_CHILD = "Bad AST - chhildren of parent do not contains this node. " + INTERNAL_ERROR;
+		@Nonnull public static final String FUNCTION_NAME_ALREADY_DEFINED = "Function name %s already exists as a global variable.";
+		@Nonnull public static final String FUNCTION_CLAUSE_NOT_HOISTED = "Function clause cannot occur at main program, it must have been hoisted to the header by now. " + INTERNAL_ERROR;
+		@Nonnull public static final String NODE_WITHOUT_CHILDREN = "Node does not have any children.";
+		@Nonnull public static final String FUNCTION_NODE_ARGUMENT_OUT_OF_BOUNDS = "Cannot access argument %d, function node contains only %d arguments.";
+		@Nonnull public static final String WITH_CLAUSE_NODE_SCOPE_OUT_OF_BOUNDS = "Cannot access scope name %d, with clause node contains only %d scopes.";
+		@Nonnull public static final String DUPLICATE_FUNCTION_ARGUMENT = "Duplicate argument %s encountered in function parameters.";
+		@Nonnull public static final String ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION = "Scope definition %s cannot occur in the main program. " + INTERNAL_ERROR;
+		@Nonnull public static final String MISSING_EXTERNAL_CONTEXT = "Evaluation context is missing external context, but it is required. " + INTERNAL_ERROR;
+		@Nonnull public static final String SCOPED_VARIABLE_NOT_RESOLVED = "Variable %s::%s is not resolved. " + INTERNAL_ERROR;
+		@Nonnull public static final String UNSCOPED_VARIABLE_NOT_RESOLVED = "Variable %s is not resolved. " + INTERNAL_ERROR;
+		@Nonnull public static final String ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE = "Variable %s::%s belongs to an external scope and cannot be assigned to.";
 	}
 
 	public static final class ToString {

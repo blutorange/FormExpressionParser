@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
-import de.xima.fc.form.expression.exception.IllegalThisContextException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;

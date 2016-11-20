@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -69,7 +69,8 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE009("foo::k=0;with(foo){k=42;k;}", Tests.N42), // default scopes writing to vars
 	SCOPE010("foo::k=42;with(foo){k=0;foo::k;}", Tests.N42), // can still access explicitly
 	SCOPE011("k=42;foo::k=0;with(foo){k;}", Tests.N42), // first global, then default scope
-
+	SCOPE012("function foo(){0;}function foo::bar(){42;}", Tests.N42), // scoped function
+	
 	//Property expressions
 	PROP001("'Ab3'.toUpperCase().toLowerCase();", StringLangObject.create("ab3")),
 	PROP002("s='Ab3';f=s.toLowerCase;f.call(s);", StringLangObject.create("ab3")),

@@ -3,8 +3,8 @@ package de.xima.fc.form.expression.object;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.CoercionException;
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -12,6 +12,7 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class BooleanLangObject extends ALangObject {
+	private static final long serialVersionUID = 1L;
 	private final boolean value;
 
 	private BooleanLangObject(final boolean value) {

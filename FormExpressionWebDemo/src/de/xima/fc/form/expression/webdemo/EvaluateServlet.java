@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;

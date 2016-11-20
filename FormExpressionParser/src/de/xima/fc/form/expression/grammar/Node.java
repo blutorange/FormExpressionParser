@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.context.ITraceElement;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -88,7 +88,7 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public <T extends Node> T getNthChildAs(int index, final Class<T> clazz) throws ParseException;
 
-	public <T extends Node> T getNthChildAsOrNull(int index, Class<T> clazz);
+	public <T extends Node> T getNthChildAsOrNull(int index, @Nonnull Class<T> clazz);
 
 
 	/**
@@ -157,9 +157,14 @@ public interface Node extends Serializable, ITraceElement {
 	public Node[] getChildArray();
 
 	@Nullable
-	public Node getLastChild();
+	public Node getLastChildOrNull();
 	@Nullable
-	public Node getFirstChild();
+	public Node getFirstChildOrNull();
+
+	@Nonnull
+	public Node getLastChild() throws ParseException;
+	@Nonnull
+	public Node getFirstChild() throws ParseException;
 
 	/**
 	 * @return The id for this TYPE of node.
@@ -167,6 +172,9 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public int jjtGetNodeId();
 
+	/**
+	 * @return The current embedment. <code>null</code> when not a template program.
+	 */
 	@Nullable
 	public String getEmbedment();
 
@@ -174,9 +182,16 @@ public interface Node extends Serializable, ITraceElement {
 	public void jjtSetLastToken(Token token);
 
 	/**
-	 * Detaches this node from the parent. Does nothing if this is the top-level node.
+	 * Detaches this node from the parent. Does nothing if this is the top-level
+	 * node.
+	 * 
+	 * @return The detached node.
+	 * @throws ParseException
+	 *             When the syntax tree is bad and the parent does not contain
+	 *             this node as one of its children.
 	 */
-	public void detach();
+	@Nonnull
+	public Node detach() throws ParseException;
 
 	/**
 	 * Removes the child at the given index. Does nothing if the index is out-of-bounds.
@@ -184,4 +199,13 @@ public interface Node extends Serializable, ITraceElement {
 	 */
 	public void removeChild(int i);
 
+	/**
+	 * @param clazz Class to cast this node to.
+	 * @return T Casted node, or null when it cannot be casted.
+	 */
+	@Nullable
+	public <T extends Node> T getAsOrNull(@Nonnull Class<T> clazz);
+
+	@Nonnull
+	public String getNodeName();
 }

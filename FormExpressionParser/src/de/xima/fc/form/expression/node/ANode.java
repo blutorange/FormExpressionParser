@@ -10,6 +10,7 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
@@ -137,7 +138,7 @@ public abstract class ANode implements Node {
 	@Override
 	public final String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(nodeName())
+		sb.append(getNodeName())
 		.append('(')
 		.append(embedment)
 		.append(',')
@@ -201,16 +202,20 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public <T extends Node> T getNthChildAsOrNull(final int index, final Class<T> clazz) {
-		final Node n = children[0];
-		if (!clazz.isAssignableFrom(n.getClass()))
+	public <T extends Node> T getNthChildAsOrNull(final int index, @Nonnull final Class<T> clazz) {
+		return children[index].getAsOrNull(clazz);
+	}
+
+	@Override
+	public <T extends Node> T getAsOrNull(@Nonnull final Class<T> clazz) {
+		if (!clazz.isAssignableFrom(getClass()))
 			return null;
-		return clazz.cast(n);
+		return clazz.cast(this);
 	}
 
 	@Override
 	@Nullable
-	public Node getLastChild() {
+	public Node getLastChildOrNull() {
 		if (children.length == 0)
 			return null;
 		return children[children.length - 1];
@@ -218,10 +223,26 @@ public abstract class ANode implements Node {
 
 	@Override
 	@Nullable
-	public Node getFirstChild() {
+	public Node getFirstChildOrNull() {
 		if (children.length == 0)
 			return null;
 		return children[0];
+	}
+
+	@SuppressWarnings("null") // already checked when setting children
+	@Override
+	public Node getFirstChild() throws ParseException {
+		if (children.length == 0)
+			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN);
+		return children[0];
+	}
+
+	@SuppressWarnings("null") // already checked when setting children
+	@Override
+	public Node getLastChild() throws ParseException {
+		if (children.length == 0)
+			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN);
+		return children[children.length-1];
 	}
 
 	@Override
@@ -321,7 +342,7 @@ public abstract class ANode implements Node {
 	@Override
 	public String getMethodName() {
 		if (this instanceof ASTFunctionClauseNode) {
-			return ((ASTFunctionClauseNode) this).getFunctionName();
+			return ((ASTFunctionClauseNode) this).getCanonicalName();
 		} else if (this instanceof ASTFunctionNode) {
 			return CmnCnst.TRACER_POSITION_NAME_ANONYMOUS_FUNCTION;
 		}
@@ -343,8 +364,9 @@ public abstract class ANode implements Node {
 	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
 	}
 
+	@Override
 	@Nonnull
-	protected String nodeName() {
+	public String getNodeName() {
 		return NullUtil.checkNotNull(getClass().getSimpleName());
 	}
 
@@ -360,7 +382,7 @@ public abstract class ANode implements Node {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
 				break;
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
-				final Node pen = ((ASTPropertyExpressionNode)children[i]).getLastChild();
+				final Node pen = ((ASTPropertyExpressionNode)children[i]).getLastChildOrNull();
 				if (pen == null || pen.getSiblingMethod() == EMethod.PARENTHESIS) {
 					// Cannot do assignment a.foobar() = 42;
 					final String msg = String.format(
@@ -393,17 +415,19 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public final void detach() {
+	public final Node detach() throws SemanticsException {
 		final Node p = parent;
 		if (p != null) {
 			for (int i = p.jjtGetNumChildren(); i --> 0;) {
 				if (p.jjtGetChild(i).getId() == uniqueId) {
 					p.removeChild(i);
 					parent = null;
-					return;
+					return this;
 				}
 			}
+			throw new SemanticsException(CmnCnst.Error.BAD_AST_PARENT_CHILD, this);
 		}
+		return this;
 	}
 
 	@SuppressWarnings("null") // ArrayUtils.remove does not return null.

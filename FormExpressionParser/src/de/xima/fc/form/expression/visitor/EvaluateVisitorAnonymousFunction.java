@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
@@ -19,7 +19,7 @@ class EvaluateVisitorAnonymousFunction extends EvaluateVisitorNamedFunction {
 			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		final String[] argList = new String[node.jjtGetNumChildren() - 1];
 		for (int i = 0; i != argList.length; ++i)
-			argList[i] = node.jjtGetChild(i).jjtAccept(visitor, ec).coerceString(ec).stringValue();
+			argList[i] = node.jjtGetChild(i).jjtAccept(visitor).coerceString(ec).stringValue();
 		return argList;
 	}
 }

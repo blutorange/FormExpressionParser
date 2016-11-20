@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -10,65 +9,45 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
-import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.VariableNotDefinedException;
+import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.parse.IScopeInfo;
+import de.xima.fc.form.expression.impl.scope.FormcycleScope;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.CmnCnst.CustomScope;
 
-// Dummy for illustration, remove this and use the real FORMCYCLE class FormVersion.
+// Dummy for illustration, remove this and use the class FormVersion etc.
 public class FormcycleExternalContext extends AHtmlExternalContext {
+	@Nullable
 	private Writer writer;
+	@Nonnull
+	private final Formcycle formcycle;
 
-	// For demonstration purposes only. Replace with access to actual form elements.
-	private static final ImmutableMap<String, String> nameMap;
-	private static final ImmutableMap<String, String> aliasMap;
+	// TODO replace with an actual type to be used.
+	private final static ImmutableMap<String, FormcycleScope> scopeMap;
 	static {
-		final Builder<String, String> builderName = new Builder<String, String>();
-		final Builder<String, String> builderAlias = new Builder<String, String>();
-		// Elements by name
-		builderName.put("tf1", "Hello"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderName.put("tf2", "World"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderName.put("tf3", "igel"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderName.put("lang", "tr"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderName.put("backslash", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderName.put("tfVorname", "Andre"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderName.put("tfNachname","Wachsmuth"); //$NON-NLS-1$ //$NON-NLS-2$
-		// Elements by alias
-		builderAlias.put("VornameUnicode", "André"); //$NON-NLS-1$ //$NON-NLS-2$
-		builderAlias.put("NachnameUnicode","Wachsmuth"); //$NON-NLS-1$ //$NON-NLS-2$
-		// Build
-		nameMap = builderName.build();
-		aliasMap = builderAlias.build();
+		scopeMap = new Builder<String, FormcycleScope>()
+				.put(FormcycleScope.FORM_FIELD.getScopeName(), FormcycleScope.FORM_FIELD)
+				.build();
 	}
 
 	public FormcycleExternalContext() {
-		// Write to stdout for debugging.
-		this.writer = SystemWriter.getSystemOutInstance();
+		this(SystemWriter.getSystemOutInstance());
 	}
 
-	public FormcycleExternalContext(final Writer writer) {
+	public FormcycleExternalContext(@Nonnull final Writer writer) {
+		this(writer, new Formcycle());
+	}
+
+	public FormcycleExternalContext(@Nonnull Writer writer, @Nonnull Formcycle formcycle) {
 		this.writer = writer;
-	}
-
-
-	/*
-	public FormcycleExternalContext(Object customObject) {
-		// this.customObject = customObject;
-	}
-	 */
-
-	public String getFieldValueByName(final String name) {
-		return nameMap.get(name);
-	}
-	public String getFieldValueByAlias(final String name) {
-		return aliasMap.get(name);
+		this.formcycle = formcycle;
 	}
 
 	@Override
-	protected void output(final String html) throws EmbedmentOutputException {
+	protected void output(@Nullable final String html) throws EmbedmentOutputException {
+		final Writer writer = this.writer;
 		if (writer == null) return;
 		try {
 			writer.write(html);
@@ -81,6 +60,7 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 
 	@Override
 	protected void finishOutput() throws EmbedmentOutputException {
+		final Writer writer = this.writer;
 		if (writer == null) return;
 		try {
 			writer.flush();
@@ -89,43 +69,58 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 			throw new EmbedmentOutputException(e, this);
 		}
 		finally {
-			writer = null;
+			this.writer = null;
 		}
 	}
 
-	private final static ImmutableMap<String, ScopeImpl> scopeMap;
-	private static enum ScopeImpl {
-		FORM_FIELD {
-			@SuppressWarnings({ "null", "unused" })
-			@Override
-			public ALangObject fetch(final String name, final Object myObject) {
-				@Nullable final String value = aliasMap.get(name);
-				if (value != null) return StringLangObject.create(value);
-				return StringLangObject.create(nameMap.get(name));
-			}
-		};
-		public abstract ALangObject fetch(String name, Object myObject);
-	}
-	static {
-		scopeMap = new Builder<String, ScopeImpl>()
-				.put(CustomScope.FORM_FIELD, ScopeImpl.FORM_FIELD)
-				.build();
-	}
-
-	@SuppressWarnings({ "unused", "null" })
+	@SuppressWarnings({ "null", "unused" })
 	@Nonnull
 	@Override
-	public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name, @Nonnull final IEvaluationContext ec) throws VariableNotDefinedException {
-		final ScopeImpl s = scopeMap.get(scope);
+	public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name,
+			@Nonnull final IEvaluationContext ec) throws VariableNotDefinedException {
+		@Nullable final FormcycleScope s = scopeMap.get(scope);
 		if (s == null)
 			throw new VariableNotDefinedException(scope, name, ec);
-		final ALangObject o = s.fetch(name, null);
+		final ALangObject o = s.fetch(name, formcycle);
 		if (o == null)
 			throw new VariableNotDefinedException(scope, name, ec);
 		return o;
 	}
 
-	public static Set<String> getScopeList() {
-		return scopeMap.keySet();
+	@Nullable
+	public static IScopeInfo getScopeInfo(String scope) {
+		return scopeMap.get(scope);
+	}
+	
+	// For demonstration purposes only. Replace with real class.
+	public static class Formcycle {
+		private static final ImmutableMap<String, String> nameMap;
+		private static final ImmutableMap<String, String> aliasMap;
+		static {
+			final Builder<String, String> builderName = new Builder<String, String>();
+			final Builder<String, String> builderAlias = new Builder<String, String>();
+			// Elements by name
+			builderName.put("tf1", "Hello"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderName.put("tf2", "World"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderName.put("tf3", "igel"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderName.put("lang", "tr"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderName.put("backslash", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderName.put("tfVorname", "Andre"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderName.put("tfNachname","Wachsmuth"); //$NON-NLS-1$ //$NON-NLS-2$
+			// Elements by alias
+			builderAlias.put("VornameUnicode", "André"); //$NON-NLS-1$ //$NON-NLS-2$
+			builderAlias.put("NachnameUnicode","Wachsmuth"); //$NON-NLS-1$ //$NON-NLS-2$
+			// Build
+			nameMap = builderName.build();
+			aliasMap = builderAlias.build();
+		}
+		@Nullable
+		public String getByAlias(String alias) {
+			return aliasMap.get(alias);
+		}
+		@Nullable
+		public String getByName(String name) {
+			return nameMap.get(name);
+		}
 	}
 }

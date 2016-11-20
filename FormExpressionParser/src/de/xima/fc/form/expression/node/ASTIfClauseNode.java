@@ -1,12 +1,14 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -41,5 +43,20 @@ public class ASTIfClauseNode extends ANode {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenBetween(2, 3);
 		super.init(method);
+	}
+	
+	@Nonnull
+	public Node getConditionNode() {
+		return jjtGetChild(0);
+	}
+	
+	@Nonnull
+	public Node getIfNode() {
+		return jjtGetChild(1);
+	}
+	
+	@Nullable
+	public Node getElseNode() {
+		return jjtGetNumChildren() == 3 ? jjtGetChild(2) : null;
 	}
 }

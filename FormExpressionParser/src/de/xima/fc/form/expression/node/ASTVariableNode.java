@@ -4,9 +4,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.EScopeSource;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
@@ -23,6 +25,12 @@ public class ASTVariableNode extends ANode {
 	private String name = CmnCnst.NonnullConstant.EMPTY_STRING;
 	@Nullable
 	private String scope;
+	/**
+	 * Source of the variable.
+	 * If >= 0, it is a variable on the heap,
+	 * Otherwise, see {@link EScopeSource#getSourceId()}
+	 */
+	private int source = EScopeSource.ID_UNRESOLVED;
 
 	@Nonnull
 	public String getVariableName() {
@@ -72,5 +80,27 @@ public class ASTVariableNode extends ANode {
 	@Override
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
+	}
+
+	/**
+	 * Does nothing when the variable is already scoped. Otherwise,
+	 * it sets the scope to the provided scope.
+	 * @param scope Scope to set.
+	 */
+	public void resolveScope(@Nonnull final String scope) {
+		if (this.scope == null)
+			this.scope = NullUtil.checkNotNull(scope);
+	}
+
+	public void resolveSource(final int source) {
+		this.source = source;
+	}
+	
+	public int getSource() {
+		return source;
+	}
+	
+	public boolean isOnHeap() {
+		return source >= 0;
 	}
 }

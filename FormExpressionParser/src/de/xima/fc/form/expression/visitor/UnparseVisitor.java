@@ -458,7 +458,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		}
 		writer.write(config.optionalSpace);
 		writer.write(Syntax.PAREN_OPEN);
-		if (node.getIteratingLoopVariable() == null) {
+		if (node.isPlainLoop()) {
 			// plain loop
 			// header for (i = 0; i != 10; ++i) {
 			forHeaderExpression(node.jjtGetChild(0), prefix);
@@ -577,7 +577,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		writer.write(Syntax.SWITCH);
 		writer.write(config.optionalSpace);
 		writer.write(Syntax.PAREN_OPEN);
-		expression(node.getFirstChild(), prefix);
+		expression(node.getFirstChildOrNull(), prefix);
 		writer.write(Syntax.PAREN_CLOSE);
 		writer.write(config.optionalSpace);
 		writer.write(Syntax.BRACE_OPEN);
@@ -751,7 +751,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		writer.write(config.linefeed);
 		// Function body ...
 		writer.write(next);
-		blockOrClause(node.getLastChild(), next);
+		blockOrClause(node.getLastChildOrNull(), next);
 		writer.write(config.linefeed);
 		// Closing brace }
 		writer.write(prefix);
@@ -842,7 +842,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		writer.write(config.linefeed);
 		// body
 		writer.write(next);
-		blockOrClause(node.getLastChild(), next);
+		blockOrClause(node.getLastChildOrNull(), next);
 		writer.write(config.linefeed);
 		// footer
 		writer.write(prefix);
@@ -858,7 +858,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		// header function foo(bar) {
 		writer.write(Syntax.FUNCTION);
 		writer.write(config.requiredSpace);
-		expression(node.getFirstChild(), prefix);
+		expression(node.getFirstChildOrNull(), prefix);
 		writer.write(Syntax.PAREN_OPEN);
 		for (int i = 1; i < len - 1; ++i) {
 			expression(node.jjtGetChild(i), prefix);
@@ -873,7 +873,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		writer.write(config.linefeed);
 		// body
 		writer.write(next);
-		blockOrClause(node.getLastChild(), next);
+		blockOrClause(node.getLastChildOrNull(), next);
 		writer.write(config.linefeed);
 		// footer
 		writer.write(prefix);
@@ -933,7 +933,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 	public Void visit(@Nonnull final ASTParenthesisExpressionNode node, @Nonnull final String prefix)
 			throws IOException {
 		writer.write(Syntax.PAREN_OPEN);
-		expression(node.getFirstChild(), prefix);
+		expression(node.getFirstChildOrNull(), prefix);
 		writer.write(Syntax.PAREN_CLOSE);
 		return Void.NULL;
 	}
@@ -958,7 +958,7 @@ public class UnparseVisitor implements IFormExpressionReturnDataVisitor<Void, St
 		writer.write(Syntax.EQUAL);
 		writer.write(config.optionalSpace);
 		if (node.jjtGetNumChildren() == 1) {
-			expression(node.getFirstChild(), prefix);
+			expression(node.getFirstChildOrNull(), prefix);
 		}
 		else {
 			writer.write(Syntax.NULL);

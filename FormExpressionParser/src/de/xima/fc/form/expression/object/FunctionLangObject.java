@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.object;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public class FunctionLangObject extends ALangObject {
+	private static final long serialVersionUID = 1L;
 	@Nonnull private final IFunction<ALangObject> value;
 
 	private static class InstanceHolder {

@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.exception.SemanticsException;
+import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTokenManager;
@@ -24,7 +24,7 @@ import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
-import de.xima.fc.form.expression.visitor.VariableDeclarationCheckVisitor;
+import de.xima.fc.form.expression.visitor.VariableDeclarationHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
 
 public final class FormExpressionFactory {
@@ -275,11 +275,11 @@ public final class FormExpressionFactory {
 	@Nonnull
 	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node,
 			@Nonnull final FormExpressionParser parser, @Nonnull final IEvaluationContextContractFactory<T> contractFactory,
-			final boolean strictMode) throws SemanticsException {
+			final boolean strictMode) throws ParseException {
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node);
-		VariableDeclarationCheckVisitor.check(node, scopeDefBuilder, contractFactory, strictMode);
+		VariableDeclarationHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, strictMode);
+		final int heapSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, strictMode);
 		final IScopeDefinitions scopeDef = scopeDefBuilder.build();
-		VariableResolveVisitor.resolve(node, scopeDef);
-		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDef, contractFactory);
+		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDef, contractFactory, heapSize);
 	}
 }

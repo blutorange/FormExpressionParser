@@ -2,13 +2,11 @@ package de.xima.fc.form.expression.iface.context;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
-import de.xima.fc.form.expression.exception.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.InvalidTemplateDataException;
+import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.util.IReset;
 
-@Immutable
 public interface IEmbedment extends IReset {
 	/**
 	 * Sets the name of the current embedment. For code templates, code is

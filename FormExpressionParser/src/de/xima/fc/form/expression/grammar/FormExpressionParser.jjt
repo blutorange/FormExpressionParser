@@ -604,6 +604,18 @@ void VariableDeclarationClauseWithAssignment(EMethod method) #VariableDeclaratio
   }
 }
 
+void VariableDeclarationExpressionWithAssignment(EMethod method) #VariableDeclarationClauseNode :
+{
+  Token t;
+}
+{
+  (
+    < Var > t = < Identifier > [ < Equal > Expression(null) ]
+  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
 void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
@@ -812,7 +824,7 @@ void ForLoop(EMethod method) #ForLoopNode :
 }
 {
   (
-    < For > [< AngleOpen > label = < Identifier > < AngleClose >] < ParenOpen >
+    < For > [ < AngleOpen > label = < Identifier > < AngleClose > ] < ParenOpen >
     (
       LOOKAHEAD(< Identifier > < Colon >)
       (
@@ -820,7 +832,7 @@ void ForLoop(EMethod method) #ForLoopNode :
       )
     |
       (
-        ExpressionListCommaSeparated(null) < SemiColon > ExpressionListCommaSeparated(null) < SemiColon > ExpressionListCommaSeparated(null)
+        ExpressionOrVariableDeclarationListCommaSeparated(null) < SemiColon > ExpressionListCommaSeparated(null) < SemiColon > ExpressionListCommaSeparated(null)
       )
     )
     < ParenClose > 
@@ -886,18 +898,45 @@ void Block(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() !=
   }
 }
 
+void ExpressionOrVariableDeclarationListCommaSeparated(EMethod method) #StatementListNode :
+{
+  
+}
+{
+  (
+    [
+      (
+        VariableDeclarationExpressionWithAssignment(null)
+      | Expression(null)
+      )
+      (
+        < Comma >
+        (
+          Expression(null)
+        | VariableDeclarationExpressionWithAssignment(null)
+        )
+      )*
+    ]
+  )
+  {
+    jjtThis.init(method);
+    
+  }
+}
+
+
 void ExpressionListCommaSeparated(EMethod method) #StatementListNode :
 {
   
 }
 {
   (
-    (
+    [
       Expression(null)
-    )?
-    (
-      < Comma > Expression(null)
-    )*
+      (
+        < Comma > Expression(null)
+      )*
+    ]
   )
   {
     jjtThis.init(method);
@@ -1414,7 +1453,6 @@ void PostUnaryExpression(EMethod method) #PostUnaryExpressionNode(unaryMethod !=
 void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode = true;
-    
 }
 {
   (

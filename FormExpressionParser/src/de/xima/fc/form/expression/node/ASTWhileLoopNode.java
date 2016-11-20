@@ -5,9 +5,10 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -54,5 +55,15 @@ public class ASTWhileLoopNode extends ANode {
 	@Nullable
 	public String getLabel() {
 		return label;
+	}
+	
+	@Nonnull
+	public Node getWhileHeaderNode() {
+		return jjtGetChild(0);
+	}
+	
+	@Nonnull
+	public Node getBodyNode() {
+		return jjtGetChild(1);
 	}
 }

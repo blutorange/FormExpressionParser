@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 
 public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOException> {
 	private static class InstanceHolder {

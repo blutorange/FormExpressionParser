@@ -6,8 +6,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.exception.CannotUnnestGlobalNestingException;
-import de.xima.fc.form.expression.exception.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
 
 /**
@@ -19,6 +20,7 @@ import de.xima.fc.form.expression.iface.context.IBinding;
  */
 public class CloneBinding<T> implements IBinding<T> {
 	private Impl<T> impl;
+	private int level = 0;
 
 	public CloneBinding() {
 		impl = new Impl<T>();
@@ -32,6 +34,7 @@ public class CloneBinding<T> implements IBinding<T> {
 	@Override
 	public void reset() {
 		impl.reset();
+		level = 0;
 	}
 
 	@Override
@@ -48,16 +51,19 @@ public class CloneBinding<T> implements IBinding<T> {
 	@Override
 	public void nest() throws NestingLevelTooDeepException {
 		impl = impl.nest();
+		++level;
 	}
 
 	@Override
 	public void nestLocal() {
 		impl = impl.nestLocal();
+		++level;
 	}
 
 	@Override
 	public void unnest() throws CannotUnnestGlobalNestingException {
 		impl = impl.unnest();
+		--level;
 	}
 
 	@Override
@@ -70,6 +76,21 @@ public class CloneBinding<T> implements IBinding<T> {
 		return false;
 	}
 
+	@Override
+	public int getBookmark() {
+		return level;
+	}
+
+	@Override
+	public void gotoBookmark(final int bookmark) throws NestingLevelException {
+		while (bookmark != level) {
+			if (bookmark > level)
+				nest();
+			else
+				unnest();
+		}
+	}
+	
 	private static class Impl<T> {
 		private final Map<String, T> map;
 		@Nullable private final Impl<T> parent;

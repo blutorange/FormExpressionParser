@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
-import de.xima.fc.form.expression.exception.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
@@ -22,7 +22,7 @@ public interface IFormExpression<T extends IExternalContext> extends Serializabl
 	 * @throws EvaluationException When any error occurred during the evaluation.
 	 */
 	@Nonnull
-	public ALangObject evaluate(@Nullable final T ex) throws EvaluationException;
+	public ALangObject evaluate(@Nonnull final T ex) throws EvaluationException;
 
 	public IEvaluationContextContractFactory<T> getSpecs();
 
