@@ -12,7 +12,6 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class BooleanLangObject extends ALangObject {
-	private static final long serialVersionUID = 1L;
 	private final boolean value;
 
 	private BooleanLangObject(final boolean value) {

@@ -16,6 +16,9 @@ import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 public class ASTWithClauseNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
+	@Nonnull
+	private String[] scopes = CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+	
 	public ASTWithClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
@@ -44,10 +47,11 @@ public class ASTWithClauseNode extends ANode {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
 		super.init(method);
+		setScopes();
 	}
 
 	public int getScopeCount() {
-		return jjtGetNumChildren() - 1;
+		return scopes.length;
 	}
 	
 	@Nonnull
@@ -60,6 +64,18 @@ public class ASTWithClauseNode extends ANode {
 
 	@Nonnull
 	public Node getBodyNode() {
-		return jjtGetChild(jjtGetNumChildren()-1);
+		return jjtGetChild(0);
+	}
+	
+	private void setScopes() throws ParseException {
+		scopes = new String[jjtGetNumChildren()-1];
+		for (int i = 0; i < scopes.length; ++i)
+			scopes[i] = getNthChildAs(i, ASTIdentifierNameNode.class).getName();
+		for (int i = scopes.length; i --> 0;)
+			removeChild(i);
+	}
+
+	public String getScope(final int i) {
+		return scopes[i];
 	}
 }

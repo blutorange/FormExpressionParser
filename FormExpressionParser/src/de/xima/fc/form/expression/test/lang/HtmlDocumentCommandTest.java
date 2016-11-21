@@ -7,11 +7,13 @@ import javax.annotation.Nonnull;
 import org.junit.Test;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
-import de.xima.fc.form.expression.impl.factory.GenericEcFactory;
+import de.xima.fc.form.expression.impl.factory.GenericEcContractFactory;
 import de.xima.fc.form.expression.object.ALangObject;
 
 @SuppressWarnings("nls")
@@ -77,8 +79,9 @@ public class HtmlDocumentCommandTest {
 		private final StringBuilder sb = new StringBuilder();
 
 		@Override
-		public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec) {
-			return null;
+		public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec)
+				throws EvaluationException {
+			throw new UncatchableEvaluationException(ec, "Should not occur as context provides no scoped vars.");
 		}
 
 		@Override
@@ -98,11 +101,9 @@ public class HtmlDocumentCommandTest {
 
 	private static String process(final Object... stuffToWrite) throws Exception {
 		final HtmlExternalContext hec = new HtmlExternalContext();
-		@SuppressWarnings("null")
-		@Nonnull
-		final IEvaluationContext ec = GenericEcFactory.getPoolInstance().borrowObject();
+		final IEvaluationContext ec = GenericEcContractFactory.INSTANCE.getContextWithExternal(null);
+		hec.beginWriting();
 		try {
-			hec.beginWriting();
 			for (final Object stuff : stuffToWrite) {
 				if (stuff instanceof IExternalContextCommand)
 					hec.process((IExternalContextCommand) stuff, ec);
@@ -113,10 +114,9 @@ public class HtmlDocumentCommandTest {
 					hec.write(s);
 				}
 			}
-			hec.finishWriting();
 		}
 		finally {
-			GenericEcFactory.getPoolInstance().returnObject(ec);
+			hec.finishWriting();
 		}
 		return hec.toString();
 	}

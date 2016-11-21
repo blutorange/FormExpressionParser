@@ -116,5 +116,4 @@ public interface IBinding<T> extends IReset {
 	 * @throws NestingLevelException When we cannot return to the requested level (because nesting/unnesting cannot be performed). 
 	 */
 	public void gotoBookmark(int bookmark) throws NestingLevelException;
-
 }

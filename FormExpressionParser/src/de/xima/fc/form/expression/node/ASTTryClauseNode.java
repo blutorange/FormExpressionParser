@@ -7,21 +7,17 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTTryClauseNode extends ANode {
+public class ASTTryClauseNode extends ASourceResolvableNode {
 	private static final long serialVersionUID = 1L;
-
+	
 	public ASTTryClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
-
-	@Nonnull private String errorVariableName = CmnCnst.NonnullConstant.EMPTY_STRING;
-
 
 	@Override
 	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
@@ -43,11 +39,10 @@ public class ASTTryClauseNode extends ANode {
 		visitor.visit(this);
 	}
 
+	@Override
 	public void init(@Nullable final EMethod method, @Nonnull final String errorVariableName) throws ParseException {
 		assertChildrenExactly(2);
-		assertNonNull(errorVariableName, CmnCnst.Error.NULL_ERROR_VARIABLE_NAME);
-		super.init(method);
-		this.errorVariableName = errorVariableName;
+		super.init(method, errorVariableName);
 	}
 	
 	@Nonnull
@@ -58,10 +53,5 @@ public class ASTTryClauseNode extends ANode {
 	@Nonnull
 	public Node getCatchNode() {
 		return jjtGetChild(1);
-	}
-
-	@Nonnull
-	public String getErrorVariableName() {
-		return errorVariableName;
 	}
 }

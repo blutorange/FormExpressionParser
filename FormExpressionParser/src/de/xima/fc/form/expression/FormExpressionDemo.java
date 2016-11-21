@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.factory.FormcycleEcContractFactory;
@@ -34,6 +35,10 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  * - Check variable scope.
  */
 public class FormExpressionDemo {
+	private static final boolean STRICT_MODE = false;
+	@Nonnull
+	private static final IEvaluationContextContractFactory<FormcycleExternalContext> FACTORY = FormcycleEcContractFactory.INSTANCE;
+
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
 		if (code == null)
@@ -126,7 +131,7 @@ public class FormExpressionDemo {
 		final IFormExpression<FormcycleExternalContext> ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = FormExpressionFactory.Program.parse(code, FormcycleEcContractFactory.INSTANCE);
+			ex = FormExpressionFactory.Program.parse(code, FACTORY, STRICT_MODE);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final ParseException e) {
@@ -150,7 +155,7 @@ public class FormExpressionDemo {
 
 		System.out.println("\n===Parse tree==="); //$NON-NLS-1$
 		try {
-			node.jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.NonnullConstant.EMPTY_STRING);
+			node.jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.NonnullConstant.STRING_EMPTY);
 		} catch (final IOException e) {
 			e.printStackTrace();
 			System.exit(-1);

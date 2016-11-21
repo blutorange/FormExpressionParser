@@ -1,8 +1,10 @@
 package de.xima.fc.form.expression.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -22,26 +24,25 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
-import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
+import de.xima.fc.form.expression.exception.parse.NestingLevelException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.context.IBinding;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.impl.ReadScopedEvaluationContext;
-import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.NumberLangObject;
 
 @SuppressWarnings("null")
 @RunWith(Parameterized.class)
 public class IBindingTest {
 
+	private final static Object OBJECT_1 = new Object();
+	private final static Object OBJECT_2 = new Object();
+	private final static Object OBJECT_3 = new Object();
+	
 	private static interface IBindingFactory {
-		public IBinding makeBinding();
+		public IBinding<Object> makeBinding();
 	}
 
 	private final IBindingFactory bindingFactory;
-	private IBinding binding;
-	private static IEvaluationContext ec;
+	private IBinding<Object> binding;
 
 	public IBindingTest(final IBindingFactory bindingFactory) {
 		this.bindingFactory = bindingFactory;
@@ -56,11 +57,11 @@ public class IBindingTest {
 			if ((c.getModifiers() & Modifier.ABSTRACT) == 0 && (c.getModifiers() & Modifier.INTERFACE) == 0) {
 				if (IBinding.class.isAssignableFrom(c)) {
 					@SuppressWarnings("unchecked")
-					final Class<IBinding> cb = (Class<IBinding>)c;
-					System.out.println(cb.getCanonicalName());
+					final Class<IBinding<Object>> cb = (Class<IBinding<Object>>)c;
+					System.out.println("Loading IBinding implementation " + cb.getCanonicalName());
 					list.add(new IBindingFactory[]{new IBindingFactory() {
 						@Override
-						public IBinding makeBinding() {
+						public IBinding<Object> makeBinding() {
 							try {
 								return cb.newInstance();
 							}
@@ -83,18 +84,15 @@ public class IBindingTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		ec = ReadScopedEvaluationContext.getNewBasicEvaluationContext();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		ec.reset();
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		assertNotNull("Binding factory must not be null", bindingFactory);
-		assertNotNull("Ec must not be null", ec);
 		binding = bindingFactory.makeBinding();
 		assertNotNull("Binding must not be null", binding);
 	}
@@ -108,95 +106,198 @@ public class IBindingTest {
 	public final void testUnnestingGlobalScopeThrows() {
 		assertTrue(binding.isGlobal());
 		try {
-			binding.unnest(ec);
+			binding.unnest();
 		}
-		catch (final EvaluationException e) {
+		catch (final CannotUnnestGlobalNestingException e) {
 			return;
 		}
 		fail("Failed to throw an error when attempting to unnest global scope");
 	}
 
 	@Test
-	public final void testSettingAndGettingVariableWithoutScoping() throws EvaluationException {
+	public final void testDefiningVariable() throws NestingLevelException {
 		assertTrue(binding.isGlobal());
-		binding.setVariable("foo", NumberLangObject.create(42));
-		final ALangObject foo = binding.getVariable("foo");
-		assertNotNull(foo);
-		assertTrue(foo.equals(NumberLangObject.create(42)));
+		binding.defineVariable("foo", OBJECT_1);
+		assertVariableEquals("foo", OBJECT_1);
 	}
 
 	@Test
-	public final void testNestingLocallyDoesNotBlockGlobalVariable() throws EvaluationException {
+	public final void testNestingLocallyDoesNotLookupInHigherLevels() throws NestingLevelException {
 		assertTrue(binding.isGlobal());
-		binding.setVariable("foo", NumberLangObject.create(0));
-		binding.nestLocal(ec);
-		final ALangObject foo = binding.getVariable("foo");
-		assertNotNull(foo);
-		assertTrue(foo.equals(NumberLangObject.create(0)));
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_2);
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_3);
+		binding.nestLocal();
+		assertNull(binding.getVariable("foo"));
+	}
+	
+	@Test
+	public final void testHasVariableAtCurrentLevel() throws NestingLevelException {
+		assertTrue(binding.isGlobal());
+		binding.defineVariable("foo", OBJECT_1);
+		assertTrue(binding.hasVariableAtCurrentLevel("foo"));
+		binding.nest();
+		assertFalse(binding.hasVariableAtCurrentLevel("foo"));
+		binding.unnest();
+		assertTrue(binding.hasVariableAtCurrentLevel("foo"));
+		binding.nestLocal();
+		assertFalse(binding.hasVariableAtCurrentLevel("foo"));
+		binding.unnest();
+		assertTrue(binding.hasVariableAtCurrentLevel("foo"));
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.defineVariable("bar", OBJECT_2);
+		assertTrue(binding.hasVariableAtCurrentLevel("bar"));
+		binding.unnest();
+		assertFalse(binding.hasVariableAtCurrentLevel("bar"));		
 	}
 
 	@Test
 	public final void testNestingAndUnnestingSwitchBetweenLevels() throws NestingLevelTooDeepException, CannotUnnestGlobalNestingException {
 		assertTrue(binding.isGlobal());
-		binding.nest(ec);
+		binding.nest();
 		assertFalse(binding.isGlobal());
-		binding.nestLocal(ec);
+		binding.nestLocal();
 		assertFalse(binding.isGlobal());
-		binding.unnest(ec);
+		binding.unnest();
 		assertFalse(binding.isGlobal());
-		binding.unnest(ec);
+		binding.unnest();
 		assertTrue(binding.isGlobal());
 	}
 
 	@Test
-	public final void testUnnestingDoesNotRememberVariables() throws EvaluationException {
+	public final void testUnnestingDoesNotRememberVariables() throws NestingLevelException {
 		assertTrue(binding.isGlobal());
-		binding.nest(ec);
-		binding.setVariable("foo", NumberLangObject.create(1));
-		binding.nest(ec);
-		binding.setVariable("foo", NumberLangObject.create(2));
-		binding.setVariable("bar", NumberLangObject.create(2));
-		binding.unnest(ec);
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_2);
+		binding.defineVariable("bar", OBJECT_2);
+		binding.unnest();
 		assertNull(binding.getVariable("bar"));
-		assertVariableEquals("foo", NumberLangObject.create(1));
-		binding.nest(ec);
+		assertVariableEquals("foo", OBJECT_1);
+		binding.nest();
 		assertNull(binding.getVariable("bar"));
-		assertVariableEquals("foo", NumberLangObject.create(1));
+		assertVariableEquals("foo", OBJECT_1);
 	}
 
 	@Test
-	public final void testScopingShadowsVariable() throws EvaluationException {
+	public final void testScopingShadowsVariable() throws NestingLevelException {
 		assertTrue(binding.isGlobal());
-		binding.setVariable("foo", NumberLangObject.create(0));
-		binding.nest(ec);
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nest();
 		assertFalse(binding.isGlobal());
-		binding.setVariable("foo", NumberLangObject.create(1));
-		assertVariableEquals("foo", NumberLangObject.create(1));
+		binding.defineVariable("foo", OBJECT_2);
+		assertVariableEquals("foo", OBJECT_2);
 	}
 
 	@Test
-	public final void testFallsBackToHigherNestingLevel() throws EvaluationException {
+	public final void testFallsBackToHigherNestingLevel() throws NestingLevelException {
 		assertTrue(binding.isGlobal());
-		binding.nest(ec);
-		binding.setVariable("foo", NumberLangObject.create(0));
-		binding.nest(ec);
-		assertVariableEquals("foo", NumberLangObject.create(0));
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nest();
+		assertVariableEquals("foo", OBJECT_1);
 	}
 
 	@Test
-	public final void testDoesNotThrowWhenVariableHasNotBeenSet() throws EvaluationException {
+	public final void testDoesNotThrowWhenVariableHasNotBeenSet() throws NestingLevelException {
 		assertTrue(binding.isGlobal());
-		final ALangObject foo = binding.getVariable("foo");
-		assertNull(foo);
-	}
-
-	@Test
-	public final void testDoesNotFallBackAfterNestingLocally() throws EvaluationException {
-		assertTrue(binding.isGlobal());
-		binding.nest(ec);
-		binding.setVariable("foo", NumberLangObject.create(0));
-		binding.nestLocal(ec);
 		assertNull(binding.getVariable("foo"));
+	}
+
+	@Test
+	public final void testDoesNotFallBackAfterNestingLocally() throws NestingLevelException {
+		assertTrue(binding.isGlobal());
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nestLocal();
+		assertNull(binding.getVariable("foo"));
+	}
+
+	@Test
+	public final void testBookmarkingDownwardsOne() throws NestingLevelException {
+		assertTrue(binding.isGlobal());
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		final int bookmark = binding.getBookmark();
+		binding.nest();
+		binding.defineVariable("bar", OBJECT_2);
+		binding.gotoBookmark(bookmark);
+		assertEquals(bookmark, binding.getBookmark());
+		assertVariableEquals("foo", OBJECT_1);
+		assertNull(binding.getVariable("bar"));
+	}
+
+	@Test
+	public final void testBookmarkingUpwardsOne() throws NestingLevelException {
+		assertTrue(binding.isGlobal());
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nest();
+		final int bookmark = binding.getBookmark();
+		binding.unnest();
+		binding.gotoBookmark(bookmark);
+		binding.defineVariable("foo", OBJECT_2);
+		assertEquals(bookmark, binding.getBookmark());
+		assertVariableEquals("foo", OBJECT_2);
+		binding.unnest();
+		assertVariableEquals("foo", OBJECT_1);
+	}
+
+
+	@Test
+	public final void testBookmarkingUpwardsMany() throws NestingLevelException {
+		assertTrue(binding.isGlobal());
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		final int bookmark = binding.getBookmark();
+		binding.unnest();
+		binding.unnest();
+		binding.unnest();
+		binding.gotoBookmark(bookmark);
+		binding.defineVariable("foo", OBJECT_2);
+		assertEquals(bookmark, binding.getBookmark());
+		assertVariableEquals("foo", OBJECT_2);
+		binding.unnest();
+		binding.unnest();
+		binding.unnest();
+		assertVariableEquals("foo", OBJECT_1);
+	}
+
+	@Test
+	public final void testBookmarkingDownwardsMultiple() throws NestingLevelException {
+		assertTrue(binding.isGlobal());
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.defineVariable("foo", OBJECT_1);
+		final int bookmark = binding.getBookmark();
+		binding.nest();
+		binding.defineVariable("bar", OBJECT_2);
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.nest();
+		binding.gotoBookmark(bookmark);
+		assertEquals(bookmark, binding.getBookmark());
+		assertVariableEquals("foo", OBJECT_1);
+		assertNull(binding.getVariable("bar"));
 	}
 
 	@Test
@@ -205,11 +306,11 @@ public class IBindingTest {
 		final int limit = binding.getNestingLimit();
 		if (limit >= 0) {
 			for (int i = limit; i --> 0;) {
-				binding.nest(ec);
+				binding.nest();
 			}
 			assertTrue(binding.isAtMaximumNestingLimit());
 			try {
-				binding.nest(ec);
+				binding.nest();
 			}
 			catch (final NestingLevelTooDeepException e) {
 				return;
@@ -219,14 +320,13 @@ public class IBindingTest {
 		else {
 			// We cannot test no limit, but we can try a few times.
 			for (int i = 500; i--> 0;)
-				binding.nest(ec);
+				binding.nest();
 		}
 	}
 
-	private void assertVariableEquals(final String name, final ALangObject object) throws EvaluationException {
-		final ALangObject res = binding.getVariable(name);
+	private void assertVariableEquals(final String name, final Object object) throws NestingLevelException {
+		final Object res = binding.getVariable(name);
 		assertNotNull(res);
-		assertTrue(res.equals(object));
+		assertSame(res, object);
 	}
-
 }

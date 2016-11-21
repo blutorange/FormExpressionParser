@@ -4,24 +4,23 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.EScopeSource;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.parse.ILabelled;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTForLoopNode extends ANode {
-
+public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled {
 	private static final long serialVersionUID = 1L;
-	private String iteratingLoopVariable;
 
 	@Nullable
 	private String label;
-	private int source = EScopeSource.ID_UNRESOLVED;
+
+	private boolean isEnhancedLoop;
 
 	public ASTForLoopNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -52,18 +51,9 @@ public class ASTForLoopNode extends ANode {
 	public void init(@Nullable final EMethod method, @Nullable final String iteratingLoopVariable,
 			@Nullable final String label) throws ParseException {
 		assertChildrenExactly(iteratingLoopVariable != null ? 2 : 4);
-		super.init(method);
-		this.iteratingLoopVariable = iteratingLoopVariable;
+		super.init(method, iteratingLoopVariable != null ? iteratingLoopVariable : CmnCnst.NonnullConstant.STRING_EMPTY);
+		this.isEnhancedLoop = iteratingLoopVariable != null;
 		this.label = label;
-	}
-
-	/**
-	 * @return Name of the iterating loop variable. Undefined when this node is node an enhanced loop.
-	 * @see #isEnhancedLoop()
-	 */
-	@Nonnull
-	public String getIteratingLoopVariable() {
-		return iteratingLoopVariable != null ? iteratingLoopVariable : CmnCnst.NonnullConstant.EMPTY_STRING;
 	}
 
 	/**
@@ -71,7 +61,7 @@ public class ASTForLoopNode extends ANode {
 	 * @see #isPlainLoop()
 	 */
 	public boolean isEnhancedLoop() {
-		return iteratingLoopVariable != null;
+		return isEnhancedLoop;
 	}
 
 	/**
@@ -79,12 +69,12 @@ public class ASTForLoopNode extends ANode {
 	 * @see #isEnhancedLoop()
 	 */
 	public boolean isPlainLoop() {
-		return iteratingLoopVariable == null;
+		return !isEnhancedLoop;
 	}
 
 	@Nonnull
 	public Node getBodyNode() {
-		return iteratingLoopVariable != null ? jjtGetChild(1) : jjtGetChild(3);
+		return isEnhancedLoop ? jjtGetChild(1) : jjtGetChild(3);
 	}
 
 	@Nonnull
@@ -109,25 +99,18 @@ public class ASTForLoopNode extends ANode {
 
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(iteratingLoopVariable).append(',');
+		sb.append(getVariableName()).append(',');
 		sb.append(label).append(',');
 	}
 
 	@Override
 	public String getNodeName() {
-		return iteratingLoopVariable != null ? CmnCnst.Name.FOR_ITERATING_NODE : CmnCnst.Name.FOR_PLAIN_NODE;
+		return isEnhancedLoop ? CmnCnst.Name.FOR_ITERATING_NODE : CmnCnst.Name.FOR_PLAIN_NODE;
 	}
 
+	@Override
 	@Nullable
 	public String getLabel() {
 		return label;
-	}
-
-	public void resolveSource(final int source) {
-		this.source = source;
-	}
-
-	public int getSource() {
-		return source;
 	}
 }

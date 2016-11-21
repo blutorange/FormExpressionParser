@@ -46,7 +46,7 @@ import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.Void;
 
 public abstract class FormExpressionVoidDataVisitorAdapter<T, E extends Throwable>
-implements IFormExpressionReturnDataVisitor<Void, T, E> {
+implements IFormExpressionVoidDataVisitor<T, E> {
 
 	@Nonnull
 	protected Void visitChildren(@Nonnull final Node node, @Nonnull final T data) throws E {
@@ -57,214 +57,214 @@ implements IFormExpressionReturnDataVisitor<Void, T, E> {
 	}
 
 	@Override
-	public Void visit(final ASTExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTAssignmentExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTAssignmentExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTNumberNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTNumberNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTArrayNode node, final T data) throws E {
-		return visitChildren(node, data);
-
-	}
-
-	@Override
-	public Void visit(final ASTHashNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTArrayNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTNullNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTHashNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTBooleanNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTNullNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTVariableNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTBooleanNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTStringNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTVariableNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTStatementListNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTStringNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTIfClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTStatementListNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTForLoopNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTIfClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTWhileLoopNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTTryClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTSwitchClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTDoWhileLoopNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTExceptionNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTThrowClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTBreakClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTContinueClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTForLoopNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTReturnClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTWhileLoopNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTLogNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTTryClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTFunctionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTSwitchClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTUnaryExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTDoWhileLoopNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTPropertyExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTExceptionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTIdentifierNameNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTThrowClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTWithClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTBreakClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTFunctionClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
-	}
-
-	@Override
-	public Void visit(final ASTEmptyNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTContinueClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTLosNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTReturnClauseNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTRegexNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTLogNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTFunctionNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTUnaryExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTPropertyExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTIdentifierNameNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTWithClauseNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTFunctionClauseNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTEmptyNode node, final T data) throws E {
+		visitChildren(node, data);
 
 	}
 
 	@Override
-	public Void visit(final ASTTernaryExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTLosNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTParenthesisExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTRegexNode node, final T data) throws E {
+		visitChildren(node, data);
+
 	}
 
 	@Override
-	public Void visit(final ASTEqualExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTTernaryExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTPostUnaryExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTParenthesisExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTComparisonExpressionNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTEqualExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTScopeExternalNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTPostUnaryExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTVariableDeclarationClauseNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTComparisonExpressionNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTScopeManualNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTScopeExternalNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
-	public Void visit(final ASTScopeGlobalNode node, final T data) throws E {
-		return visitChildren(node, data);
+	public void visit(final ASTVariableDeclarationClauseNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTScopeManualNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+
+	@Override
+	public void visit(final ASTScopeGlobalNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 }

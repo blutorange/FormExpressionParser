@@ -5,7 +5,6 @@ global scope {
   var i = null;
   var j = null;
   var test = null;
-
 }
 scope myScope {
   var i = 5 + 3;

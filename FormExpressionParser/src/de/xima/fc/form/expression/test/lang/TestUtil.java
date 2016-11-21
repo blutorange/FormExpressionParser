@@ -29,32 +29,85 @@ import de.xima.fc.form.expression.object.StringLangObject;
 
 @SuppressWarnings("nls")
 public final class TestUtil {
-	private TestUtil() {}
-	public static enum ETestType {
-		PROGRAM,
-		TEMPLATE;
+	private TestUtil() {
 	}
-	public static enum EContextType {
-		GENERIC,
-		FORMCYCLE;
-	}
-	public static interface ITestCase {
-		@Nonnull public String getCode();
-		@Nonnull public ETestType getTestType();
 
-		@Nullable public ALangObject getExpectedResult();
+	static enum ETestType {
+		PROGRAM, TEMPLATE;
+	}
+
+	static enum EContextType {
+		GENERIC, FORMCYCLE;
+	}
+
+	static interface ITestCase {
+		@Nonnull
+		public String getCode();
+
+		@Nonnull
+		public ETestType getTestType();
+
+		@Nullable
+		public ALangObject getExpectedResult();
 
 		public boolean isPerformEvaluation();
 
-		@Nullable public Class<? extends Throwable> getExpectedException();
+		@Nullable
+		public Class<? extends Throwable> getExpectedException();
 
-		@Nonnull public EContextType getContextType();
+		@Nonnull
+		public EContextType getContextType();
 
-		@Nullable public String getErrorBegin();
+		@Nullable
+		public String getErrorBegin();
+
+		public boolean isUseStrictMode();
 	}
 
+	static class Cfg {
+		boolean strict  = false;
+		@Nonnull final String code;
+		@Nullable String errMsg = null;
+		@Nonnull ETestType type = ETestType.PROGRAM;
+		@Nonnull EContextType context = EContextType.GENERIC;
+		@Nullable Class<? extends Throwable> errClass;
+		Cfg(@Nonnull final  String code) {
+			this.code = code;
+		}
+		@Nonnull Cfg strict() {
+			strict = true;
+			return this;
+		}
+		@Nonnull Cfg prog() {
+			type = ETestType.PROGRAM;
+			return this;
+		}
+		@Nonnull Cfg template() {
+			type = ETestType.TEMPLATE;
+			return this;
+		}
+		@Nonnull Cfg err(@Nullable  final String errMsg) {
+			this.errMsg = errMsg;
+			return this;
+		}
+		@Nonnull Cfg err(@Nullable final Class<? extends Throwable> err) {
+			this.errClass = err;
+			return this;
+		}
+		@Nonnull Cfg generic() {
+			context = EContextType.GENERIC;
+			return this;
+		}
+		@Nonnull Cfg fc() {
+			context = EContextType.FORMCYCLE;
+			return this;
+		}
+	}
+
+	
 	public static void test(final Class<? extends ITestCase> clazz) throws IllegalArgumentException, AssertionError {
-		if (!clazz.isEnum()) throw new IllegalAccessError(String.format("%s is not an enum.", clazz));
+		if (!clazz.isEnum())
+			throw new IllegalAccessError(String.format("%s is not an enum.", clazz));
 		for (final ITestCase test : clazz.getEnumConstants()) {
 			System.out.println(String.format("Running test %s::%s.", clazz.getSimpleName(), test));
 			Throwable exception = null;
@@ -62,42 +115,49 @@ public final class TestUtil {
 			try {
 				switch (test.getContextType()) {
 				case FORMCYCLE:
-					final IFormExpression<FormcycleExternalContext> feForm = parse(test.getCode(), test.getTestType(), FormcycleEcContractFactory.INSTANCE);
-					if (test.isPerformEvaluation()) res = evaluateFormcycle(feForm, test.getTestType());
+					final IFormExpression<FormcycleExternalContext> feForm = parse(test.getCode(), test.getTestType(),
+							FormcycleEcContractFactory.INSTANCE, test.isUseStrictMode());
+					if (test.isPerformEvaluation())
+						res = evaluateFormcycle(feForm, test.getTestType());
 					break;
 				case GENERIC:
-					final IFormExpression<AGenericExternalContext> feGeneric = parse(test.getCode(), test.getTestType(), GenericEcContractFactory.INSTANCE);
-					if (test.isPerformEvaluation()) res = evaluateGeneric(feGeneric, test.getTestType());
+					final IFormExpression<AGenericExternalContext> feGeneric = parse(test.getCode(), test.getTestType(),
+							GenericEcContractFactory.INSTANCE, test.isUseStrictMode());
+					if (test.isPerformEvaluation())
+						res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
 				default:
 					break;
 				}
-			} catch (final TokenMgrError e) {
+			}
+			catch (final TokenMgrError e) {
 				exception = e;
-			} catch (final ParseException e) {
+			}
+			catch (final ParseException e) {
 				exception = e;
-			} catch (final EvaluationException e) {
+			}
+			catch (final EvaluationException e) {
 				exception = e;
-			} catch (final Throwable throwable) {
+			}
+			catch (final Throwable throwable) {
 				exception = throwable;
 			}
 			String msg = null;
 			final Class<? extends Throwable> exceptionClass = exception == null ? null : exception.getClass();
 			if (test.getExpectedException() != null) {
 				if (exception == null) {
-					msg = String.format(
-							"Code was expected to throw an Exception of type %s, but it threw none.",
+					msg = String.format("Code was expected to throw an Exception of type %s, but it threw none.",
 							test.getExpectedException());
 				}
 				else if (test.getExpectedException() != exceptionClass) {
 					exception.printStackTrace();
-					msg = String.format(
-							"Code was expected to throw an Exception of type %s, but it threw %s.",
+					msg = String.format("Code was expected to throw an Exception of type %s, but it threw %s.",
 							test.getExpectedException(), exception);
 				}
 				else if (test.getErrorBegin() != null) {
 					String em = exception.getMessage();
-					if (em == null) em = "";
+					if (em == null)
+						em = "";
 					if (!em.startsWith(test.getErrorBegin())) {
 						exception.printStackTrace();
 						msg = String.format(
@@ -107,9 +167,9 @@ public final class TestUtil {
 				}
 			}
 			else if (test.getExpectedException() == null && exceptionClass != null) {
-				if (exception != null) exception.printStackTrace();
-				msg = String.format("Code was not expected to throw an Exception, but it threw %s.",
-						exceptionClass);
+				if (exception != null)
+					exception.printStackTrace();
+				msg = String.format("Code was not expected to throw an Exception, but it threw %s.", exceptionClass);
 			}
 			else if (test.isPerformEvaluation()) {
 				final ALangObject er = test.getExpectedResult();
@@ -117,7 +177,8 @@ public final class TestUtil {
 					msg = "No language object was returned.";
 				}
 				else if (er != null && !er.equals(res)) {
-					msg = String.format("Expected result was %s, but code evaluated to %s.", er.inspect(), res.inspect());
+					msg = String.format("Expected result was %s, but code evaluated to %s.", er.inspect(),
+							res.inspect());
 				}
 			}
 			if (msg != null) {
@@ -127,7 +188,8 @@ public final class TestUtil {
 		}
 	}
 
-	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<AGenericExternalContext> fe, @Nonnull final ETestType type) throws EvaluationException {
+	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<AGenericExternalContext> fe,
+			@Nonnull final ETestType type) throws EvaluationException {
 		final ALangObject res;
 		final Date t1 = new Date();
 		switch (type) {
@@ -143,10 +205,12 @@ public final class TestUtil {
 			throw new RuntimeException("Unkown enum: " + type);
 		}
 		final Date t2 = new Date();
-		System.out.println(String.format("Evaluation took %s ms.", t2.getTime()-t1.getTime()));
+		System.out.println(String.format("Evaluation took %s ms.", t2.getTime() - t1.getTime()));
 		return res;
 	}
-	private static ALangObject evaluateFormcycle(@Nonnull final IFormExpression<FormcycleExternalContext> fe, @Nonnull final ETestType type) throws EvaluationException {
+
+	private static ALangObject evaluateFormcycle(@Nonnull final IFormExpression<FormcycleExternalContext> fe,
+			@Nonnull final ETestType type) throws EvaluationException {
 		final ALangObject res;
 		final Date t1 = new Date();
 		switch (type) {
@@ -162,26 +226,28 @@ public final class TestUtil {
 			throw new RuntimeException("Unkown enum: " + type);
 		}
 		final Date t2 = new Date();
-		System.out.println(String.format("Evaluation took %s ms.", t2.getTime()-t1.getTime()));
+		System.out.println(String.format("Evaluation took %s ms.", t2.getTime() - t1.getTime()));
 		return res;
 	}
 
 	@Nonnull
-	private static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider) throws ParseException, TokenMgrError {
+	private static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
+			@Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider, final boolean strictMode)
+			throws ParseException, TokenMgrError {
 		final IFormExpression<T> res;
 		final Date t1 = new Date();
 		switch (type) {
 		case PROGRAM:
-			res = FormExpressionFactory.Program.parse(code, provider);
+			res = FormExpressionFactory.Program.parse(code, provider, strictMode);
 			break;
 		case TEMPLATE:
-			res = FormExpressionFactory.Template.parse(code, provider);
+			res = FormExpressionFactory.Template.parse(code, provider, strictMode);
 			break;
 		default:
 			throw new ParseException("Unkown enum: " + type);
 		}
 		final Date t2 = new Date();
-		System.out.println(String.format("Parsing took %s ms.", t2.getTime()-t1.getTime()));
+		System.out.println(String.format("Parsing took %s ms.", t2.getTime() - t1.getTime()));
 		return res;
 	}
 }

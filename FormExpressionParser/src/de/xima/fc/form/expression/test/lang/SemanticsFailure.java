@@ -71,4 +71,8 @@ enum SemanticsFailure implements ITestCase {
 	public String getErrorBegin() {
 		return errorBegin;
 	}
+	@Override
+	public boolean isUseStrictMode() {
+		return false;
+	}
 }

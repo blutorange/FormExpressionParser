@@ -22,7 +22,7 @@ public class ASTStringNode extends ANode {
 		super(parser, nodeId);
 	}
 
-	@Nonnull private String stringValue = CmnCnst.NonnullConstant.EMPTY_STRING;
+	@Nonnull private String stringValue = CmnCnst.NonnullConstant.STRING_EMPTY;
 
 	/**
 	 * @param delimiter

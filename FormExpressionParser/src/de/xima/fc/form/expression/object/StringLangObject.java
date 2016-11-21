@@ -179,7 +179,7 @@ public class StringLangObject extends ALangObject {
 	@Nonnull
 	public static StringLangObject create(final char value) {
 		final String s = String.valueOf(value);
-		return new StringLangObject(s == null ? CmnCnst.NonnullConstant.EMPTY_STRING : s);
+		return new StringLangObject(s == null ? CmnCnst.NonnullConstant.STRING_EMPTY : s);
 	}
 
 	@Nonnull

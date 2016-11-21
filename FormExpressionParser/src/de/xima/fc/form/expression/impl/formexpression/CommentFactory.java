@@ -30,7 +30,7 @@ public final class CommentFactory {
 			text = NullUtil.checkNotNull(t.image.substring(2));
 			break;
 		default:
-			text = CmnCnst.NonnullConstant.EMPTY_STRING;
+			text = CmnCnst.NonnullConstant.STRING_EMPTY;
 			break;
 		}
 		return new CommentImpl(type, text, line, column);

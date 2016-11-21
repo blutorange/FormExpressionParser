@@ -573,12 +573,12 @@ void ClauseOrStatement(EMethod method) #void :
   | BreakClause(method)
   | ContinueClause(method)
   | ReturnClause(method)
-  | VariableDeclarationClauseWithAssignment(method)
+  | VariableDeclarationClause(method)
   | Statement(method)
   )
 }
 
-void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
+void VariableDeclarationClauseWithoutAssignment(EMethod method) #VariableDeclarationClauseNode :
 {
   Token t;
 }
@@ -591,7 +591,7 @@ void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
   }
 }
 
-void VariableDeclarationClauseWithAssignment(EMethod method) #VariableDeclarationClauseNode :
+void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
 {
   Token t;
 }
@@ -625,10 +625,12 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
   (
     < Function > VariableWithOptionalScope(null) < ParenOpen >
     (
-      [ IdentifierName(null) ]
-      (
-        < Comma > IdentifierName(null)
-      )*
+      [
+        IdentifierName(null)
+        (
+          < Comma > IdentifierName(null)
+        )*
+      ]
     )
     < ParenClose >
     (
@@ -989,7 +991,6 @@ void Expression(EMethod method) #void :
 void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1062,32 +1063,29 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
     )*
   )
   {
-    
     if (createNode) jjtThis.init(method);
   }
 }
 
 void TernaryExpression(EMethod method) #TernaryExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
-  boolean createNode;
-  
+  boolean createNode; 
 }
 {
   (
-    DoubleBarExpression(method) [
+    DoubleBarExpression(method)
+    [
       < QuestionMark > DoubleBarExpression(method) < Colon > DoubleBarExpression(method)
     ]
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method);    
   }
 }
 
 void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
-  boolean createNode;
-  
+  boolean createNode; 
 }
 {
   (
@@ -1098,8 +1096,7 @@ void DoubleBarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method);   
   }
 }
 
@@ -1174,15 +1171,13 @@ void AmpersandExpression(EMethod method) #ExpressionNode(createNode = jjtree.nod
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method); 
   }
 }
 
 void DoubleEqualTypeExpression(EMethod method) #EqualExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1230,7 +1225,6 @@ void DoubleEqualTypeExpression(EMethod method) #EqualExpressionNode(createNode =
 void AngleTypeExpression(EMethod method) #ComparisonExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1254,15 +1248,13 @@ void AngleTypeExpression(EMethod method) #ComparisonExpressionNode(createNode = 
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method);   
   }
 }
 
 void MultiAngleExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1290,15 +1282,13 @@ void MultiAngleExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method);   
   }
 }
 
 void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1316,14 +1306,12 @@ void PlusLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
   )
   {
     if (createNode) jjtThis.init(method);
-    
   }
 }
 
 void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
-  boolean createNode;
-  
+  boolean createNode; 
 }
 {
   DoubleStarExpression(method)
@@ -1344,15 +1332,13 @@ void StarLikeExpression(EMethod method) #ExpressionNode(createNode = jjtree.node
     )*
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method);   
   }
 }
 
 void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1363,15 +1349,13 @@ void DoubleStarExpression(EMethod method) #ExpressionNode(createNode = jjtree.no
     ]
   )
   {
-    if (createNode) jjtThis.init(method);
-    
+    if (createNode) jjtThis.init(method);   
   }
 }
 
 void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
 {
   EMethod unaryMethod = null;
-  
 }
 {
   (
@@ -1430,8 +1414,7 @@ void UnaryExpression(EMethod method) #UnaryExpressionNode(unaryMethod != null) :
 
 void PostUnaryExpression(EMethod method) #PostUnaryExpressionNode(unaryMethod != null) :
 {
-  EMethod unaryMethod = null;
-  
+  EMethod unaryMethod = null; 
 }
 {
   (
@@ -1474,8 +1457,7 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
 
 void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
 {
-  Token t;
-  
+  Token t; 
 }
 {
   (
@@ -1487,7 +1469,6 @@ void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
   }
 }
 
-
 void IdentifierName(EMethod method) #IdentifierNameNode :
 {
   Token t;
@@ -1498,8 +1479,7 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
     t = < Identifier >
   )
   {
-    jjtThis.init(method, t.image);
-    
+    jjtThis.init(method, t.image);   
   }
 }
 
@@ -1516,14 +1496,12 @@ void FunctionArgumentList(EMethod method) #ArrayNode :
   )
   {
     jjtThis.init(method);
-    
   }
 }
 
 void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(createNode) :
 {
   boolean createNode = false;
-  
 }
 {
   (
@@ -1538,19 +1516,16 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
     )
   )
   {
-    if (createNode) { 
-      
+    if (createNode) {
       jjtThis.init(method);
     }
   }
 }
 
-
 void VariableWithOptionalScope(EMethod method) #VariableNode :
 {
   Token part1;
   Token part2 = null;
-  
 }
 {
   (
@@ -1558,10 +1533,9 @@ void VariableWithOptionalScope(EMethod method) #VariableNode :
   )
   {
     if (part2 == null) 
-    jjtThis.init(method, null, part1.image);
+      jjtThis.init(method, null, part1.image);
     else 
-    jjtThis.init(method, part1.image, part2.image);
-    
+      jjtThis.init(method, part1.image, part2.image);
   }
 }
 
@@ -1569,7 +1543,6 @@ void Number(EMethod method) #NumberNode :
 {
   Token t;
   boolean isInt;
-  
 }
 {
   (
@@ -1767,10 +1740,12 @@ void Function(EMethod method) #FunctionNode :
     < LambdaArrow >
     < ParenOpen >
     (
-      [ IdentifierName(null) ]
-      (
-        < Comma > IdentifierName(null)
-      )*
+      [
+        IdentifierName(null)
+        (
+          < Comma > IdentifierName(null)
+        )*
+      ]
     )
     < ParenClose > 
     Block(null)

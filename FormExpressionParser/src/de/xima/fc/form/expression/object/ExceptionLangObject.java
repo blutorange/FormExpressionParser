@@ -15,9 +15,8 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class ExceptionLangObject extends ALangObject {
-	private static final long serialVersionUID = 1L;
-
-	@Nonnull private final CatchableEvaluationException value;
+	@Nonnull
+	private final CatchableEvaluationException value;
 
 	private ExceptionLangObject(@Nonnull final CatchableEvaluationException value) {
 		super(Type.EXCEPTION);
@@ -119,14 +118,14 @@ public class ExceptionLangObject extends ALangObject {
 	public static ExceptionLangObject create(@Nullable final CatchableEvaluationException value,
 			@Nonnull final IEvaluationContext ec) {
 		if (value == null || value.getMessage() == null)
-			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.NonnullConstant.EMPTY_STRING, ec));
+			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.NonnullConstant.STRING_EMPTY, ec));
 		return new ExceptionLangObject(value);
 	}
 
 	@Nonnull
 	public static ExceptionLangObject create(@Nullable final String message, @Nonnull final IEvaluationContext ec) {
 		if (message == null)
-			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.NonnullConstant.EMPTY_STRING, ec));
+			return new ExceptionLangObject(new CustomRuntimeException(CmnCnst.NonnullConstant.STRING_EMPTY, ec));
 		return new ExceptionLangObject(new CustomRuntimeException(message, ec));
 	}
 }

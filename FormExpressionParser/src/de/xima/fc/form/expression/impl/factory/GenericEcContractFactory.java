@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.base.Preconditions;
+
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEmbedment;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -18,6 +20,7 @@ import de.xima.fc.form.expression.impl.GenericExternalScope;
 import de.xima.fc.form.expression.impl.externalcontext.AGenericExternalContext;
 import de.xima.fc.form.expression.impl.scope.MathScope;
 import de.xima.fc.form.expression.impl.tracer.GenericTracer;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public enum GenericEcContractFactory implements IEvaluationContextContractFactory<AGenericExternalContext> {
 	INSTANCE;
@@ -29,7 +32,8 @@ public enum GenericEcContractFactory implements IEvaluationContextContractFactor
 	}
 
 	@Override
-	public IEvaluationContext getContextWithExternal(final AGenericExternalContext ex) {
+	public IEvaluationContext getContextWithExternal(@Nonnull final AGenericExternalContext ex) {
+		Preconditions.checkNotNull(ex, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
 		final IEvaluationContext ec = makeEc();
 		ec.setExternalContext(ex);
 		return ec;

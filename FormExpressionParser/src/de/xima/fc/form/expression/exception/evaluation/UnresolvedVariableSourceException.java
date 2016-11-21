@@ -7,10 +7,10 @@ import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public class UnresolvedVariableException extends UncatchableEvaluationException {
+public class UnresolvedVariableSourceException extends UncatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
-	public UnresolvedVariableException(@Nullable final String scope, @Nonnull final String name, @Nonnull final IEvaluationContext ec) {
+	public UnresolvedVariableSourceException(@Nullable final String scope, @Nonnull final String name, @Nonnull final IEvaluationContext ec) {
 		super(ec, format(scope,name));
 		this.scope = scope;
 		this.name = name;

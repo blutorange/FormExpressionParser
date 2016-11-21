@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
+import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 
 @SuppressWarnings("nls")
 public final class CmnCnst {
@@ -24,12 +25,16 @@ public final class CmnCnst {
 		private NonnullConstant() {}
 		@Nonnull public static final Boolean BOOLEAN_TRUE = new Boolean(true);
 		@Nonnull public static final Boolean BOOLEAN_FALSE = new Boolean(false);
-		@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
-		@Nonnull public static final String EMPTY_STRING = "";
-		@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(EMPTY_STRING));
+		@Nonnull public static final String STRING_EMPTY = "";
+		@Nonnull public static final String STRING_SPACE = " ";
+		@Nonnull public static final String STRING_LF = "\n";
+		@Nonnull public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(STRING_EMPTY));
 		@Nonnull public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+		@Nonnull public static final int[] EMPTY_INT_ARRAY = new int[0];
 		@Nonnull public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
 		@Nonnull public static final IVariableReference[] EMPTY_SYMBOL_TABLE = new IVariableReference[0];
+		@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
+		@Nonnull public static final GenericSourceResolvable[] EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY = new GenericSourceResolvable[0];
 	}
 
 	public final static class CustomScope {
@@ -310,6 +315,11 @@ public final class CmnCnst {
 		@Nonnull public static final String SCOPED_VARIABLE_NOT_RESOLVED = "Variable %s::%s is not resolved. " + INTERNAL_ERROR;
 		@Nonnull public static final String UNSCOPED_VARIABLE_NOT_RESOLVED = "Variable %s is not resolved. " + INTERNAL_ERROR;
 		@Nonnull public static final String ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE = "Variable %s::%s belongs to an external scope and cannot be assigned to.";
+		@Nonnull public static final String DUPLICATE_REQUIRE_SCOPE = "External scope %s was already required previously.";
+		@Nonnull public static final String MANUAL_SCOPE_ALREADY_REQUIRED = "Cannot define manual scope %s, it was already required previously.";
+		@Nonnull public static final String VARIABLE_SOURCE_ALREADY_RESOLVED = "Illegal attempt to resolve variable %s to %s; it was already resolved to %s. " + INTERNAL_ERROR;
+		@Nonnull public static final String VARIABLE_SCOPE_ALREADY_RESOLVED = "Illegal attempt to resolve the scope of variable %s, it was already resolved to scope %s. " + INTERNAL_ERROR;
+		@Nonnull public static final String DUPLICATE_LABEL = "Duplicate label %s is already in scope.";
 	}
 
 	public static final class ToString {

@@ -60,7 +60,7 @@ public class LookUpBinding<T> implements IBinding<T> {
 
 	@Override
 	public T getVariable(final String name) {
-		for (int i = currentDepth; i > 0 && !breakpointArray[i]; --i) {
+		for (int i = currentDepth; i >= 0 && !breakpointArray[i]; --i) {
 			final T o = mapArray[i].get(name);
 			if (o != null)
 				return o;

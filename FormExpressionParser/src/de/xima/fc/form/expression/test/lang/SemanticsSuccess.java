@@ -182,4 +182,10 @@ enum SemanticsSuccess implements ITestCase {
 	public String getErrorBegin() {
 		return null;
 	}
+	
+	@Override
+	public boolean isUseStrictMode() {
+		return false;
+	}
+
 }

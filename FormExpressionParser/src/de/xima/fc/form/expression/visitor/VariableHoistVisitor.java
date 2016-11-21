@@ -11,9 +11,10 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
+import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.impl.variable.HeaderNodeImpl;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTLosNode;
-import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -23,14 +24,14 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  * @author madgaksha
  */
-public class VariableDeclarationHoistVisitor extends AVariableBindingVisitor<Boolean> {
+public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 	private final IEvaluationContextContractFactory<?> contractFactory;
 	private final boolean treatMissingDeclarationAsError;
 	private final boolean treatMissingRequireScopeAsError;
 	private final boolean treatMissingScopeDeclarationAsError;
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
 
-	public VariableDeclarationHoistVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
+	public VariableHoistVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
 			final IEvaluationContextContractFactory<?> contractFactory, final boolean treatMissingDeclarationAsError,
 			final boolean treatMissingRequireScopeAsError, final boolean treatMissingScopeDeclarationAsError) {
 		this.scopeDefBuilder = scopeDefBuilder;
@@ -54,7 +55,7 @@ public class VariableDeclarationHoistVisitor extends AVariableBindingVisitor<Boo
 			else {
 				if (treatMissingScopeDeclarationAsError)
 					throw new NoSuchScopeException(scope, node);
-				scopeDefBuilder.addManual(scope, node.getVariableName(), new ASTNullNode(node.getEmbedment()));
+				scopeDefBuilder.addManual(scope, node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
 			}
 		}
 	}
@@ -69,7 +70,7 @@ public class VariableDeclarationHoistVisitor extends AVariableBindingVisitor<Boo
 		final String[] scopes = contractFactory.getScopesForEmbedment(embedment);
 		for (final String scope : scopes) {
 			if (scope != null && !(scopeDefBuilder.hasManual(scope) || scopeDefBuilder.hasExternal(scope))) {
-				if (contractFactory.isProvidingExternalScope(scope)) {
+				if (!contractFactory.isProvidingExternalScope(scope)) {
 					if (treatMissingRequireScopeAsError)
 						throw new MissingRequireScopeStatementException(scope, node);
 					scopeDefBuilder.addExternal(scope);
@@ -86,15 +87,19 @@ public class VariableDeclarationHoistVisitor extends AVariableBindingVisitor<Boo
 		// Check if variable was declared locally or globally.
 		// If not, throw an error when in strict mode.
 		// Otherwise, add it as a global variable.
-		for (int i = 0; i < node.jjtGetNumChildren() - 1; ++i) {
+		// We need to visit nodes in reverse order. Consider eg.
+		//   j = 0;
+		//   k = i = (k = j);
+		node.jjtGetChild(node.jjtGetNumChildren()-1).jjtAccept(this);
+		for (int i = node.jjtGetNumChildren() - 1; i --> 0;) {
 			switch (node.jjtGetChild(i).jjtGetNodeId()) {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
 				final ASTVariableNode n = (ASTVariableNode) node.jjtGetChild(i);
 				if (binding.getVariable(n.getVariableName()) == null) {
-					if (scopeDefBuilder.hasGlobal(n.getVariableName())) {
+					if (!scopeDefBuilder.hasGlobal(n.getVariableName())) {
 						if (treatMissingDeclarationAsError)
 							throw new VariableUsageBeforeDeclarationException(n);
-						scopeDefBuilder.addGlobal(n.getVariableName(), new ASTNullNode(n.getEmbedment()));
+						scopeDefBuilder.addGlobal(n.getVariableName(), new HeaderNodeImpl(n.getVariableName(), n));
 					}
 				}
 				break;
@@ -109,20 +114,22 @@ public class VariableDeclarationHoistVisitor extends AVariableBindingVisitor<Boo
 	}
 
 	@Override
-	protected Boolean getNewObjectToSet() {
+	protected Boolean getNewObjectToSet(final ISourceResolvable res) {
 		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
-	
+
 	public static void hoist(@Nonnull final Node node, @Nonnull final IScopeDefinitionsBuilder scopeDefBuilder,
-			@Nonnull final IEvaluationContextContractFactory<?> contractFactory, final boolean strictMode) throws ParseException {
+			@Nonnull final IEvaluationContextContractFactory<?> contractFactory, final boolean strictMode)
+			throws ParseException {
 		hoist(node, scopeDefBuilder, contractFactory, strictMode, strictMode, strictMode);
 	}
 
 	public static void hoist(@Nonnull final Node node, @Nonnull final IScopeDefinitionsBuilder scopeDefBuilder,
-			@Nonnull final IEvaluationContextContractFactory<?> contractFactory, final boolean treatMissingDeclarationAsError,
-			final boolean treatMissingRequireScopeAsError, final boolean treatMissingScopeDeclarationAsError) throws ParseException {
-		final VariableDeclarationHoistVisitor v = new VariableDeclarationHoistVisitor(scopeDefBuilder,
-				contractFactory, treatMissingDeclarationAsError, treatMissingRequireScopeAsError, treatMissingScopeDeclarationAsError);
+			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
+			final boolean treatMissingDeclarationAsError, final boolean treatMissingRequireScopeAsError,
+			final boolean treatMissingScopeDeclarationAsError) throws ParseException {
+		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory,
+				treatMissingDeclarationAsError, treatMissingRequireScopeAsError, treatMissingScopeDeclarationAsError);
 		v.resolveFunctions(scopeDefBuilder);
 		node.jjtAccept(v);
 		v.binding.reset();

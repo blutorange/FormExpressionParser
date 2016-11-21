@@ -33,7 +33,7 @@ public class ASTLosNode extends ANode {
 
 	@Nonnull
 	public String getText() {
-		return text != null ? text : CmnCnst.NonnullConstant.EMPTY_STRING;
+		return text != null ? text : CmnCnst.NonnullConstant.STRING_EMPTY;
 	}
 
 	public boolean isHasOpen() {
@@ -50,7 +50,7 @@ public class ASTLosNode extends ANode {
 
 	@Nonnull
 	public String getOpen() {
-		return open != null ? open : CmnCnst.NonnullConstant.EMPTY_STRING;
+		return open != null ? open : CmnCnst.NonnullConstant.STRING_EMPTY;
 	}
 
 	@Override

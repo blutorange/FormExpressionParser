@@ -22,6 +22,11 @@ public class NullUtil {
 		return checkNotNull(String.format(format, params));
 	}
 
+	@Nonnull
+	public static String orEmpty(@Nullable final String string) {
+		return string != null ? string : CmnCnst.NonnullConstant.STRING_EMPTY;
+	}
+
 	public static void main(final String[] args) {
 		final char c = '3';
 		System.out.println(toString(c));

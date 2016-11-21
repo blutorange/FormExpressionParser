@@ -7,12 +7,13 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.parse.ILabelled;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTWhileLoopNode extends ANode {
+public class ASTWhileLoopNode extends ANode implements ILabelled {
 	private static final long serialVersionUID = 1L;
 
 	public ASTWhileLoopNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
@@ -52,6 +53,7 @@ public class ASTWhileLoopNode extends ANode {
 		this.label = label;
 	}
 
+	@Override
 	@Nullable
 	public String getLabel() {
 		return label;

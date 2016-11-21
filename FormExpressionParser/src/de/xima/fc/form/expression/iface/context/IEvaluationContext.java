@@ -24,7 +24,6 @@ import de.xima.fc.form.expression.util.IReset;
  * @author mad_gaksha
  */
 public interface IEvaluationContext extends IReset {
-
 	@Nonnull
 	public IExternalScope getScope();
 	@Nonnull

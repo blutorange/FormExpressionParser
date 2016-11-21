@@ -1,31 +1,28 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTVariableDeclarationClauseNode extends ANode {
+public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode {
 	private static final long serialVersionUID = 1L;
-	@Nonnull
-	private String variableName = CmnCnst.NonnullConstant.EMPTY_STRING;
 
 	public ASTVariableDeclarationClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
+	@Override
 	public void init(final EMethod method, final String variableName) throws ParseException {
-		assertNonNull(variableName, CmnCnst.Error.VARIABLE_NODE_NULL_NAME);
 		assertChildrenAtMost(1);
-		super.init(method);
-		if (variableName != null)
-			this.variableName = variableName;
+		super.init(method, variableName);
 	}
 
 	@Override
@@ -48,13 +45,19 @@ public class ASTVariableDeclarationClauseNode extends ANode {
 		visitor.visit(this);
 	}
 
-	@Nonnull
-	public String getVariableName() {
-		return variableName;
-	}
-
 	@Override
 	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
-		sb.append(variableName).append(',');
+		sb.append(getVariableName()).append(',');
+	}
+		
+	public boolean hasAssignment() {
+		return jjtGetNumChildren() != 0;
+	}
+	
+	@Nullable
+	public Node getAssignmentNode() {
+		if (jjtGetNumChildren() == 0)
+			return null;
+		return jjtGetChild(0);
 	}
 }

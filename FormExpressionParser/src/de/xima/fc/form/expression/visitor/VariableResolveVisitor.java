@@ -1,23 +1,23 @@
 package de.xima.fc.form.expression.visitor;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.collections4.map.MultiKeyMap;
-
+import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
 import de.xima.fc.form.expression.exception.parse.ScopeMissingVariableException;
-import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.IScopeInfo;
-import de.xima.fc.form.expression.node.ASTForLoopNode;
-import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
+import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -27,9 +27,6 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
 	@Nonnull
 	private final IEvaluationContextContractFactory<?> contractFactory;
-
-	@Nonnull
-	private final MultiKeyMap<String, Integer> scopeSourceMap = new MultiKeyMap<>();
 	@Nonnull
 	private final Stack<String> defaultScopeStack = new Stack<String>();
 
@@ -49,23 +46,26 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		// First, look it up in manually defined scopes.
 		// Otherwise, try external scopes, including those from the external
 		// context.
+
+		// Try manual scope.
 		if (scopeDefBuilder.hasManual(scope)) {
-			if (scopeDefBuilder.hasManual(scope, name)) {
-				node.resolveScope(scope);
-				Integer scopeSource = scopeSourceMap.get(scope, name);
-				if (scopeSource == null) {
-					scopeSource = symbolTableSize++;
-					scopeSourceMap.put(scope, name, symbolTableSize++);
-				}
-				node.resolveSource(scopeSource);
+			final IHeaderNode header = scopeDefBuilder.getManual(scope, name);
+			if (header != null) {
+				if (!header.isResolved())
+					// Should not happen as these variables are resolved
+					// earlier.
+					throw new VariableNotResolvableException(node);
+				node.resolveSource(header.getSource(), scope);
 				return true;
-			} else {
+			}
+			else {
 				if (doThrow)
 					throw new ScopeMissingVariableException(scope, name, node);
 				return false;
 			}
 		}
 
+		// Try external scope.
 		final IScopeInfo info = contractFactory.getExternalScopeInfo(scope);
 		if (info != null) {
 			if (!info.isProviding(name)) {
@@ -79,11 +79,11 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 				return false;
 			}
 			scopeDefBuilder.addExternal(scope);
-			node.resolveScope(scope);
-			node.resolveSource(info.getSource().getSourceId());
+			node.resolveSource(info.getSource(), scope);
 			return true;
 		}
 
+		// Give up.
 		if (doThrow)
 			throw new NoSuchScopeException(scope, node);
 		return false;
@@ -113,13 +113,12 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 			return;
 		}
 
-		// Check if variable exists locally.
-		if (scopeDefBuilder.hasGlobal(name)) {
-			Integer scopeSource = scopeSourceMap.get(null, name);
-			if (scopeSource == null) {
-				scopeSource = symbolTableSize++;
-				scopeSourceMap.put(null, name, symbolTableSize++);
-			}
+		// Check if variable exists globally.
+		final IHeaderNode header = scopeDefBuilder.getGlobal(name);
+		if (header != null) {
+			if (!header.isResolved())
+				throw new VariableNotResolvableException(node);
+			node.resolveSource(header.getSource());
 			return;
 		}
 
@@ -147,44 +146,61 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	//
 	@Override
 	public void visit(final ASTWithClauseNode node) throws ParseException {
-		mode = Mode.INSIDE_WITH_CLAUSE_HEADER;
 		try {
 			for (int i = 0; i < node.getScopeCount(); ++i)
-				node.getScopeNode(i).jjtAccept(this);
+				defaultScopeStack.push(node.getScope(i));
 			node.getBodyNode().jjtAccept(this);
-		} finally {
-			mode = Mode.NONE;
+		}
+		finally {
 			for (int i = node.getScopeCount(); i-- > 0; --i)
 				defaultScopeStack.pop();
 		}
 	}
 
-	@Override
-	public void visitIdentifierNameNode(final ASTIdentifierNameNode node) throws SemanticsException {
-		if (mode == Mode.INSIDE_WITH_CLAUSE_HEADER)
-			defaultScopeStack.push(node.getName());
-	}
-
-	@Override
-	protected Integer getNewObjectToSet() {
+	@Nonnull
+	private Integer getNewObjectToSet() {
 		return symbolTableSize++;
 	}
-	
+
 	@Override
-	protected void enhancedForLoopIteratingLoopVariable(final ASTForLoopNode node, final Integer object) {
-		node.resolveSource(object);
+	protected Integer getNewObjectToSet(final ISourceResolvable res) throws IllegalVariableSourceResolutionException {
+		final Integer object = getNewObjectToSet();
+		res.resolveSource(object);
+		return object;
 	}
 
-	// TODO check for illegal assignment of external scoped variables, eg field::tf1 = 8;
-	
+	// TODO check for illegal assignment of external scoped variables, eg
+	// field::tf1 = 8;
+
+	// TODO mark unused variables
+
 	public static int resolve(final Node node, final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
 			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
 			final boolean treatMissingRequireScopeAsError) throws ParseException {
 		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, contractFactory,
 				treatMissingRequireScopeAsError);
+		v.resolveScopeDefs();
 		v.resolveFunctions(scopeDefBuilder);
 		node.jjtAccept(v);
 		v.binding.reset();
 		return v.symbolTableSize;
-	}	
+	}
+
+	private void resolveScopeDefs() throws IllegalVariableSourceResolutionException {
+		// Global.
+		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();)
+			it.next().getValue().resolveSource(getNewObjectToSet());
+		// Manual scopes.
+		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
+			final String scope = it.next();
+			if (scope != null) {
+				final Iterator<Entry<String, IHeaderNode>> it2 = scopeDefBuilder.getManual(scope);
+				if (it2 != null) {
+					while (it2.hasNext()) {
+						it2.next().getValue().resolveSource(getNewObjectToSet());
+					}
+				}
+			}
+		}
+	}
 }

@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl.formexpression;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -14,6 +15,7 @@ import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
@@ -47,20 +49,18 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	@Override
 	@Nonnull
 	public ALangObject evaluate(@Nonnull final T ex) throws EvaluationException {
-		//TODO pass heap to evaluate visitor, or add to ec.
-		//TODO restore initial values for global, scopes, functions
+		Preconditions.checkNotNull(ex, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
 		final IEvaluationContext ec = specs.getContextWithExternal(ex);
 		ec.createSymbolTable(symbolTableSize);
-		return EvaluateVisitor.evaluateCode(node, ec);
+		return EvaluateVisitor.evaluateCode(node, scopeDefs, ec);
 	}
 
 	@Nonnull
 	@Override
 	public String unparse(@Nullable final UnparseVisitorConfig config) {
-		//TODO pass scopeDef to unparseVisitor so that they get unparsed as well.
 		if (unparse != null)
 			return unparse;
-		return unparse = UnparseVisitor.unparse(node, comments,
+		return unparse = UnparseVisitor.unparse(node, scopeDefs, comments,
 				config != null ? config : UnparseVisitorConfig.getDefaultConfig());
 	}
 

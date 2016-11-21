@@ -60,21 +60,32 @@ public abstract class ANode implements Node {
 	private int endColumn = 1;
 
 	/**
+	 * Do not use, exists only internally for javacc.
 	 * @param nodeId
 	 *            Node id. Not needed (yet).
 	 */
 	public ANode(@Nonnull final FormExpressionParser parser, final int nodeId) {
-		this(parser.getCurrentEmbedmentContext(), nodeId);
-	}
-
-	public ANode(@Nullable final String embedmentContext, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
 		// by itself would raise many other issues...
 		uniqueId = ID_PROVIDER.incrementAndGet();
 		this.nodeId = nodeId;
-		this.embedment = embedmentContext;
+		this.embedment = parser.getCurrentEmbedmentContext();
+	}
+
+	public ANode(@Nonnull final Node prototype, final int nodeId) {
+		// This will always provide a unique ID for each node of a
+		// parse tree, even if idProvider overflows and wraps around,
+		// unless a parse tree contains more than 2^32 nodes, which
+		// by itself would raise many other issues...
+		this.uniqueId = ID_PROVIDER.incrementAndGet();
+		this.nodeId = nodeId;
+		this.embedment = prototype.getEmbedment();
+		this.beginColumn = prototype.getStartColumn();
+		this.beginLine = prototype.getStartLine();
+		this.endColumn = prototype.getEndColumn();
+		this.endLine = prototype.getEndLine();
 	}
 
 

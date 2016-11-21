@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.scope;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.EScopeSource;
+import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.iface.context.IParametrizedCustomScope;
 import de.xima.fc.form.expression.iface.parse.IScopeInfo;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext.Formcycle;
@@ -31,7 +31,7 @@ public enum FormcycleScope implements IParametrizedCustomScope<Formcycle>, IScop
 	@Override
 	public abstract ALangObject fetch(@Nonnull String name, @Nonnull Formcycle formcycle);
 	@Override
-	public EScopeSource getSource() {
-		return EScopeSource.EXTERNAL_CONTEXT;
+	public EVariableSource getSource() {
+		return EVariableSource.EXTERNAL_CONTEXT;
 	}
 }

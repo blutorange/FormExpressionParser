@@ -9,18 +9,21 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
+import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.VariableDeclaredTwiceException;
-import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
+import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.impl.binding.CloneBinding;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
-import de.xima.fc.form.expression.node.ASTIdentifierNameNode;
+import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
@@ -30,20 +33,21 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
- * For preparing the binding so we know which variables are in scope at which point.
+ * For preparing the binding so we know which variables are in scope at which
+ * point.
+ * 
  * @author mad_gaksha
- * @param <T> Type of the objects of the binding.
+ * @param <T>
+ *            Type of the objects of the binding.
  */
 public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidVisitorAdapter<ParseException> {
 	@Nonnull
 	protected final IBinding<T> binding;
-	@Nonnull
-	protected Mode mode = Mode.NONE;
 
 	protected AVariableBindingVisitor() {
 		this.binding = new CloneBinding<T>();
 	}
-		
+
 	private void visitNested(@Nonnull final Node node) throws ParseException {
 		final int bookmark = binding.getBookmark();
 		binding.nest();
@@ -54,24 +58,26 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 			binding.gotoBookmark(bookmark);
 		}
 	}
-	
+
 	private void visitNestedNullable(@Nullable final Node node) throws ParseException {
 		if (node == null)
 			return;
 		visitNested(node);
 	}
-	
-	@OverridingMethodsMustInvokeSuper
+
 	@Override
 	public final void visit(final ASTVariableDeclarationClauseNode node) throws ParseException {
+		// We need to visit the children first. Consider
+		//  var i = i;
+		// Here, i at the right hand side has not been initialized.
+		visitChildren(node);
 		if (binding.isGlobal())
 			throw new IllegalVariableDeclarationAtGlobalScopeException(node);
 		if (binding.hasVariableAtCurrentLevel(node.getVariableName()))
 			throw new VariableDeclaredTwiceException(node);
-		binding.defineVariable(node.getVariableName(), getNewObjectToSet());
+		binding.defineVariable(node.getVariableName(), getNewObjectToSet(node));
 	}
 
-	@OverridingMethodsMustInvokeSuper
 	@Override
 	public final void visit(final ASTIfClauseNode node) throws ParseException {
 		node.getConditionNode().jjtAccept(this);
@@ -100,9 +106,8 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 			binding.nest();
 			try {
 				node.getEnhancedIteratorNode().jjtAccept(this);
-				final T object = getNewObjectToSet();
-				binding.defineVariable(node.getIteratingLoopVariable(), object);
-				enhancedForLoopIteratingLoopVariable(node, object);
+				final T object = getNewObjectToSet(node);
+				binding.defineVariable(node.getVariableName(), object);
 				node.getBodyNode().jjtAccept(this);
 			}
 			finally {
@@ -125,19 +130,35 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	}
 
 	@Override
+	public final void visit(final ASTFunctionNode node) throws ParseException {
+		visitFunctionNode(node);
+	}
+
+	@Override
 	public final void visit(final ASTFunctionClauseNode node) throws ParseException {
+		visitFunctionNode(node);
+	}
+
+	private <S extends IArgumentResolvable & Node> void visitFunctionNode(final S node) throws ParseException {
 		final int bookmark = binding.getBookmark();
 		binding.nestLocal();
-		// TODO set arguments/this variables. does this make sense?
-		binding.defineVariable(CmnCnst.Name.VARIABLE_THIS, getNewObjectToSet());
-		binding.defineVariable(CmnCnst.Name.VARIABLE_ARGUMENTS, getNewObjectToSet());
+
+		final T objectThis = getNewObjectToSet(node.getThisResolvable());
+		binding.defineVariable(node.getThisResolvable().getVariableName(), objectThis);
+
+		final T objectArguments = getNewObjectToSet(node.getArgumentsResolvable());
+		binding.defineVariable(node.getArgumentsResolvable().getVariableName(), objectArguments);
+
 		try {
-			mode = Mode.INSIDE_FUNCTION_ARGUMENT;
-			for (int i = 0; i < node.getArgumentCount(); ++i)
-				node.getArgumentNode(i).jjtAccept(this);
-			mode = Mode.NONE;
+			for (int i = 0; i < node.getArgumentCount(); ++i) {
+				final ISourceResolvable res = node.getArgResolvable(i);
+				if (binding.hasVariableAtCurrentLevel(res.getVariableName()))
+					throw new DuplicateFunctionArgumentException(res.getVariableName(), node);
+				binding.defineVariable(res.getVariableName(), getNewObjectToSet(res));
+			}
 			node.getBodyNode().jjtAccept(this);
-		} finally {
+		}
+		finally {
 			binding.gotoBookmark(bookmark);
 		}
 	}
@@ -148,7 +169,8 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		final int bookmark = binding.getBookmark();
 		binding.nest();
 		try {
-			binding.defineVariable(node.getErrorVariableName(), getNewObjectToSet());
+			final T object = getNewObjectToSet(node);
+			binding.defineVariable(node.getVariableName(), object);
 			node.getCatchNode().jjtAccept(this);
 		}
 		finally {
@@ -190,45 +212,30 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		finally {
 			if (nested)
 				binding.gotoBookmark(bookmark);
-		}		
-	}
-	
-	@Override
-	public final void visit(final ASTIdentifierNameNode node) throws SemanticsException {
-		if (mode == Mode.INSIDE_FUNCTION_ARGUMENT) {
-			if (binding.hasVariableAtCurrentLevel(node.getName()))
-				throw new DuplicateFunctionArgumentException(node.getName(), node);
-			binding.defineVariable(node.getName(), getNewObjectToSet());
 		}
-		visitIdentifierNameNode(node);
 	}
-	
+
+	/**
+	 * Resolves code inside function bodies. Function have already been detached
+	 * from the main program and put at the top.
+	 * 
+	 * @param scopeDefBuilder
+	 * @throws ParseException
+	 */
 	protected void resolveFunctions(@Nonnull final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
-		for (final Iterator<Entry<String,Node>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
-			final Node node = it.next().getValue();
-			if (node.jjtGetNodeId() == FormExpressionParserTreeConstants.JJTFUNCTIONCLAUSENODE)
-				node.jjtAccept(this);
+		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
+			final IHeaderNode hn = it.next().getValue();
+			if (hn.hasNode())
+				hn.getNode().jjtAccept(this);
 		}
 	}
-	
+
 	/**
 	 * When a variable is declared, it is set to this value initially.
+	 * 
 	 * @return The object to set.
+	 * @throws IllegalVariableSourceResolutionException 
 	 */
 	@Nonnull
-	protected abstract T getNewObjectToSet();
-	
-	protected void visitIdentifierNameNode(@Nonnull final ASTIdentifierNameNode node)
-			throws SemanticsException {
-	}
-
-	protected void enhancedForLoopIteratingLoopVariable(final ASTForLoopNode node, final T object) {
-	}
-
-	protected static enum Mode {
-		NONE,
-		INSIDE_WITH_CLAUSE_HEADER,
-		INSIDE_FUNCTION_ARGUMENT;
-	}
-
+	protected abstract T getNewObjectToSet(ISourceResolvable res) throws IllegalVariableSourceResolutionException;
 }

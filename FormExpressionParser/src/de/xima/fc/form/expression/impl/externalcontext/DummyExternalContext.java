@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
@@ -7,6 +9,7 @@ import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 public class DummyExternalContext extends AGenericExternalContext implements IExternalContext {
 
 	private static class InstanceHolder {
+		@Nonnull
 		public final static DummyExternalContext INSTANCE = new DummyExternalContext();
 	}
 
@@ -26,6 +29,7 @@ public class DummyExternalContext extends AGenericExternalContext implements IEx
 	public void beginWriting() {
 	}
 
+	@Nonnull
 	public static AGenericExternalContext getInstance() {
 		return InstanceHolder.INSTANCE;
 	}

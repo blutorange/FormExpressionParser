@@ -19,7 +19,6 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class RegexLangObject extends ALangObject {
-	private static final long serialVersionUID = 1L;
 	private final static class InstanceHolder {
 		@SuppressWarnings("null")
 		@Nonnull public final static RegexLangObject UNMATCHABLE = new RegexLangObject(Pattern.compile("(?!)")); //$NON-NLS-1$

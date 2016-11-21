@@ -1,66 +1,177 @@
 package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
+/**
+ * A configuration affecting the output of {@link IFormExpression#unparse(UnparseVisitorConfig)}.
+ * It offers several options to change how FormExpression code will be formatted.
+ * @author mad_gaksha
+ */
 public final class UnparseVisitorConfig {
-	public final String indentPrefix;
-	public final String linefeed;
-	public final String optionalSpace;
-	public final String requiredSpace;
+	@Nonnull public final String indentPrefix;
+	@Nonnull public final String linefeed;
+	@Nonnull public final String optionalSpace;
+	@Nonnull public final String requiredSpace;
+	@Nonnull public final HeaderType[] headerTypeOrder;
 	public final boolean keepComments;
-	private UnparseVisitorConfig(final String indentPrefix, final String linefeed, final String optionalSpace, final String requiredSpace, final boolean keepComments) {
+	
+	private UnparseVisitorConfig(@Nonnull final String indentPrefix, @Nonnull final String linefeed,
+			@Nonnull final String optionalSpace, @Nonnull final String requiredSpace,
+			@Nonnull final HeaderType[] headerTypeOrder, final boolean keepComments) {
 		this.indentPrefix = indentPrefix;
 		this.linefeed = linefeed;
 		this.optionalSpace = optionalSpace;
 		this.requiredSpace = requiredSpace;
+		this.headerTypeOrder = headerTypeOrder;
 		this.keepComments = keepComments;
 	}
+
 	public static class Builder {
-		public String indentPrefix;
-		public String linefeed;
-		public String optionalSpace;
-		public String requiredSpace;
-		public boolean keepComments;
-		public Builder setIndentPrefix(final String indentPrefix) {
+		@Nullable private String indentPrefix;
+		@Nullable private String linefeed;
+		@Nullable private String optionalSpace;
+		@Nullable private String requiredSpace;
+		@Nullable public HeaderType[] headerTypeOrder;
+		private boolean keepComments;
+		
+		/**
+		 * Sets the prefix to the beginning of each line for each indentation level.
+		 * @param indentPrefix Prefix for indentation. Defaults to two spaces (<code>  </code>).
+		 * @return this
+		 */
+		@Nonnull
+		public Builder setIndentPrefix(@Nullable final String indentPrefix) {
 			this.indentPrefix = indentPrefix;
 			return this;
 		}
-		public Builder setLinefeed(final String linefeed) {
+		/**
+		 * String to be used as a linefeed, must be either \n, \t or \r\n.
+		 * @param linefeed Character to be used for linefeeds, defaults to \n.
+		 * @return this
+		 */
+		@Nonnull
+		public Builder setLinefeed(@Nullable final String linefeed) {
 			this.linefeed = linefeed;
 			return this;
 		}
+		/**
+		 * Sets the number spaces to be added when spaces are not required syntactically.
+		 * <p>When set to 0: <code>if(true)</code></p>
+		 * <p>When set to 4: <code>if    (true)</code></p>
+		 * @param requiredSpace Number of required spaces, defaults to 1.
+		 * @return this.
+		 */
+		@Nonnull
 		public Builder setOptionalSpace(int optionalSpace) {
 			if (optionalSpace < 0) optionalSpace = 0;
 			this.optionalSpace = StringUtils.repeat(' ', optionalSpace);
 			return this;
 		}
+		/**
+		 * Sets the number spaces to be added when spaces are required syntactically.
+		 * <p>When set to 1: <code>function foo(){}</code></p>
+		 * <p>When set to 4: <code>function    foo(){}</code></p>
+		 * @param requiredSpace Number of required spaces, default 1.
+		 * @return this.
+		 */
+		@Nonnull
 		public Builder setRequiredSpace(int requiredSpace) {
 			if (requiredSpace < 1) requiredSpace = 1;
 			this.requiredSpace = StringUtils.repeat(' ', requiredSpace);
 			return this;
 		}
+		/**
+		 * @param keepComments Whether the output should contain comments.
+		 * @return this
+		 */
+		@Nonnull
 		public Builder setKeepComments(final boolean keepComments) {
 			this.keepComments = keepComments;
 			return this;
 		}
+		
+		/**
+		 * In which order headers should be added. Compare:
+		 * <p>
+		 * With the default
+		 * <code>setHeaderTypeOrder(HeaderType.REQUIRE, HeaderType.GLOBAL, HeaderType.MANUAL, HeaderType.GLOBAL_FUNCTION)</code>:
+		 * <pre>
+		 *   require scope math;
+		 *   global {
+		 *     var i;
+		 *     var j;
+		 *   }
+		 *   scope myScope {
+		 *     var k;
+		 *     function scopedFunction(){}
+		 *   }
+		 *   function globalFunction(){}
+		 * </pre>
+		 * </p>
+		 * <p>
+		 * Compare with
+		 * <code>setHeaderTypeOrder(HeaderType.GLOBAL_FUNCTION, HeaderType.MANUAL, HeaderType.GLOBAL, HeaderType.REQUIRE)</code>
+		 * 
+		 * <pre>
+		 *   function globalFunction(){}
+		 *   scope myScope {
+		 *     var k;
+		 *     function scopedFunction(){}
+		 *   }
+		 *   global {
+		 *     var i;
+		 *     var j;
+		 *   }
+		 *   require scope math;
+		 * </pre>
+		 * </p>
+		 * 
+		 * @param headerTypeOrder
+		 *            Order in which headers are added, from earliest to latest.
+		 *            Elements that occur more than once are ignored, elements
+		 *            that do not occur at all are added in the defalt order.
+		 * @return
+		 */
 		@Nonnull
-		public UnparseVisitorConfig build() {
-			if (indentPrefix == null) indentPrefix = StringUtils.SPACE;
-			if (linefeed == null) linefeed = StringUtils.LF;
-			if (optionalSpace == null) optionalSpace = StringUtils.EMPTY;
-			if (requiredSpace == null) requiredSpace = StringUtils.SPACE;
-			indentPrefix = indentPrefix.replaceAll("[^\t ]", StringUtils.EMPTY); //$NON-NLS-1$
-			linefeed = linefeed.replaceAll("[^\r\n]", StringUtils.EMPTY); //$NON-NLS-1$
-			if (linefeed.isEmpty()) linefeed = StringUtils.LF;
-			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
+		public Builder setHeaderTypeOrder(@Nullable final HeaderType... headerTypeOrder) {
+			this.headerTypeOrder = headerTypeOrder;
+			return this;
 		}
+		/**
+		 * @param linefeed Character to be used as for newlines.
+		 * @return this
+		 * @see #setLinefeed(String)
+		 */
+		@Nonnull
 		public Builder setLinefeed(final char linefeed) {
 			this.linefeed = Character.toString(linefeed);
 			return this;
+		}
+		/** @return A new, sane configuration with the configured options. */
+		@Nonnull
+		public UnparseVisitorConfig build() {
+			String indentPrefix = this.indentPrefix;
+			String linefeed = this.linefeed;
+			String optionalSpace = this.optionalSpace;
+			String requiredSpace = this.requiredSpace;
+			HeaderType[] headerTypeOrder = this.headerTypeOrder;
+			if (indentPrefix == null) indentPrefix = CmnCnst.NonnullConstant.STRING_SPACE;
+			if (linefeed == null) linefeed = CmnCnst.NonnullConstant.STRING_LF;
+			if (optionalSpace == null) optionalSpace = CmnCnst.NonnullConstant.STRING_EMPTY;
+			if (requiredSpace == null) requiredSpace = CmnCnst.NonnullConstant.STRING_SPACE;
+			if (headerTypeOrder == null) headerTypeOrder = new HeaderType[0];
+			indentPrefix = indentPrefix.replaceAll("[^\t ]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
+			linefeed = linefeed.replaceAll("[^\r\n]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
+			if (indentPrefix == null) indentPrefix = CmnCnst.NonnullConstant.STRING_SPACE;
+			if (linefeed.isEmpty()) linefeed = CmnCnst.NonnullConstant.STRING_LF;
+			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, headerTypeOrder, keepComments);
 		}
 	}
 
@@ -128,5 +239,16 @@ public final class UnparseVisitorConfig {
 	public static UnparseVisitorConfig getUnstyledWithoutCommentsConfig() {
 		return InstanceHolder.UNSTYLED_WITHOUT_COMMENTS;
 	}
+	
+	/**
+	 * For setting the order in which headers (require declarations, global
+	 * variables, manual scopes, global functions) should occur.
+	 * 
+	 * @see Builder#setHeaderTypeOrder(HeaderType...)
+	 * @author mad_gaksha
+	 *
+	 */
+	public static enum HeaderType {
+		REQUIRE, GLOBAL, MANUAL, GLOBAL_FUNCTION;
+	}
 }
-

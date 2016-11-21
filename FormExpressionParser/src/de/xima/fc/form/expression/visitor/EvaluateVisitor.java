@@ -4,6 +4,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -13,7 +14,7 @@ import com.google.common.base.Optional;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.EScopeSource;
+import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
 import de.xima.fc.form.expression.exception.evaluation.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
@@ -23,12 +24,16 @@ import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextExcepti
 import de.xima.fc.form.expression.exception.evaluation.MissingExternalContextException;
 import de.xima.fc.form.expression.exception.evaluation.ReturnClauseException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UnresolvedVariableException;
+import de.xima.fc.form.expression.exception.evaluation.UnresolvedVariableSourceException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.iface.context.ILogger;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
+import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
+import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -86,58 +91,26 @@ import de.xima.fc.form.expression.util.NullUtil;
 
 public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangObject, EvaluationException> {
 
-	/**
-	 * Evaluates the given node as a complete program with the given context.
-	 * This method may be used by multiple threads, however, the node and
-	 * evaluation context passed require external synchronization. This is
-	 * because usually you would create a new evaluation context for each
-	 * evaluation; and {@link Node} (should) be immutable after parsing.
-	 *
-	 * @param node
-	 *            Node to evaluate.
-	 * @param ec
-	 *            Evaluation context to use.
-	 * @return The evaluated result.
-	 * @throws EvaluationException
-	 *             When the code cannot be evaluated.
-	 */
-	@Nonnull
-	public static ALangObject evaluateCode(@Nonnull final Node node, @Nonnull final IEvaluationContext ec)
-			throws EvaluationException {
-		final EvaluateVisitor v = new EvaluateVisitor(ec);
-		final ALangObject res;
-		final Optional<IExternalContext> ex = ec.getExternalContext();
-		if (ex.isPresent())
-			ex.get().beginWriting();
-		try {
-			res = node.jjtAccept(v);
-		} finally {
-			if (ex.isPresent())
-				ex.get().finishWriting();
-		}
-		v.assertNoJumps();
-		v.reinit();
-		return res;
-	}
-
+	//TODO use utility functions for node, and dont access children array directly
 	@Nonnull
 	private ALangObject currentResult = NullLangObject.getInstance();
-	private IEvaluationContext ec;
+	@Nonnull
+	private final IEvaluationContext ec;
 	private boolean mustJump;
 	private EJump jumpType;
 	private String jumpLabel;
 
-	private EvaluateVisitor(@Nonnull final IEvaluationContext ec) throws EvaluationException {
+	private EvaluateVisitor(@Nonnull final IEvaluationContext ec)
+			throws EvaluationException {
 		reinit();
 		this.ec = ec;
 	}
 
-	public void reinit() throws EvaluationException {
+	private void reinit() throws EvaluationException {
 		currentResult = NullLangObject.getInstance();
 		mustJump = false;
 		jumpType = null;
 		jumpLabel = null;
-		ec = null;
 	}
 
 	private void assertNoJumps() throws UncatchableEvaluationException {
@@ -165,26 +138,37 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		ec.getEmbedment().setCurrentEmbedment(node.getEmbedment());
 		try {
 			return currentResult = node.jjtAccept(this);
-		} finally {
+		}
+		finally {
 			ec.getTracer().setCurrentlyProcessed(parentNode);
 		}
 	}
 
 	@Nonnull
-	private static ALangObject setVariable(@Nullable final ASTVariableNode node, @Nonnull final ALangObject val,
+	private ALangObject setVariable(@Nullable final IScopedSourceResolvable node, @Nonnull final ALangObject val,
 			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		if (node == null)
-			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);		
-		//TODO check if this makes sense
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
 		switch (node.getSource()) {
-		case EScopeSource.ID_LIBRARY:
-		case EScopeSource.ID_EXTERNAL_CONTEXT:
+		case EVariableSource.ID_LIBRARY:
+		case EVariableSource.ID_EXTERNAL_CONTEXT:
 			throw new IllegalExternalScopeAssignmentException(node.getScope(), node.getVariableName(), ec);
-		case EScopeSource.ID_UNRESOLVED:
-			throw new UnresolvedVariableException(node.getScope(), node.getVariableName(), ec);
+		case EVariableSource.ID_UNRESOLVED:
+			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
 		default:
 			ec.getSymbolTable()[node.getSource()].setCurrentObject(val);
+			return val;
 		}
+	}
+	
+	@Nonnull
+	private ALangObject setSimpleVariable(@Nullable final ISourceResolvable node, @Nonnull final ALangObject val,
+			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+		if (node == null)
+			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
+		if (node.getSource() < 0)
+			throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
+		ec.getSymbolTable()[node.getSource()].setCurrentObject(val);
 		return val;
 	}
 
@@ -237,7 +221,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 						thisContext = NullLangObject.getInstance();
 					// Evaluate function
 					thisContext = res = func.evaluate(ec, thisContext, args);
-				} finally {
+				}
+				finally {
 					ec.getTracer().ascend();
 				}
 				// Check for disallowed break / continue clauses.
@@ -486,25 +471,24 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTBooleanNode node) throws EvaluationException {
 		return BooleanLangObject.create(node.getBooleanValue());
 	}
-	
+
 	@Override
 	public ALangObject visit(final ASTVariableNode node) throws EvaluationException {
-		//TODO check if this makes sense
 		final String scope = node.getScope();
 		switch (node.getSource()) {
-		case EScopeSource.ID_LIBRARY:
+		case EVariableSource.ID_LIBRARY:
 			if (scope == null)
-				throw new UnresolvedVariableException(null, node.getVariableName(), ec);
+				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
 			return ec.getScope().getVariable(scope, node.getVariableName(), ec);
-		case EScopeSource.ID_EXTERNAL_CONTEXT:
+		case EVariableSource.ID_EXTERNAL_CONTEXT:
 			final IExternalContext ex = ec.getExternalContext().orNull();
 			if (ex == null)
 				throw new MissingExternalContextException(ec);
 			if (scope == null)
-				throw new UnresolvedVariableException(null, node.getVariableName(), ec);
+				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
 			return ex.fetchScopedVariable(scope, node.getVariableName(), ec);
-		case EScopeSource.ID_UNRESOLVED:
-			throw new UnresolvedVariableException(node.getScope(), node.getVariableName(), ec);
+		case EVariableSource.ID_UNRESOLVED:
+			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
 		default:
 			return ec.getSymbolTable()[node.getSource()].getCurrentObject();
 		}
@@ -561,10 +545,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			// Iterating for loop
 			final NonNullIterator<ALangObject> it = jjtAccept(node, children[0], ec).getIterable(ec).iterator();
 			forloop: while (it.hasNext()) {
-				//TODO check if makes sense
-				if (node.getSource() == EScopeSource.ID_UNRESOLVED)
-					throw new UnresolvedVariableException(null, node.getIteratingLoopVariable(), ec);
-				ec.getSymbolTable()[node.getSource()].setCurrentObject(it.next());
+				setSimpleVariable(node, it.next(), ec);
 				res = jjtAccept(node, children[1], ec);
 				// Handle break, continue, return.
 				if (mustJump) {
@@ -624,14 +605,14 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			// Try branch, no explicit check for mustJump as it returns
 			// immediately anyway
 			res = jjtAccept(node, children[0], ec);
-		} catch (final CatchableEvaluationException e) {
+		}
+		catch (final CatchableEvaluationException e) {
 			exception = e;
 		}
 		// If mustJump is true, break/continue/return was the last statement
 		// evaluated and no exception could have been thrown.
 		if (exception != null) {
-			final ALangObject e = ExceptionLangObject.create(exception, ec);
-			ec.getBinding().setVariable(node.getErrorVariableName(), e);
+			setSimpleVariable(node, ExceptionLangObject.create(exception, ec), ec);
 			// Catch branch, no explicit check for mustJump as it returns
 			// immediately anyway
 			res = jjtAccept(node, children[1], ec);
@@ -770,7 +751,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTWithClauseNode node) throws EvaluationException {
-		// Evaluate block.
+		// Need not do anything as variables are already resolved.
 		// Need not check for must jump as we return immediately anyway.
 		return jjtAccept(node, node.getBodyNode(), ec);
 	}
@@ -896,8 +877,10 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTVariableDeclarationClauseNode node) throws EvaluationException {
-		// TODO visit children? set variable?
-		throw new RuntimeException("TODO - not yet implemented");
+		final Node n = node.getAssignmentNode();
+		if (n != null)
+			return setSimpleVariable(node, n.jjtAccept(this), ec);
+		return NullLangObject.getInstance();
 	}
 
 	@Override
@@ -916,5 +899,58 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTScopeGlobalNode node) throws EvaluationException {
 		throw new UncatchableEvaluationException(ec,
 				NullUtil.format(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
+	}
+
+	/**
+	 * Evaluates the given node as a complete program or template with the given
+	 * context. This method itself may be used by multiple threads, however, the
+	 * node and evaluation context passed require external synchronization.
+	 * Usually you would create a new evaluation context for each evaluation or
+	 * get one from a pool so that it is not shared by multiple thread.
+	 * {@link Node} is not muted anymore after parsing finishes (,but the class
+	 * is not principally immutable).
+	 *
+	 * @param node
+	 *            Node to evaluate.
+	 * @param scopeDefs The definitions for global and manually scoped variables. 
+	 * @param ec
+	 *            Evaluation context to use.
+	 * @return The evaluated result.
+	 * @throws EvaluationException
+	 *             When the code cannot be evaluated.
+	 */
+	@Nonnull
+	public static ALangObject evaluateCode(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
+			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+		final EvaluateVisitor v = new EvaluateVisitor(ec);
+		final ALangObject res;
+		final Optional<IExternalContext> ex = ec.getExternalContext();
+		if (ex.isPresent())
+			ex.get().beginWriting();
+		try {
+			v.applyScopeDefs(scopeDefs);
+			res = node.jjtAccept(v);
+		}
+		finally {
+			if (ex.isPresent())
+				ex.get().finishWriting();
+		}
+		v.assertNoJumps();
+		v.reinit();
+		return res;
+	}
+
+	// TODO create compile time constant check visitor and check whether header var declarations are constant
+	private void applyScopeDefs(@Nonnull final IScopeDefinitions scopeDefs) throws EvaluationException {
+		applyAll(scopeDefs.getGlobal());
+		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
+			applyAll(coll);
+	}
+	
+	private void applyAll(final Collection<IHeaderNode> coll) throws EvaluationException {
+		for (final IHeaderNode header : coll) {
+			if (header.hasNode())
+				ec.getSymbolTable()[header.getSource()].setCurrentObject(header.getNode().jjtAccept(this));
+		}
 	}
 }

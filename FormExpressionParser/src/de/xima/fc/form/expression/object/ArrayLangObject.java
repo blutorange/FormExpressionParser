@@ -20,7 +20,6 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class ArrayLangObject extends ALangObject {
-	private static final long serialVersionUID = 1L;
 	@Nonnull private final List<ALangObject> value;
 	private ArrayLangObject(@Nonnull final List<ALangObject> value) {
 		super(Type.ARRAY);

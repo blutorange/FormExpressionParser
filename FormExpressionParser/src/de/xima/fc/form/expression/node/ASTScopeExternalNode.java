@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 public class ASTScopeExternalNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	@Nonnull
-	private String scopeName = CmnCnst.NonnullConstant.EMPTY_STRING;
+	private String scopeName = CmnCnst.NonnullConstant.STRING_EMPTY;
 
 	public ASTScopeExternalNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

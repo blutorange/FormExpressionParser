@@ -101,15 +101,9 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 				if (thisContext.functionValue().getThisContextType() != thiz.getType())
 					throw new IllegalThisContextException(thiz, thisContext.functionValue().getThisContextType(),
 							thisContext.functionValue(), ec);
-				ec.getBinding().nestLocal(ec);
-				try {
-					if (args.length > 1)
-						return thisContext.functionValue().evaluate(ec, thiz, args[1].coerceArray(ec).toArray());
-					return thisContext.functionValue().evaluate(ec, thiz);
-				}
-				finally {
-					ec.getBinding().unnest(ec);
-				}
+				if (args.length > 1)
+					return thisContext.functionValue().evaluate(ec, thiz, args[1].coerceArray(ec).toArray());
+				return thisContext.functionValue().evaluate(ec, thiz);
 			}
 		},
 		call("args", "thisContext") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -121,15 +115,9 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 				if (thisContext.functionValue().getThisContextType() != thiz.getType())
 					throw new IllegalThisContextException(thiz, thisContext.functionValue().getThisContextType(),
 							thisContext.functionValue(), ec);
-				ec.getBinding().nestLocal(ec);
-				try {
-					if (args.length > 1)
-						return thisContext.functionValue().evaluate(ec, thiz, Arrays.copyOfRange(args, 1, args.length));
-					return thisContext.functionValue().evaluate(ec, thiz);
-				}
-				finally {
-					ec.getBinding().unnest(ec);
-				}
+				if (args.length > 1)
+					return thisContext.functionValue().evaluate(ec, thiz, Arrays.copyOfRange(args, 1, args.length));
+				return thisContext.functionValue().evaluate(ec, thiz);
 			}
 		};
 

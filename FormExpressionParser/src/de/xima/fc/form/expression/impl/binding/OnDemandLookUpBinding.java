@@ -24,16 +24,13 @@ public class OnDemandLookUpBinding<T> extends LookUpBinding<T> {
 		this(DEFAULT_NESTING_DEPTH);
 	}
 
-	public OnDemandLookUpBinding(final int nestingDepth) {
-		this(nestingDepth, new HashMap<String, T>());
-	}
-
 	@SuppressWarnings("unchecked")
-	protected OnDemandLookUpBinding(int nestingDepth, final Map<String, T> globalVariables) {
-		if (nestingDepth < 1) nestingDepth = 1;
+	public OnDemandLookUpBinding(int nestingDepth) {
+		if (nestingDepth < 1)
+			nestingDepth = 1;
 		breakpointArray = new boolean[nestingDepth];
 		mapArray = new Map[nestingDepth];
-		mapArray[0] = globalVariables;
+		mapArray[0] = new HashMap<String, T>();
 		currentDepth = 0;
 	}
 

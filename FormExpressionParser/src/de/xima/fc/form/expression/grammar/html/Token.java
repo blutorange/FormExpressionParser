@@ -97,14 +97,14 @@ public class Token implements java.io.Serializable {
 	 * No-argument constructor
 	 */
 	public Token() {
-		this(0,CmnCnst.NonnullConstant.EMPTY_STRING);
+		this(0,CmnCnst.NonnullConstant.STRING_EMPTY);
 	}
 
 	/**
 	 * Constructs a new token for the specified Image.
 	 */
 	public Token(final int kind) {
-		this(kind, CmnCnst.NonnullConstant.EMPTY_STRING);
+		this(kind, CmnCnst.NonnullConstant.STRING_EMPTY);
 	}
 
 	/**

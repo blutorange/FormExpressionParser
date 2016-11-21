@@ -17,7 +17,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 public class ASTIdentifierNameNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	@Nonnull private String name = CmnCnst.NonnullConstant.EMPTY_STRING;
+	@Nonnull private String name = CmnCnst.NonnullConstant.STRING_EMPTY;
 
 	public ASTIdentifierNameNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

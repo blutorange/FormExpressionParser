@@ -1,10 +1,13 @@
 package de.xima.fc.form.expression.test.lang;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalExternalScopeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.lang.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
@@ -21,51 +24,45 @@ enum SyntaxFailure implements ITestCase {
 	TEST008("^|n};","Encountered \" \"^\" \"^ \"\" at line 1, column 1."),
 	TEST009("with (foo bar) foobar;","Encountered \" <Identifier> \"bar \"\" at line 1, column 11."),
 	TEST010("foo()%]", "Embedded blocks are not allowed."),
-	TEST011("foo=bar;/*unclosed", "Lexical error at line 1, column 19.  Encountered: <EOF> after : \"\"", TokenMgrError.class),
+	TEST011(new Cfg("foo=bar;/*unclosed").err("Lexical error at line 1, column 19.  Encountered: <EOF> after : \"\"").err(TokenMgrError.class)),
 	TEST012("#foobar#q;", "Encountered \" <Identifier> \"q \"\" at line 1, column 9."),
 	TEST013("#(\\d+#", "Encountered invalid regex at line 1, column 1: Unclosed group near index 4"),
 	TEST014("42 = 42;", "Encountered illegal LVALUE ASTNumberNode in assignment at line 1, column 1."),
-	TEST015("\"\\\";", "Lexical error at line 1, column 5.  Encountered: <EOF> after : \"\\\"\\\\\\\";\"", TokenMgrError.class),
+	TEST015(new Cfg("\"\\\";").err("Lexical error at line 1, column 5.  Encountered: <EOF> after : \"\\\"\\\\\\\";\"").err(TokenMgrError.class)),
 	TEST016("++(1+2);", "Encountered illegal LVALUE ASTParenthesisExpressionNode in prefix operation at line 1, column 1."),
 	TEST017("++a.b();", "Encountered illegal LVALUE (function call) ASTPropertyExpressionNode(null,NONE,1:3-1:7) in prefix operation at line 1, column 1."),
 	TEST018("++--a;", "Encountered illegal LVALUE ASTUnaryExpressionNode in prefix operation at line 1, column 1."),
 	TEST019("if (true) require scope math;", "Encountered \" \"require\" \"require \"\" at line 1, column 11."),
 	TEST020("scoped::var.works['great']();", "Encountered \" \"var\" \"var \"\" at line 1, column 9."),
 	TEST021("a = var b = c;", "Encountered \" \"var\" \"var \"\" at line 1, column 5."),
+	TEST022(new Cfg("var i = i;").err("Variable unresolvable.").err(VariableNotResolvableException.class)),
+	TEST023(new Cfg("require scope math;math::pi=42;").err("Variable unresolvable.").err(IllegalExternalScopeAssignmentException.class)),
 
-	TEMPLATE001("<foo>[% i = %]</foo> [% 42; %]", ETestType.TEMPLATE,"Encountered \" \"%]\" \"%] \"\" at line 1, column 13."),
-	TEMPLATE002("<foo>[% i = 0;", ETestType.TEMPLATE,"Final code block in templates must be closed."),
-	TEMPLATE003("<foo> [% foo(); <bar>", ETestType.TEMPLATE,"Encountered \" \"<\" \"< \"\" at line 1, column 17."),
+	STRICT001(new Cfg("a = b").err("Variable use before declaration in strict mode.").strict()),
+
+	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.")),
+	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.")),
+	TEMPLATE003(new Cfg("<foo> [% foo(); <bar>").template().err("Encountered \" \"<\" \"< \"\" at line 1, column 17.")),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;
 	@Nonnull private final EContextType context;
-	private final String errorBegin;
-	private final Class<? extends Throwable> errorClass;
-
-	private SyntaxFailure(@Nonnull final String code) {
-		this(code, ETestType.PROGRAM, null);
+	@Nullable private final String errorBegin;
+	@Nullable private final Class<? extends Throwable> errorClass;
+	private final boolean strictMode;
+	
+	private SyntaxFailure(@Nonnull final String code, @Nonnull final String errMsg) {
+		this(new Cfg(code).err(errMsg));
 	}
-	private SyntaxFailure(@Nonnull final String code, final String errorBegin) {
-		this(code, ETestType.PROGRAM, errorBegin);
+	private SyntaxFailure(final Cfg cfg) {
+		this.code = cfg.code;
+		this.type = cfg.type;
+		this.errorBegin = cfg.errMsg;
+		this.context = cfg.context;
+		this.errorClass = cfg.errClass;
+		this.strictMode = cfg.strict;
 	}
-	private SyntaxFailure(@Nonnull final String code, final String errorBegin, final Class<? extends Throwable> errorClass) {
-		this(code, ETestType.PROGRAM, errorBegin, EContextType.GENERIC, errorClass);
-	}
-	private SyntaxFailure(@Nonnull final String code, @Nonnull final ETestType type) {
-		this(code, type, null);
-	}
-	private SyntaxFailure(@Nonnull final String code, @Nonnull final ETestType type, final String errorBegin) {
-		this(code, type, errorBegin, EContextType.GENERIC, ParseException.class);
-	}
-	private SyntaxFailure(@Nonnull final String code, @Nonnull final ETestType type, final String errorBegin, @Nonnull final EContextType context, final Class<? extends Throwable> errorClass) {
-		this.code = code;
-		this.type = type;
-		this.errorBegin = errorBegin;
-		this.context = context;
-		this.errorClass = errorClass;
-	}
-
+	
 	@Override
 	public String getErrorBegin() {
 		return errorBegin;
@@ -99,5 +96,10 @@ enum SyntaxFailure implements ITestCase {
 	@Override
 	public Class<? extends Throwable> getExpectedException() {
 		return errorClass;
+	}
+	
+	@Override
+	public boolean isUseStrictMode() {
+		return strictMode;
 	}
 }

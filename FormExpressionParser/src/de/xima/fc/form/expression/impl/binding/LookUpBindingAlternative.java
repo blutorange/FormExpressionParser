@@ -48,7 +48,7 @@ public class LookUpBindingAlternative<T> implements IBinding<T> {
 		// Enlarge array
 		if (currentDepth >= array.length)
 			map.put(name, array = Arrays.copyOf(array, 2*currentDepth+1));
-		for (int i = currentDepth; i > 0 && !breakpoints[i]; --i)
+		for (int i = currentDepth; i >= 0 && !breakpoints[i]; --i)
 			if (array[i] != null) return array[i];
 		return null;
 	}
@@ -97,15 +97,17 @@ public class LookUpBindingAlternative<T> implements IBinding<T> {
 		final T[] array = map.get(name);
 		if (array == null)
 			return false;
-		return array[currentDepth] != null;
+		return currentDepth < array.length && array[currentDepth] != null;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void defineVariable(final String name, final T object) {
 		T[] array = map.get(name);
-		if (array == null)
+		if (array == null) {
 			array = (T[])new Object[2*currentDepth+1];
+			map.put(name, array);
+		}
 		// Enlarge breakpoint array
 		if (currentDepth >= breakpoints.length)
 			breakpoints = Arrays.copyOf(breakpoints, 2*currentDepth);
@@ -128,5 +130,5 @@ public class LookUpBindingAlternative<T> implements IBinding<T> {
 			else
 				unnest();
 		}
-	}
+	}	
 }

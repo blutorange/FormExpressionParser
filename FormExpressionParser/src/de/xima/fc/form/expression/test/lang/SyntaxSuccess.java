@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.lang.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
@@ -47,15 +48,15 @@ enum SyntaxSuccess implements ITestCase {
 	TEST035("myscope::myvar;"),
 	TEST036("scoped::variable.works['great']();"),
 	TEST037("foo::bar = baz = 'hello';"),
-	TEST038("<foo></foo>", ETestType.TEMPLATE),
-	TEST039("<foo>[% a+b;%]</foo>", ETestType.TEMPLATE),
-	TEST040("<foo>[% a+b;%]", ETestType.TEMPLATE),
-	TEST041("[% a+b;%]", ETestType.TEMPLATE),
-	TEST042("<foo>[% for(i:10) { %]</foo>[% k+1;%]<bar/>[% } %]", ETestType.TEMPLATE),
-	TEST043("<foo>[%i=0;%][%j=0;%]</foo>", ETestType.TEMPLATE),
-	TEST044("<foo>[%42%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
-	TEST045("<foo>[%42;%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
-	TEST046("<foo>[%{4:5}.b.c[0].d()%]</foo>", ETestType.TEMPLATE, EContextType.FORMCYCLE),
+	TEST038(new Cfg("<foo></foo>").template()),
+	TEST039(new Cfg("<foo>[% a+b;%]</foo>").template()),
+	TEST040(new Cfg("<foo>[% a+b;%]").template()),
+	TEST041(new Cfg("[% a+b;%]").template()),
+	TEST042(new Cfg("<foo>[% for(i:10) { %]</foo>[% k+1;%]<bar/>[% } %]").template()),
+	TEST043(new Cfg("<foo>[%i=0;%][%j=0;%]</foo>").template()),
+	TEST044(new Cfg("<foo>[%42%]</foo>").template().fc()),
+	TEST045(new Cfg("<foo>[%42;%]</foo>").template().fc()),
+	TEST046(new Cfg("<foo>[%{4:5}.b.c[0].d()%]</foo>").template().fc()),
 	TEST047("foo=bar;/*+&*/bar=foo;"),
 	TEST048("#regex#;"),
 	TEST049("#regex#i;"),
@@ -74,19 +75,18 @@ enum SyntaxSuccess implements ITestCase {
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;
 	@Nonnull private final EContextType context;
-
+	private final boolean strictMode;
+	
 	private SyntaxSuccess(@Nonnull final String code) {
-		this(code, ETestType.PROGRAM);
+		this(new Cfg(code));
 	}
-
-	private SyntaxSuccess(@Nonnull final String code, @Nonnull final ETestType type) {
-		this(code, type, EContextType.GENERIC);
-	}
-	private SyntaxSuccess(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final EContextType context) {
-		this.code = code;
-		this.type = type;
-		this.context = context;
-	}
+	
+	private SyntaxSuccess(@Nonnull final Cfg cfg) {
+		this.code = cfg.code;
+		this.type = cfg.type;
+		this.context = cfg.context;
+		this.strictMode = cfg.strict;
+	}	
 
 	@Override
 	public ETestType getTestType() {
@@ -121,5 +121,10 @@ enum SyntaxSuccess implements ITestCase {
 	@Override
 	public String getErrorBegin() {
 		return null;
+	}
+
+	@Override
+	public boolean isUseStrictMode() {
+		return strictMode;
 	}
 }

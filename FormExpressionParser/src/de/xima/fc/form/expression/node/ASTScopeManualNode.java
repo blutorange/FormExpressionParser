@@ -15,7 +15,7 @@ public class ASTScopeManualNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull
-	private String scopeName = CmnCnst.NonnullConstant.EMPTY_STRING;
+	private String scopeName = CmnCnst.NonnullConstant.STRING_EMPTY;
 
 	public ASTScopeManualNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

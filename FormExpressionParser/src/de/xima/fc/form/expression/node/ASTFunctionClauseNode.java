@@ -1,27 +1,31 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
+import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
-import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTFunctionClauseNode extends ANode {
+public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvable {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull
-	private String variableName = CmnCnst.NonnullConstant.EMPTY_STRING;
-	@Nullable
-	private String scope;
+	private final GenericSourceResolvable thisResolvable = new GenericSourceResolvable(CmnCnst.Name.VARIABLE_THIS);
+	@Nonnull
+	private final GenericSourceResolvable argumentsResolvable = new GenericSourceResolvable(
+			CmnCnst.Name.VARIABLE_ARGUMENTS);
+	@Nonnull
+	private GenericSourceResolvable[] argResolvable = CmnCnst.NonnullConstant.EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY;
 
 	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -30,43 +34,32 @@ public class ASTFunctionClauseNode extends ANode {
 	@Override
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
-		super.init(method);
 		final ASTVariableNode var = getNthChildAs(0, ASTVariableNode.class);
-		scope = var.getScope();
-		variableName = var.getVariableName();
+		final String scope = var.getScope();
+		final String variableName = var.getVariableName();
+		super.init(method, scope, variableName);
+		argResolvable = ASTFunctionNode.getArgs(this);
 	}
 
 	@Nonnull
 	public Node getFunctionNameNode() {
 		return jjtGetChild(0);
 	}
-	
+
+	@Override
 	@Nonnull
 	public Node getBodyNode() {
-		return jjtGetChild(jjtGetNumChildren()-1);
-	}
-	
-	public int getArgumentCount() {
-		return jjtGetNumChildren()-2;
-	}
-	
-	@Nonnull
-	public String getCanonicalName() {
-		return scope != null ? scope + Syntax.SCOPE_SEPARATOR + variableName : variableName;
+		return jjtGetChild(jjtGetNumChildren() - 1);
 	}
 
-	@Nullable
-	public String getScope() {
-		return scope;
-	}
-	
 	@Nonnull
-	public String getVariableName() {
-		return variableName;
+	public String getCanonicalName() {
+		return getScope() != null ? getScope() + Syntax.SCOPE_SEPARATOR + getVariableName() : getVariableName();
 	}
 
 	@Override
-	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor,
+			final T data) throws E {
 		return visitor.visit(this, data);
 	}
 
@@ -76,7 +69,8 @@ public class ASTFunctionClauseNode extends ANode {
 	}
 
 	@Override
-	public <T, E extends Throwable> void jjtAccept(final IFormExpressionVoidDataVisitor<T, E> visitor, final T data) throws E {
+	public <T, E extends Throwable> void jjtAccept(final IFormExpressionVoidDataVisitor<T, E> visitor, final T data)
+			throws E {
 		visitor.visit(this, data);
 	}
 
@@ -85,9 +79,24 @@ public class ASTFunctionClauseNode extends ANode {
 		visitor.visit(this);
 	}
 
-	public Node getArgumentNode(final int i) throws ArrayIndexOutOfBoundsException {
-		if (i>=getArgumentCount())
-			throw new ArrayIndexOutOfBoundsException(NullUtil.format(CmnCnst.Error.FUNCTION_NODE_ARGUMENT_OUT_OF_BOUNDS, i, getArgumentCount()));
-		return jjtGetChild(i+1);
+	@Override
+	public final int getArgumentCount() {
+		return argResolvable.length;
+	}
+
+	@SuppressWarnings("null")
+	@Override
+	public final ISourceResolvable getArgResolvable(final int i) {
+		return argResolvable[i];
+	}
+
+	@Override
+	public ISourceResolvable getThisResolvable() {
+		return thisResolvable;
+	}
+
+	@Override
+	public ISourceResolvable getArgumentsResolvable() {
+		return argumentsResolvable;
 	}
 }
