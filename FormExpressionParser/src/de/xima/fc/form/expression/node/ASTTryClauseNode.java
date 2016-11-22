@@ -45,6 +45,11 @@ public class ASTTryClauseNode extends ASourceResolvableNode {
 		super.init(method, errorVariableName);
 	}
 	
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return nullNode();
+	}
+
 	@Nonnull
 	public Node getTryNode() {
 		return jjtGetChild(0);

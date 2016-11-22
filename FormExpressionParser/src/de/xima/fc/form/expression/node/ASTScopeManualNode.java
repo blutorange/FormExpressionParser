@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
@@ -26,6 +27,11 @@ public class ASTScopeManualNode extends ANode {
 		super.init(method);
 		if (scopeName != null)
 			this.scopeName = scopeName;
+	}
+	
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class ASTDoWhileLoopNode extends ANode  implements ILabelled {
 	}
 	
 	@Override
-	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return true;
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return nullNode();
 	}
 }

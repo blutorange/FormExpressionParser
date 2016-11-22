@@ -49,6 +49,13 @@ public class ASTWithClauseNode extends ANode {
 		super.init(method);
 		setScopes();
 	}
+	
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		if (jjtGetNumChildren() < 3)
+			throw new ArrayIndexOutOfBoundsException();
+		return i == jjtGetNumChildren() - 1 ? nullNode() : null;
+	}
 
 	public int getScopeCount() {
 		return scopes.length;
@@ -72,7 +79,7 @@ public class ASTWithClauseNode extends ANode {
 		for (int i = 0; i < scopes.length; ++i)
 			scopes[i] = getNthChildAs(i, ASTIdentifierNameNode.class).getName();
 		for (int i = scopes.length; i --> 0;)
-			removeChild(i);
+			clearChild(i);
 	}
 
 	public String getScope(final int i) {

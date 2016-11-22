@@ -197,7 +197,7 @@ public interface Node extends Serializable, ITraceElement {
 	 * Removes the child at the given index. Does nothing if the index is out-of-bounds.
 	 * @param i Index of the child to remove.
 	 */
-	public void removeChild(int i);
+	public void clearChild(int i);
 
 	/**
 	 * @param clazz Class to cast this node to.
@@ -208,4 +208,11 @@ public interface Node extends Serializable, ITraceElement {
 
 	@Nonnull
 	public String getNodeName();
+
+	/**
+	 * @param nodeType Type to check against.
+	 * @return Whether this node is of the specified type.
+	 * @see FormExpressionParserTreeConstants
+	 */
+	public boolean isA(int jjtvariablenode);
 }

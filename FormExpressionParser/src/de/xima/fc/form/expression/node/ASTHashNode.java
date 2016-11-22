@@ -4,9 +4,10 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -41,5 +42,10 @@ public class ASTHashNode extends ANode {
 		assertChildrenEven();
 		super.init(method);
 	}
-
+		
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		removeChildUnconditionally(i % 2 == 0 ? i + 1 : i - 1);
+		return null;
+	}
 }

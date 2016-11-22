@@ -86,6 +86,7 @@ public abstract class ANode implements Node {
 		this.beginLine = prototype.getStartLine();
 		this.endColumn = prototype.getEndColumn();
 		this.endLine = prototype.getEndLine();
+		this.siblingMethod = prototype.getSiblingMethod();
 	}
 
 
@@ -93,18 +94,18 @@ public abstract class ANode implements Node {
 	// However, note that the files that call this method are
 	// generated automatically by javacc.
 	@Override
-	public void jjtOpen() {
+	public final void jjtOpen() {
 	}
 
 	// For performance, calls to this method may be removed.
 	// However, note that the files that call this method are
 	// generated automatically by javacc. @Override
 	@Override
-	public void jjtClose() {
+	public final void jjtClose() {
 	}
 
 	@Override
-	public void jjtSetParent(final Node n) {
+	public final void jjtSetParent(final Node n) {
 		parent = n;
 	}
 
@@ -113,19 +114,17 @@ public abstract class ANode implements Node {
 	 * @see FormExpressionParserTreeConstants
 	 */
 	@Override
-	public int jjtGetNodeId() {
+	public final int jjtGetNodeId() {
 		return nodeId;
 	}
 
 	@Override
-	public Node jjtGetParent() {
-		// throw new UnsupportedOperationException("Getting parents has not been
-		// neccessary as of now, uncomment to enable.");
+	public final Node jjtGetParent() {
 		return parent;
 	}
 
 	@Override
-	public void jjtAddChild(@Nonnull final Node n, final int i) {
+	public final void jjtAddChild(@Nonnull final Node n, final int i) {
 		if (i >= children.length) {
 			final Node c[] = new Node[i + 1];
 			System.arraycopy(children, 0, c, 0, children.length);
@@ -137,12 +136,12 @@ public abstract class ANode implements Node {
 	@SuppressWarnings("null") // checked in method addChild
 	@Nonnull
 	@Override
-	public Node jjtGetChild(final int i) throws ArrayIndexOutOfBoundsException {
+	public final Node jjtGetChild(final int i) throws ArrayIndexOutOfBoundsException {
 		return children[i];
 	}
 
 	@Override
-	public int jjtGetNumChildren() {
+	public final int jjtGetNumChildren() {
 		return children.length;
 	}
 
@@ -172,23 +171,27 @@ public abstract class ANode implements Node {
 	 * @return A unique ID for this node.
 	 */
 	@Override
-	public int getId() {
+	public final int getId() {
 		return uniqueId;
 	}
 
+	/**
+	 * @deprecated Use {@link #jjtGetChild(int)} and {@link #jjtGetNumChildren()}
+	 */
 	@Nonnull
 	@Override
-	public Node[] getChildArray() {
+	@Deprecated
+	public final Node[] getChildArray() {
 		return children;
 	}
 
 	@Override
-	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start) throws ParseException {
+	public final <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start) throws ParseException {
 		return getChildArrayAs(clazz, start, children.length - 1);
 	}
 
 	@Override
-	public <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start, int end) throws ParseException {
+	public final <T extends Node> T[] getChildArrayAs(final Class<T> clazz, final int start, int end) throws ParseException {
 		if (end < start)
 			end = start;
 		@SuppressWarnings("unchecked")
@@ -205,20 +208,21 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public <T extends Node> T getNthChildAs(final int index, final Class<T> clazz) throws ParseException {
-		final Node n = children[0];
+	public final <T extends Node> T getNthChildAs(final int index, final Class<T> clazz) throws ParseException {
+		final Node n = children[index];
 		if (!clazz.isAssignableFrom(n.getClass()))
-			throw new ParseException(String.format(CmnCnst.Error.NODE_INCORRECT_TYPE, n.getClass().getSimpleName(), clazz.getSimpleName()));
+			throw new ParseException(String.format(CmnCnst.Error.NODE_INCORRECT_TYPE, n.getClass().getSimpleName(),
+					clazz.getSimpleName()));
 		return clazz.cast(n);
 	}
 
 	@Override
-	public <T extends Node> T getNthChildAsOrNull(final int index, @Nonnull final Class<T> clazz) {
+	public final <T extends Node> T getNthChildAsOrNull(final int index, @Nonnull final Class<T> clazz) {
 		return children[index].getAsOrNull(clazz);
 	}
 
 	@Override
-	public <T extends Node> T getAsOrNull(@Nonnull final Class<T> clazz) {
+	public final <T extends Node> T getAsOrNull(@Nonnull final Class<T> clazz) {
 		if (!clazz.isAssignableFrom(getClass()))
 			return null;
 		return clazz.cast(this);
@@ -226,7 +230,7 @@ public abstract class ANode implements Node {
 
 	@Override
 	@Nullable
-	public Node getLastChildOrNull() {
+	public final Node getLastChildOrNull() {
 		if (children.length == 0)
 			return null;
 		return children[children.length - 1];
@@ -234,7 +238,7 @@ public abstract class ANode implements Node {
 
 	@Override
 	@Nullable
-	public Node getFirstChildOrNull() {
+	public final Node getFirstChildOrNull() {
 		if (children.length == 0)
 			return null;
 		return children[0];
@@ -242,7 +246,7 @@ public abstract class ANode implements Node {
 
 	@SuppressWarnings("null") // already checked when setting children
 	@Override
-	public Node getFirstChild() throws ParseException {
+	public final Node getFirstChild() throws ParseException {
 		if (children.length == 0)
 			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN);
 		return children[0];
@@ -250,19 +254,19 @@ public abstract class ANode implements Node {
 
 	@SuppressWarnings("null") // already checked when setting children
 	@Override
-	public Node getLastChild() throws ParseException {
+	public final Node getLastChild() throws ParseException {
 		if (children.length == 0)
 			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN);
 		return children[children.length-1];
 	}
 
 	@Override
-	public EMethod getSiblingMethod() {
+	public final EMethod getSiblingMethod() {
 		return siblingMethod;
 	}
 
 	@Override
-	public void assertChildrenBetween(final int atLeast, final int atMost) throws ParseException {
+	public final void assertChildrenBetween(final int atLeast, final int atMost) throws ParseException {
 		if (children.length < atLeast || children.length > atMost)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_BETWEEN,
@@ -270,7 +274,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void assertChildrenExactly(final int count) throws ParseException {
+	public final void assertChildrenExactly(final int count) throws ParseException {
 		if (children.length != count)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_EXACTLY,
@@ -278,7 +282,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void assertChildrenExactlyOneOf(final int count1, final int count2) throws ParseException {
+	public final void assertChildrenExactlyOneOf(final int count1, final int count2) throws ParseException {
 		if (children.length != count1 && children.length != count2)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_EXACTLY_ONE_OF,
@@ -286,7 +290,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void assertChildrenAtLeast(final int count) throws ParseException {
+	public final void assertChildrenAtLeast(final int count) throws ParseException {
 		if (children.length < count)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_AT_LEAST,
@@ -294,7 +298,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void assertChildrenAtMost(final int count) throws ParseException {
+	public final void assertChildrenAtMost(final int count) throws ParseException {
 		if (children.length > count)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_AT_MOST,
@@ -302,7 +306,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void assertChildrenEven() throws ParseException {
+	public final void assertChildrenEven() throws ParseException {
 		if ((children.length & 1) != 0)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_NOT_EVEN,
@@ -310,7 +314,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void assertChildrenOdd() throws ParseException {
+	public final void assertChildrenOdd() throws ParseException {
 		if ((children.length & 1) != 1)
 			throw new ParseException(String.format(
 					CmnCnst.Error.NODE_COUNT_NOT_ODD,
@@ -338,20 +342,20 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public void jjtSetFirstToken(final Token token) {
+	public final void jjtSetFirstToken(final Token token) {
 		beginLine = token.beginLine;
 		beginColumn = token.beginColumn;
 	}
 
 	@Override
-	public void jjtSetLastToken(final Token token) {
+	public final void jjtSetLastToken(final Token token) {
 		endLine = token.endLine;
 		endColumn = token.endColumn;
 	}
 
 	@Nonnull
 	@Override
-	public String getMethodName() {
+	public final String getMethodName() {
 		if (this instanceof ASTFunctionClauseNode) {
 			return ((ASTFunctionClauseNode) this).getCanonicalName();
 		} else if (this instanceof ASTFunctionNode) {
@@ -387,7 +391,7 @@ public abstract class ANode implements Node {
 	 * @param assignType Type of assignment, for the error message.
 	 * @throws ParseException When any children in the range [from,to) are not assignable.
 	 */
-	protected void assertChildrenAssignable(final int from, final int to, final String assignType) throws ParseException {
+	protected final void assertChildrenAssignable(final int from, final int to, final String assignType) throws ParseException {
 		for (int i = from; i < to; ++i) {
 			switch (children[i].jjtGetNodeId()) {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
@@ -419,7 +423,7 @@ public abstract class ANode implements Node {
 
 	@Override
 	@Nonnull
-	public <T> T assertNonNull(@Nullable final T object, @Nonnull final String errMessage) throws ParseException {
+	public final <T> T assertNonNull(@Nullable final T object, @Nonnull final String errMessage) throws ParseException {
 		if (object == null)
 			throw new ParseException(errMessage);
 		return object;
@@ -431,7 +435,7 @@ public abstract class ANode implements Node {
 		if (p != null) {
 			for (int i = p.jjtGetNumChildren(); i --> 0;) {
 				if (p.jjtGetChild(i).getId() == uniqueId) {
-					p.removeChild(i);
+					p.clearChild(i);
 					parent = null;
 					return this;
 				}
@@ -441,12 +445,20 @@ public abstract class ANode implements Node {
 		return this;
 	}
 
+	/**
+	 * Clears the child at the given index, either by removing it
+	 * completely or replacing it with an appropriate empty node.
+	 * Furthermore, other children may be removed or changed
+	 * for some node types.
+	 * @param i Child to clear.
+	 */
 	@SuppressWarnings("null") // ArrayUtils.remove does not return null.
 	@Override
-	public final void removeChild(final int i) {
+	public final void clearChild(final int i) {
 		if (i >= 0 && i < children.length) {
-			if (replaceWithEmptyOnChildRemoval(i)) {
-				children[i] = new ASTEmptyNode(this);
+			final Node replacement = replacementOnChildRemoval(i);
+			if (replacement != null) {
+				children[i] = replacement;
 				children[i].jjtSetParent(this);
 			}
 			else {
@@ -455,11 +467,50 @@ public abstract class ANode implements Node {
 			}
 		}
 	}
+	
+	@Override
+	public final boolean isA(final int nodeType) {
+		return this.nodeId == nodeType;
+	}
 
 	/**
+	 * Only to be used by subclasses overriding {@link #replacementOnChildRemoval(int)}
+	 * when they need to remove other children as well (to prevent recursion).
 	 * @param i Child to remove.
+	 */
+	@SuppressWarnings("null") // ArrayUtils.remove does not return null.
+	protected final void removeChildUnconditionally(final int i) {
+		if (i >= 0 && i < children.length) {
+			children[i].jjtSetParent(null);
+			children = ArrayUtils.remove(children, i);
+		}
+	}
+	
+	/** @return A newly created empty node. */
+	protected final Node nullNode() {
+		return new ASTNullNode(this);
+	}
+	
+	/** @return A newly created empty node. */
+	protected final Node emptyNode() {
+		return new ASTEmptyNode(this);
+	}
+
+	/** @return A newly created string node for the empty string. */
+	@Nonnull
+	protected final Node emptyStringNode() {
+		return new ASTStringNode(this);
+	}
+
+	/**
+	 * Nodes may choose to replace the child with some other (empty) node
+	 * instead of removing the child to keep when clearing a child.
+	 * They may also have to remove or replace other children.
+	 * @param i Child to remove/clear.
 	 * @return Whether to replace the child with an empty node instead of removing it.
 	 * @throws ArrayIndexOutOfBoundsException When removal is not allowed under any circumstances.
+	 * @see #clearChild(int)
 	 */
-	protected abstract boolean replaceWithEmptyOnChildRemoval(int i) throws ArrayIndexOutOfBoundsException;
+	@Nullable
+	protected abstract Node replacementOnChildRemoval(int i) throws ArrayIndexOutOfBoundsException;	
 }

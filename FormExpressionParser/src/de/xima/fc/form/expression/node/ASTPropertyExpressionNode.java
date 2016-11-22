@@ -4,9 +4,10 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -21,6 +22,13 @@ public class ASTPropertyExpressionNode extends ANode {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(2);
 		super.init(method);
+	}
+
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		if (jjtGetNumChildren() < 3)
+			throw new ArrayIndexOutOfBoundsException();
+		return null;
 	}
 
 	@Override

@@ -24,6 +24,11 @@ public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode {
 		assertChildrenAtMost(1);
 		super.init(method, variableName);
 	}
+	
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
+	}
 
 	@Override
 	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {

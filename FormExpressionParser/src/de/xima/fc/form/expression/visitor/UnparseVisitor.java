@@ -104,6 +104,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	private IComment commentToken;
 	private int commentPos;
 
+	private boolean insideManualDefs;
+
 	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
 			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final ImmutableList<IComment> comments)
 			throws IOException {
@@ -183,6 +185,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		final String next = prefix + config.indentPrefix;
 		if (scopeDefs.hasGlobalVariable()) {
 			writer.write(CmnCnst.Syntax.GLOBAL);
+			writer.write(config.requiredSpace);
+			writer.write(CmnCnst.Syntax.SCOPE);
 			writer.write(config.optionalSpace);
 			writer.write(CmnCnst.Syntax.BRACE_OPEN);
 			writer.write(config.linefeed);
@@ -190,13 +194,14 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			final int len = scopeDefs.getGlobal().size();
 			int i = 0;
 			for (final IHeaderNode global : scopeDefs.getGlobal()) {
-				if (!global.isFunction())
+				if (!global.isFunction()) {
 					headerNode(global, next);
-				writer.write(config.linefeed);
-				if (len != 1 && i < len - 1) {
-					writer.write(next);
+					writer.write(config.linefeed);
+					if (len != 1 && i < len - 1) {
+						writer.write(next);
+					}
+					++i;
 				}
-				++i;
 			}
 			writer.write(prefix);
 			writer.write(CmnCnst.Syntax.BRACE_CLOSE);
@@ -222,7 +227,13 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			final int len = entry.getValue().size();
 			int i = 0;
 			for (final IHeaderNode manual : entry.getValue()) {
-				headerNode(manual, next);
+				insideManualDefs = true;
+				try {
+					headerNode(manual, next);
+				}
+				finally {
+					insideManualDefs = false;
+				}
 				writer.write(config.linefeed);
 				if (len != 1 && i < len - 1) {
 					writer.write(next);
@@ -956,7 +967,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// header function foo(bar) {
 		writer.write(Syntax.FUNCTION);
 		writer.write(config.requiredSpace);
-		writer.write(node.getCanonicalName());
+		writer.write(insideManualDefs ? node.getVariableName() : node.getCanonicalName());
 		writer.write(Syntax.PAREN_OPEN);
 		for (int i = 0; i < count; ++i) {
 			writer.write(node.getArgResolvable(i).getVariableName());

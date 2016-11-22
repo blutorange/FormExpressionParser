@@ -69,8 +69,11 @@ enum SyntaxSuccess implements ITestCase {
 	TEST056("global scope{}"),
 	TEST057("global scope{var i; var j = 5+3;}"),
 	TEST058("scope myScope{var i; var j = 5+3;}"),
-	TEST059("require scope math;"),
-	TEST060("a = 8;require scope math;"),
+	TEST059("scope myScope{function foo(){}}"),
+	TEST060("require scope math;"),
+	TEST061("a = 8;require scope math;"),
+	TEST062("scope foo{var ko;}foo::ko=0;"),
+	
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

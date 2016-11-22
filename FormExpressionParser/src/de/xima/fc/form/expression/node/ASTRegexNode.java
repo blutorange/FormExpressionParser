@@ -10,6 +10,7 @@ import com.google.common.base.Preconditions;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -41,6 +42,11 @@ public class ASTRegexNode extends ANode {
 			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_REGEX,
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
+	}
+	
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 
 	@Override

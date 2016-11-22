@@ -52,7 +52,12 @@ public class ASTWhileLoopNode extends ANode implements ILabelled {
 		super.init(method);
 		this.label = label;
 	}
-
+	
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return nullNode();
+	}
+	
 	@Override
 	@Nullable
 	public String getLabel() {
@@ -67,10 +72,5 @@ public class ASTWhileLoopNode extends ANode implements ILabelled {
 	@Nonnull
 	public Node getBodyNode() {
 		return jjtGetChild(1);
-	}
-
-	@Override
-	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return true;
 	}
 }

@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -18,11 +20,20 @@ import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 public class ASTStringNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
+	@Nonnull private String stringValue = CmnCnst.NonnullConstant.STRING_EMPTY;
+
 	public ASTStringNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	@Nonnull private String stringValue = CmnCnst.NonnullConstant.STRING_EMPTY;
+	public ASTStringNode(@Nonnull final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTSTRINGNODE);
+	}
+
+	public ASTStringNode(@Nonnull final Node prototype, @Nonnull final String string) {
+		super(prototype, FormExpressionParserTreeConstants.JJTSTRINGNODE);		
+		this.stringValue = string;
+	}
 
 	/**
 	 * @param delimiter
@@ -34,6 +45,11 @@ public class ASTStringNode extends ANode {
 		super.init(method);
 		final String s = parseString(value);
 		stringValue = s;
+	}
+	
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 
 	@Nonnull

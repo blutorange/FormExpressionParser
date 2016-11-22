@@ -3,13 +3,16 @@ package de.xima.fc.form.expression.impl.formexpression;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
+import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
@@ -22,16 +25,18 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.visitor.CompileTimeConstantCheckVisitor;
 import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
 
 public final class FormExpressionFactory {
-	
+
 	private FormExpressionFactory() {
 	}
 
@@ -297,6 +302,24 @@ public final class FormExpressionFactory {
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, strictMode);
 		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, strictMode);
 		final IScopeDefinitions scopeDef = scopeDefBuilder.build();
+		checkScopeDefsConstancy(scopeDef);
 		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDef, contractFactory, symbolTableSize);
+	}
+
+	private static void checkScopeDefsConstancy(final IScopeDefinitions scopeDef)
+			throws HeaderAssignmentNotCompileTimeConstantException {
+		final CompileTimeConstantCheckVisitor visitor = new CompileTimeConstantCheckVisitor();
+		checkScopeDefsConstancy(scopeDef.getGlobal(), visitor);
+		for (final Collection<IHeaderNode> coll : scopeDef.getManual().values())
+			checkScopeDefsConstancy(coll, visitor);
+	}
+
+	private static void checkScopeDefsConstancy(@Nullable final Collection<IHeaderNode> collection,
+			@Nonnull final CompileTimeConstantCheckVisitor visitor) throws HeaderAssignmentNotCompileTimeConstantException {
+		if (collection == null)
+			return;
+		for (final IHeaderNode hn : collection)
+			if (hn.hasNode() && !hn.getNode().jjtAccept(visitor))
+				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getNode());		
 	}
 }

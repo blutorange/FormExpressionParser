@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
@@ -22,9 +23,14 @@ public class ASTVariableNode extends AScopedSourceResolvableNode {
 	@Override
 	public void init(@Nullable final EMethod method, @Nullable final String scope, @Nonnull final String name)
 			throws ParseException {
-		assertChildrenAtMost(1);
+		assertChildrenExactly(0);
 		assertNonNull(name, CmnCnst.Error.VARIABLE_NODE_NULL_NAME);
 		super.init(method, scope, name);
+	}
+
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 
 	@Override

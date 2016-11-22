@@ -1,12 +1,7 @@
-require scope math;
-require scope field;
-require scope form;
-
-k = 1;
-var i = 0;
-do  {
-  function foo() {
-    return;
-  }
-} while(false);
-k;
+global scope {
+  var func = ->(a,b){a+b;};
+}
+foo::func(2,5);
+function scope1::foo() {
+}
+scope1::foo();*/

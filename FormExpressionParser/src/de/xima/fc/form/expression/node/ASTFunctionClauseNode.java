@@ -38,9 +38,18 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		final String scope = var.getScope();
 		final String variableName = var.getVariableName();
 		super.init(method, scope, variableName);
-		argResolvable = ASTFunctionNode.getArgs(this);
+		argResolvable = ASTFunctionNode.getArgs(this, 1);
 	}
 
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		if (i == 0)
+			throw new ArrayIndexOutOfBoundsException();
+		if (i != jjtGetNumChildren() -1)
+			return null;
+		return nullNode();
+	}
+	
 	@Nonnull
 	public Node getFunctionNameNode() {
 		return jjtGetChild(0);

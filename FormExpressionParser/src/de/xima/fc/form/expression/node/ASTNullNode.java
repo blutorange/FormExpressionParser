@@ -50,7 +50,7 @@ public class ASTNullNode extends ANode {
 	}
 	
 	@Override
-	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return false;
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 }

@@ -33,7 +33,12 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	public void init(final EMethod method) throws ParseException {
 		assertChildrenAtLeast(1);
 		super.init(method);
-		argResolvable = ASTFunctionNode.getArgs(this);
+		argResolvable = ASTFunctionNode.getArgs(this, 0);
+	}
+	
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return i == jjtGetNumChildren() - 1 ? nullNode() : null;
 	}
 
 	@Override
@@ -68,15 +73,15 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	}
 
 	@Nonnull
-	static GenericSourceResolvable[] getArgs(final Node node) throws ParseException {
-		final int count = node.jjtGetNumChildren()-2;
-		final GenericSourceResolvable[] argResolvable = new GenericSourceResolvable[count];
-		for (int i = 0; i < count; ++i) {
-			final ASTIdentifierNameNode argNode = node.getNthChildAs(i + 1, ASTIdentifierNameNode.class);
-			argResolvable[i] = new GenericSourceResolvable(argNode.getName());
+	static GenericSourceResolvable[] getArgs(final Node node, final int paramStartIndex) throws ParseException {
+		final int paramAfterEndIndex = node.jjtGetNumChildren() - 1;
+		final GenericSourceResolvable[] argResolvable = new GenericSourceResolvable[paramAfterEndIndex-paramStartIndex];
+		for (int i = paramStartIndex; i < paramAfterEndIndex; ++i) {
+			final ASTIdentifierNameNode argNode = node.getNthChildAs(i, ASTIdentifierNameNode.class);
+			argResolvable[i-paramStartIndex] = new GenericSourceResolvable(argNode.getName());
 		}
-		for (int i = count; i-- > 0;)
-			node.removeChild(i);
+		for (int i = paramAfterEndIndex; i-- > paramStartIndex;)
+			node.clearChild(i);
 		return argResolvable;
 	}
 

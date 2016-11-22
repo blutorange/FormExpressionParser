@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.ILabelled;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
@@ -57,7 +58,7 @@ public class ASTBreakClauseNode extends ANode implements ILabelled {
 	}
 	
 	@Override
-	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return false;
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 }

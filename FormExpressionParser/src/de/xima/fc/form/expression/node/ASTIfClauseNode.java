@@ -45,6 +45,11 @@ public class ASTIfClauseNode extends ANode {
 		super.init(method);
 	}
 	
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return i == 3 ? null : nullNode();
+	}
+	
 	@Nonnull
 	public Node getConditionNode() {
 		return jjtGetChild(0);

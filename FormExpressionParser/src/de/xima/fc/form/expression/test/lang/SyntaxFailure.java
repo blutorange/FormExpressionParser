@@ -3,7 +3,8 @@ package de.xima.fc.form.expression.test.lang;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.exception.evaluation.IllegalExternalScopeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
+import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -36,8 +37,11 @@ enum SyntaxFailure implements ITestCase {
 	TEST020("scoped::var.works['great']();", "Encountered \" \"var\" \"var \"\" at line 1, column 9."),
 	TEST021("a = var b = c;", "Encountered \" \"var\" \"var \"\" at line 1, column 5."),
 	TEST022(new Cfg("var i = i;").err("Variable unresolvable.").err(VariableNotResolvableException.class)),
-	TEST023(new Cfg("require scope math;math::pi=42;").err("Variable unresolvable.").err(IllegalExternalScopeAssignmentException.class)),
-
+	TEST024("if(false){function foo(){}}", "Encountered \" \"function\" \"function \"\" at line 1, column 11."),
+	TEST025(new Cfg("global scope {var i=0;var j=i;}j;").err("Error during parsing at line 1, column 27: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
+	TEST026(new Cfg("scope myscope{var i=0;var j=i;}j;").err("Error during parsing at line 1, column 27: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
+	TEST027(new Cfg("if(true){var i=0;}else{var j=i+3;}").err("Error during parsing at line 1, column 30: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
+	TEST028(new Cfg("require scope math;math::pi=9;").err("Cannot assign to external").err(IllegalExternalScopeAssignmentException.class)),
 	STRICT001(new Cfg("a = b").err("Variable use before declaration in strict mode.").strict()),
 
 	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.")),

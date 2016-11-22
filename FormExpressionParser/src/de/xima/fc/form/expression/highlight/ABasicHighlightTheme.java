@@ -82,7 +82,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.T
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Try;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.While;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.With;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Error;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Exception;
 
 /**
  * Groups several similar tokens and allows you to specify a style
@@ -118,7 +118,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LogError:
 		case LogInfo:
 		case LogWarn:
-		case __Error:
+		case __Exception:
 			return getStyleKeyword();
 
 		case Identifier:

@@ -6,10 +6,11 @@ import com.google.common.base.Preconditions;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
@@ -28,6 +29,11 @@ public class ASTPostUnaryExpressionNode extends ANode {
 			assertChildrenAssignable(0, 1, CmnCnst.Name.SUFFIX_OPERATION);
 		super.init(method);
 		unaryMethod = unary;
+	}
+
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		throw new ArrayIndexOutOfBoundsException();
 	}
 
 	@Override

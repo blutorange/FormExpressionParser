@@ -301,7 +301,7 @@ TOKEN :
 | 
   < Catch : "catch" >
 |
-  < __Error : "error" >
+  < __Exception : "exception" >
 | 
   < Throw : "throw" >
 | 
@@ -471,6 +471,7 @@ Node CompleteProgram(EMethod method) #StatementListNode :
       (
         ClauseOrStatement(null)
       | ScopeDefinition(null)
+      | FunctionClause(null)
       )+
       < EOF >
     )
@@ -491,6 +492,7 @@ void TemplateProgram(EMethod method) #StatementListNode :
     (
       ClauseOrStatement(null)
     | ScopeDefinition(null)
+    | FunctionClause(null)
     | LosBody(null)
     )+
   )
@@ -563,7 +565,6 @@ void ClauseOrStatement(EMethod method) #void :
   (
     ForLoop(method)
   | IfClause(method)
-  | FunctionClause(method)
   | WhileLoop(method)
   | DoWhileLoop(method)
   | SwitchClause(method)
@@ -619,7 +620,6 @@ void VariableDeclarationExpressionWithAssignment(EMethod method) #VariableDeclar
 void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
-  
 }
 {
   (
@@ -1464,8 +1464,7 @@ void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
     t = < IdentifierAfterDot >
   )
   {
-    jjtThis.init(method, t.image);
-    
+    jjtThis.init(method, t.image);    
   }
 }
 
@@ -1688,7 +1687,6 @@ void Boolean(EMethod method) #BooleanNode :
 void Log(EMethod method) #LogNode :
 {
   ELogLevel logLevel;
-  
 }
 {
   (
@@ -1713,18 +1711,16 @@ void Log(EMethod method) #LogNode :
     < ParenOpen > Expression(null) < ParenClose >
   )
   {
-    jjtThis.init(method, logLevel);
-    
+    jjtThis.init(method, logLevel);   
   }
 }
 
 void Exception(EMethod method) #ExceptionNode :
 {
-  
 }
 {
   (
-    < __Error > < ParenOpen > Expression(null) < ParenClose >
+    < __Exception > < ParenOpen > Expression(null) < ParenClose >
   )
   {
     jjtThis.init(method);

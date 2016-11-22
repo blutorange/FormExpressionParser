@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
@@ -33,6 +34,11 @@ public class ASTNumberNode extends ANode {
 			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_NUMBER, string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 		super.init(method);
+	}
+	
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
 	}
 
 	@Override
@@ -63,10 +69,4 @@ public class ASTNumberNode extends ANode {
 	public double getDoubleValue() {
 		return doubleValue;
 	}
-
-	@Override
-	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return false;
-	}
-
 }

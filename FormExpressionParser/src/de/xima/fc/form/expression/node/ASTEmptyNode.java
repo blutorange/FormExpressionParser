@@ -47,4 +47,9 @@ public class ASTEmptyNode extends ANode {
 		assertChildrenExactly(0);
 		super.init(method);
 	}
+	
+	@Override
+	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return null;
+	}
 }

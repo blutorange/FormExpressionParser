@@ -24,15 +24,15 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
-/**
- * todo
+/**TODO
  * - unparse: los nicer
+ * - fixme: check current input.fep (global scope {var func = ->(a,b){a+b;};}func(2,5);)
  * - optional variable types
- * - revise binding policy:
- *     i = 9; if (true) i = 10;
- *   This sets the outer variable i to 9. What if I want to create a new local variable that shadows the other one?
- * - Hoist global variables to the scope, same for scope.
- * - Check variable scope.
+ * - support functions inside scope defs
+ * - complain about invalid assignments to external scopes
+ * - check for used/unused variables (especially this and arguments variable in function body)
+ * - make it possible to check variables or external scopes provided by the external context for a particular external context without evaluating it
+ *   => for example to check whether the current form version defines all field::.. variables
  */
 public class FormExpressionDemo {
 	private static final boolean STRICT_MODE = false;
@@ -189,7 +189,8 @@ public class FormExpressionDemo {
 			e.printStackTrace(System.err);
 			System.exit(-1);
 			return;
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			System.err.println("Unhandled exception!!!"); //$NON-NLS-1$
 			e.printStackTrace(System.err);
 			System.exit(-1);

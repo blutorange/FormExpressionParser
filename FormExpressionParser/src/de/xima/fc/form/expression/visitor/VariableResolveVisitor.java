@@ -1,11 +1,12 @@
 package de.xima.fc.form.expression.visitor;
-
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Stack;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.EVariableSource;
+import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
@@ -18,6 +19,7 @@ import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.IScopeInfo;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -156,6 +158,22 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 				defaultScopeStack.pop();
 		}
 	}
+	
+	@Override
+	public void visit(final ASTAssignmentExpressionNode node) throws ParseException {
+		// Resolve all variables first.
+		visitChildren(node);
+		// Now check whether we assign to any variable from an external scope.
+		for (int i = 0; i < node.getAssignableNodeCount(); ++i) {
+			final ASTVariableNode var = node.getAssignableNode(i).getAsOrNull(ASTVariableNode.class);
+			if (var != null) {
+				if (var.getSource() == EVariableSource.ID_EXTERNAL_CONTEXT
+						|| var.getSource() == EVariableSource.ID_LIBRARY) {
+					throw new IllegalExternalScopeAssignmentException(var);
+				}
+			}
+		}
+	}
 
 	@Nonnull
 	private Integer getNewObjectToSet() {
@@ -169,11 +187,13 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		return object;
 	}
 
+	// TODO allow scope myscope{function(){}} syntactically
+	
 	// TODO check for illegal assignment of external scoped variables, eg
 	// field::tf1 = 8;
 
-	// TODO mark unused variables
-
+	// TODO mark unused variables	
+	
 	public static int resolve(final Node node, final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
 			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
 			final boolean treatMissingRequireScopeAsError) throws ParseException {

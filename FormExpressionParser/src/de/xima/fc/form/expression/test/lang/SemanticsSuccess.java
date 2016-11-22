@@ -107,8 +107,9 @@ enum SemanticsSuccess implements ITestCase {
 	// Variable resolution
 	RESOLUTION001("i=0;if(true)i=42;i;", Tests.N42),
 	RESOLUTION002("i=42;if(true)var i=0;i;", Tests.N42),
-	
-	// Assigment
+	RESOLUTION003("global scope{var baz='global';var t1='bug1';var t2='bug2';}scope foo{var baz='foo';}scope bar{var baz='bar';}if(true){var baz='bug';t1='';}function foobar(){var baz='bug3';t2='';};foobar();baz+foo::baz+bar::baz+t1+t2;", StringLangObject.create("globalfoobar")),
+
+	// Assignment
 	ASSIGNMENT001("a=0;b=23;c=19;a += b += c;",Tests.N42),
 	ASSIGNMENT002("a=[2,3,37];a[0]+=a[1]+=a[2];a;", ArrayLangObject.create(
 			NumberLangObject.create(42),

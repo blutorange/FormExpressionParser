@@ -183,7 +183,6 @@ public final class CmnCnst {
 		@Nonnull public static final String ENHANCED_FOR_LOOP_SEPARATOR = ":";
 		@Nonnull public static final String LINEFEED = "\n";
 		@Nonnull public static final String INDENT = "  ";
-		@Nonnull public static final String ERROR = "error";
 		@Nonnull public static final String TRUE = "true";
 		@Nonnull public static final String FALSE = "false";
 		@Nonnull public static final String NULL = "null";
@@ -320,6 +319,9 @@ public final class CmnCnst {
 		@Nonnull public static final String VARIABLE_SOURCE_ALREADY_RESOLVED = "Illegal attempt to resolve variable %s to %s; it was already resolved to %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String VARIABLE_SCOPE_ALREADY_RESOLVED = "Illegal attempt to resolve the scope of variable %s, it was already resolved to scope %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String DUPLICATE_LABEL = "Duplicate label %s is already in scope.";
+		@Nonnull public static final String HEADER_ASSIGNMENT_NOT_COMPILE_TIME_CONSTANT = "Illegal assignment for %s. Assignment in header definitions must be compile-time constant.";
+		@Nonnull public static final String SEMANTIC_PARSE_EXCEPTION = "Error during parsing at line %d, column %d: %s";
+		@Nonnull public static final String DUPLICATE_SCOPED_VARIABLE = "Variable %s under scope %s was already declared previously.";
 	}
 
 	public static final class ToString {
