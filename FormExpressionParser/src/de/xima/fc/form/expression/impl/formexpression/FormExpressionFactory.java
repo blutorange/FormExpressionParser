@@ -25,6 +25,7 @@ import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
@@ -291,6 +292,7 @@ public final class FormExpressionFactory {
 			@Nonnull final FormExpressionParser parser,
 			@Nonnull final IEvaluationContextContractFactory<T> contractFactory, final boolean strictMode)
 			throws ParseException {
+		JumpCheckVisitor.check(node);
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node);
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, strictMode);
 		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, strictMode);

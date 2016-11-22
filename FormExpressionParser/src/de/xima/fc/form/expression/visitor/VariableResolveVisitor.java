@@ -188,8 +188,10 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 
 	private void resolveScopeDefs() throws IllegalVariableSourceResolutionException {
 		// Global.
-		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();)
-			it.next().getValue().resolveSource(getNewObjectToSet());
+		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
+			final IHeaderNode header = it.next().getValue();
+			header.resolveSource(getNewObjectToSet());
+		}
 		// Manual scopes.
 		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
 			final String scope = it.next();

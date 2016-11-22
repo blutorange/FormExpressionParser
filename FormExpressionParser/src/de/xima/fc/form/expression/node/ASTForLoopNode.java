@@ -113,4 +113,11 @@ public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled {
 	public String getLabel() {
 		return label;
 	}
+	
+	@Override
+	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		if (isEnhancedLoop && i == 0)
+			throw new ArrayIndexOutOfBoundsException();
+		return true;
+	}
 }

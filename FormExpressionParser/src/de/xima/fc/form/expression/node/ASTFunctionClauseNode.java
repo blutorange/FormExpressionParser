@@ -99,4 +99,9 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	public ISourceResolvable getArgumentsResolvable() {
 		return argumentsResolvable;
 	}
+
+	@Nonnull
+	public ASTVariableNode getVariableNode() {
+		return (ASTVariableNode) jjtGetChild(0);
+	}
 }

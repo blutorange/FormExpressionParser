@@ -6,12 +6,13 @@ import javax.annotation.Nullable;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.parse.ILabelled;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTContinueClauseNode extends ANode {
+public class ASTContinueClauseNode extends ANode implements ILabelled {
 	private static final long serialVersionUID = 1L;
 	@Nullable private String label;
 
@@ -49,6 +50,7 @@ public class ASTContinueClauseNode extends ANode {
 		sb.append(label).append(',');
 	}
 
+	@Override
 	@Nullable
 	public String getLabel() {
 		return label;

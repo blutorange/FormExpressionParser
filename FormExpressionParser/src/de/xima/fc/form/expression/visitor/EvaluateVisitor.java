@@ -741,7 +741,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	@Override
 	public ALangObject visit(final ASTFunctionClauseNode node) throws EvaluationException {
 		final ALangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec));
-		return setVariable((ASTVariableNode) node.getFirstChildOrNull(), func, ec);
+		// no need to set this, it is done when applying scopeDefs
+		return func;//setVariable(node.getVariableNode(), func, ec);
 	}
 
 	@Override
@@ -940,6 +941,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return res;
 	}
 
+	//TODO stack trace for functions gone? (detaching function nodes)
 	// TODO create compile time constant check visitor and check whether header var declarations are constant
 	private void applyScopeDefs(@Nonnull final IScopeDefinitions scopeDefs) throws EvaluationException {
 		applyAll(scopeDefs.getGlobal());
@@ -949,8 +951,9 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	
 	private void applyAll(final Collection<IHeaderNode> coll) throws EvaluationException {
 		for (final IHeaderNode header : coll) {
-			if (header.hasNode())
+			if (header.hasNode()) {
 				ec.getSymbolTable()[header.getSource()].setCurrentObject(header.getNode().jjtAccept(this));
+			}
 		}
 	}
 }

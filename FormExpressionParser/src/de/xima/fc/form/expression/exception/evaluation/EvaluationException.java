@@ -101,7 +101,7 @@ public class EvaluationException extends Exception {
 			.append(System.lineSeparator())
 			.append(CmnCnst.Error.EVALUATION_EXCEPTION_EX)
 			.append(' ')
-			.append(ec.getExternalContext());
+			.append(ec.getExternalContext().orNull());
 			final Optional<IExternalContext> ex = ec.getExternalContext();
 			if (ex.isPresent()) {
 				sb.append('(')

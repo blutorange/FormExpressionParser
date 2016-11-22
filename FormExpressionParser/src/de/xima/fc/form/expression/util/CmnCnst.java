@@ -198,10 +198,10 @@ public final class CmnCnst {
 	public static final class Error {
 		private Error() {}
 		@Nonnull public static final String ARRAY_INDEX_OUT_OF_BOUNDS = "Index %s out of bounds for array %s.";
-		@Nonnull public static final String BREAK_CLAUSE = "Break used outside of loop or switch, or label does not match any loop or switch.";
+		@Nonnull public static final String BREAK_CLAUSE = "Break %s used outside of loop or switch, or label does not match any loop or switch.";
 		@Nonnull public static final String CANNOT_ACQUIRE_EVALUATION_CONTEXT = "Failed to acquire evaluation context.";
 		@Nonnull public static final String COERCION = "Object %s of class %s cannot be coerced to %s.";
-		@Nonnull public static final String CONTINUE_CLAUSE = "Continue used outside of loop or switch, or label does not match any loop or switch.";
+		@Nonnull public static final String CONTINUE_CLAUSE = "Continue %s used outside of loop or switch, or label does not match any loop or switch.";
 		@Nonnull public static final String CUSTOM_RUNTIME_EXCEPTION = "Custom Exception: %s";
 		@Nonnull public static final String EMBEDMENT_OUPTUT = "Failed to write output due to an I/O exception.";
 		@Nonnull public static final String ILLEGAL_ARGUMENT_VALUE = "Illegal value %s for argument %d of function %s: %s.";

@@ -45,6 +45,12 @@ public class ASTNullNode extends ANode {
 
 	@Override
 	public void init(final EMethod method) throws ParseException {
+		assertChildrenExactly(0);
 		super.init(method);
+	}
+	
+	@Override
+	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return false;
 	}
 }

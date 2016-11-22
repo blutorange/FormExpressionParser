@@ -64,7 +64,7 @@ public abstract class ANode implements Node {
 	 * @param nodeId
 	 *            Node id. Not needed (yet).
 	 */
-	public ANode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	protected ANode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
@@ -74,7 +74,7 @@ public abstract class ANode implements Node {
 		this.embedment = parser.getCurrentEmbedmentContext();
 	}
 
-	public ANode(@Nonnull final Node prototype, final int nodeId) {
+	protected ANode(@Nonnull final Node prototype, final int nodeId) {
 		// This will always provide a unique ID for each node of a
 		// parse tree, even if idProvider overflows and wraps around,
 		// unless a parse tree contains more than 2^32 nodes, which
@@ -444,7 +444,22 @@ public abstract class ANode implements Node {
 	@SuppressWarnings("null") // ArrayUtils.remove does not return null.
 	@Override
 	public final void removeChild(final int i) {
-		if (i >= 0 && i < children.length)
-			children = ArrayUtils.remove(children, i);
+		if (i >= 0 && i < children.length) {
+			if (replaceWithEmptyOnChildRemoval(i)) {
+				children[i] = new ASTEmptyNode(this);
+				children[i].jjtSetParent(this);
+			}
+			else {
+				children[i].jjtSetParent(null);
+				children = ArrayUtils.remove(children, i);
+			}
+		}
 	}
+
+	/**
+	 * @param i Child to remove.
+	 * @return Whether to replace the child with an empty node instead of removing it.
+	 * @throws ArrayIndexOutOfBoundsException When removal is not allowed under any circumstances.
+	 */
+	protected abstract boolean replaceWithEmptyOnChildRemoval(int i) throws ArrayIndexOutOfBoundsException;
 }

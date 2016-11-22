@@ -15,11 +15,13 @@ public class GenericSourceResolvable implements ISourceResolvable, Serializable 
 	public GenericSourceResolvable(@Nonnull final String name) {
 		this.name = name;
 	}
+
 	@Override
 	public void resolveSource(final int source) {
-		if (source == EVariableSource.ID_UNRESOLVED)
+		if (this.source == EVariableSource.ID_UNRESOLVED)
 			this.source = source;
 	}
+	
 	@Override
 	public int getSource() {
 		return source;

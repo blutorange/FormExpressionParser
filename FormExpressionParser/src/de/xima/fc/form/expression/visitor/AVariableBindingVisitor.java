@@ -225,7 +225,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	protected void resolveFunctions(@Nonnull final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode hn = it.next().getValue();
-			if (hn.hasNode())
+			if (hn.hasNode() && hn.isFunction())
 				hn.getNode().jjtAccept(this);
 		}
 	}

@@ -192,8 +192,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			for (final IHeaderNode global : scopeDefs.getGlobal()) {
 				if (!global.isFunction())
 					headerNode(global, next);
+				writer.write(config.linefeed);
 				if (len != 1 && i < len - 1) {
-					writer.write(config.linefeed);
 					writer.write(next);
 				}
 				++i;
@@ -223,15 +223,16 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			int i = 0;
 			for (final IHeaderNode manual : entry.getValue()) {
 				headerNode(manual, next);
+				writer.write(config.linefeed);
 				if (len != 1 && i < len - 1) {
-					writer.write(config.linefeed);
 					writer.write(next);
 				}
 				++i;
 			}
-			writer.write(config.linefeed);
 			writer.write(prefix);
 			writer.write(CmnCnst.Syntax.BRACE_CLOSE);
+			writer.write(config.linefeed);
+			writer.write(prefix);
 		}
 	}
 
@@ -303,13 +304,12 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				writer.write(CmnCnst.Syntax.VAR);
 				writer.write(config.requiredSpace);
 				writer.write(header.getVariableName());
-				writer.write(config.optionalSpace);
-				writer.write(CmnCnst.Syntax.EQUAL);
-				writer.write(config.optionalSpace);
-				if (header.hasNode())
+				if (header.hasNode()) {
+					writer.write(config.optionalSpace);
+					writer.write(CmnCnst.Syntax.EQUAL);
+					writer.write(config.optionalSpace);
 					expression(header.getNode(), prefix);
-				else
-					writer.write(CmnCnst.Syntax.NULL);
+				}
 				writer.write(CmnCnst.Syntax.SEMI_COLON);
 			}
 		}

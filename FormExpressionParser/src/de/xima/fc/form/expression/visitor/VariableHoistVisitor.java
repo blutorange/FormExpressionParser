@@ -41,8 +41,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		this.treatMissingScopeDeclarationAsError = treatMissingScopeDeclarationAsError;
 	}
 
-	@Override
-	public void visit(final ASTVariableNode node) throws ParseException {
+	private void processAssignment(final ASTVariableNode node) throws ParseException {
 		// Check if scope of scoped variable exists.
 		// If not, add the required "import", or create a new manual scope.
 		final String scope = node.getScope();
@@ -56,6 +55,13 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 				if (treatMissingScopeDeclarationAsError)
 					throw new NoSuchScopeException(scope, node);
 				scopeDefBuilder.addManual(scope, node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
+			}
+		}
+		else if (scope == null && binding.getVariable(node.getVariableName()) == null) {
+			if (!scopeDefBuilder.hasGlobal(node.getVariableName())) {
+				if (treatMissingDeclarationAsError)
+					throw new VariableUsageBeforeDeclarationException(node);
+				scopeDefBuilder.addGlobal(node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
 			}
 		}
 	}
@@ -87,6 +93,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		// Check if variable was declared locally or globally.
 		// If not, throw an error when in strict mode.
 		// Otherwise, add it as a global variable.
+
 		// We need to visit nodes in reverse order. Consider eg.
 		//   j = 0;
 		//   k = i = (k = j);
@@ -95,13 +102,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			switch (node.jjtGetChild(i).jjtGetNodeId()) {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
 				final ASTVariableNode n = (ASTVariableNode) node.jjtGetChild(i);
-				if (binding.getVariable(n.getVariableName()) == null) {
-					if (!scopeDefBuilder.hasGlobal(n.getVariableName())) {
-						if (treatMissingDeclarationAsError)
-							throw new VariableUsageBeforeDeclarationException(n);
-						scopeDefBuilder.addGlobal(n.getVariableName(), new HeaderNodeImpl(n.getVariableName(), n));
-					}
-				}
+				processAssignment(n);
 				break;
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
 				break;

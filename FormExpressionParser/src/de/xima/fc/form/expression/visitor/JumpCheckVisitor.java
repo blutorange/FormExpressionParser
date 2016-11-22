@@ -32,13 +32,13 @@ public class JumpCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Set<S
 	// Throw exception when encountering illegal jump, break, return.
 	@Override
 	public void visit(final ASTBreakClauseNode node, final Set<String> labelSet) throws SemanticsException {
-		if ((node.getLabel() == null && nullLabel <= 0) || !labelSet.contains(node.getLabel()))
+		if (node.getLabel() == null ? nullLabel <= 0 : !labelSet.contains(node.getLabel()))
 			throw new IllegalJumpClauseException(EJump.BREAK, node);
 	}
 
 	@Override
 	public void visit(final ASTContinueClauseNode node, final Set<String> labelSet) throws SemanticsException {
-		if (!labelSet.contains(node.getLabel()))
+		if (node.getLabel() == null ? nullLabel <= 0 : !labelSet.contains(node.getLabel()))
 			throw new IllegalJumpClauseException(EJump.CONTINUE, node);
 	}
 

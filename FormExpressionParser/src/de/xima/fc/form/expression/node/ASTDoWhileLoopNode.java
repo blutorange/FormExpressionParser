@@ -67,4 +67,9 @@ public class ASTDoWhileLoopNode extends ANode  implements ILabelled {
 	public Node getBodyNode() {
 		return jjtGetChild(0);
 	}
+	
+	@Override
+	protected boolean replaceWithEmptyOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return true;
+	}
 }

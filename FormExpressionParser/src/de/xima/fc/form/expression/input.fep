@@ -1,22 +1,12 @@
 require scope math;
 require scope field;
 require scope form;
-global scope {
-  var i = null;
-  var j = null;
-  var test = null;
-}
-scope myScope {
-  var i = 5 + 3;
-  var j = 10 + 2;
-}
-scope yourScope {
-  var i = 2 + 2;
-  var j = i;
-}
-foo = "".toLowerCase;
-foo.call();
-if (false) {
-  test = 9;
-}
-test = 4;
+
+k = 1;
+var i = 0;
+do  {
+  function foo() {
+    return;
+  }
+} while(false);
+k;
