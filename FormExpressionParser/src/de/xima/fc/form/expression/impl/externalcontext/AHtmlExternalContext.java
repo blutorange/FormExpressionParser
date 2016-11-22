@@ -17,13 +17,13 @@ import de.xima.fc.form.expression.grammar.html.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.html.Token;
 import de.xima.fc.form.expression.grammar.html.TokenMgrError;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.contextcommand.PositionedDocumentCommand;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public abstract class AHtmlExternalContext implements IExternalContext {
+
+public abstract class AHtmlExternalContext extends AGenericExternalContext{
 	private StringBuilder builder;
 	private List<PositionedDocumentCommand> docCommandList;
 	private int priority = 0;

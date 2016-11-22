@@ -7,14 +7,11 @@ import javax.annotation.Nonnull;
 import org.junit.Test;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
-import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 import de.xima.fc.form.expression.impl.factory.GenericEcContractFactory;
-import de.xima.fc.form.expression.object.ALangObject;
 
 @SuppressWarnings("nls")
 public class HtmlDocumentCommandTest {
@@ -37,18 +34,23 @@ public class HtmlDocumentCommandTest {
 		EDGE011("<html></html>", "<html><", DocumentCommand.newRemoveEnclosingTag("p"), "p></p></html>"),
 		EDGE012("<html><p></p></html>", "<html><", DocumentCommand.newRemoveNextTag("p"), "p></p></html>"),
 
-		PREV001("<html><p id=2></p></html>", "<html><p id=1></p><p id=2>", DocumentCommand.newRemovePreviousTag("p"), "</p></html>"),
-		PREV002("<html><p id=1><p id=2></p></p></html>", "<html><p id=1><p id=2>", DocumentCommand.newRemovePreviousTag("p"), "</p></p></html>"),
+		PREV001("<html><p id=2></p></html>", "<html><p id=1></p><p id=2>", DocumentCommand.newRemovePreviousTag("p"),
+				"</p></html>"),
+		PREV002("<html><p id=1><p id=2></p></p></html>", "<html><p id=1><p id=2>",
+				DocumentCommand.newRemovePreviousTag("p"), "</p></p></html>"),
 
-		ENCL001("<html></html>", "<html><p><p a></p>", DocumentCommand.newRemoveEnclosingTag("p"), "<p b></p></p></html>"),
-		ENCL002("<html><p><p a></p></p></html>", "<html><p><p a></p><", DocumentCommand.newRemoveEnclosingTag("p"), "p b></p></p></html>"),
+		ENCL001("<html></html>", "<html><p><p a></p>", DocumentCommand.newRemoveEnclosingTag("p"),
+				"<p b></p></p></html>"),
+		ENCL002("<html><p><p a></p></p></html>", "<html><p><p a></p><", DocumentCommand.newRemoveEnclosingTag("p"),
+				"p b></p></p></html>"),
 
 		NEXT001("<html><p></p></html>", "<html><p>", DocumentCommand.newRemoveNextTag("p"), "</p><p foo></p></html>"),
 
-		LINK001("<html><a href=\"a\" target=\"c\">b</a></html>", "<html>", DocumentCommand.newInsertLink("a", "b", "c"), "</html>"),
+		LINK001("<html><a href=\"a\" target=\"c\">b</a></html>", "<html>", DocumentCommand.newInsertLink("a", "b", "c"),
+				"</html>"),
 		LINK002("<html><a href=\"a\"></a></html>", "<html>", DocumentCommand.newInsertLink("a", null, null), "</html>"),
-		LINK003("<html><a href=\"&lt;&quot;&gt;\"></a></html>", "<html>", DocumentCommand.newInsertLink("<\">", null, null), "</html>"),
-		;
+		LINK003("<html><a href=\"&lt;&quot;&gt;\"></a></html>", "<html>",
+				DocumentCommand.newInsertLink("<\">", null, null), "</html>"),;
 		public final String expectedResult;
 		public final Object[] stuffToWrite;
 
@@ -62,7 +64,7 @@ public class HtmlDocumentCommandTest {
 	@Test
 	public final void test() {
 		for (final TestCase test : TestCase.values()) {
-			System.out.println("Running test "+ test);
+			System.out.println("Running test " + test);
 			String result = null;
 			try {
 				result = process(test.stuffToWrite);
@@ -77,12 +79,6 @@ public class HtmlDocumentCommandTest {
 
 	private static class HtmlExternalContext extends AHtmlExternalContext {
 		private final StringBuilder sb = new StringBuilder();
-
-		@Override
-		public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec)
-				throws EvaluationException {
-			throw new UncatchableEvaluationException(ec, "Should not occur as context provides no scoped vars.");
-		}
 
 		@Override
 		protected void output(final String html) throws EmbedmentOutputException {
@@ -101,7 +97,7 @@ public class HtmlDocumentCommandTest {
 
 	private static String process(final Object... stuffToWrite) throws Exception {
 		final HtmlExternalContext hec = new HtmlExternalContext();
-		final IEvaluationContext ec = GenericEcContractFactory.INSTANCE.getContextWithExternal(null);
+		final IEvaluationContext ec = GenericEcContractFactory.INSTANCE.getContextWithExternal(hec);
 		hec.beginWriting();
 		try {
 			for (final Object stuff : stuffToWrite) {
@@ -120,5 +116,4 @@ public class HtmlDocumentCommandTest {
 		}
 		return hec.toString();
 	}
-
 }
