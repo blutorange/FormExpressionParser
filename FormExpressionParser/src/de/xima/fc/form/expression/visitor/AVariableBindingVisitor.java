@@ -35,7 +35,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 /**
  * For preparing the binding so we know which variables are in scope at which
  * point.
- * 
+ *
  * @author mad_gaksha
  * @param <T>
  *            Type of the objects of the binding.
@@ -202,6 +202,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 					binding.gotoBookmark(bookmark);
 					nested = false;
 					break;
+					//$CASES-OMITTED$
 				default:
 					throw new SemanticsException(
 							NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()),
@@ -218,7 +219,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	/**
 	 * Resolves code inside function bodies. Function have already been detached
 	 * from the main program and put at the top.
-	 * 
+	 *
 	 * @param scopeDefBuilder
 	 * @throws ParseException
 	 */
@@ -232,9 +233,9 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 
 	/**
 	 * When a variable is declared, it is set to this value initially.
-	 * 
+	 *
 	 * @return The object to set.
-	 * @throws IllegalVariableSourceResolutionException 
+	 * @throws IllegalVariableSourceResolutionException
 	 */
 	@Nonnull
 	protected abstract T getNewObjectToSet(ISourceResolvable res) throws IllegalVariableSourceResolutionException;

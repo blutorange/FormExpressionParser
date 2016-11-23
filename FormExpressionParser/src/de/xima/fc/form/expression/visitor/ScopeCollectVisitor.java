@@ -31,7 +31,7 @@ import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
 public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<SemanticsException>
-		implements IScopeDefinitionsBuilder {
+implements IScopeDefinitionsBuilder {
 	@Nullable
 	private String currentScope;
 	@Nullable
@@ -46,7 +46,7 @@ public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<Se
 	@Nonnull
 	private final Map<String, Map<String, IHeaderNode>> manualMap;
 
-	@Nonnull	
+	@Nonnull
 	public static IScopeDefinitionsBuilder collect(final Node node) throws ParseException {
 		final ScopeCollectVisitor v = new ScopeCollectVisitor();
 		node.jjtAccept(v);
@@ -121,7 +121,7 @@ public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<Se
 			map.put(node.getVariableName(), new HeaderNodeImpl(node));
 		}
 	}
-	
+
 	@Override
 	public void visit(final ASTFunctionClauseNode node) throws SemanticsException {
 		// Put function declaration at the top inside the global declaration.
@@ -216,7 +216,7 @@ public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<Se
 	public Iterator<String> getExternal() {
 		return requiredSet.iterator();
 	}
-	
+
 	@Override
 	public IScopeDefinitions build() {
 		return new ImmutableScopeDefinitions(globalMap, manualMap, requiredSet);
@@ -226,17 +226,21 @@ public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<Se
 	public Iterator<IHeaderNode> getManualAll() {
 		return new ManIter();
 	}
-	
+
 	private class ManIter implements Iterator<IHeaderNode> {
 		private final Iterator<Map<String, IHeaderNode>> it = manualMap.values().iterator();
 		private Iterator<IHeaderNode> it2;
 		@Override
 		public boolean hasNext() {
-			return it2.hasNext() || it.hasNext();	
+			return it2.hasNext() || it.hasNext();
 		}
 		@Override
 		public IHeaderNode next() {
 			return (it2.hasNext() ? it2 : (it2 = it.next().values().iterator())).next();
+		}
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
 		}
 	}
 }

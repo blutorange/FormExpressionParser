@@ -1,7 +1,5 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import java.io.Serializable;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -17,7 +15,7 @@ import de.xima.fc.form.expression.iface.context.IExternalContext;
  * @param <T>
  *            Type of the required external context.
  */
-public interface IEvaluationContextContractFactory<T extends IExternalContext> extends Serializable {
+public interface IEvaluationContextContractFactory<T extends IExternalContext> {
 	@Nonnull
 	public IEvaluationContext getContextWithExternal(@Nonnull T ex);
 	/**
@@ -31,7 +29,7 @@ public interface IEvaluationContextContractFactory<T extends IExternalContext> e
 	public IScopeInfo getExternalScopeInfo(@Nonnull String scope);
 	/**
 	 * Provides information on whether all {@link IEvaluationContext} created by this
-	 * factory provide a certain scope. 
+	 * factory provide a certain scope.
 	 * @param scope Scope to check for.
 	 * @return Whether the scope is provided.
 	 */

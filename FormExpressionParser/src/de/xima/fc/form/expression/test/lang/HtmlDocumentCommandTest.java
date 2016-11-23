@@ -3,15 +3,28 @@ package de.xima.fc.form.expression.test.lang;
 import static org.junit.Assert.fail;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.junit.Test;
 
+import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IScopeInfo;
+import de.xima.fc.form.expression.impl.GenericEmbedment;
+import de.xima.fc.form.expression.impl.GenericEvaluationContext;
+import de.xima.fc.form.expression.impl.GenericExternalScope;
+import de.xima.fc.form.expression.impl.GenericNamespace;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
-import de.xima.fc.form.expression.impl.factory.GenericEcContractFactory;
+import de.xima.fc.form.expression.impl.logger.SystemLogger;
+import de.xima.fc.form.expression.impl.tracer.DummyTracer;
+import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 @SuppressWarnings("nls")
 public class HtmlDocumentCommandTest {
@@ -77,27 +90,69 @@ public class HtmlDocumentCommandTest {
 		}
 	}
 
-	private static class HtmlExternalContext extends AHtmlExternalContext {
+	private static class DummyHtmlExternalContext extends AHtmlExternalContext {
 		private final StringBuilder sb = new StringBuilder();
-
 		@Override
 		protected void output(final String html) throws EmbedmentOutputException {
 			sb.append(html);
 		}
-
 		@Override
 		protected void finishOutput() throws EmbedmentOutputException {
 		}
-
 		@Override
 		public String toString() {
 			return sb.toString();
 		}
+		@Override
+		public ALangObject fetchScopedVariable(final String scope, final String name, final IEvaluationContext ec)
+				throws EvaluationException {
+			throw new VariableNotDefinedException(scope, name, ec);
+		}
+	}
+	private static class DummyContractFactory implements IEvaluationContextContractFactory<DummyHtmlExternalContext> {
+		final IScopeInfo scopeInfo = new IScopeInfo() {
+			@Override
+			public boolean isProviding(final String variableName) {
+				return false;
+			}
+			@Override
+			public EVariableSource getSource() {
+				return EVariableSource.LIBRARY;
+			}
+			@Override
+			public String getScopeName() {
+				return "[%%";
+			}
+		};
+		@Override
+		public IEvaluationContext getContextWithExternal(@Nullable final DummyHtmlExternalContext ex) {
+			final IEvaluationContext ec = new GenericEvaluationContext.Builder().setTracer(DummyTracer.INSTANCE)
+					.setScope(new GenericExternalScope.Builder().build()).setLogger(SystemLogger.getDebugLogger())
+					.setNamespace(GenericNamespace.getGenericNamespaceInstance())
+					.setEmbedment(new GenericEmbedment.Builder().build()).build();
+			ec.setExternalContext(ex);
+			return ec;
+
+		}
+		@Override
+		public IScopeInfo getExternalScopeInfo(final String scope) {
+			return scopeInfo;
+		}
+
+		@Override
+		public boolean isProvidingExternalScope(final String scope) {
+			return false;
+		}
+
+		@Override
+		public String[] getScopesForEmbedment(final String embedment) {
+			return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+		}
 	}
 
 	private static String process(final Object... stuffToWrite) throws Exception {
-		final HtmlExternalContext hec = new HtmlExternalContext();
-		final IEvaluationContext ec = GenericEcContractFactory.INSTANCE.getContextWithExternal(hec);
+		final DummyHtmlExternalContext hec = new DummyHtmlExternalContext();
+		final IEvaluationContext ec = new DummyContractFactory().getContextWithExternal(hec);
 		hec.beginWriting();
 		try {
 			for (final Object stuff : stuffToWrite) {
