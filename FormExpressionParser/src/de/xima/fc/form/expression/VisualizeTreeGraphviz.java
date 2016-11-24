@@ -25,7 +25,7 @@ public class VisualizeTreeGraphviz {
 			throw new RuntimeException("First argument (code) must not be null."); //$NON-NLS-1$
 		final Node rootNode;
 		try {
-			rootNode = FormExpressionFactory.Program.asNode(expression);
+			rootNode = FormExpressionFactory.forProgram().asNode(expression);
 		} catch (final ParseException e) {
 			System.out.println("Failed to parse expression."); //$NON-NLS-1$
 			e.printStackTrace();

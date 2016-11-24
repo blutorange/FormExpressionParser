@@ -25,6 +25,7 @@ import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
@@ -32,98 +33,13 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.CompileTimeConstantCheckVisitor;
 import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
+import de.xima.fc.form.expression.visitor.UnparseVisitor;
+import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
 
 public final class FormExpressionFactory {
-
 	private FormExpressionFactory() {
-	}
-
-	/**
-	 * Methods for parsing code as one complete program.
-	 *
-	 * @author mad_gaksha
-	 */
-	public final static class Program {
-		private Program() {
-		}
-
-		/**
-		 * Parses the given string and returns the top level node of the parse
-		 * tree.
-		 *
-		 * @return Top level node of the parse tree.
-		 * @throws ParseException
-		 *             When the code is not a valid program. Specifically, when
-		 *             the tokens cannot be parsed as a valid program.
-		 * @throws TokenMgrError
-		 *             When the code is not a valid program. Specifically, when
-		 *             the code cannot be parsed into valid tokens.
-		 * @throws SemanticsException
-		 *             When the code did not technically fail to parse, but is
-		 *             semantically invalid. This is a subclass of
-		 *             {@link ParseException}.
-		 */
-		@Nonnull
-		public static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
-				@Nonnull final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
-				throws ParseException, TokenMgrError, SemanticsException {
-			Preconditions.checkNotNull(code);
-			Preconditions.checkNotNull(factory);
-			try (final StringReader reader = new StringReader(code)) {
-				final FormExpressionParser parser = asParser(asTokenManager(reader));
-				final Node node = parser.CompleteProgram(null);
-				if (node == null)
-					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return postProcess(node, parser, factory, strictMode);
-			}
-		}
-
-		@Nonnull
-		public static Node asNode(@Nonnull final String code) throws ParseException, TokenMgrError {
-			Preconditions.checkNotNull(code);
-			try (final StringReader reader = new StringReader(code)) {
-				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
-				if (node == null)
-					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
-				return node;
-			}
-		}
-
-		/**
-		 * @param reader
-		 *            Reader to read from.
-		 * @return A token manager for tokenizing the stream.
-		 */
-		@Nonnull
-		public static FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
-			Preconditions.checkNotNull(reader);
-			return tokenManagerForState(reader, FormExpressionParserTokenManager.CODE);
-		}
-
-		/**
-		 * @param code
-		 *            Code to parse.
-		 * @return An object that, for convenience, is both a {@link Iterable}
-		 *         and {@link Iterator} and can only be iterated once, even when
-		 *         calling {@link Iterable#iterator()} more than once.
-		 * @throws TokenMgrError
-		 */
-		@Nonnull
-		public static TokenIterator asTokenStream(@Nonnull final Reader reader) throws TokenMgrError {
-			Preconditions.checkNotNull(reader);
-			return new TokenIterator(asTokenManager(reader));
-		}
-
-		@Nonnull
-		public static Token[] asTokenArray(@Nonnull final String code) throws TokenMgrError {
-			Preconditions.checkNotNull(code);
-			try (final StringReader reader = new StringReader(code)) {
-				return tokenManagerToArray(asTokenManager(reader));
-			}
-		}
-
 	}
 
 	/**
@@ -159,16 +75,95 @@ public final class FormExpressionFactory {
 	 *     &lt;/body&gt;
 	 *   &lt;/html&gt;
 	 * </pre>
-	 *
-	 * @author madgaksha
-	 *
+	 * 
+	 * @see #forProgram()
 	 */
-	public final static class Template {
-		private Template() {
+	public static IFormExpressionFactory forTemplate() {
+		return TemplateImpl.INSTANCE;
+	}
+
+	/**
+	 * Methods for parsing code as one complete program.
+	 * 
+	 * @see #forTemplate()
+	 */
+	public static IFormExpressionFactory forProgram() {
+		return ProgramImpl.INSTANCE;
+	}
+
+	private static enum ProgramImpl implements IFormExpressionFactory {
+		INSTANCE;
+
+		@Override
+		@Nonnull
+		public <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
+				@Nonnull final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
+				throws ParseException, TokenMgrError, SemanticsException {
+			Preconditions.checkNotNull(code);
+			Preconditions.checkNotNull(factory);
+			try (final StringReader reader = new StringReader(code)) {
+				final FormExpressionParser parser = asParser(asTokenManager(reader));
+				final Node node = parser.CompleteProgram(null);
+				if (node == null)
+					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
+				return postProcess(node, parser, factory, strictMode);
+			}
 		}
 
+		@Override
 		@Nonnull
-		public static Node asNode(@Nonnull final String code) throws ParseException, TokenMgrError {
+		public String format(@Nonnull final String code, @Nonnull final UnparseVisitorConfig config) throws ParseException, TokenMgrError {
+			Preconditions.checkNotNull(code);
+			Preconditions.checkNotNull(config);
+			try (final StringReader reader = new StringReader(code)) {
+				final FormExpressionParser parser = asParser(asTokenManager(reader));
+				final Node node = parser.CompleteProgram(null);
+				if (node == null)
+					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
+				return UnparseVisitor.unparse(node, parser.buildComments(), config);
+			}
+		}
+
+		@Override
+		@Nonnull
+		public Node asNode(@Nonnull final String code) throws ParseException, TokenMgrError {
+			Preconditions.checkNotNull(code);
+			try (final StringReader reader = new StringReader(code)) {
+				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
+				if (node == null)
+					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
+				return node;
+			}
+		}
+
+		@Override
+		@Nonnull
+		public FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
+			Preconditions.checkNotNull(reader);
+			return tokenManagerForState(reader, FormExpressionParserTokenManager.CODE);
+		}
+
+		@Override
+		@Nonnull
+		public Iterator<Token> asTokenStream(@Nonnull final Reader reader) throws TokenMgrError {
+			Preconditions.checkNotNull(reader);
+			return new TokenIterator(asTokenManager(reader));
+		}
+
+		@Override
+		@Nonnull
+		public Token[] asTokenArray(@Nonnull final String code) throws TokenMgrError {
+			Preconditions.checkNotNull(code);
+			try (final StringReader reader = new StringReader(code)) {
+				return tokenManagerToArray(asTokenManager(reader));
+			}
+		}
+	}
+
+	private static enum TemplateImpl implements IFormExpressionFactory {
+		INSTANCE;
+		@Override
+		public Node asNode(final String code) throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
@@ -180,25 +175,9 @@ public final class FormExpressionFactory {
 			}
 		}
 
-		/**
-		 * Parses the given string and returns the top level node of the parse
-		 * tree.
-		 *
-		 * @return Top level node of the parse tree.
-		 * @throws ParseException
-		 *             When the code is not a valid program. Specifically, when
-		 *             the tokens cannot be parsed as a valid program.
-		 * @throws TokenMgrError
-		 *             When the code is not a valid program. Specifically, when
-		 *             the code cannot be parsed into valid tokens.
-		 * @throws SemanticsException
-		 *             When the code did not technically fail to parse, but is
-		 *             semantically invalid. This is a subclass of
-		 *             {@link ParseException}.
-		 */
-		@Nonnull
-		public static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
-				@Nonnull final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
+		@Override
+		public <T extends IExternalContext> IFormExpression<T> parse(final String code,
+				final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
 				throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			Preconditions.checkNotNull(factory);
@@ -212,28 +191,42 @@ public final class FormExpressionFactory {
 			}
 		}
 
-		@Nonnull
-		public static TokenIterator asTokenStream(@Nonnull final Reader reader) throws TokenMgrError {
+		@Override
+		public String format(final String code, final UnparseVisitorConfig config)
+				throws ParseException, TokenMgrError {
+			Preconditions.checkNotNull(code);
+			Preconditions.checkNotNull(config);
+			try (final StringReader reader = new StringReader(code)) {
+				final FormExpressionParser parser = asParser(asTokenManager(reader));
+				final Node node = parser.Template(null);
+				if (node == null)
+					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);
+				return UnparseVisitor.unparse(node, parser.buildComments(), config);
+			}
+		}
+
+		@Override
+		public Iterator<Token> asTokenStream(final Reader reader) throws TokenMgrError {
 			Preconditions.checkNotNull(reader);
 			return new TokenIterator(asTokenManager(reader));
 		}
 
-		@Nonnull
-		public static Token[] asTokenArray(@Nonnull final String code) throws TokenMgrError {
+		@Override
+		public Token[] asTokenArray(final String code) throws TokenMgrError {
 			Preconditions.checkNotNull(code);
 			try (final StringReader reader = new StringReader(code)) {
 				return tokenManagerToArray(asTokenManager(reader));
 			}
 		}
 
-		@Nonnull
-		public static FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
+		@Override
+		public FormExpressionParserTokenManager asTokenManager(final Reader reader) {
 			Preconditions.checkNotNull(reader);
 			return tokenManagerForState(reader, FormExpressionParserTokenManager.LOS);
 		}
 	}
 
-	private final static class TokenIterator implements Iterator<Token>, Iterable<Token> {
+	private final static class TokenIterator implements Iterator<Token> {
 		private boolean hasNext = true;
 		private final FormExpressionParserTokenManager tm;
 
@@ -257,12 +250,6 @@ public final class FormExpressionFactory {
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(CmnCnst.Error.TOKEN_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
-		}
-
-		@Nonnull
-		@Override
-		public Iterator<Token> iterator() {
-			return this;
 		}
 	}
 
@@ -315,11 +302,12 @@ public final class FormExpressionFactory {
 	}
 
 	private static void checkScopeDefsConstancy(@Nullable final Collection<IHeaderNode> collection,
-			@Nonnull final CompileTimeConstantCheckVisitor visitor) throws HeaderAssignmentNotCompileTimeConstantException {
+			@Nonnull final CompileTimeConstantCheckVisitor visitor)
+			throws HeaderAssignmentNotCompileTimeConstantException {
 		if (collection == null)
 			return;
 		for (final IHeaderNode hn : collection)
 			if (hn.hasNode() && !hn.getNode().jjtAccept(visitor))
-				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getNode());		
+				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getNode());
 	}
 }

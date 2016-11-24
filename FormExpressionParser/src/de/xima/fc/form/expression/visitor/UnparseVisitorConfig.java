@@ -19,17 +19,15 @@ public final class UnparseVisitorConfig {
 	@Nonnull public final String linefeed;
 	@Nonnull public final String optionalSpace;
 	@Nonnull public final String requiredSpace;
-	@Nonnull public final HeaderType[] headerTypeOrder;
 	public final boolean keepComments;
 	
 	private UnparseVisitorConfig(@Nonnull final String indentPrefix, @Nonnull final String linefeed,
 			@Nonnull final String optionalSpace, @Nonnull final String requiredSpace,
-			@Nonnull final HeaderType[] headerTypeOrder, final boolean keepComments) {
+			final boolean keepComments) {
 		this.indentPrefix = indentPrefix;
 		this.linefeed = linefeed;
 		this.optionalSpace = optionalSpace;
 		this.requiredSpace = requiredSpace;
-		this.headerTypeOrder = headerTypeOrder;
 		this.keepComments = keepComments;
 	}
 
@@ -38,7 +36,6 @@ public final class UnparseVisitorConfig {
 		@Nullable private String linefeed;
 		@Nullable private String optionalSpace;
 		@Nullable private String requiredSpace;
-		@Nullable public HeaderType[] headerTypeOrder;
 		private boolean keepComments;
 		
 		/**
@@ -95,55 +92,7 @@ public final class UnparseVisitorConfig {
 		public Builder setKeepComments(final boolean keepComments) {
 			this.keepComments = keepComments;
 			return this;
-		}
-		
-		/**
-		 * In which order headers should be added. Compare:
-		 * <p>
-		 * With the default
-		 * <code>setHeaderTypeOrder(HeaderType.REQUIRE, HeaderType.GLOBAL, HeaderType.MANUAL, HeaderType.GLOBAL_FUNCTION)</code>:
-		 * <pre>
-		 *   require scope math;
-		 *   global {
-		 *     var i;
-		 *     var j;
-		 *   }
-		 *   scope myScope {
-		 *     var k;
-		 *     function scopedFunction(){}
-		 *   }
-		 *   function globalFunction(){}
-		 * </pre>
-		 * </p>
-		 * <p>
-		 * Compare with
-		 * <code>setHeaderTypeOrder(HeaderType.GLOBAL_FUNCTION, HeaderType.MANUAL, HeaderType.GLOBAL, HeaderType.REQUIRE)</code>
-		 * 
-		 * <pre>
-		 *   function globalFunction(){}
-		 *   scope myScope {
-		 *     var k;
-		 *     function scopedFunction(){}
-		 *   }
-		 *   global {
-		 *     var i;
-		 *     var j;
-		 *   }
-		 *   require scope math;
-		 * </pre>
-		 * </p>
-		 * 
-		 * @param headerTypeOrder
-		 *            Order in which headers are added, from earliest to latest.
-		 *            Elements that occur more than once are ignored, elements
-		 *            that do not occur at all are added in the defalt order.
-		 * @return
-		 */
-		@Nonnull
-		public Builder setHeaderTypeOrder(@Nullable final HeaderType... headerTypeOrder) {
-			this.headerTypeOrder = headerTypeOrder;
-			return this;
-		}
+		}		
 		/**
 		 * @param linefeed Character to be used as for newlines.
 		 * @return this
@@ -161,17 +110,15 @@ public final class UnparseVisitorConfig {
 			String linefeed = this.linefeed;
 			String optionalSpace = this.optionalSpace;
 			String requiredSpace = this.requiredSpace;
-			HeaderType[] headerTypeOrder = this.headerTypeOrder;
 			if (indentPrefix == null) indentPrefix = CmnCnst.NonnullConstant.STRING_SPACE;
 			if (linefeed == null) linefeed = CmnCnst.NonnullConstant.STRING_LF;
 			if (optionalSpace == null) optionalSpace = CmnCnst.NonnullConstant.STRING_EMPTY;
 			if (requiredSpace == null) requiredSpace = CmnCnst.NonnullConstant.STRING_SPACE;
-			if (headerTypeOrder == null) headerTypeOrder = new HeaderType[0];
 			indentPrefix = indentPrefix.replaceAll("[^\t ]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
 			linefeed = linefeed.replaceAll("[^\r\n]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
 			if (indentPrefix == null) indentPrefix = CmnCnst.NonnullConstant.STRING_SPACE;
 			if (linefeed.isEmpty()) linefeed = CmnCnst.NonnullConstant.STRING_LF;
-			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, headerTypeOrder, keepComments);
+			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
 		}
 	}
 
@@ -238,17 +185,5 @@ public final class UnparseVisitorConfig {
 	@Nonnull
 	public static UnparseVisitorConfig getUnstyledWithoutCommentsConfig() {
 		return InstanceHolder.UNSTYLED_WITHOUT_COMMENTS;
-	}
-	
-	/**
-	 * For setting the order in which headers (require declarations, global
-	 * variables, manual scopes, global functions) should occur.
-	 * 
-	 * @see Builder#setHeaderTypeOrder(HeaderType...)
-	 * @author mad_gaksha
-	 *
-	 */
-	public static enum HeaderType {
-		REQUIRE, GLOBAL, MANUAL, GLOBAL_FUNCTION;
 	}
 }

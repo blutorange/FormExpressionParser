@@ -7,7 +7,6 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
-import de.xima.fc.form.expression.impl.variable.DummyScopeDefinitions;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -89,8 +88,7 @@ public class FunctionLangObject extends ALangObject {
 		if (n == null)
 			builder.append(Syntax.NATIVE_CODE);
 		else {
-			final String unparse = UnparseVisitor.unparse(n, DummyScopeDefinitions.INSTANCE,
-					UnparseVisitorConfig.getUnstyledWithoutCommentsConfig());
+			final String unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithoutCommentsConfig());
 			builder.append(unparse);
 		}
 		builder.append(Syntax.BRACE_CLOSE).append(Syntax.SEMI_COLON);

@@ -186,8 +186,6 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		res.resolveSource(object);
 		return object;
 	}
-
-	// TODO mark unused variables
 	
 	public static int resolve(final Node node, final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
 			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,

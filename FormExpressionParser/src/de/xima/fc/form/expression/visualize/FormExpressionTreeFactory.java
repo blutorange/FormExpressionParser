@@ -47,7 +47,7 @@ public class FormExpressionTreeFactory {
 		final DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(
 				root);
 
-		final Node rootNode = FormExpressionFactory.Program.asNode(expression);
+		final Node rootNode = FormExpressionFactory.forProgram().asNode(expression);
 		addNodes(tree, rootNode, root);
 		return tree;
 	}

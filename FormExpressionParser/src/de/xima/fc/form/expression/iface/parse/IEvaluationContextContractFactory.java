@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.iface.parse;
 
+import java.io.Serializable;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -15,7 +17,7 @@ import de.xima.fc.form.expression.iface.context.IExternalContext;
  * @param <T>
  *            Type of the required external context.
  */
-public interface IEvaluationContextContractFactory<T extends IExternalContext> {
+public interface IEvaluationContextContractFactory<T extends IExternalContext> extends Serializable {
 	@Nonnull
 	public IEvaluationContext getContextWithExternal(@Nonnull T ex);
 	/**

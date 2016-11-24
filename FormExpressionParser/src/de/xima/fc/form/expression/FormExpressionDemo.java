@@ -23,11 +23,10 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
+import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 /**TODO
  * - unparse: los nicer
- * - unparse: comments at wrongs position (variable hoisting etc.)
- * - unparse: wrong header pos for template programs (eg. [%%=i=0;%])
  * - optional variable types
  * - check for used/unused variables (especially this and arguments variable in function body)
  * - make it possible to check variables or external scopes provided by the external context for a particular external context without evaluating it
@@ -50,6 +49,7 @@ public class FormExpressionDemo {
 		showHighlighting(tokenArray);
 
 		final IFormExpression<FormcycleExternalContext> expression = parseCode(code);
+
 		if (expression == null)
 			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
 
@@ -58,10 +58,9 @@ public class FormExpressionDemo {
 		if (node == null)
 			throw new RuntimeException("Node must not be null."); //$NON-NLS-1$
 
-		showUnparsed(expression);
+		showUnparsed(code);
 
 		showEvaluatedResult(expression);
-
 	}
 
 	private static String readArgs(final String[] args) {
@@ -90,7 +89,7 @@ public class FormExpressionDemo {
 		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
-			tokenArray = FormExpressionFactory.Program.asTokenArray(code);
+			tokenArray = FormExpressionFactory.forProgram().asTokenArray(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final TokenMgrError e) {
@@ -130,7 +129,7 @@ public class FormExpressionDemo {
 		final IFormExpression<FormcycleExternalContext> ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = FormExpressionFactory.Program.parse(code, FACTORY, STRICT_MODE);
+			ex = FormExpressionFactory.forProgram().parse(code, FACTORY, STRICT_MODE);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final ParseException e) {
@@ -145,7 +144,7 @@ public class FormExpressionDemo {
 	private static Node showParseTree(@Nonnull final String code) {
 		final Node node;
 		try {
-			node = FormExpressionFactory.Program.asNode(code);
+			node = FormExpressionFactory.forProgram().asNode(code);
 		} catch (final ParseException e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -164,9 +163,18 @@ public class FormExpressionDemo {
 		return node;
 	}
 
-	private static void showUnparsed(@Nonnull final IFormExpression<FormcycleExternalContext> ex) {
+	private static void showUnparsed(@Nonnull final String code) {
+		final String format;
+		try {
+			format = FormExpressionFactory.forProgram().format(code, UnparseVisitorConfig.getDefaultConfig());
+		} catch (final ParseException e) {
+			e.printStackTrace();
+			System.exit(-1);
+			return;
+		}
+
 		System.out.println("===Unparse==="); //$NON-NLS-1$
-		System.out.println(ex.unparse(null));
+		System.out.println(format);
 		System.out.println();
 	}
 

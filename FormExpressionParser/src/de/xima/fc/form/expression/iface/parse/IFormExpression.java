@@ -3,14 +3,12 @@ package de.xima.fc.form.expression.iface.parse;
 import java.io.Serializable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public interface IFormExpression<T extends IExternalContext> extends Serializable {
 	/**
@@ -25,14 +23,6 @@ public interface IFormExpression<T extends IExternalContext> extends Serializabl
 	public ALangObject evaluate(@Nonnull final T ex) throws EvaluationException;
 
 	public IEvaluationContextContractFactory<T> getSpecs();
-
-	/**
-	 * A string that is a valid form expression program and is equivalent to this program.
-	 * @param config Number of white spaces etc. When <code>null</code>, uses some default configuration.
-	 * @return A syntactically valid represenation of this program.
-	 */
-	@Nonnull
-	public String unparse(@Nullable UnparseVisitorConfig config);
 
 	/**
 	 * @return A list of comment this program contains.

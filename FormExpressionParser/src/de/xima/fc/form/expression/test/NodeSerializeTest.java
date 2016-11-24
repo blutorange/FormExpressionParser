@@ -12,16 +12,16 @@ import de.xima.fc.form.expression.impl.factory.GenericEcContractFactory;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 
 final class NodeSerializeTest {
-	@SuppressWarnings({ "nls", "null" })
+	@SuppressWarnings({ "nls"})
 	public static void main(final String[] args) {
 		//final String string = "[%" + StringUtils.repeat("if (true) 42;else 0;", 500000) + "%]";
 		//final String string = StringUtils.repeat("abcdefghijklmnopqrst", 500000);
 		final String string = "global scope{var a=10;}"+StringUtils.repeat("if(true)var a=9;a;", 5000);
 		final IFormExpression<AGenericExternalContext> ex;
 		try {
-			FormExpressionFactory.Template.parse(string, GenericEcContractFactory.INSTANCE, false);
+			FormExpressionFactory.forTemplate().parse(string, GenericEcContractFactory.INSTANCE, false);
 			final long t1 = System.nanoTime();
-			ex = FormExpressionFactory.Program.parse(string, GenericEcContractFactory.INSTANCE, false);
+			ex = FormExpressionFactory.forProgram().parse(string, GenericEcContractFactory.INSTANCE, false);
 			final long t2 = System.nanoTime();
 			System.out.println("Parsing took " + (t2-t1)/1000000 + "ms");
 		} catch (final ParseException e) {

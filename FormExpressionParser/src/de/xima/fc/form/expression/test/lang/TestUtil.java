@@ -238,10 +238,10 @@ public final class TestUtil {
 		final Date t1 = new Date();
 		switch (type) {
 		case PROGRAM:
-			res = FormExpressionFactory.Program.parse(code, provider, strictMode);
+			res = FormExpressionFactory.forProgram().parse(code, provider, strictMode);
 			break;
 		case TEMPLATE:
-			res = FormExpressionFactory.Template.parse(code, provider, strictMode);
+			res = FormExpressionFactory.forTemplate().parse(code, provider, strictMode);
 			break;
 		default:
 			throw new ParseException("Unkown enum: " + type);

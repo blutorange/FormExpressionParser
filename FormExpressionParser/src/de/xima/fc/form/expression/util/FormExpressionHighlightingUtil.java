@@ -37,7 +37,7 @@ public final class FormExpressionHighlightingUtil {
 		public static void highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme,
 				final String cssClassPrefix, final boolean basicStyling,@Nonnull final Writer html,@Nonnull final Writer css)
 						throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionFactory.Program.asTokenArray(code);
+			final Token[] tokenList = FormExpressionFactory.forProgram().asTokenArray(code);
 			final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
 			highlighter.process(tokenList, cssClassPrefix, basicStyling, html, css);
 		}
@@ -52,7 +52,7 @@ public final class FormExpressionHighlightingUtil {
 		 * @throws ParseException When the code is invalid.
 		 */
 		public static String highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme, final String cssClassPrefix, final boolean basicStyling) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionFactory.Program.asTokenArray(code);
+			final Token[] tokenList = FormExpressionFactory.forProgram().asTokenArray(code);
 			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix, basicStyling);
 		}
 	}
@@ -76,7 +76,7 @@ public final class FormExpressionHighlightingUtil {
 		public static void highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme,
 				@Nullable final String cssClassPrefix, final boolean basicStyling, @Nonnull final Writer html,
 				@Nonnull final Writer css) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionFactory.Template.asTokenArray(code);
+			final Token[] tokenList = FormExpressionFactory.forTemplate().asTokenArray(code);
 			final HtmlHighlighter highlighter = HtmlHighlighter.getFor(theme);
 			highlighter.process(tokenList, cssClassPrefix, basicStyling, html, css);
 		}
@@ -92,11 +92,12 @@ public final class FormExpressionHighlightingUtil {
 		 */
 		public static String highlightHtml(@Nonnull final String code, @Nonnull final IHighlightTheme theme,
 				@Nullable final String cssClassPrefix, final boolean basicStyling) throws IOException, ParseException {
-			final Token[] tokenList = FormExpressionFactory.Template.asTokenArray(code);
+			final Token[] tokenList = FormExpressionFactory.forTemplate().asTokenArray(code);
 			return FormExpressionHighlightingUtil.highlightHtml(tokenList, theme, cssClassPrefix, basicStyling);
 		}
 	}
 
+	//TODO move these highlighting methods to the IFormExpressionFactory
 
 	public static String highlightHtml(@Nonnull final Token[] tokenArray, @Nonnull final IHighlightTheme theme,
 			@Nullable String cssClassPrefix, final boolean basicStyling) throws IOException {

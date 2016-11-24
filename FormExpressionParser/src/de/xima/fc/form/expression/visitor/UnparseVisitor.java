@@ -29,19 +29,15 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.iface.parse.IHeaderNode;
-import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -90,7 +86,6 @@ import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
-import de.xima.fc.form.expression.visitor.UnparseVisitorConfig.HeaderType;
 
 public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IOException> {
 	private final Writer writer;
@@ -101,46 +96,43 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	private boolean insideManualDefs;
 
-	//TODO comments for scopes are placed at wrong pos
-	
 	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
-			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final ImmutableList<IComment> comments)
+			@Nonnull final ImmutableList<IComment> comments)
 			throws IOException {
-		unparse(writer, node, scopeDefs, comments, UnparseVisitorConfig.getDefaultConfig());
+		unparse(writer, node, comments, UnparseVisitorConfig.getDefaultConfig());
 	}
 
-	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
-			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final ImmutableList<IComment> comments,
+	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node, 
+			@Nonnull final ImmutableList<IComment> comments,
 			@Nonnull final UnparseVisitorConfig config) throws IOException {
 		final UnparseVisitor unparser = new UnparseVisitor(writer, comments, config);
-		unparser.scopeDefs(scopeDefs, CmnCnst.NonnullConstant.STRING_EMPTY);
 		unparser.blockOrClause(node, CmnCnst.NonnullConstant.STRING_EMPTY);
 		unparser.writeRemainingComments();
 		writer.flush();
 	}
 
 	@Nonnull
-	public static String unparse(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs) {
-		return unparse(node, scopeDefs, ImmutableList.<IComment> of());
+	public static String unparse(@Nonnull final Node node) {
+		return unparse(node, ImmutableList.<IComment> of());
 	}
 
 	@Nonnull
-	public static String unparse(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
+	public static String unparse(@Nonnull final Node node,
 			@Nonnull final ImmutableList<IComment> comments) {
-		return unparse(node, scopeDefs, comments, UnparseVisitorConfig.getDefaultConfig());
+		return unparse(node, comments, UnparseVisitorConfig.getDefaultConfig());
 	}
 
 	@Nonnull
-	public static String unparse(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
+	public static String unparse(@Nonnull final Node node,
 			@Nonnull final UnparseVisitorConfig config) {
-		return unparse(node, scopeDefs, ImmutableList.<IComment> of(), config);
+		return unparse(node, ImmutableList.<IComment> of(), config);
 	}
 
 	@Nonnull
-	public static String unparse(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
+	public static String unparse(@Nonnull final Node node,
 			@Nonnull final ImmutableList<IComment> comments, @Nonnull final UnparseVisitorConfig config) {
 		try (final Writer writer = new StringBuilderWriter()) {
-			unparse(writer, node, scopeDefs, comments, config);
+			unparse(writer, node, comments, config);
 			final String s = writer.toString();
 			return s != null ? s : CmnCnst.NonnullConstant.STRING_EMPTY;
 		}
@@ -157,172 +149,6 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		this.comments = comments;
 		this.commentPos = 0;
 		this.commentToken = (commentPos < comments.size()) ? comments.get(commentPos) : null;
-	}
-
-	private void requireDefs(@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final String prefix)
-			throws IOException {
-		// require scope math;
-		for (final String external : scopeDefs.getExternal()) {
-			writer.write(CmnCnst.Syntax.REQUIRE);
-			writer.write(config.requiredSpace);
-			writer.write(CmnCnst.Syntax.SCOPE);
-			writer.write(config.requiredSpace);
-			writer.write(external);
-			writer.write(CmnCnst.Syntax.SEMI_COLON);
-			writer.write(config.linefeed);
-			writer.write(prefix);
-		}
-	}
-
-	private void globalDefs(@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final String prefix)
-			throws IOException {
-		// global {
-		// var myScope = 1;
-		// }
-		final String next = prefix + config.indentPrefix;
-		if (scopeDefs.hasGlobalVariable()) {
-			writer.write(CmnCnst.Syntax.GLOBAL);
-			writer.write(config.requiredSpace);
-			writer.write(CmnCnst.Syntax.SCOPE);
-			writer.write(config.optionalSpace);
-			writer.write(CmnCnst.Syntax.BRACE_OPEN);
-			writer.write(config.linefeed);
-			writer.write(next);
-			final int len = scopeDefs.getGlobal().size();
-			int i = 0;
-			for (final IHeaderNode global : scopeDefs.getGlobal()) {
-				if (!global.isFunction()) {
-					headerNode(global, next);
-					writer.write(config.linefeed);
-					if (len != 1 && i < len - 1) {
-						writer.write(next);
-					}
-					++i;
-				}
-			}
-			writer.write(prefix);
-			writer.write(CmnCnst.Syntax.BRACE_CLOSE);
-			writer.write(config.linefeed);
-			writer.write(prefix);
-		}
-	}
-
-	private void manualDefs(@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final String prefix)
-			throws IOException {
-		// scope myScope {
-		// var myVar = 1;
-		// }
-		final String next = prefix + config.indentPrefix;
-		for (final Entry<String, ImmutableCollection<IHeaderNode>> entry : scopeDefs.getManual().entrySet()) {
-			writer.write(CmnCnst.Syntax.SCOPE);
-			writer.write(config.requiredSpace);
-			writer.write(entry.getKey());
-			writer.write(config.optionalSpace);
-			writer.write(CmnCnst.Syntax.BRACE_OPEN);
-			writer.write(config.linefeed);
-			writer.write(next);
-			final int len = entry.getValue().size();
-			int i = 0;
-			for (final IHeaderNode manual : entry.getValue()) {
-				insideManualDefs = true;
-				try {
-					headerNode(manual, next);
-				}
-				finally {
-					insideManualDefs = false;
-				}
-				writer.write(config.linefeed);
-				if (len != 1 && i < len - 1) {
-					writer.write(next);
-				}
-				++i;
-			}
-			writer.write(prefix);
-			writer.write(CmnCnst.Syntax.BRACE_CLOSE);
-			writer.write(config.linefeed);
-			writer.write(prefix);
-		}
-	}
-
-	private void globalFunction(@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final String prefix)
-			throws IOException {
-		// Globally scoped functions
-		// function foo(){}
-		for (final IHeaderNode global : scopeDefs.getGlobal())
-			if (global.isFunction())
-				headerNode(global, prefix);
-	}
-
-	private void scopeDefs(@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final String prefix)
-			throws IOException {
-		final HeaderType[] headerTypeOrder = config.headerTypeOrder;
-		boolean didRequire = false;
-		boolean didGlobal = false;
-		boolean didManual = false;
-		boolean didFunction = false;
-		for (final HeaderType headerType : headerTypeOrder) {
-			if (headerType == null)
-				continue;
-			switch (headerType) {
-			case GLOBAL:
-				if (!didGlobal)
-					globalDefs(scopeDefs, prefix);
-				didGlobal = true;
-				break;
-			case GLOBAL_FUNCTION:
-				if (!didFunction)
-					globalFunction(scopeDefs, prefix);
-				didFunction = true;
-				break;
-			case MANUAL:
-				if (!didManual)
-					manualDefs(scopeDefs, prefix);
-				didManual = true;
-				break;
-			case REQUIRE:
-				if (!didRequire)
-					requireDefs(scopeDefs, prefix);
-				didRequire = true;
-				break;
-			default:
-				break;
-			}
-		}
-		if (!didRequire)
-			requireDefs(scopeDefs, prefix);
-		if (!didGlobal)
-			globalDefs(scopeDefs, prefix);
-		if (!didManual)
-			manualDefs(scopeDefs, prefix);
-		if (!didFunction)
-			globalFunction(scopeDefs, prefix);
-	}
-
-	private void headerNode(@Nullable final IHeaderNode header, @Nonnull final String prefix) throws IOException {
-		// var i;
-		// var j = 6;
-		// function foo(){}
-		// function foo::bar(){}
-		if (header != null) {
-			if (header.isFunction()) {
-				writeCommentForNode(header.getNode(), prefix, true);
-				if (header.hasNode())
-					header.getNode().jjtAccept(this, prefix);
-			}
-			else {
-				writeCommentForNode(header.getNode(), prefix, true);
-				writer.write(CmnCnst.Syntax.VAR);
-				writer.write(config.requiredSpace);
-				writer.write(header.getVariableName());
-				if (header.hasNode()) {
-					writer.write(config.optionalSpace);
-					writer.write(CmnCnst.Syntax.EQUAL);
-					writer.write(config.optionalSpace);
-					expression(header.getNode(), prefix);
-				}
-				writer.write(CmnCnst.Syntax.SEMI_COLON);
-			}
-		}
 	}
 
 	private void writeComment(@Nonnull final String prefix, final boolean isBlock) throws IOException {
