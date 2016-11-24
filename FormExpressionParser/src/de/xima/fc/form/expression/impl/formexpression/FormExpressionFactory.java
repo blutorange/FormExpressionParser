@@ -298,7 +298,7 @@ public final class FormExpressionFactory {
 			@Nonnull final IEvaluationContextContractFactory<T> contractFactory, final boolean strictMode)
 			throws ParseException {
 		JumpCheckVisitor.check(node);
-		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node);
+		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, strictMode);
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, strictMode);
 		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, strictMode);
 		final IScopeDefinitions scopeDef = scopeDefBuilder.build();

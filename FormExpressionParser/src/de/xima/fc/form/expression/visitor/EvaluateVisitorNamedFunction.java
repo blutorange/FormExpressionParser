@@ -20,7 +20,6 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
-	// TODO try and do it without keeping reference to the visitor
 	@Nonnull
 	private final EvaluateVisitor visitor;
 	@Nonnull

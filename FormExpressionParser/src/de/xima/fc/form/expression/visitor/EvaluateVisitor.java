@@ -941,8 +941,6 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return res;
 	}
 
-	//TODO stack trace for functions gone? (detaching function nodes)
-	// TODO create compile time constant check visitor and check whether header var declarations are constant
 	private void applyScopeDefs(@Nonnull final IScopeDefinitions scopeDefs) throws EvaluationException {
 		applyAll(scopeDefs.getGlobal());
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())

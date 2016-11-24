@@ -14,15 +14,13 @@ import de.xima.fc.form.expression.util.CmnCnst;
 
 public abstract class ASourceResolvableNode extends ANode implements ISourceResolvable {
 	private static final long serialVersionUID = 1L;
-
+	@Nonnull
+	private String name = CmnCnst.NonnullConstant.STRING_EMPTY;
 	/**
 	 * Source of the variable. If >= 0, it is a variable on the heap, Otherwise,
 	 * see {@link EVariableSource#getSourceId()}
 	 */
 	private int source = EVariableSource.ID_UNRESOLVED;
-
-	@Nonnull
-	private String name = CmnCnst.NonnullConstant.STRING_EMPTY;
 
 	public ASourceResolvableNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);

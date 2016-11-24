@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 public class GenericVariableReference implements IVariableReference {
 	@Nonnull
 	private ALangObject object = NullLangObject.getInstance();
-
+	
 	@Override
 	public ALangObject getCurrentObject() {
 		return object;

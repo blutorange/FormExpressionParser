@@ -471,7 +471,7 @@ Node CompleteProgram(EMethod method) #StatementListNode :
       (
         ClauseOrStatement(null)
       | ScopeDefinition(null)
-      | FunctionClause(null)
+      | FunctionClauseWithOptionalScope(null)
       )+
       < EOF >
     )
@@ -492,7 +492,7 @@ void TemplateProgram(EMethod method) #StatementListNode :
     (
       ClauseOrStatement(null)
     | ScopeDefinition(null)
-    | FunctionClause(null)
+    | FunctionClauseWithOptionalScope(null)
     | LosBody(null)
     )+
   )
@@ -536,7 +536,8 @@ void ScopeManual(EMethod method) #ScopeManualNode :
   (
     < Scope > t = < Identifier > < BracesOpen >
     (
-      VariableDeclarationClause(method)
+      VariableDeclarationClause(null)
+    | FunctionClause(null)
     )*
     < BracesClose >
   )
@@ -617,13 +618,40 @@ void VariableDeclarationExpressionWithAssignment(EMethod method) #VariableDeclar
     jjtThis.init(method, t.image);
   }
 }
-void FunctionClause(EMethod method) #FunctionClauseNode :
+
+void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   Token t;
 }
 {
   (
     < Function > VariableWithOptionalScope(null) < ParenOpen >
+    (
+      [
+        IdentifierName(null)
+        (
+          < Comma > IdentifierName(null)
+        )*
+      ]
+    )
+    < ParenClose >
+    (
+      Block(null)
+    )
+  )
+  {
+    jjtThis.init(method);
+    
+  }
+}
+
+void FunctionClause(EMethod method) #FunctionClauseNode :
+{
+  Token t;
+}
+{
+  (
+    < Function > Variable(null) < ParenOpen >
     (
       [
         IdentifierName(null)
@@ -1521,6 +1549,19 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
   }
 }
 
+void Variable(EMethod method) #VariableNode :
+{
+  Token t;
+}
+{
+  (
+    t = < Identifier >
+  )
+  {
+    jjtThis.init(method, null, t.image);
+  }
+}
+
 void VariableWithOptionalScope(EMethod method) #VariableNode :
 {
   Token part1;
@@ -1757,13 +1798,11 @@ void Function(EMethod method) #FunctionNode :
 void Regex(EMethod method) #RegexNode :
 {
   Token t;
-  
 }
 {
   (
     t = < BackslashQuotedRegex >  )
-  {
-    
+  {    
     jjtThis.init(method, t.image);
   }
 }

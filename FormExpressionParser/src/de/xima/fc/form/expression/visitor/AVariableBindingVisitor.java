@@ -223,14 +223,29 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	 * @param scopeDefBuilder
 	 * @throws ParseException
 	 */
-	protected void resolveFunctions(@Nonnull final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
+	protected void bindScopeDefValues(@Nonnull final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
+		// Global scope.
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode hn = it.next().getValue();
-			if (hn.hasNode() && hn.isFunction())
+			if (hn.hasNode())
 				hn.getNode().jjtAccept(this);
 		}
+		// Manual scopes.
+		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
+			final String scope = it.next();
+			if (scope != null) {
+				final Iterator<Entry<String, IHeaderNode>> it2 = scopeDefBuilder.getManual(scope);
+				if (it2 != null) {
+					while (it2.hasNext()) {
+						final IHeaderNode hn = it2.next().getValue();
+						if (hn.hasNode())
+							hn.getNode().jjtAccept(this);
+					}
+				}
+			}
+		}
 	}
-
+	
 	/**
 	 * When a variable is declared, it is set to this value initially.
 	 *

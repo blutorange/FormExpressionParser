@@ -16,6 +16,7 @@ import de.xima.fc.form.expression.exception.parse.DuplicateRequireScopeDeclarati
 import de.xima.fc.form.expression.exception.parse.DuplicateScopedVariableDeclarationException;
 import de.xima.fc.form.expression.exception.parse.FunctionNameAlreadyDefinedException;
 import de.xima.fc.form.expression.exception.parse.ManualScopeAlreadyRequiredException;
+import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -46,9 +47,11 @@ implements IScopeDefinitionsBuilder {
 	@Nonnull
 	private final Map<String, Map<String, IHeaderNode>> manualMap;
 
+	private final boolean treatScopedFunctionOutsideHeaderAsError;
+
 	@Nonnull
-	public static IScopeDefinitionsBuilder collect(final Node node) throws ParseException {
-		final ScopeCollectVisitor v = new ScopeCollectVisitor();
+	public static IScopeDefinitionsBuilder collect(final Node node, final boolean strictMode) throws ParseException {
+		final ScopeCollectVisitor v = new ScopeCollectVisitor(strictMode);
 		node.jjtAccept(v);
 		v.currentMap = null;
 		v.currentScope = null;
@@ -56,10 +59,11 @@ implements IScopeDefinitionsBuilder {
 		return v;
 	}
 
-	private ScopeCollectVisitor() {
+	private ScopeCollectVisitor(final boolean treatScopedFunctionOutsideHeaderAsError) {
 		globalMap = new HashMap<>();
 		requiredSet = new HashSet<>();
 		manualMap = new HashMap<>();
+		this.treatScopedFunctionOutsideHeaderAsError = treatScopedFunctionOutsideHeaderAsError;
 	}
 
 	private void detachNodes() throws ParseException {
@@ -125,16 +129,29 @@ implements IScopeDefinitionsBuilder {
 	@Override
 	public void visit(final ASTFunctionClauseNode node) throws SemanticsException {
 		// Put function declaration at the top inside the global declaration.
-		final String scope = node.getScope();
-		if (scope == null) {
-			if (hasGlobal(node.getVariableName()))
-				throw new FunctionNameAlreadyDefinedException(node);
-			addGlobal(node.getVariableName(), new HeaderNodeImpl(node));
+		final Map<String, IHeaderNode> map = currentMap;
+		if (map != null) {
+			// Function inside scope (global / manual)
+			if (map.containsKey(node.getVariableName()))
+				throw new DuplicateScopedVariableDeclarationException(currentScope, node.getVariableName(), node);
+			node.supplyScope(currentScope);
+			map.put(node.getVariableName(), new HeaderNodeImpl(node));
 		}
 		else {
-			if (hasManual(scope) && hasManual(scope, node.getVariableName()))
-				throw new FunctionNameAlreadyDefinedException(node);
-			addManual(scope, node.getVariableName(), new HeaderNodeImpl(node));
+			// Add function outside scope to the corresponding scope
+			final String scope = node.getScope();
+			if (scope == null) {
+				if (hasGlobal(node.getVariableName()))
+					throw new FunctionNameAlreadyDefinedException(node);
+				addGlobal(node.getVariableName(), new HeaderNodeImpl(node));
+			}
+			else {
+				if (hasManual(scope) && hasManual(scope, node.getVariableName()))
+					throw new FunctionNameAlreadyDefinedException(node);
+				if (treatScopedFunctionOutsideHeaderAsError)
+					throw new ScopedFunctionOutsideHeaderException(node);
+				addManual(scope, node.getVariableName(), new HeaderNodeImpl(node));
+			}
 		}
 		// Collect everything from function bodies as well.
 		node.getBodyNode().jjtAccept(this);

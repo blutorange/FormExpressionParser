@@ -26,10 +26,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**TODO
  * - unparse: los nicer
- * - fixme: check current input.fep (global scope {var func = ->(a,b){a+b;};}func(2,5);)
  * - optional variable types
- * - support functions inside scope defs
- * - complain about invalid assignments to external scopes
  * - check for used/unused variables (especially this and arguments variable in function body)
  * - make it possible to check variables or external scopes provided by the external context for a particular external context without evaluating it
  *   => for example to check whether the current form version defines all field::.. variables

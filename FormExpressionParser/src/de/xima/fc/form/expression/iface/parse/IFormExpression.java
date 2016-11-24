@@ -12,8 +12,6 @@ import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
-//TODO should externalcontext be nullable / nonnull ???
-
 public interface IFormExpression<T extends IExternalContext> extends Serializable {
 	/**
 	 * Evaluates (executes) this program and returns the result. You must supply the

@@ -58,4 +58,8 @@ public abstract class AScopedSourceResolvableNode extends ASourceResolvableNode 
 		super.init(method, name);
 		this.scope = scope;
 	}
+	
+	protected void setScope(@Nullable final String scope) {
+		this.scope = scope;
+	}
 }

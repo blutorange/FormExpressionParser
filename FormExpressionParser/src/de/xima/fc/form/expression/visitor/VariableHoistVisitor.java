@@ -131,7 +131,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			final boolean treatMissingScopeDeclarationAsError) throws ParseException {
 		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory,
 				treatMissingDeclarationAsError, treatMissingRequireScopeAsError, treatMissingScopeDeclarationAsError);
-		v.resolveFunctions(scopeDefBuilder);
+		v.bindScopeDefValues(scopeDefBuilder);
 		node.jjtAccept(v);
 		v.binding.reset();
 	}

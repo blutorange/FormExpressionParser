@@ -187,26 +187,22 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		return object;
 	}
 
-	// TODO allow scope myscope{function(){}} syntactically
-	
-	// TODO check for illegal assignment of external scoped variables, eg
-	// field::tf1 = 8;
-
-	// TODO mark unused variables	
+	// TODO mark unused variables
 	
 	public static int resolve(final Node node, final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
 			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
 			final boolean treatMissingRequireScopeAsError) throws ParseException {
 		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, contractFactory,
 				treatMissingRequireScopeAsError);
-		v.resolveScopeDefs();
-		v.resolveFunctions(scopeDefBuilder);
+		v.resolveScopeDefs(scopeDefBuilder);
+		v.bindScopeDefValues(scopeDefBuilder);
 		node.jjtAccept(v);
 		v.binding.reset();
 		return v.symbolTableSize;
 	}
 
-	private void resolveScopeDefs() throws IllegalVariableSourceResolutionException {
+	private void resolveScopeDefs(final IScopeDefinitionsBuilder scopeDefBuilder)
+			throws IllegalVariableSourceResolutionException {
 		// Global.
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode header = it.next().getValue();

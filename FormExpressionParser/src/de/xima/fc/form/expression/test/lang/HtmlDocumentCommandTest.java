@@ -132,18 +132,15 @@ public class HtmlDocumentCommandTest {
 					.setEmbedment(new GenericEmbedment.Builder().build()).build();
 			ec.setExternalContext(ex);
 			return ec;
-
 		}
 		@Override
 		public IScopeInfo getExternalScopeInfo(final String scope) {
 			return scopeInfo;
 		}
-
 		@Override
 		public boolean isProvidingExternalScope(final String scope) {
 			return false;
 		}
-
 		@Override
 		public String[] getScopesForEmbedment(final String embedment) {
 			return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;

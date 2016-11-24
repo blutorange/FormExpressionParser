@@ -34,9 +34,6 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 
@@ -96,8 +93,6 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig.HeaderType;
 
 public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IOException> {
-	private final static Logger LOG = LoggerFactory.getLogger(UnparseVisitor.class);
-
 	private final Writer writer;
 	private final UnparseVisitorConfig config;
 	private final ImmutableList<IComment> comments;
@@ -106,6 +101,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	private boolean insideManualDefs;
 
+	//TODO comments for scopes are placed at wrong pos
+	
 	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
 			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final ImmutableList<IComment> comments)
 			throws IOException {
@@ -308,10 +305,12 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// function foo::bar(){}
 		if (header != null) {
 			if (header.isFunction()) {
+				writeCommentForNode(header.getNode(), prefix, true);
 				if (header.hasNode())
 					header.getNode().jjtAccept(this, prefix);
 			}
 			else {
+				writeCommentForNode(header.getNode(), prefix, true);
 				writer.write(CmnCnst.Syntax.VAR);
 				writer.write(config.requiredSpace);
 				writer.write(header.getVariableName());
@@ -355,8 +354,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				writer.write(prefix);
 			break;
 		default:
-			LOG.error("Unknown enum: " + commentToken.getCommentType());
-			break;
+			throw new IOException(String.format(CmnCnst.Error.ILLEGAL_ENUM_COMMENT, commentToken.getCommentType()));
 		}
 		// Get the next comment
 		++commentPos;

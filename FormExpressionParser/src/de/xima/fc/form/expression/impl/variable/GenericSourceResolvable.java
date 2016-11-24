@@ -11,6 +11,7 @@ public class GenericSourceResolvable implements ISourceResolvable, Serializable 
 	private static final long serialVersionUID = 1L;
 	@Nonnull
 	private final String name;
+	
 	private int source = EVariableSource.ID_UNRESOLVED;
 	public GenericSourceResolvable(@Nonnull final String name) {
 		this.name = name;
@@ -30,6 +31,7 @@ public class GenericSourceResolvable implements ISourceResolvable, Serializable 
 	public boolean isResolved() {
 		return source != EVariableSource.ID_UNRESOLVED;
 	}
+	
 	@Override
 	public String getVariableName() {
 		return name;

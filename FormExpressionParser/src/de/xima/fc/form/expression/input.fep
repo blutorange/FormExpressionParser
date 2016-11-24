@@ -1,7 +1,12 @@
-global scope {
-  var func = ->(a,b){a+b;};
+function s1::foo(i) {
+  if (i>30)
+    throw exception("overflow");
+  s2::foo(i+1);
 }
-foo::func(2,5);
-function scope1::foo() {
+function s2::foo(i) {
+  s3::foo(i+1);
 }
-scope1::foo();*/
+function s3::foo(i) {
+  s1::foo(i+1);
+}
+s1::foo(0);

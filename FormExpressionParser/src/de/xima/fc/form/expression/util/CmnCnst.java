@@ -256,6 +256,7 @@ public final class CmnCnst {
 		@Nonnull public static final String ILLEGAL_ENUM_SWITCH = "Illegal enum for switch : %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_LOGLEVEL = "No such log level %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_EQUAL = "Unexptected enum for equal expression: %s. " + INTERNAL_ERROR;
+		@Nonnull public static final String ILLEGAL_ENUM_COMMENT = "Unexptected enum for comment: %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String CANNOT_EVALUATE_VARIABLE_TYPE_NODE = "ASTVariableTypeDeclarationNode cannot be evaluated. " + INTERNAL_ERROR;
 		@Nonnull public static final String NULL_WRITER = "Writer must not be null";
 		@Nonnull public static final String TODO = "TODO - not yet implemented. " + INTERNAL_ERROR;
@@ -322,6 +323,7 @@ public final class CmnCnst {
 		@Nonnull public static final String HEADER_ASSIGNMENT_NOT_COMPILE_TIME_CONSTANT = "Illegal assignment for %s. Assignment in header definitions must be compile-time constant.";
 		@Nonnull public static final String SEMANTIC_PARSE_EXCEPTION = "Error during parsing at line %d, column %d: %s";
 		@Nonnull public static final String DUPLICATE_SCOPED_VARIABLE = "Variable %s under scope %s was already declared previously.";
+		@Nonnull public static final String SCOPED_FUNCTION_OUTSIDE_HEADER = "Occurence of function %s::%s at top level. Scoped function must be defined in a scope block in strict mode.";
 	}
 
 	public static final class ToString {

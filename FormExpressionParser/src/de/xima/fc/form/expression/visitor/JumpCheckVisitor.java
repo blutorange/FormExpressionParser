@@ -21,8 +21,6 @@ import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 
 public class JumpCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Set<String>, SemanticsException> {
-	//TODO acutally use this visitor
-	//TODO perhaps we can resolve jumps already???
 	private int insideFunction = 0;
 	private int nullLabel = 0;
 

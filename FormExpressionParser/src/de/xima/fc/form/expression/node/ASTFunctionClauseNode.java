@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -112,5 +113,10 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	@Nonnull
 	public ASTVariableNode getVariableNode() {
 		return (ASTVariableNode) jjtGetChild(0);
+	}
+
+	public void supplyScope(@Nullable final String scope) {
+		if (scope != null)
+			setScope(scope);
 	}
 }
