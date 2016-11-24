@@ -79,6 +79,7 @@ public final class CmnCnst {
 		@Nonnull public static final String KEY = "key";
 		@Nonnull public static final String HASH = "hash";
 		@Nonnull public static final String VALUE = "value";
+		@Nonnull public static final String EMPTY_LABEL = "without label";
 	}
 
 	public final static class ExpressionMethod {

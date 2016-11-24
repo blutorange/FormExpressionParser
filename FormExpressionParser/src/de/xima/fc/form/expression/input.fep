@@ -1,12 +1,1 @@
-function s1::foo(i) {
-  if (i>30)
-    throw exception("overflow");
-  s2::foo(i+1);
-}
-function s2::foo(i) {
-  s3::foo(i+1);
-}
-function s3::foo(i) {
-  s1::foo(i+1);
-}
-s1::foo(0);
+0.0.lower();

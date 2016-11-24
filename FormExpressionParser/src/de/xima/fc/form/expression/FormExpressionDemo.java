@@ -26,6 +26,8 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**TODO
  * - unparse: los nicer
+ * - unparse: comments at wrongs position (variable hoisting etc.)
+ * - unparse: wrong header pos for template programs (eg. [%%=i=0;%])
  * - optional variable types
  * - check for used/unused variables (especially this and arguments variable in function body)
  * - make it possible to check variables or external scopes provided by the external context for a particular external context without evaluating it

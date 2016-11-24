@@ -27,6 +27,12 @@ public class NullUtil {
 		return string != null ? string : CmnCnst.NonnullConstant.STRING_EMPTY;
 	}
 
+	@Nonnull
+	public static String or(@Nullable final String string, @Nonnull final String orString) {
+		return string != null ? string : orString;
+	}
+
+	
 	public static void main(final String[] args) {
 		final char c = '3';
 		System.out.println(toString(c));

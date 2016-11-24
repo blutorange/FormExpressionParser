@@ -60,8 +60,8 @@ enum SemanticsSuccess implements ITestCase {
 	// Variables and scopes.
 	SCOPE001("k=42;k;", Tests.N42), // local variables
 	SCOPE002("k=0;if(true)k=42;k;", Tests.N42), // can access parent when nesting
-	SCOPE003("k=42;->(){k=0;}();k;", Tests.N42), // functions with separate scope
-	SCOPE004("k=42;function foo(){k=0;};foo();k;", Tests.N42), // functions with separate scope
+	SCOPE003("k=42;->(){var k=0;}();k;", Tests.N42), // functions with separate scope
+	SCOPE004("k=42;function foo(){var k=0;};foo();k;", Tests.N42), // functions with separate scope
 	SCOPE005("k=42;->(){k;}();", Tests.N42), // accessing global variables
 	SCOPE006("k=0;->(){k=42;k;}();", Tests.N42), // shadowing global variables
 	SCOPE007("foo::k=0;bar::k=42;bar::k;",Tests.N42), // scopes
@@ -69,7 +69,7 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE009("foo::k=0;with(foo){k=42;k;}", Tests.N42), // default scopes writing to vars
 	SCOPE010("foo::k=42;with(foo){k=0;foo::k;}", Tests.N42), // can still access explicitly
 	SCOPE011("k=42;foo::k=0;with(foo){k;}", Tests.N42), // first global, then default scope
-	SCOPE012("function foo(){0;}function foo::bar(){42;}", Tests.N42), // scoped function
+	SCOPE012("function foo(){0;}function foo::bar(){42;};with(foo)bar();", Tests.N42), // scoped function
 	SCOPE013("scope myscope{var a=42;}with(myscope){a;}", Tests.N42), // resolving scopes
 	
 	//Property expressions

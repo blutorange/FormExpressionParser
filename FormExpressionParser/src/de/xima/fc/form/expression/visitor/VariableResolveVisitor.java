@@ -149,7 +149,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	@Override
 	public void visit(final ASTWithClauseNode node) throws ParseException {
 		try {
-			for (int i = 0; i < node.getScopeCount(); ++i)
+			for (int i = node.getScopeCount(); i-->0;)
 				defaultScopeStack.push(node.getScope(i));
 			node.getBodyNode().jjtAccept(this);
 		}

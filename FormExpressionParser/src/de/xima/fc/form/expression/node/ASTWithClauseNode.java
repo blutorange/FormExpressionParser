@@ -52,7 +52,7 @@ public class ASTWithClauseNode extends ANode {
 	
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		if (jjtGetNumChildren() < 3)
+		if (i==0 && jjtGetNumChildren() < 2)
 			throw new ArrayIndexOutOfBoundsException();
 		return i == jjtGetNumChildren() - 1 ? nullNode() : null;
 	}

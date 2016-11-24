@@ -5,7 +5,12 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
 import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
+import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
+import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
+import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclarationException;
+import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
@@ -36,17 +41,29 @@ enum SyntaxFailure implements ITestCase {
 	TEST019("if (true) require scope math;", "Encountered \" \"require\" \"require \"\" at line 1, column 11."),
 	TEST020("scoped::var.works['great']();", "Encountered \" \"var\" \"var \"\" at line 1, column 9."),
 	TEST021("a = var b = c;", "Encountered \" \"var\" \"var \"\" at line 1, column 5."),
-	TEST022(new Cfg("var i = i;").err("Variable unresolvable.").err(VariableNotResolvableException.class)),
+	TEST022(new Cfg("var i = i;").err("Error during parsing at line 1, column 1: Encountered variable declaration for i at global scope. Global variable must be declared in a global{} block.").err(IllegalVariableDeclarationAtGlobalScopeException.class)),
 	TEST024("if(false){function foo(){}}", "Encountered \" \"function\" \"function \"\" at line 1, column 11."),
-	TEST025(new Cfg("global scope {var i=0;var j=i;}j;").err("Error during parsing at line 1, column 27: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
-	TEST026(new Cfg("scope myscope{var i=0;var j=i;}j;").err("Error during parsing at line 1, column 27: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
+	TEST025(new Cfg("global scope {var i=0;var j=i;}j;").err("Error during parsing at line 1, column 29: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
+	TEST026(new Cfg("scope myscope{var j=''.lower();}myscope::j;").err("Error during parsing at line 1, column 21: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
 	TEST027(new Cfg("if(true){var i=0;}else{var j=i+3;}").err("Error during parsing at line 1, column 30: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
-	TEST028(new Cfg("require scope math;math::pi=9;").err("Cannot assign to external").err(IllegalExternalScopeAssignmentException.class)),
-	STRICT001(new Cfg("a = b").err("Variable use before declaration in strict mode.").strict()),
-
-	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.")),
-	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.")),
-	TEMPLATE003(new Cfg("<foo> [% foo(); <bar>").template().err("Encountered \" \"<\" \"< \"\" at line 1, column 17.")),
+	TEST028(new Cfg("require scope math;math::pi=9;").err("Error during parsing at line 1, column 20: Variable math::pi belongs to an external scope and cannot be assigned to.").err(IllegalExternalScopeAssignmentException.class)),
+	TEST029(new Cfg("break;").err("Error during parsing at line 1, column 1: Break without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST030(new Cfg("continue;").err("Error during parsing at line 1, column 1: Continue without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST031(new Cfg("return;").err("Error during parsing at line 1, column 1: Return clause used outside a function.").err(IllegalJumpClauseException.class)),
+	TEST032(new Cfg("while(true)break foo;").err("Error during parsing at line 1, column 12: Break foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST033(new Cfg("while<foo>(true)break;").err("Error during parsing at line 1, column 17: Break without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST034(new Cfg("while<foo>(true);while(true)break foo;").err("Error during parsing at line 1, column 29: Break foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST035(new Cfg("do{continue foo;}while(true);").err("Error during parsing at line 1, column 4: Continue foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST036(new Cfg("for<foo>(i:10)continue;").err("Error during parsing at line 1, column 15: Continue without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST037(new Cfg("switch<foo>(true){};while(true)continue foo;").err("Error during parsing at line 1, column 32: Continue foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
+	TEST038(new Cfg("if(true)var i = i;").err("Error during parsing at line 1, column 17: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
+	
+	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
+	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),
+	
+	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.").err(ParseException.class)),
+	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.").err(ParseException.class)),
+	TEMPLATE003(new Cfg("<foo> [%foo=0;foo(); <bar>").template().err("Encountered \" \"<\" \"< \"\" at line 1, column 22.").err(ParseException.class)),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;
@@ -56,7 +73,7 @@ enum SyntaxFailure implements ITestCase {
 	private final boolean strictMode;
 	
 	private SyntaxFailure(@Nonnull final String code, @Nonnull final String errMsg) {
-		this(new Cfg(code).err(errMsg));
+		this(new Cfg(code).err(errMsg).err(ParseException.class));
 	}
 	private SyntaxFailure(final Cfg cfg) {
 		this.code = cfg.code;
