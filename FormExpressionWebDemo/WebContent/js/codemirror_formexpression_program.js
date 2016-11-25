@@ -8,7 +8,8 @@ CodeMirror.defineSimpleMode("formexpression-program", {
     {regex: /(for|switch|do|while)(\s*)(<[a-zA-Z_][a-zA-Z0-9_]*>)/, token: ["keyword", null, "def"]},
     {regex: /(break|continue)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)/, token: ["keyword", null, "def"]},
     {regex: /(function)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)/, token: ["keyword", null, "variable-2"]},    
-    {regex: /(?:function|with|return|throw|var|global|scope|require|continue|break|if|for|while|else|do|try|catch|switch|case|default|loginfo|logwarn|logerror|logdebug)\b/, token: "keyword"},
+    {regex: /(?:var|global|scope|require)\b/, token: "def"},
+    {regex: /(?:function|with|return|throw|continue|break|if|for|while|else|do|try|catch|switch|case|default|loginfo|logwarn|logerror|logdebug)\b/, token: "keyword"},
     {regex: /true|false|null|exception/, token: "atom"},
     {regex: /[-+]?(?:\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?/, token: "number"},
     // Single line comment
