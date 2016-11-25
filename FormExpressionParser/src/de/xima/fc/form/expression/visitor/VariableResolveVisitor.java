@@ -30,7 +30,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	@Nonnull
 	private final IEvaluationContextContractFactory<?> contractFactory;
 	@Nonnull
-	private final Stack<String> defaultScopeStack = new Stack<String>();
+	private final Stack<String> defaultScopeStack = new Stack<>();
 
 	private final boolean treatMissingRequireScopeAsError;
 	private int symbolTableSize = 0;
@@ -60,11 +60,9 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 				node.resolveSource(header.getSource(), scope);
 				return true;
 			}
-			else {
-				if (doThrow)
-					throw new ScopeMissingVariableException(scope, name, node);
-				return false;
-			}
+			if (doThrow)
+				throw new ScopeMissingVariableException(scope, name, node);
+			return false;
 		}
 
 		// Try external scope.
@@ -158,7 +156,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 				defaultScopeStack.pop();
 		}
 	}
-	
+
 	@Override
 	public void visit(final ASTAssignmentExpressionNode node) throws ParseException {
 		// Resolve all variables first.
@@ -186,7 +184,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		res.resolveSource(object);
 		return object;
 	}
-	
+
 	public static int resolve(final Node node, final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
 			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
 			final boolean treatMissingRequireScopeAsError) throws ParseException {

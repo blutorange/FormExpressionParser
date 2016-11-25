@@ -44,24 +44,28 @@ public class ASTIfClauseNode extends ANode {
 		assertChildrenBetween(2, 3);
 		super.init(method);
 	}
-	
+
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return i == 3 ? null : nullNode();
 	}
-	
+
 	@Nonnull
 	public Node getConditionNode() {
 		return jjtGetChild(0);
 	}
-	
+
 	@Nonnull
 	public Node getIfNode() {
 		return jjtGetChild(1);
 	}
-	
+
 	@Nullable
 	public Node getElseNode() {
 		return jjtGetNumChildren() == 3 ? jjtGetChild(2) : null;
+	}
+
+	public boolean hasElseNode() {
+		return jjtGetNumChildren() == 3;
 	}
 }

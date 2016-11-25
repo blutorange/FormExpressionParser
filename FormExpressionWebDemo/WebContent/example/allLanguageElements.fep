@@ -1,3 +1,32 @@
+// Local and global variables.
+
+global scope {        // Global variables are introduced in
+  var globalVariable; // their own block, which should be at
+}                     // the beginning, but does not have to be.
+globalVariable2 = 0;  // In non-strict mode, global variables
+                      // are automatically declared upon assignment.
+
+scope myScope {       // You can define your own scopes to
+  var scopedVariable; // prevent confusion amongst different
+}                     // variables.
+myScope::scopedVariable = 2; // Scoped variables are accessed via :: notation.
+
+scope myScope {       // Scoped function can be
+  function sum(a,b) { // declared in directly in
+    a+b;              // the scope header block.
+  }
+}
+function myScope::multitply(a,b) { // Or outside the header
+  a*b;                             // block as well, whatever
+}                                  // suits you better.
+
+if (true) {           // Local variables are
+  var i = 0;          // block-scoped. Do not
+  while (i<10) {      // forget to prepend them
+    var name = "Max"; // with var, or they will be
+    ++i;              // interpreted as global variables.
+  }                   // In strict mode, you need to declare
+}                     // them or a parse exception will be thrown.
 // Literals
 null;            // Null.
 true == !false;  // Booleans.
@@ -24,10 +53,10 @@ loginfo("info"); // Log message at log level info.
 loginfo("warn"); // Log message at log level warn.
 loginfo("error"); // Log message at log level error.
 
-// Variables
-variable = 1; // default global scope
-myScope::variable = 2; // custom scope
-variable + myScope::variable; // => 3
+// Variables are created automatically in non-strict mode.
+variable = 1; // Default global scope
+yourScope::variable = 2; // Custom scope.
+variable + yourScope::variable; // => 3
 
 // Operators
 (1 + 2) * 3;      // Operators work as expected.
@@ -50,7 +79,7 @@ for (key : {1:null,2:null,3:null})
   loginfo(key);              // => 1 2 3
 
 // While loop, Do-While loop
-while (false) doSomething();
+while (false) ->(){};
 do 1+2; while (false);
 
 // Switch
@@ -76,7 +105,7 @@ while<outer> (true) {
 
 // Error handling.
 try {
-  nonExistingVariable;
+  null.toLowerCase();
 }
 catch (e) {
   logerror(e);

@@ -5,9 +5,6 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.context.ITraceElement;
@@ -21,28 +18,23 @@ public class EvaluationException extends Exception {
 		super(exception);
 		if (exception != null) {
 			ec = exception.ec;
-			externalContext = exception.ec.transform(new Function<IEvaluationContext, Optional<IExternalContext>>(){
-				@Override
-				public Optional<IExternalContext> apply(final IEvaluationContext ec) {
-					return ec != null ? ec.getExternalContext() : Optional.<IExternalContext>absent();
-				}
-			}).or(Optional.<IExternalContext>absent());
+			externalContext = ec != null ? ec.getExternalContext() : null;
 		}
 		else {
-			ec = Optional.absent();
-			externalContext = Optional.absent();
+			ec = null;
+			externalContext = null;
 		}
 	}
 
 	public EvaluationException(@Nonnull final IEvaluationContext ec) {
 		super(msgWithContext(StringUtils.EMPTY, ec));
-		this.ec = Optional.fromNullable(ec);
+		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
 
 	public EvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
 		super(msgWithContext(msg, ec));
-		this.ec = Optional.fromNullable(ec);
+		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
 
@@ -53,21 +45,21 @@ public class EvaluationException extends Exception {
 	 */
 	protected EvaluationException(@Nonnull final String msg, @Nonnull final Throwable throwable) {
 		super(msg, throwable);
-		ec = Optional.absent();
-		externalContext = Optional.absent();
+		ec = null;
+		externalContext = null;
 	}
 
 	protected EvaluationException(@Nonnull final IExternalContext externalContext, @Nonnull final String msg,
 			@Nonnull final Throwable throwable) {
 		super(msg, throwable);
-		ec = Optional.absent();
-		this.externalContext = Optional.fromNullable(externalContext);
+		ec = null;
+		this.externalContext = externalContext;
 	}
 
 	public EvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg,
 			@Nonnull final Throwable throwable) {
 		super(msgWithContext(msg, ec), throwable);
-		this.ec = Optional.fromNullable(ec);
+		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
 
@@ -101,11 +93,11 @@ public class EvaluationException extends Exception {
 			.append(System.lineSeparator())
 			.append(CmnCnst.Error.EVALUATION_EXCEPTION_EX)
 			.append(' ')
-			.append(ec.getExternalContext().orNull());
-			final Optional<IExternalContext> ex = ec.getExternalContext();
-			if (ex.isPresent()) {
+			.append(ec.getExternalContext());
+			final IExternalContext ex = ec.getExternalContext();
+			if (ex != null) {
 				sb.append('(')
-				.append(ex.get().getClass().getCanonicalName())
+				.append(ex.getClass().getCanonicalName())
 				.append(')');
 			}
 		}
@@ -140,9 +132,9 @@ public class EvaluationException extends Exception {
 	 * {@link NumberLangObject#divide(NumberLangObject)} etc. that do not have
 	 * access to the context.
 	 */
-	@Nonnull
-	public final transient Optional<IEvaluationContext> ec;
+	@Nullable
+	public final transient IEvaluationContext ec;
 
-	@Nonnull
-	public final transient Optional<IExternalContext> externalContext;
+	@Nullable
+	public final transient IExternalContext externalContext;
 }

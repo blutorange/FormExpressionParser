@@ -18,14 +18,14 @@ import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 /**
  * Servlet implementation class HighlightServlet
  */
-@WebServlet("/FormatServlet")
-public class FormatServlet extends AFormExpressionServlet {
+@WebServlet("/UnformatServlet")
+public class UnformatServlet extends AFormExpressionServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public FormatServlet() {
+	public UnformatServlet() {
 		super(CmnCnst.TIMEOUT, CmnCnst.TIMEOUT_UNIT);
 	}
 
@@ -38,32 +38,27 @@ public class FormatServlet extends AFormExpressionServlet {
 				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
 				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
 				final String indent = request.getParameter(CmnCnst.URL_PARAM_KEY_INDENT);
-				final UnparseVisitorConfig config = new UnparseVisitorConfig.Builder()
-						.setLinefeed('\n')
-						.setIndentPrefix(indent)
-						.setOptionalSpace(0)
-						.setRequiredSpace(1)
-						.setKeepComments(false)
-						.build();				final JSONObject json = new JSONObject();
-						if (code == null) {
-							json.put(CmnCnst.RESPONSE_ERROR, CmnCnst.RESPONSE_ERROR_PARAM_CODE_REQUIRED);
+				final UnparseVisitorConfig config = UnparseVisitorConfig.getUnstyledWithoutCommentsConfig();
+				final JSONObject json = new JSONObject();
+				if (code == null) {
+					json.put(CmnCnst.RESPONSE_ERROR, CmnCnst.RESPONSE_ERROR_PARAM_CODE_REQUIRED);
+				}
+				else {
+					try (final Writer html = new StringBuilderWriter(); final Writer css = new StringBuilderWriter()) {
+						final String formatted;
+						if (CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM.equalsIgnoreCase(type)) {
+							formatted = FormExpressionFactory.forProgram().format(code, config);
 						}
 						else {
-							try (final Writer html = new StringBuilderWriter(); final Writer css = new StringBuilderWriter()) {
-								final String formatted;
-								if (CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM.equalsIgnoreCase(type)) {
-									formatted = FormExpressionFactory.forProgram().format(code, config);
-								}
-								else {
-									formatted = FormExpressionFactory.forTemplate().format(code, config);
-								}
-								json.put(CmnCnst.RESPONSE_TEXT, formatted);
-							}
-							catch (ParseException | TokenMgrError | IOException e) {
-								json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_PARSING_FAILED, e.getMessage()));
-							}
+							formatted = FormExpressionFactory.forTemplate().format(code, config);
 						}
-						return json;
+						json.put(CmnCnst.RESPONSE_TEXT, formatted);
+					}
+					catch (ParseException | TokenMgrError | IOException e) {
+						json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_PARSING_FAILED, e.getMessage()));
+					}
+				}
+				return json;
 			}
 		};
 	}

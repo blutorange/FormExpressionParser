@@ -3,8 +3,6 @@ package de.xima.fc.form.expression.impl;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
-
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEmbedment;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -25,7 +23,7 @@ public final class GenericEvaluationContext implements IEvaluationContext {
 	@Nonnull private final ITracer<Node> tracer;
 	@Nonnull private final IExternalScope scope;
 	@Nonnull private final IEmbedment embedment;
-	@Nonnull private Optional<IExternalContext> externalContext = Optional.absent();
+	@Nullable private IExternalContext externalContext;
 	@Nonnull private IVariableReference[] symbolTable;
 
 	/**
@@ -84,16 +82,16 @@ public final class GenericEvaluationContext implements IEvaluationContext {
 		scope.reset();
 		embedment.reset();
 		tracer.reset();
-		externalContext = Optional.absent();
+		externalContext = null;
 	}
 
 	@Override
 	public void setExternalContext(final IExternalContext externalContext) {
-		this.externalContext = Optional.fromNullable(externalContext);
+		this.externalContext = externalContext;
 	}
 
 	@Override
-	public Optional<IExternalContext> getExternalContext() {
+	public IExternalContext getExternalContext() {
 		return externalContext;
 	}
 
@@ -107,7 +105,7 @@ public final class GenericEvaluationContext implements IEvaluationContext {
 		b.setScope(GenericExternalScope.getEmptyScopeInstance());
 		return b.build();
 	}
-	
+
 	public final static class Builder {
 		private ILogger logger;
 		private ITracer<Node> tracer;

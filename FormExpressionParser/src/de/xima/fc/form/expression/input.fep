@@ -1,1 +1,1 @@
-[%tf19%]
+<p>Hello world, <span>[%%='op'.toUpperCase()%]</span>!!! Nice weather today.</p>

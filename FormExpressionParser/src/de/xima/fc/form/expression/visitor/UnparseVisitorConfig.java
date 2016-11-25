@@ -20,7 +20,7 @@ public final class UnparseVisitorConfig {
 	@Nonnull public final String optionalSpace;
 	@Nonnull public final String requiredSpace;
 	public final boolean keepComments;
-	
+
 	private UnparseVisitorConfig(@Nonnull final String indentPrefix, @Nonnull final String linefeed,
 			@Nonnull final String optionalSpace, @Nonnull final String requiredSpace,
 			final boolean keepComments) {
@@ -37,7 +37,7 @@ public final class UnparseVisitorConfig {
 		@Nullable private String optionalSpace;
 		@Nullable private String requiredSpace;
 		private boolean keepComments;
-		
+
 		/**
 		 * Sets the prefix to the beginning of each line for each indentation level.
 		 * @param indentPrefix Prefix for indentation. Defaults to two spaces (<code>  </code>).
@@ -92,7 +92,7 @@ public final class UnparseVisitorConfig {
 		public Builder setKeepComments(final boolean keepComments) {
 			this.keepComments = keepComments;
 			return this;
-		}		
+		}
 		/**
 		 * @param linefeed Character to be used as for newlines.
 		 * @return this
@@ -117,7 +117,7 @@ public final class UnparseVisitorConfig {
 			indentPrefix = indentPrefix.replaceAll("[^\t ]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
 			linefeed = linefeed.replaceAll("[^\r\n]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
 			if (indentPrefix == null) indentPrefix = CmnCnst.NonnullConstant.STRING_SPACE;
-			if (linefeed.isEmpty()) linefeed = CmnCnst.NonnullConstant.STRING_LF;
+			if (linefeed == null) linefeed = CmnCnst.NonnullConstant.STRING_LF;
 			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
 		}
 	}

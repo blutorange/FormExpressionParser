@@ -13,10 +13,16 @@
 		<servlet-class>de.xima.fc.form.expression.webdemo.EvaluateServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
-	   <servlet>
-        <servlet-name>FormatServlet</servlet-name>
-        <servlet-class>de.xima.fc.form.expression.webdemo.FormatServlet</servlet-class>
+
+	<servlet>
+		<servlet-name>FormatServlet</servlet-name>
+		<servlet-class>de.xima.fc.form.expression.webdemo.FormatServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+    <servlet>
+        <servlet-name>UnformatServlet</servlet-name>
+        <servlet-class>de.xima.fc.form.expression.webdemo.UnformatServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

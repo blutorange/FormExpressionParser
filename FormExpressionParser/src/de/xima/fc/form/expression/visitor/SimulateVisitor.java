@@ -23,10 +23,10 @@ public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<Evalua
 	private final IEvaluationContext ec;
 	@Nullable
 	private final IExternalContext ex;
-	
+
 	private SimulateVisitor(@Nonnull final IEvaluationContext ec) {
 		this.ec = ec;
-		ex = ec.getExternalContext().orNull();
+		ex = ec.getExternalContext();
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<Evalua
 		}
 		ec.getTracer().setCurrentlyProcessed(node);
 	}
-	
+
 	@Override
 	public void visit(final ASTVariableNode node) throws EvaluationException {
 		final String scope = node.getScope();

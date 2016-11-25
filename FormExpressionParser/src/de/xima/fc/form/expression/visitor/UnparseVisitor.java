@@ -98,11 +98,11 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
 			@Nonnull final ImmutableList<IComment> comments)
-			throws IOException {
+					throws IOException {
 		unparse(writer, node, comments, UnparseVisitorConfig.getDefaultConfig());
 	}
 
-	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node, 
+	public static void unparse(@Nonnull final Writer writer, @Nonnull final Node node,
 			@Nonnull final ImmutableList<IComment> comments,
 			@Nonnull final UnparseVisitorConfig config) throws IOException {
 		final UnparseVisitor unparser = new UnparseVisitor(writer, comments, config);
@@ -148,7 +148,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		this.writer = writer;
 		this.comments = comments;
 		this.commentPos = 0;
-		this.commentToken = (commentPos < comments.size()) ? comments.get(commentPos) : null;
+		this.commentToken = (config.keepComments && commentPos < comments.size()) ? comments.get(commentPos) : null;
 	}
 
 	private void writeComment(@Nonnull final String prefix, final boolean isBlock) throws IOException {
@@ -189,7 +189,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	private void writeRemainingComments() throws IOException {
 		writer.write(config.linefeed);
-		while (commentToken != null)
+		while (config.keepComments && commentToken != null)
 			writeComment(CmnCnst.NonnullConstant.STRING_EMPTY, true);
 	}
 
@@ -205,7 +205,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// node.
 		while (commentToken != null
 				&& (node.getStartLine() > commentToken.getLine() || node.getStartLine() == commentToken.getLine()
-						&& node.getStartColumn() >= commentToken.getColumn())) {
+				&& node.getStartColumn() >= commentToken.getColumn())) {
 			writeComment(prefix, isBlock);
 		}
 	}
@@ -568,7 +568,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				blockOrClause(node.jjtGetChild(i), next2);
 				writer.write(config.linefeed);
 				break;
-			// $CASES-OMITTED$
+				// $CASES-OMITTED$
 			default:
 				throw new RuntimeException(
 						String.format(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()));
@@ -743,7 +743,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				}
 				writer.write(Syntax.PAREN_CLOSE);
 				break;
-			// $CASES-OMITTED$
+				// $CASES-OMITTED$
 			default:
 				throw new RuntimeException(String.format(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION,
 						node.jjtGetChild(i).getSiblingMethod()));

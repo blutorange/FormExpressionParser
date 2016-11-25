@@ -6,7 +6,7 @@ import de.xima.fc.form.expression.enums.ECommentType;
 import de.xima.fc.form.expression.iface.parse.IComment;
 
 public class CommentImpl implements IComment {
-
+	private static final long serialVersionUID = 1L;
 	@Nonnull private final String text;
 	@Nonnull private final ECommentType type;
 	private final int column;

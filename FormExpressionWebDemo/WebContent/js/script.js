@@ -35,6 +35,7 @@ $(function(){
 	var selectTheme = $("#theme")
 	var buttonHlgt = $("#buttonHighlight")
 	var buttonFmt = $("#buttonFormat")
+	var buttonMin = $("#buttonMinify")
 	var buttonEval = $("#buttonEvaluate")
 	
 	
@@ -80,6 +81,27 @@ $(function(){
 		myCodeMirror.save();
 		out.empty().text("working...")
 		$.post("./FormatServlet", form.serialize(), null, "json")
+			.done(function(data){
+				console.log(data, (data||{}).text)
+				out.empty()
+				if (data.error) {
+					out.text(data.error)
+				}
+				else {
+					myCodeMirror.setValue(data.text);
+				}
+			})
+			.fail(function(){
+				out.empty()
+				out.append("Failed to execute post request, try again.")
+			})
+	})
+	buttonMin.on("click", function() {
+		var form = $("#codeForm")
+		var out = $("#output")
+		myCodeMirror.save();
+		out.empty().text("working...")
+		$.post("./UnformatServlet", form.serialize(), null, "json")
 			.done(function(data){
 				console.log(data, (data||{}).text)
 				out.empty()

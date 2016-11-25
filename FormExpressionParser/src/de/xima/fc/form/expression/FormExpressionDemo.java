@@ -43,6 +43,8 @@ public class FormExpressionDemo {
 	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
 	@Nonnull
 	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
+	@Nonnull
+	private static final UnparseVisitorConfig UNPARSE_CONFIG = UnparseVisitorConfig.getUnstyledWithoutCommentsConfig();
 
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
@@ -56,12 +58,12 @@ public class FormExpressionDemo {
 		showHighlighting(tokenArray);
 
 		IFormExpression<FormcycleExternalContext> expression = parseCode(code);
-		
+
 		if (expression == null)
 			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
 
 		expression = showSerialization(expression);
-		
+
 		final Node node = showParseTree(code);
 
 		if (node == null)
@@ -212,7 +214,7 @@ public class FormExpressionDemo {
 	private static void showFormatted(@Nonnull final String code) {
 		final String format;
 		try {
-			format = EXPRESSION_FACTORY.format(code, UnparseVisitorConfig.getDefaultConfig());
+			format = EXPRESSION_FACTORY.format(code, UNPARSE_CONFIG);
 		}
 		catch (final ParseException e) {
 			e.printStackTrace();

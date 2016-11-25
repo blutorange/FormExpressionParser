@@ -3,8 +3,6 @@ package de.xima.fc.form.expression.iface.context;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Optional;
-
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.object.FunctionLangObject;
@@ -35,8 +33,8 @@ public interface IEvaluationContext extends IReset {
 	@Nonnull
 	public IEmbedment getEmbedment();
 
-	@Nonnull
-	public Optional<IExternalContext> getExternalContext();
+	@Nullable
+	public IExternalContext getExternalContext();
 	public void setExternalContext(@Nullable IExternalContext externalContext);
 
 	/**

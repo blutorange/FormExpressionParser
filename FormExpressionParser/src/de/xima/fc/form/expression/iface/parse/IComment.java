@@ -1,8 +1,10 @@
 package de.xima.fc.form.expression.iface.parse;
 
+import java.io.Serializable;
+
 import de.xima.fc.form.expression.enums.ECommentType;
 
-public interface IComment {
+public interface IComment extends Serializable {
 	/** @return The text of this comment. */
 	public String getText();
 

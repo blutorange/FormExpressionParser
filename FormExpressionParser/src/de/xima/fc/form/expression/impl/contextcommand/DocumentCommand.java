@@ -31,7 +31,7 @@ public class DocumentCommand extends AExternalContextCommand {
 		this.data = dataArray;
 	}
 
-	private final static void assertArguments(final EDocumentCommandType type, final String[] data) {
+	private final static void assertArguments(@Nullable final EDocumentCommandType type, @Nonnull final String[] data) {
 		if (type == null)
 			throw new IllegalArgumentException(CmnCnst.Error.NULL_TYPE);
 		if (data.length != type.argc)
@@ -51,36 +51,44 @@ public class DocumentCommand extends AExternalContextCommand {
 		return type;
 	}
 
+	@Nonnull
 	public static DocumentCommand getRemoveEnclosingParagraphInstance() {
 		return InstanceHolder.REMOVE_ENCLOSING_PARAGRAPH;
 	}
 
+	@Nonnull
 	public static DocumentCommand getRemoveEnclosingTableInstance() {
 		return InstanceHolder.REMOVE_ENCLOSING_TABLE;
 	}
 
+	@Nonnull
 	public static DocumentCommand getRemoveEnclosingTableRowInstance() {
 		return InstanceHolder.REMOVE_ENCLOSING_TABLE_ROW;
 	}
 
+	@Nonnull
 	public static DocumentCommand getNoOpInstance() {
 		return InstanceHolder.NO_OP;
 	}
 
+	@Nonnull
 	public static DocumentCommand newInsertLink(final String href, final String text, final String target) {
 		return new DocumentCommand(EDocumentCommandType.INSERT_LINK, href, text, target);
 	}
 
+	@Nonnull
 	public static DocumentCommand newRemoveEnclosingTag(final String tagName) {
 		return tagName == null ? getNoOpInstance()
 				: new DocumentCommand(EDocumentCommandType.REMOVE_ENCLOSING_TAG, tagName);
 	}
 
+	@Nonnull
 	public static DocumentCommand newRemovePreviousTag(final String tagName) {
 		return tagName == null ? getNoOpInstance()
 				: new DocumentCommand(EDocumentCommandType.REMOVE_PREVIOUS_TAG, tagName);
 	}
 
+	@Nonnull
 	public static DocumentCommand newRemoveNextTag(final String tagName) {
 		return tagName == null ? getNoOpInstance() : new DocumentCommand(EDocumentCommandType.REMOVE_NEXT_TAG, tagName);
 	}
@@ -124,12 +132,16 @@ public class DocumentCommand extends AExternalContextCommand {
 	}
 
 	private final static class InstanceHolder {
+		@Nonnull
 		public final static DocumentCommand REMOVE_ENCLOSING_PARAGRAPH = new DocumentCommand(
 				EDocumentCommandType.REMOVE_ENCLOSING_TAG, "p"); //$NON-NLS-1$
+		@Nonnull
 		public final static DocumentCommand REMOVE_ENCLOSING_TABLE = new DocumentCommand(
 				EDocumentCommandType.REMOVE_ENCLOSING_TAG, "table"); //$NON-NLS-1$
+		@Nonnull
 		public final static DocumentCommand REMOVE_ENCLOSING_TABLE_ROW = new DocumentCommand(
 				EDocumentCommandType.REMOVE_ENCLOSING_TAG, "tr"); //$NON-NLS-1$
+		@Nonnull
 		public final static DocumentCommand NO_OP = new DocumentCommand(EDocumentCommandType.NO_OP);
 	}
 }
