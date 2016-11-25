@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.parse.IScopeInfo;
@@ -40,7 +41,7 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 		this(writer, new Formcycle());
 	}
 
-	public FormcycleExternalContext(@Nonnull Writer writer, @Nonnull Formcycle formcycle) {
+	public FormcycleExternalContext(@Nonnull final Writer writer, @Nonnull final Formcycle formcycle) {
 		this.writer = writer;
 		this.formcycle = formcycle;
 	}
@@ -77,18 +78,16 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 	@Nonnull
 	@Override
 	public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name,
-			@Nonnull final IEvaluationContext ec) throws VariableNotDefinedException {
+			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		@Nullable final FormcycleScope s = scopeMap.get(scope);
-		if (s == null)
+		if (s == null) {
 			throw new VariableNotDefinedException(scope, name, ec);
-		final ALangObject o = s.fetch(name, formcycle);
-		if (o == null)
-			throw new VariableNotDefinedException(scope, name, ec);
-		return o;
+		}
+		return s.fetch(name, formcycle, ec);
 	}
 
 	@Nullable
-	public static IScopeInfo getScopeInfo(String scope) {
+	public static IScopeInfo getScopeInfo(final String scope) {
 		return scopeMap.get(scope);
 	}
 	
@@ -115,11 +114,11 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 			aliasMap = builderAlias.build();
 		}
 		@Nullable
-		public String getByAlias(String alias) {
+		public String getByAlias(final String alias) {
 			return aliasMap.get(alias);
 		}
 		@Nullable
-		public String getByName(String name) {
+		public String getByName(final String name) {
 			return nameMap.get(name);
 		}
 	}

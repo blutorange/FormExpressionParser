@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.iface.context;
 
+import java.util.Collection;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -7,9 +9,15 @@ import de.xima.fc.form.expression.util.IReset;
 
 public interface ITracer<T extends ITraceElement> extends IReset {
 	public void setCurrentlyProcessed(@Nullable T position);
-	@javax.annotation.Nullable
+	@Nullable
 	public T getCurrentlyProcessed();
-
+	public void appendWarning(@Nonnull IEvaluationWarning warning);
+	@Nonnull
+	public Collection<IEvaluationWarning> getWarnings();
+	public void enableWarnings();
+	public void disableWarnings();
+	public boolean isWarningsEnabled();
+	
 	/**
 	 * Descend one stack trace level, ie. when calling a function.
 	 * @param position Current position.

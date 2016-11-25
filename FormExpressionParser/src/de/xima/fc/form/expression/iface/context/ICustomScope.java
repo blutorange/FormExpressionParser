@@ -1,8 +1,8 @@
 package de.xima.fc.form.expression.iface.context;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -14,10 +14,11 @@ import de.xima.fc.form.expression.object.ALangObject;
 public interface ICustomScope {
 	/**
 	 * @param variableName Name of the variable to fetch.
-	 * @return Value of the variable in this scope. <code>null</code> when the variable does not exist.
+	 * @return Value of the variable in this scope.
+	 * @throws EvaluationException When an illegal variable was requested.
 	 */
-	@Nullable
-	public ALangObject fetch(@Nonnull String variableName);
+	@Nonnull
+	public ALangObject fetch(@Nonnull String variableName, @Nonnull IEvaluationContext ec) throws EvaluationException;
 	/** @return Name of the scope that can be used by programs to access variables in this scope. */
 	@Nonnull
 	public String getScopeName();

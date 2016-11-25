@@ -65,7 +65,8 @@ public class ASTLosNode extends ANode {
 		.append(',')
 		.append(hasClose)
 		.append(',')
-		.append(text);
+		.append(text)
+		.append(',');
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package de.xima.fc.form.expression.iface.context;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -14,9 +14,10 @@ import de.xima.fc.form.expression.object.ALangObject;
 public interface IParametrizedCustomScope<T> {
 	/**
 	 * @see ICustomScope#fetch(String)
+	 * @throws EvaluationException When an illegal variable is requested.
 	 */
-	@Nullable
-	public ALangObject fetch(@Nonnull String variableName, @Nonnull T object);
+	@Nonnull
+	public ALangObject fetch(@Nonnull String variableName, @Nonnull T object, @Nonnull final IEvaluationContext ec) throws EvaluationException;
 	@Nonnull
 	public String getScopeName();
 }

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -14,8 +15,10 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
+import de.xima.fc.form.expression.iface.context.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.factory.FormcycleEcContractFactory;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
@@ -25,17 +28,21 @@ import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
-/**TODO
- * - unparse: los nicer
- * - optional variable types
- * - check for used/unused variables (especially this and arguments variable in function body)
- * - make it possible to check variables or external scopes provided by the external context for a particular external context without evaluating it
- *   => for example to check whether the current form version defines all field::.. variables
+/**
+ * TODO - unparse: los nicer - optional variable types - update formatting js -
+ * update highlighter with new token types (global, scope, require etc) - check
+ * for used/unused variables (especially this and arguments variable in function
+ * body) - make it possible to check variables or external scopes provided by
+ * the external context for a particular external context without evaluating it
+ * => for example to check whether the current form version defines all
+ * field::.. variables
  */
 public class FormExpressionDemo {
 	private static final boolean STRICT_MODE = false;
 	@Nonnull
-	private static final IEvaluationContextContractFactory<FormcycleExternalContext> FACTORY = FormcycleEcContractFactory.INSTANCE;
+	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
+	@Nonnull
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
 
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
@@ -48,19 +55,53 @@ public class FormExpressionDemo {
 
 		showHighlighting(tokenArray);
 
-		final IFormExpression<FormcycleExternalContext> expression = parseCode(code);
-
+		IFormExpression<FormcycleExternalContext> expression = parseCode(code);
+		
 		if (expression == null)
 			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
 
+		expression = showSerialization(expression);
+		
 		final Node node = showParseTree(code);
 
 		if (node == null)
 			throw new RuntimeException("Node must not be null."); //$NON-NLS-1$
 
-		showUnparsed(code);
+		showFormatted(code);
+
+		showWarnings(expression);
 
 		showEvaluatedResult(expression);
+	}
+
+	@Nonnull
+	private static IFormExpression<FormcycleExternalContext> showSerialization(@Nonnull final IFormExpression<FormcycleExternalContext> ex) {
+		System.out.println("===Serialization===");
+		final byte[] bytes = SerializationUtils.serialize(ex);
+		SerializationUtils.deserialize(bytes);
+		final long t1 = System.nanoTime();
+		final IFormExpression<FormcycleExternalContext> dex = SerializationUtils.deserialize(bytes);
+		final long t2 = System.nanoTime();
+		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms");
+		if (dex == null)
+			throw new RuntimeException("Deseialized expression is null.");
+		return dex;
+	}
+
+	private static void showWarnings(final IFormExpression<FormcycleExternalContext> expression) {
+		System.out.println("===Warnings==="); //$NON-NLS-1$
+		try {
+			for (final IEvaluationWarning warning : expression.simulate(new FormcycleExternalContext())) {
+				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getLine(),
+						warning.getColumn(), warning.getMessage()));
+				System.out.println();
+			}
+		}
+		catch (final EvaluationException e) {
+			e.printStackTrace();
+		}
+		System.out.println();
+		System.out.println();
 	}
 
 	private static String readArgs(final String[] args) {
@@ -89,10 +130,11 @@ public class FormExpressionDemo {
 		final Token[] tokenArray;
 		try {
 			final long t1 = System.nanoTime();
-			tokenArray = FormExpressionFactory.forProgram().asTokenArray(code);
+			tokenArray = EXPRESSION_FACTORY.asTokenArray(code);
 			final long t2 = System.nanoTime();
-			System.out.println("\nTokenizing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final TokenMgrError e) {
+			System.out.println("\nTokenizing took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (final TokenMgrError e) {
 			e.printStackTrace();
 			System.exit(-1);
 			return new Token[0];
@@ -109,7 +151,8 @@ public class FormExpressionDemo {
 				charsWithoutLf = 0;
 			}
 		}
-		if (charsWithoutLf > 0) System.out.println();
+		if (charsWithoutLf > 0)
+			System.out.println();
 		System.out.println();
 		return tokenArray;
 	}
@@ -119,7 +162,8 @@ public class FormExpressionDemo {
 		try {
 			System.out.println(FormExpressionHighlightingUtil.highlightHtml(tokenArray,
 					HighlightThemeEclipse.getInstance(), null, true));
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println();
@@ -129,10 +173,11 @@ public class FormExpressionDemo {
 		final IFormExpression<FormcycleExternalContext> ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = FormExpressionFactory.forProgram().parse(code, FACTORY, STRICT_MODE);
+			ex = EXPRESSION_FACTORY.parse(code, CONTRACT_FACTORY, STRICT_MODE);
 			final long t2 = System.nanoTime();
-			System.out.println("\nParsing took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final ParseException e) {
+			System.out.println("\nParsing took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (final ParseException e) {
 			e.printStackTrace();
 			System.exit(-1);
 			return null;
@@ -140,12 +185,12 @@ public class FormExpressionDemo {
 		return ex;
 	}
 
-
 	private static Node showParseTree(@Nonnull final String code) {
 		final Node node;
 		try {
-			node = FormExpressionFactory.forProgram().asNode(code);
-		} catch (final ParseException e) {
+			node = EXPRESSION_FACTORY.asNode(code);
+		}
+		catch (final ParseException e) {
 			e.printStackTrace();
 			System.exit(-1);
 			return null;
@@ -154,7 +199,8 @@ public class FormExpressionDemo {
 		System.out.println("\n===Parse tree==="); //$NON-NLS-1$
 		try {
 			node.jjtAccept(DumpVisitor.getSystemOutDumper(), CmnCnst.NonnullConstant.STRING_EMPTY);
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 			return null;
@@ -163,11 +209,12 @@ public class FormExpressionDemo {
 		return node;
 	}
 
-	private static void showUnparsed(@Nonnull final String code) {
+	private static void showFormatted(@Nonnull final String code) {
 		final String format;
 		try {
-			format = FormExpressionFactory.forProgram().format(code, UnparseVisitorConfig.getDefaultConfig());
-		} catch (final ParseException e) {
+			format = EXPRESSION_FACTORY.format(code, UnparseVisitorConfig.getDefaultConfig());
+		}
+		catch (final ParseException e) {
 			e.printStackTrace();
 			System.exit(-1);
 			return;
@@ -189,7 +236,7 @@ public class FormExpressionDemo {
 			result = ex.evaluate(new FormcycleExternalContext());
 			final long t2 = System.nanoTime();
 
-			System.out.println("Evaluation took " + (t2-t1)/1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println("Evaluation took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final EvaluationException e) {
 			System.err.println("Failed to evaluate expression."); //$NON-NLS-1$

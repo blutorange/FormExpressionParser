@@ -1,19 +1,6 @@
-i = 9;
-k = 10;
-global scope {
-  //hello
-  var foo;
-}
-scope you {
- function bar() {
-    /* hey there */
-    var lop;
-  }
-}
-function foo2() {
-  // yo hey
-  var n;
-}
-
-42;
-//greate
+[%%require scope field;%]
+<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
+<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
+<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
+<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
+<p> Vorname ist so: [%tf1.toUpperCase()%]</p>

@@ -20,6 +20,7 @@ public final class CmnCnst {
 	@Nonnull public static final String TRACER_POSITION_NAME_UNKNOWN = "unknown";
 
 	@Nonnull public static final String SYSTEM_LOGGER_FORMAT = "[%s] (%s) %s %s";
+	@Nonnull public static final Pattern PATTERN_FORM_FIELD_NAME = NullUtil.checkNotNull(Pattern.compile("^[a-zA-Z0-9_]+$"));
 
 	public final static class NonnullConstant {
 		private NonnullConstant() {}

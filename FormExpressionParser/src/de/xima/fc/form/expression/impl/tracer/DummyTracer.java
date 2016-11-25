@@ -1,8 +1,13 @@
 package de.xima.fc.form.expression.impl.tracer;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.context.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.context.ITracer;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * A tracer that is not tracing anything. Use this when you
@@ -37,5 +42,27 @@ public enum DummyTracer implements ITracer<Node> {
 
 	@Override
 	public void reset() {
+	}
+
+	@Override
+	public void appendWarning(final IEvaluationWarning warning) {
+	}
+
+	@Override
+	public Collection<IEvaluationWarning> getWarnings() {
+		return NullUtil.checkNotNull(Collections.<IEvaluationWarning>emptyList());
+	}
+
+	@Override
+	public void enableWarnings() {
+	}
+
+	@Override
+	public void disableWarnings() {
+	}
+
+	@Override
+	public boolean isWarningsEnabled() {
+		return false;
 	}
 }

@@ -78,6 +78,7 @@ public final class FormExpressionFactory {
 	 * 
 	 * @see #forProgram()
 	 */
+	@Nonnull
 	public static IFormExpressionFactory forTemplate() {
 		return TemplateImpl.INSTANCE;
 	}
@@ -87,6 +88,7 @@ public final class FormExpressionFactory {
 	 * 
 	 * @see #forTemplate()
 	 */
+	@Nonnull
 	public static IFormExpressionFactory forProgram() {
 		return ProgramImpl.INSTANCE;
 	}
@@ -198,6 +200,7 @@ public final class FormExpressionFactory {
 			Preconditions.checkNotNull(config);
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
+				parser.setLosAllowed(true);
 				final Node node = parser.Template(null);
 				if (node == null)
 					throw new ParseException(CmnCnst.Error.PARSER_RETURNED_NULL_NODE);

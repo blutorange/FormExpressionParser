@@ -109,8 +109,9 @@ public class HtmlDocumentCommandTest {
 			throw new VariableNotDefinedException(scope, name, ec);
 		}
 	}
-	private static class DummyContractFactory implements IEvaluationContextContractFactory<DummyHtmlExternalContext> {
-		final IScopeInfo scopeInfo = new IScopeInfo() {
+	private static enum DummyContractFactory implements IEvaluationContextContractFactory<DummyHtmlExternalContext> {
+		INSTANCE;
+		final static IScopeInfo scopeInfo = new IScopeInfo() {
 			@Override
 			public boolean isProviding(final String variableName) {
 				return false;
@@ -149,7 +150,7 @@ public class HtmlDocumentCommandTest {
 
 	private static String process(final Object... stuffToWrite) throws Exception {
 		final DummyHtmlExternalContext hec = new DummyHtmlExternalContext();
-		final IEvaluationContext ec = new DummyContractFactory().getContextWithExternal(hec);
+		final IEvaluationContext ec = DummyContractFactory.INSTANCE.getContextWithExternal(hec);
 		hec.beginWriting();
 		try {
 			for (final Object stuff : stuffToWrite) {

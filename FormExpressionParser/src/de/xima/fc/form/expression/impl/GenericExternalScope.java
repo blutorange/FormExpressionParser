@@ -34,13 +34,10 @@ public class GenericExternalScope implements IExternalScope {
 	@Override
 	public ALangObject getVariable(final String scope, final String name, final IEvaluationContext ec)
 			throws EvaluationException {
-		@Nullable final ICustomScope customScope = custom.get(scope);
+		final ICustomScope customScope = custom.get(scope);
 		if (customScope == null)
 			throw new VariableNotDefinedException(scope, name, ec);
-		final ALangObject object = customScope.fetch(name);
-		if (object == null)
-			throw new VariableNotDefinedException(scope, name, ec);
-		return object;
+		return customScope.fetch(name);
 	}
 
 	public final static class Builder {
