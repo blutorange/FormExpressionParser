@@ -108,7 +108,7 @@ $(function(){
 					out.append($("<pre></pre>").text(data.error))
 				}
 				else {
-					if ($("#asHtmlYes").prop("checked")) {
+					if ($("#asHtml").prop("checked")) {
 						out.append($(data.text))
 					}
 					else {
@@ -129,14 +129,18 @@ $(function(){
 			if (me.hasAttribute("data-program")) setTypeProgram()
 			else if (me.hasAttribute("data-template")) setTypeTemplate()
 			else setTypeProgram()
+
+			if (me.hasAttribute("data-strict-yes")) $("#strict").prop("checked", "checked")
+			else if (me.hasAttribute("data-strict-no")) $("#strict").prop("checked", "")
+			else $("#strict").prop("checked", "")        
 			
 			if (me.hasAttribute("data-generic")) $("#context").val("generic")
 			else if (me.hasAttribute("data-formcycle")) $("#context").val("formcycle")
 			else $("#context").val("generic")
 			
-			if (me.hasAttribute("data-as-html-yes")) $("#asHtmlYes").prop("checked", "checked")
-			else if (me.hasAttribute("data-as-html-no")) $("#asHtmlNo").prop("checked", "checked")
-			else $("#asHtmlNo").prop("checked", "checked")
+			if (me.hasAttribute("data-as-html-yes")) $("#asHtml").prop("checked", "checked")
+			else if (me.hasAttribute("data-as-html-no")) $("#asHtml").prop("checked", "")
+			else $("#asHtml").prop("checked", "")
 			
 			if (me.hasAttribute("data-format")) buttonFmt.trigger("click")
 			if (me.hasAttribute("data-evaluate")) buttonEval.trigger("click")

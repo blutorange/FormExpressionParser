@@ -37,7 +37,7 @@ public class GenericExternalScope implements IExternalScope {
 		final ICustomScope customScope = custom.get(scope);
 		if (customScope == null)
 			throw new VariableNotDefinedException(scope, name, ec);
-		return customScope.fetch(name);
+		return customScope.fetch(name, ec);
 	}
 
 	public final static class Builder {

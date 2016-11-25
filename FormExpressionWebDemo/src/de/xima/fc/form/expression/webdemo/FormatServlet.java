@@ -11,7 +11,6 @@ import org.json.simple.JSONObject;
 
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
-import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
@@ -52,15 +51,14 @@ public class FormatServlet extends AFormExpressionServlet {
 				}
 				else {
 					try (final Writer html = new StringBuilderWriter(); final Writer css = new StringBuilderWriter()) {
-						final IFormExpression expr;
+						final String formatted;
 						if (CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM.equalsIgnoreCase(type)) {
-							expr = FormExpressionFactory.Program.parse(code);
+							formatted = FormExpressionFactory.forProgram().format(code, config);
 						}
 						else {
-							expr = FormExpressionFactory.Template.parse(code);
+							formatted = FormExpressionFactory.forTemplate().format(code, config);
 						}
-						final String format = expr.unparse(config);
-						json.put(CmnCnst.RESPONSE_TEXT, format);
+						json.put(CmnCnst.RESPONSE_TEXT, formatted);
 					}
 					catch (ParseException | TokenMgrError | IOException e) {
 						json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_PARSING_FAILED, e.getMessage()));

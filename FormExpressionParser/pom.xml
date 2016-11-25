@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.homelab.madgaksha</groupId>
 	<artifactId>FormExpressionParser</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>FormExpressionParser</name>
 	<dependencies>
 
@@ -39,12 +39,6 @@
 			<groupId>org.abego.treelayout</groupId>
 			<artifactId>org.abego.treelayout.core</artifactId>
 			<version>1.0.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-pool2</artifactId>
-			<version>2.4.2</version>
 		</dependency>
 
 		<dependency>

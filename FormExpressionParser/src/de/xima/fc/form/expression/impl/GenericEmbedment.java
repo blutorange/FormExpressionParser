@@ -1,12 +1,12 @@
 package de.xima.fc.form.expression.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;

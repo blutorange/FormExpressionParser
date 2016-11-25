@@ -3,28 +3,26 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>FormExpressionWebDemo</groupId>
 	<artifactId>FormExpressionWebDemo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>FormExpressionWebDemo</name>
 	<dependencies>
-		<dependency>
-			<groupId>de.homelab.madgaksha</groupId>
-			<artifactId>FormExpressionParser</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1</version>
-		</dependency>
-
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>de.homelab.madgaksha</groupId>
+			<artifactId>FormExpressionParser</artifactId>
+			<version>0.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

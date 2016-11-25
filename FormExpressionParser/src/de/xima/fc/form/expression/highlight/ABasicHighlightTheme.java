@@ -45,6 +45,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.F
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Float;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.For;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Function;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Global;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Identifier;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.IdentifierAfterDot;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.If;
@@ -66,7 +67,9 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.P
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Plus;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PlusEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.QuestionMark;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Require;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Scope;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SemiColon;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineComment;
@@ -80,6 +83,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.T
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.TripleEqual;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.True;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Try;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Var;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.While;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.With;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Exception;
@@ -118,6 +122,10 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case LogError:
 		case LogInfo:
 		case LogWarn:
+		case Global:
+		case Scope:
+		case Require:
+		case Var:
 		case __Exception:
 			return getStyleKeyword();
 

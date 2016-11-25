@@ -26,11 +26,12 @@
           <option value="formcycle">Formcycle</option>
         </select>
         <select id="theme"></select>
-        <label for="radio">Interpret output as HTML</label>
-        <label for="asHtmlYes">Yes</label>
-        <input type="radio" name="asHtml" id="asHtmlYes"/>
-        <label for="asHtmlNo">No</label>
-        <input type="radio" name="asHtml" id="asHtmlNo" checked/>
+        <label for="asHtml">Interpret output as HTML
+          <input type="checkbox" name="asHtml" id="asHtml"/>
+        </label>
+        <label for="strict">Use strict mode
+          <input type="checkbox" name="strict" id="strict"/>
+        </label>
 		<input type="hidden" name="prefix" value="hglt"></input>
 		<button id="buttonHighlight" value="asd" type="button">Highlight</button>
 		<button id="buttonFormat" type="button">Format</button>

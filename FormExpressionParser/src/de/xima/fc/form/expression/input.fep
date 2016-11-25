@@ -1,6 +1,1 @@
-[%%require scope field;%]
-<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
-<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
-<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
-<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
-<p> Vorname ist so: [%tf1.toUpperCase()%]</p>
+[%tf19%]

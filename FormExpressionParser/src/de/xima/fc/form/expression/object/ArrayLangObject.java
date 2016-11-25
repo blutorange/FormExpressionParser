@@ -168,7 +168,7 @@ public class ArrayLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(Syntax.BRACE_OPEN);
+		builder.append(Syntax.BRACKET_OPEN);
 		for (final ALangObject o : value) builder.append(o.toString()).append(Syntax.COMMA);
 		if (builder.length() > 1) builder.setLength(builder.length()-1);
 		builder.append(Syntax.BRACKET_CLOSE);
