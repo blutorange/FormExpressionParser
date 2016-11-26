@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
@@ -122,7 +122,7 @@ public class GenericEmbedment implements IEmbedment {
 	@Override
 	public String[] getScopeList(final String embedment) {
 		final IEmbedmentHandler handler = map.get(embedment);
-		return handler != null ? handler.getScopeList() : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+		return handler != null ? handler.getScopeList() : null;
 	}
 
 	private static void output(@Nonnull final String data, @Nonnull final IEvaluationContext ec) throws EmbedmentOutputException, InvalidTemplateDataException {

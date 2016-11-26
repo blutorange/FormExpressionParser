@@ -35,6 +35,6 @@ public enum DummyEmbedment implements IEmbedment {
 
 	@Override
 	public String[] getScopeList(final String embedment) {
-		return getScopeList();
+		return null;
 	}
 }

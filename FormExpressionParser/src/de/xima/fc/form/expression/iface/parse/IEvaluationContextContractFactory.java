@@ -41,6 +41,6 @@ public interface IEvaluationContextContractFactory<T extends IExternalContext> e
 	 * @param embedment Embedment to get info for.
 	 * @return List of scopes the given embedment defines.
 	 */
-	@Nonnull
+	@Nullable
 	public String[] getScopesForEmbedment(@Nonnull String embedment);
 }

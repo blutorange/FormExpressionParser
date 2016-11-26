@@ -29,7 +29,11 @@ public interface IEmbedment extends IReset {
 	@Nonnull
 	public String[] getScopeList();
 
-	@Nonnull
+	/**
+	 * @param embedment Embedment to check.
+	 * @return List of scopes the given embedment defines. <code>null</code> when the embedment is unsupported.
+	 */
+	@Nullable
 	public String[] getScopeList(String embedment);
 
 	/**

@@ -91,6 +91,10 @@ public class FormcycleExternalContext extends AHtmlExternalContext {
 		return scopeMap.get(scope);
 	}
 	
+	public static boolean isProvidingScope(final String scope) {
+		return scopeMap.containsKey(scope);
+	}
+	
 	// For demonstration purposes only. Replace with real class.
 	public static class Formcycle {
 		private static final ImmutableMap<String, String> nameMap;

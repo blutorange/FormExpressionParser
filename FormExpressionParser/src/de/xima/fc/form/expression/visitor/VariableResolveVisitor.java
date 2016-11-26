@@ -133,11 +133,11 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		final String embedment = node.getEmbedment();
 		final String[] embedmentScopeList = embedment != null ? contractFactory.getScopesForEmbedment(embedment)
 				: CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
-		for (final String defaultScope : embedmentScopeList) {
-			if (defaultScope != null && resolveVariableWithScope(defaultScope, name, node, false))
-				return;
-		}
-
+		if (embedmentScopeList != null)
+			for (final String defaultScope : embedmentScopeList)
+				if (defaultScope != null && resolveVariableWithScope(defaultScope, name, node, false))
+					return;
+		
 		throw new VariableNotResolvableException(node);
 	}
 

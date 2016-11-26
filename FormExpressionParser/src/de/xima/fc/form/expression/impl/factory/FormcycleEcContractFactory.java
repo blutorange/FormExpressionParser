@@ -20,6 +20,7 @@ import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 
 public enum FormcycleEcContractFactory implements IEvaluationContextContractFactory<FormcycleExternalContext> {
 	INSTANCE;
+	
 	private final static IEmbedment embedment = GenericEmbedment.getNewFormcycleEmbedment();
 	private final static Map<String,IScopeInfo> external = new HashMap<>(16);
 	static {
@@ -50,7 +51,7 @@ public enum FormcycleEcContractFactory implements IEvaluationContextContractFact
 
 	@Override
 	public boolean isProvidingExternalScope(final String scope) {
-		return external.containsKey(scope);
+		return external.containsKey(scope) || FormcycleExternalContext.isProvidingScope(scope);
 	}
 
 	@Override

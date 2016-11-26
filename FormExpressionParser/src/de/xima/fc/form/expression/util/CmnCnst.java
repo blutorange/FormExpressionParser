@@ -326,6 +326,7 @@ public final class CmnCnst {
 		@Nonnull public static final String SEMANTIC_PARSE_EXCEPTION = "Error during parsing at line %d, column %d: %s";
 		@Nonnull public static final String DUPLICATE_SCOPED_VARIABLE = "Variable %s under scope %s was already declared previously.";
 		@Nonnull public static final String SCOPED_FUNCTION_OUTSIDE_HEADER = "Occurence of function %s::%s at top level. Scoped function must be defined in a scope block in strict mode.";
+		@Nonnull public static final String UNDEFINED_EMBEDMENT = "Embedment %s is not defined.";
 	}
 
 	public static final class ToString {

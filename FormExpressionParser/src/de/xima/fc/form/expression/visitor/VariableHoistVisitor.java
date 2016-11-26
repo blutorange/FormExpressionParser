@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.visitor;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
+import de.xima.fc.form.expression.exception.parse.NoSuchEmbedmentException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclarationException;
@@ -74,9 +75,11 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		if (embedment == null)
 			return;
 		final String[] scopes = contractFactory.getScopesForEmbedment(embedment);
+		if (scopes == null)
+			throw new NoSuchEmbedmentException(embedment, node);
 		for (final String scope : scopes) {
 			if (scope != null && !(scopeDefBuilder.hasManual(scope) || scopeDefBuilder.hasExternal(scope))) {
-				if (!contractFactory.isProvidingExternalScope(scope)) {
+				if (contractFactory.isProvidingExternalScope(scope)) {
 					if (treatMissingRequireScopeAsError)
 						throw new MissingRequireScopeStatementException(scope, node);
 					scopeDefBuilder.addExternal(scope);
