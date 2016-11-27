@@ -65,6 +65,11 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	public final int getArgumentCount() {
 		return argResolvable.length;
 	}
+	
+	@Override
+	public Node getArgumentNode(final int i) {
+		return jjtGetChild(i);
+	}
 
 	@SuppressWarnings("null")
 	@Override

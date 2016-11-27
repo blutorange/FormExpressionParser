@@ -10,6 +10,11 @@ public class GenericWarning implements IEvaluationWarning {
 	@Nonnull
 	private final String message;
 	private final int line, column;
+	public GenericWarning(@Nonnull final String message, @Nonnull final Node node) {
+		this.message = message;
+		column = node.getStartColumn();
+		line = node.getStartLine();
+	}
 	public GenericWarning(@Nonnull final String message, @Nonnull final IEvaluationContext ec) {
 		this.message = message;
 		final Node node = ec.getTracer().getCurrentlyProcessed();

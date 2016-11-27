@@ -14,7 +14,6 @@ import de.xima.fc.form.expression.object.HashLangObject;
 
 public enum EAttrAssignerHash implements IFunction<HashLangObject> {
 	;
-
 	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
@@ -24,7 +23,7 @@ public enum EAttrAssignerHash implements IFunction<HashLangObject> {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0;
+		evalImmediately = argList.length == 0 && varArgsName == null;
 	}
 
 	@Override

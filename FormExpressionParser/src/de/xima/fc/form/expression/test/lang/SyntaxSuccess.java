@@ -73,6 +73,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST060("require scope math;"),
 	TEST061("a = 8;require scope math;"),
 	TEST062("scope foo{var ko;}foo::ko=0;"),
+	TEST063("scope myscope{function test(){for(var n=2;n<=10;++n){for(var r=n;r<=10;r+=n){}}}}"),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

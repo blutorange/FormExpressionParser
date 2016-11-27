@@ -34,7 +34,7 @@ public class ImmutableScopeDefinitions implements IScopeDefinitions {
 
 		final Collection<IHeaderNode> chn = globalMap.values();
 		if (chn != null)
-			this.globalList = new ImmutableList.Builder<IHeaderNode>().addAll(chn).build();
+			this.globalList = ImmutableList.copyOf(chn);
 		else
 			this.globalList = ImmutableList.of();
 		

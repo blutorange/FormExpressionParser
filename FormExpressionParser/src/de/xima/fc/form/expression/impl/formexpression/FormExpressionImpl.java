@@ -19,6 +19,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.SimulateVisitor;
+import de.xima.fc.form.expression.visitor.UnusedVariableCheckVisitor;
 
 class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<T> {
 	private static final long serialVersionUID = 1L;
@@ -64,11 +65,18 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	}
 
 	@Override
-	public ImmutableCollection<IEvaluationWarning> simulate(final T ex) throws EvaluationException {
+	public ImmutableCollection<IEvaluationWarning> analyze(final T ex) throws EvaluationException {
 		Preconditions.checkNotNull(ex, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
 		final IEvaluationContext ec = specs.getContextWithExternal(ex);
-		final ImmutableCollection<IEvaluationWarning> result = SimulateVisitor.simulate(node, scopeDefs, ec);
-		ec.reset();
+		final ImmutableCollection<IEvaluationWarning> result;
+		try {
+			SimulateVisitor.simulate(node, scopeDefs, ec);
+			UnusedVariableCheckVisitor.check(node, scopeDefs, symbolTableSize, ec);
+			result = ImmutableList.copyOf(ec.getTracer().getWarnings());
+		}
+		finally {
+			ec.reset();
+		}
 		return result;
 	}
 }

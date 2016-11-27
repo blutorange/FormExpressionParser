@@ -48,7 +48,7 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0;
+		evalImmediately = argList.length == 0 && varArgsName == null;
 	}
 
 	@Override

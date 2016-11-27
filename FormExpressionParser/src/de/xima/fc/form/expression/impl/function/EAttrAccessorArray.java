@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -37,7 +38,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0;
+		evalImmediately = argList.length == 0 && varArgsName == null;
 	}
 
 	@Override
@@ -111,7 +112,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		@Nonnull private String[] argList;
 		private String optionalArgumentsName;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(@Nullable final String optArg, @Nonnull final String... argList) {
 			this.argList = argList;
 			this.optionalArgumentsName = optArg;
 		}

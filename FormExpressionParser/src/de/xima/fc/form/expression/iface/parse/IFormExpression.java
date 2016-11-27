@@ -50,11 +50,11 @@ public interface IFormExpression<T extends IExternalContext> extends Serializabl
 	 * @throws EvaluationException 
 	 */
 	@Nonnull
-	public ImmutableCollection<IEvaluationWarning> simulate(@Nonnull final T ex) throws EvaluationException;
+	public ImmutableCollection<IEvaluationWarning> analyze(@Nonnull final T ex) throws EvaluationException;
 
 	/**
 	 * Specifications to which the external contexts provided to
-	 * {@link #equals(Object)} and {@link #simulate(IExternalContext)} must
+	 * {@link #equals(Object)} and {@link #analyze(IExternalContext)} must
 	 * adhere to.
 	 * @return The specifications.
 	 * @see IEvaluationContextContractFactory

@@ -42,7 +42,7 @@ public class FormExpressionDemo {
 	@Nonnull
 	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
 	private static final UnparseVisitorConfig UNPARSE_CONFIG = UnparseVisitorConfig.getUnstyledWithoutCommentsConfig();
 
@@ -93,7 +93,7 @@ public class FormExpressionDemo {
 	private static void showWarnings(final IFormExpression<FormcycleExternalContext> expression) {
 		System.out.println("===Warnings==="); //$NON-NLS-1$
 		try {
-			for (final IEvaluationWarning warning : expression.simulate(new FormcycleExternalContext())) {
+			for (final IEvaluationWarning warning : expression.analyze(new FormcycleExternalContext())) {
 				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getLine(),
 						warning.getColumn(), warning.getMessage()));
 				System.out.println();

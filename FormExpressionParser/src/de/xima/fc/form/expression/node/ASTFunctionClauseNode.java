@@ -93,6 +93,11 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	public final int getArgumentCount() {
 		return argResolvable.length;
 	}
+	
+	@Override
+	public Node getArgumentNode(final int i) {
+		return jjtGetChild(i+1);
+	}
 
 	@SuppressWarnings("null")
 	@Override

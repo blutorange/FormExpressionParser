@@ -12,6 +12,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.base.Optional;
+
 import de.xima.fc.form.expression.exception.parse.DuplicateRequireScopeDeclarationException;
 import de.xima.fc.form.expression.exception.parse.DuplicateScopedVariableDeclarationException;
 import de.xima.fc.form.expression.exception.parse.FunctionNameAlreadyDefinedException;
@@ -31,12 +33,10 @@ import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
-public class ScopeCollectVisitor extends FormExpressionVoidVoidVisitorAdapter<SemanticsException>
+public class ScopeCollectVisitor extends FormExpressionVoidDataVisitorAdapter<Optional<Map<String, IHeaderNode>>, SemanticsException>
 implements IScopeDefinitionsBuilder {
 	@Nullable
 	private String currentScope;
-	@Nullable
-	private Map<String,IHeaderNode> currentMap;
 	@Nullable
 	private List<Node> detachQueue;
 
@@ -52,8 +52,7 @@ implements IScopeDefinitionsBuilder {
 	@Nonnull
 	public static IScopeDefinitionsBuilder collect(final Node node, final boolean strictMode) throws ParseException {
 		final ScopeCollectVisitor v = new ScopeCollectVisitor(strictMode);
-		node.jjtAccept(v);
-		v.currentMap = null;
+		node.jjtAccept(v, Optional.<Map<String,IHeaderNode>>absent());
 		v.currentScope = null;
 		v.detachNodes();
 		return v;
@@ -78,7 +77,7 @@ implements IScopeDefinitionsBuilder {
 	}
 
 	@Override
-	public void visit(final ASTScopeExternalNode node) throws SemanticsException {
+	public void visit(final ASTScopeExternalNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
 		// Throw an error when the scope has already been required.
 		// Otherwise, add it to the list of required scopes.
 		if (requiredSet.contains(node.getScopeName()) || manualMap.containsKey(node.getScopeName()))
@@ -88,7 +87,7 @@ implements IScopeDefinitionsBuilder {
 	}
 
 	@Override
-	public void visit(final ASTScopeManualNode node) throws SemanticsException {
+	public void visit(final ASTScopeManualNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
 		// Throw an error when the scope has already been required.
 		// Otherwise, add the scope and the variable.
 		currentScope = node.getScopeName();
@@ -99,27 +98,24 @@ implements IScopeDefinitionsBuilder {
 			map = new HashMap<String, IHeaderNode>();
 			manualMap.put(node.getScopeName(), map);
 		}
-		currentMap = map;
-		visitChildren(node);
-		currentMap = null;
+		visitChildren(node, Optional.of(map));
 		currentScope = null;
 		getDetachQueue().add(node);
 	}
 
 	@Override
-	public void visit(final ASTScopeGlobalNode node) throws SemanticsException {
+	public void visit(final ASTScopeGlobalNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
 		currentScope = null;
-		currentMap = globalMap;
-		visitChildren(node);
-		currentMap = null;
+		visitChildren(node, Optional.of(globalMap));
 		getDetachQueue().add(node);
 	}
 
 	@Override
-	public void visit(final ASTVariableDeclarationClauseNode node) throws SemanticsException {
+	public void visit(final ASTVariableDeclarationClauseNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
 		// Add the node to a manual or global scope.
-		final Map<String, IHeaderNode> map = currentMap;
-		if (map != null) {
+		if (mapToAddTo.isPresent()) {
+			final Map<String, IHeaderNode> map = mapToAddTo.get();
+			visitChildren(node, Optional.<Map<String,IHeaderNode>>absent());
 			if (map.containsKey(node.getVariableName()))
 				throw new DuplicateScopedVariableDeclarationException(node, currentScope);
 			map.put(node.getVariableName(), new HeaderNodeImpl(node));
@@ -127,11 +123,12 @@ implements IScopeDefinitionsBuilder {
 	}
 
 	@Override
-	public void visit(final ASTFunctionClauseNode node) throws SemanticsException {
+	public void visit(final ASTFunctionClauseNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo)
+			throws SemanticsException {
 		// Put function declaration at the top inside the global declaration.
-		final Map<String, IHeaderNode> map = currentMap;
-		if (map != null) {
+		if (mapToAddTo.isPresent()) {
 			// Function inside scope (global / manual)
+			final Map<String, IHeaderNode> map = mapToAddTo.get();
 			if (map.containsKey(node.getVariableName()))
 				throw new DuplicateScopedVariableDeclarationException(currentScope, node.getVariableName(), node);
 			node.supplyScope(currentScope);
@@ -154,7 +151,7 @@ implements IScopeDefinitionsBuilder {
 			}
 		}
 		// Collect everything from function bodies as well.
-		node.getBodyNode().jjtAccept(this);
+		node.getBodyNode().jjtAccept(this, Optional.<Map<String,IHeaderNode>>absent());
 		getDetachQueue().add(node);
 	}
 

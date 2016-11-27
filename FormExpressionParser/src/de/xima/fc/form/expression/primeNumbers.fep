@@ -21,5 +21,3 @@ scope algo {
     return primes;
   }
 }
-
-algo::primeNumbers(100);

@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.grammar.Node;
 
 public interface IArgumentResolvable {
+	public Node getArgumentNode(int i);
 	public int getArgumentCount();
 	@Nonnull
 	public ISourceResolvable getArgResolvable(int i);

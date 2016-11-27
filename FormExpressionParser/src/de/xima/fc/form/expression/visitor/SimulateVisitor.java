@@ -5,14 +5,10 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.context.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
@@ -50,14 +46,12 @@ public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<Evalua
 		}
 	}
 
-	@Nonnull
-	public static ImmutableCollection<IEvaluationWarning> simulate(@Nonnull final Node node,
+	public static void simulate(@Nonnull final Node node,
 			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final IEvaluationContext ec) throws EvaluationException {
 		ec.getTracer().enableWarnings();
 		final SimulateVisitor v = new SimulateVisitor(ec);
 		v.acceptScopeDefs(scopeDefs);
 		node.jjtAccept(v);
-		return ImmutableList.copyOf(ec.getTracer().getWarnings());
 	}
 
 	private void acceptScopeDefs(final IScopeDefinitions scopeDefs) throws EvaluationException {
