@@ -38,7 +38,7 @@ public interface IFunction<T extends ALangObject> {
 	public String getVarArgsName();
 
 	/**
-	 * Runs the function and returns the result.
+	 * Executes the function and returns the result.
 	 *
 	 * @param ec
 	 *            Evaluation context.

@@ -13,6 +13,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 
 public enum EAttrAssignerArray implements IFunction<ArrayLangObject> {
+	//TODO this is not working
 	/**
 	 * @param newLength The new length of the array. Padded with {@link NullLangObject} as necessary.
 	 */
@@ -20,20 +21,17 @@ public enum EAttrAssignerArray implements IFunction<ArrayLangObject> {
 	;
 
 	@Nonnull private final FunctionLangObject impl;
-	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
 	private final String varArgsName;
 	private EAttrAssignerArray(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0 && varArgsName == null;
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 			throws EvaluationException {
-		if (!evalImmediately) return impl;
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 

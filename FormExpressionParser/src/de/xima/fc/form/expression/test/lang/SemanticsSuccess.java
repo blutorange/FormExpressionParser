@@ -104,6 +104,10 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN009("48%7;;", NumberLangObject.create(6)),
 	EMETHODBIN010("-50%7;;", NumberLangObject.create(6)),
 
+	// Attribute assigners
+	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
+	ATTRASS002("a=[1,2,3,4];a.length=2;a.length;", NumberLangObject.create(2)),
+	
 	// Variable resolution
 	RESOLUTION001("i=0;if(true)i=42;i;", Tests.N42),
 	RESOLUTION002("i=42;if(true)var i=0;i;", Tests.N42),

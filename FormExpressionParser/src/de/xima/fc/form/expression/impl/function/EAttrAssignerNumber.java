@@ -16,7 +16,6 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 	;
 
 	@Nonnull private final FunctionLangObject impl;
-	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
@@ -24,14 +23,11 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0 && varArgsName == null;
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
-		if (!evalImmediately)
-			return impl;
 		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 

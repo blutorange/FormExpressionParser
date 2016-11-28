@@ -237,8 +237,12 @@ public class ArrayLangObject extends ALangObject {
 			value.clear();
 			return;
 		}
-		if (len > value.size()) for (int i = value.size()-len; i-->0 ;) value.add(NullLangObject.getInstance());
-		else for (int i = value.size(); i-->len ;) value.remove(i);
+		if (len > value.size())
+			for (int i = len - value.size(); i-->0;)
+				value.add(NullLangObject.getInstance());
+		else
+			for (int i = value.size(); i-->len;)
+				value.remove(i);
 	}
 
 	/** Sorts the array according to the natural ordering of {@link ALangObject */

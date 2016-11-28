@@ -16,7 +16,6 @@ public enum EAttrAssignerBoolean implements IFunction<BooleanLangObject> {
 	;
 
 	@Nonnull private final FunctionLangObject impl;
-	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
 	private final String varArgsName;
 
@@ -24,13 +23,12 @@ public enum EAttrAssignerBoolean implements IFunction<BooleanLangObject> {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
 		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0 && varArgsName == null;
 	}
 
 	@Override
 	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final BooleanLangObject thisContext,
 			@Nonnull final ALangObject... args) throws EvaluationException {
-		return evalImmediately ? impl.functionValue().evaluate(ec, thisContext, args) : impl;
+		return impl.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
