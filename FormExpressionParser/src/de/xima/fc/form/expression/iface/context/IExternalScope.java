@@ -3,8 +3,8 @@ package de.xima.fc.form.expression.iface.context;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.IReset;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.IReset;
 
 public interface IExternalScope extends IReset {
 	/**

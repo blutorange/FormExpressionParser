@@ -5,7 +5,7 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.util.IReset;
+import de.xima.fc.form.expression.iface.IReset;
 
 public interface ITracer<T extends ITraceElement> extends IReset {
 	public void setCurrentlyProcessed(@Nullable T position);

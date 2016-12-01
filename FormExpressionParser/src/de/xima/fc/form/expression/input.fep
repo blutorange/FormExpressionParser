@@ -1,3 +1,4 @@
-a=[7,8,9];
-a.length=2;
-a;
+global scope {
+  var a;
+}
+a = myscope::foo;

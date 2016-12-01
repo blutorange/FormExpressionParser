@@ -21,7 +21,7 @@ public enum DummyEmbedment implements IEmbedment {
 	public void setCurrentEmbedment(final String name) {
 	}
 	@Override
-	public String[] getScopeList() {
+	public String[] getScopeListForCurrentEmbedment() {
 		return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 	}
 	@Override
@@ -36,5 +36,10 @@ public enum DummyEmbedment implements IEmbedment {
 	@Override
 	public String[] getScopeList(final String embedment) {
 		return null;
+	}
+
+	@Override
+	public String[] getEmbedmentList() {
+		return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 	}
 }

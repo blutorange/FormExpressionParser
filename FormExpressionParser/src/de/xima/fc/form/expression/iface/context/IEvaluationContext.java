@@ -4,9 +4,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.IReset;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.util.IReset;
 
 /**
  * An evaluation context is made up of the following parts:

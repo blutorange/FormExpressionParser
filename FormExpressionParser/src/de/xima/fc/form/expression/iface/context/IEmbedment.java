@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
-import de.xima.fc.form.expression.util.IReset;
+import de.xima.fc.form.expression.iface.IReset;
 
 public interface IEmbedment extends IReset {
 	/**
@@ -27,7 +27,7 @@ public interface IEmbedment extends IReset {
 	 *         <code>null</code> elements.
 	 */
 	@Nonnull
-	public String[] getScopeList();
+	public String[] getScopeListForCurrentEmbedment();
 
 	/**
 	 * @param embedment Embedment to check.
@@ -36,6 +36,15 @@ public interface IEmbedment extends IReset {
 	@Nullable
 	public String[] getScopeList(String embedment);
 
+	/**
+	 * Does not need to be fast, used only for testing or pre-processing.
+	 * 
+	 * @return A list of embedments this embedment defines, ie. for which
+	 *         {@link #getScopeList(String)} does not return <code>null</code>.
+	 */
+	@Nonnull
+	public String[] getEmbedmentList();
+	
 	/**
 	 * Writes the output of an embedded code block with the current type to the
 	 * output document, file, or stream etc.

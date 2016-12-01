@@ -38,7 +38,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
  * field::.. variables
  */
 public class FormExpressionDemo {
-	private static final boolean STRICT_MODE = false;
+	private static final boolean STRICT_MODE = true;
 	@Nonnull
 	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
 	@Nonnull

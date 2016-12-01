@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
+import de.xima.fc.form.expression.iface.IReset;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.IReset;
 
 /**
  * A binding used when checking variable scoping.

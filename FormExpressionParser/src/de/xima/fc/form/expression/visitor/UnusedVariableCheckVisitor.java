@@ -1,10 +1,13 @@
 package de.xima.fc.form.expression.visitor;
 
+import java.util.Collection;
+
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.impl.warning.UnusedVariableWarning;
@@ -95,10 +98,18 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 		}
 	}
 
-	//TODO add vars from scopedefs
+	private void defineScopeDefs(final IScopeDefinitions scopeDefs) {
+		for (final IHeaderNode header : scopeDefs.getGlobal())
+			addToNodeTable(header, header.getNode());
+		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
+			for (final IHeaderNode header : coll)
+				addToNodeTable(header, header.getNode());
+	}
+
 	public static void check(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
 			final int symbolTableSize, @Nonnull final IEvaluationContext ec) {
 		final UnusedVariableCheckVisitor v = new UnusedVariableCheckVisitor(symbolTableSize);
+		v.defineScopeDefs(scopeDefs);
 		node.jjtAccept(v, CmnCnst.NonnullConstant.BOOLEAN_FALSE);
 		v.addWarnings(ec);
 	}

@@ -72,11 +72,15 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE012("function foo(){0;}function foo::bar(){42;};with(foo)bar();", Tests.N42), // scoped function
 	SCOPE013("scope myscope{var a=42;}with(myscope){a;}", Tests.N42), // resolving scopes
 	
-	//Property expressions
+	//Attribute accessors
 	PROP001("'Ab3'.toUpperCase().toLowerCase();", StringLangObject.create("ab3")),
 	PROP002("s='Ab3';f=s.toLowerCase;f.call(s);", StringLangObject.create("ab3")),
 	PROP003("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
 
+	// Attribute assigners
+	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
+	ATTRASS002("a=[1,2,3,4];a.length=2;a.length;", NumberLangObject.create(2)),
+	
 	// Expression methods number.
 	EMETHODUN000("-42;", NumberLangObject.create(-42)),
 	EMETHODUN001("-(-42);", Tests.N42),
@@ -103,10 +107,6 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
 	EMETHODBIN009("48%7;;", NumberLangObject.create(6)),
 	EMETHODBIN010("-50%7;;", NumberLangObject.create(6)),
-
-	// Attribute assigners
-	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
-	ATTRASS002("a=[1,2,3,4];a.length=2;a.length;", NumberLangObject.create(2)),
 	
 	// Variable resolution
 	RESOLUTION001("i=0;if(true)i=42;i;", Tests.N42),
@@ -127,6 +127,7 @@ enum SemanticsSuccess implements ITestCase {
 			)),
 	ASSIGNMENT004("a=41;++a;++a;--a;a;",Tests.N42),
 
+	// Functions and lambda support
 	FUNCTION001("function foo(){arguments.length;}foo(1,2,3);", NumberLangObject.create(3)),
 	FUNCTION002("function foo(){this;}foo();", NullLangObject.getInstance()),
 	FUNCTION003("foo=''.toLowerCase;foo.call('BAR');", StringLangObject.create("bar")),
