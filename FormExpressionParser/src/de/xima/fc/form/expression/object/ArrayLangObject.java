@@ -42,6 +42,14 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Nonnull
+	public static ALangObject create(@Nonnull final ALangObject[] value, final int startIndex) {
+		final List<ALangObject> list = new ArrayList<>(value.length-startIndex+1);
+		for (int i = startIndex; i < value.length; ++i)
+			list.add(value[i]);
+		return new ArrayLangObject(list);		
+	}
+	
+	@Nonnull
 	public static ALangObject create(final ALangObject value) {
 		if (value == null) return NullLangObject.getInstance();
 		final List<ALangObject> list = new ArrayList<>(1);

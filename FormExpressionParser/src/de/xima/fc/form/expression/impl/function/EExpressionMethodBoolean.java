@@ -41,7 +41,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param orOperand {@link BooleanLangObject}. Argument for the OR.
 		 * @return {@link BooleanLangObject}. The result of the logical OR disjunction between this boolean and the argument.
 		 */
-		OR(null, "orOperand"){ //$NON-NLS-1$
+		OR(false, "orOperand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -52,7 +52,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param andOperand {@link BooleanLangObject}. Argument for the AND.
 		 * @return {@link BooleanLangObject}. The result of the logical AND conjunction between this boolean and the argument.
 		 */
-		AND(null, "andOperand"){ //$NON-NLS-1$
+		AND(false, "andOperand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -63,7 +63,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		 * @param xorOperand {@link BooleanLangObject}. Argument for the XOR.
 		 * @return {@link BooleanLangObject}. The result of the logical XOR exclusive disjunction between this boolean and the argument.
 		 */
-		XOR(null, "xorOperand"){ //$NON-NLS-1$
+		XOR(false, "xorOperand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -73,7 +73,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		/**
 		 * @return {@link BooleanLangObject}. The logical negation of this boolean.
 		 */
-		NOT(null){
+		NOT(false){
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -83,16 +83,16 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		;
 
 		@Nonnull private final String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@SuppressWarnings("null")
@@ -104,6 +104,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@Override

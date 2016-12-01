@@ -199,6 +199,7 @@ public final class CmnCnst {
 		@Nonnull public static final String SINGLE_LINE_COMMENT_START = "//";
 		@Nonnull public static final String MULTI_LINE_COMMENT_START = "/*";
 		@Nonnull public static final String MULTI_LINE_COMMENT_END = "*/";
+		@Nonnull public static final String TRIPLE_DOT = "...";
 	}
 
 	public static final class Error {
@@ -332,6 +333,8 @@ public final class CmnCnst {
 		@Nonnull public static final String DUPLICATE_SCOPED_VARIABLE = "Variable %s under scope %s was already declared previously.";
 		@Nonnull public static final String SCOPED_FUNCTION_OUTSIDE_HEADER = "Occurence of function %s::%s at top level. Scoped function must be defined in a scope block in strict mode.";
 		@Nonnull public static final String UNDEFINED_EMBEDMENT = "Embedment %s is not defined.";
+		@Nonnull public static final String VAR_ARGS_WITHOUT_ARGUMENTS = "Function cannot have varArgs without any arguments. " + INTERNAL_ERROR;
+		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires %d parameters, but %d were given.";
 	}
 
 	public static final class ToString {

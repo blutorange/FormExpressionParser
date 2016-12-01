@@ -18,6 +18,7 @@ import de.xima.fc.form.expression.exception.evaluation.CatchableEvaluationExcept
 import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalExternalScopeAssignmentException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.evaluation.MissingExternalContextException;
 import de.xima.fc.form.expression.exception.evaluation.ReturnClauseException;
@@ -209,6 +210,11 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				// Evaluate function arguments
 				final ALangObject[] args = evaluateChildren(n, ec);
 
+				// Check argument count.
+				if (!func.hasVarArgs() && args.length != func.getDeclaredArgumentCount()
+						|| func.hasVarArgs() && args.length < func.getDeclaredArgumentCount() - 1)
+					throw new IllegalNumberOfFunctionParametersException(func, args.length, ec);
+				
 				// Check thisContext of the function.
 				if (func.getThisContextType() != Type.NULL && func.getThisContextType() != thisContext.getType())
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);

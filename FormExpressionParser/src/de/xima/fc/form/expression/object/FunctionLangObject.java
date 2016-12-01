@@ -32,6 +32,11 @@ public class FunctionLangObject extends ALangObject {
 			}
 
 			@Override
+			public int getDeclaredArgumentCount() {
+				return 0;
+			}
+
+			@Override
 			public Node getNode() {
 				return null;
 			}
@@ -47,8 +52,8 @@ public class FunctionLangObject extends ALangObject {
 			}
 
 			@Override
-			public String getVarArgsName() {
-				return null;
+			public boolean hasVarArgs() {
+				return false;
 			}
 		});
 	}

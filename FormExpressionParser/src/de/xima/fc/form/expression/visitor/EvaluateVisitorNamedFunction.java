@@ -64,6 +64,11 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	}
 
 	@Override
+	public int getDeclaredArgumentCount() {
+		return node.getArgumentCount();
+	}
+
+	@Override
 	public String getDeclaredName() {
 		return name;
 	}
@@ -72,13 +77,25 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final NullLangObject thisContext,
 			@Nonnull final ALangObject... args) throws EvaluationException {
 		// Set special variables 'this' and 'arguments'.
-		// TODO check if arguments variable is used, if not, dont set it (do not
-		// create array)
+		// TODO remove the arguments variable, not needed and wont work with var
+		// types
 		set(ec, node.getThisResolvable(), thisContext);
 		set(ec, node.getArgumentsResolvable(), ArrayLangObject.create(args));
+		final int normalArgCount;
+		if (node.hasVarArgs()) {
+			normalArgCount = node.getArgumentCount() - 1;
+			// Set varArgs array.
+			if (node.hasVarArgs()) {
+				final ALangObject tmp = ArrayLangObject.create(args, normalArgCount);
+				set(ec, node.getArgResolvable(normalArgCount), tmp);
+			}
+		}
+		else
+			normalArgCount = node.getArgumentCount();
 		// Set variables passed as function arguments.
-		for (int i = Math.min(args.length, node.getArgumentCount()); i-- > 0;) {
-			// need to check for null as java7 does not allow us to mark non-null arrays
+		for (int i = normalArgCount; i-- > 0;) {
+			// Need to check for null as java7 does not allow us to mark
+			// non-null arrays
 			final ALangObject tmp = args[i];
 			set(ec, node.getArgResolvable(i), tmp != null ? tmp : NullLangObject.getInstance());
 		}
@@ -99,7 +116,7 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	}
 
 	@Override
-	public String getVarArgsName() {
-		return null;
+	public boolean hasVarArgs() {
+		return node.hasVarArgs();
 	}
 }

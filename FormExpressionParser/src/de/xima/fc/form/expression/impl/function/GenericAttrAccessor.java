@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -58,7 +57,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             an <code>int</code>.
 	 */
 	public final static IFunction<StringLangObject> STRING = new GenericAttrAccessor<StringLangObject>(Type.STRING,
-			"genericAttrAccessorString", null, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+			"genericAttrAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
@@ -86,7 +85,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             an <code>int</code>.
 	 */
 	public final static IFunction<ArrayLangObject> ARRAY = new GenericAttrAccessor<ArrayLangObject>(Type.ARRAY,
-			"genericAttrAccessorArray", null, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+			"genericAttrAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
@@ -105,7 +104,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<BooleanLangObject> BOOLEAN = new GenericAttrAccessor<BooleanLangObject>(Type.BOOLEAN,
-			"genericAttrAccessorBoolean", null) { //$NON-NLS-1$
+			"genericAttrAccessorBoolean", false) { //$NON-NLS-1$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -119,7 +118,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAccessor<ExceptionLangObject>(
-			Type.EXCEPTION, "genericAttrAccessorException", null) { //$NON-NLS-1$
+			Type.EXCEPTION, "genericAttrAccessorException", false) { //$NON-NLS-1$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -133,7 +132,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAccessor<RegexLangObject>(Type.REGEX,
-			"genericAttrAccessorRegex", null) { //$NON-NLS-1$
+			"genericAttrAccessorRegex", false) { //$NON-NLS-1$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -147,7 +146,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<FunctionLangObject> FUNCTION = new GenericAttrAccessor<FunctionLangObject>(
-			Type.FUNCTION, "genericAttrAccessorFunction", null) { //$NON-NLS-1$
+			Type.FUNCTION, "genericAttrAccessorFunction", false) { //$NON-NLS-1$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -161,7 +160,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             No generic attribute accessors.
 	 */
 	public final static IFunction<NumberLangObject> NUMBER = new GenericAttrAccessor<NumberLangObject>(Type.NUMBER,
-			"genericAttrAccessorNumber", null) { //$NON-NLS-1$
+			"genericAttrAccessorNumber", false) { //$NON-NLS-1$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -180,7 +179,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *                 {@link EAttrAccessorHash#contains} to check.
 	 */
 	public final static IFunction<HashLangObject> HASH = new GenericAttrAccessor<HashLangObject>(Type.HASH,
-			"genericAttrAccessorHash", null, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+			"genericAttrAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -192,17 +191,16 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	private final String name;
 	@Nonnull
 	private final String[] argList;
-	@Nullable
-	private final String varArgsName;
+	private final boolean hasVarArgs;
 	@Nonnull
 	private final Type type;
 
 	private GenericAttrAccessor(@Nonnull final Type type, @Nonnull final String name,
-			@Nullable final String varArgsName, @Nonnull final String... argList) {
+			final boolean hasVarArgs, @Nonnull final String... argList) {
 		this.type = type;
 		this.name = name;
 		this.argList = argList;
-		this.varArgsName = varArgsName;
+		this.hasVarArgs = hasVarArgs;
 	}
 
 	@Override
@@ -211,13 +209,18 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	}
 
 	@Override
-	public String getVarArgsName() {
-		return varArgsName;
+	public boolean hasVarArgs() {
+		return hasVarArgs;
 	}
 
 	@Override
 	public String[] getDeclaredArgumentList() {
 		return argList;
+	}
+
+	@Override
+	public int getDeclaredArgumentCount() {
+		return argList.length;
 	}
 
 	@Override

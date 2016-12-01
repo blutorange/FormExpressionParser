@@ -37,7 +37,7 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 	private static enum Impl implements IFunction<RegexLangObject> {
 		// Dummy because there are not methods yet.
 		@Deprecated
-		DUMMY(null, "comparand"){ //$NON-NLS-1$
+		DUMMY(false, "comparand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -47,16 +47,16 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 		;
 
 		@Nonnull private final String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@SuppressWarnings("null")
@@ -68,6 +68,11 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@Override

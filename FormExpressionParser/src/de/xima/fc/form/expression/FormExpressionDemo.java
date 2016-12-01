@@ -29,16 +29,15 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 /**
- * TODO - unparse: los nicer - optional variable types - update formatting js -
- * update highlighter with new token types (global, scope, require etc) - check
- * for used/unused variables (especially this and arguments variable in function
- * body) - make it possible to check variables or external scopes provided by
- * the external context for a particular external context without evaluating it
- * => for example to check whether the current form version defines all
- * field::.. variables
+ * TODO
+ * - unparse: los nicer
+ * - optional variable types
+ * - support closures for lambda expressions (nestLocal -> nest ?)
+ * - update formatting js
+ * - update highlighter with new token types (global, scope, require etc)
  */
 public class FormExpressionDemo {
-	private static final boolean STRICT_MODE = true;
+	private static final boolean STRICT_MODE = false;
 	@Nonnull
 	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
 	@Nonnull

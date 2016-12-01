@@ -25,17 +25,16 @@ public interface IFunction<T extends ALangObject> {
 	public String getDeclaredName();
 
 	/**
-	 * @return A list of the argument names as declared. Empty array when there
-	 *         are no arguments.
+	 * @return A list of the argument names as declared, including the optional varArgs.
+	 * Empty array when there are no arguments.
 	 */
 	@Nonnull
 	public String[] getDeclaredArgumentList();
 
 	/**
-	 * @return Name of the varArgs argument. Null when this function does not allow varArgs arguments.
+	 * @return The number of arguments, including the optional varArgs.
 	 */
-	@Nullable
-	public String getVarArgsName();
+	public int getDeclaredArgumentCount();
 
 	/**
 	 * Executes the function and returns the result.
@@ -66,4 +65,12 @@ public interface IFunction<T extends ALangObject> {
 	 */
 	@Nullable
 	public Node getNode();
+
+	/**
+	 * Indicates whether the last argument is a varArgs argument. If it is, {@link #getDeclaredArgumentCount()} must
+	 * return a value larger than zero. During evaluation, all additional arguments are
+	 * put in an array and passed as the value of the last declared parameter.
+	 * @return Whether the last parameter is varArgs.
+	 */
+	public boolean hasVarArgs();
 }

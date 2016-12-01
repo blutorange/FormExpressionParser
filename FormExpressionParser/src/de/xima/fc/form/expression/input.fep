@@ -1,4 +1,1 @@
-global scope {
-  var a;
-}
-a = myscope::foo;
+'asd'.toLowerCase;

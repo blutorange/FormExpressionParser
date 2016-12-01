@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.evaluation.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
@@ -14,8 +15,11 @@ import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
 @SuppressWarnings("nls")
 enum SemanticsFailure implements ITestCase {
 	TEST001("throw exception('HelloWorld');", CustomRuntimeException.class,"Custom Exception: HelloWorld"),
-	TEST002("h={'f':''.toLowerCase};h.f();", IllegalThisContextException.class, "Provided this context <{\"f\":->(locale){'[native code]'};}> of type HASH does not match the expected type STRING for function <toLowerCase>."),
-	TEST003("foo=''.toLowerCase;foo.call();", IllegalThisContextException.class, "Provided this context <null> of type NULL does not match the expected type STRING for function <toLowerCase>."),
+	TEST002("h={'f':''.toLocaleLowerCase};h.f(null);", IllegalThisContextException.class, "Provided this context <{\"f\":->(locale){'[native code]'};}> of type HASH does not match the expected type STRING for function <toLocaleLowerCase>."),
+	TEST003("foo=''.toLocaleLowerCase;foo.call(null);", IllegalThisContextException.class, "Provided this context <null> of type NULL does not match the expected type STRING for function <toLocaleLowerCase>."),
+	TEST004("function foo(arg1,arg2){}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameters, but 1 were given."),
+	TEST005("function foo(arg1,arg2,args...){args;}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameters, but 1 were given."),
+	TEST006("function foo(){arguments.length;}foo(1,2,3);", IllegalNumberOfFunctionParametersException.class, "Function requires 0 parameters, but 3 were given."),
 	;
 
 	@Nonnull private final String code;

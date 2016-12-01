@@ -689,6 +689,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				writer.write(config.optionalSpace);
 			}
 		}
+		if (node.hasVarArgs())
+			writer.write(Syntax.TRIPLE_DOT);
 		writer.write(Syntax.PAREN_CLOSE);
 		writer.write(config.optionalSpace);
 		// Opening brace {
@@ -800,6 +802,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				writer.write(config.optionalSpace);
 			}
 		}
+		if (node.hasVarArgs())
+			writer.write(Syntax.TRIPLE_DOT);
 		writer.write(Syntax.PAREN_CLOSE);
 		writer.write(config.optionalSpace);
 		writer.write(Syntax.BRACE_OPEN);

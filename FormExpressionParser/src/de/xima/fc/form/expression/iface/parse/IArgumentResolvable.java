@@ -15,4 +15,6 @@ public interface IArgumentResolvable {
 	public ISourceResolvable getThisResolvable();
 	@Nonnull
 	public ISourceResolvable getArgumentsResolvable();
+	/** @return Whether the last argument is a var args arguments. */
+	public boolean hasVarArgs();
 }

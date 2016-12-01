@@ -73,8 +73,8 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE013("scope myscope{var a=42;}with(myscope){a;}", Tests.N42), // resolving scopes
 	
 	//Attribute accessors
-	PROP001("'Ab3'.toUpperCase().toLowerCase();", StringLangObject.create("ab3")),
-	PROP002("s='Ab3';f=s.toLowerCase;f.call(s);", StringLangObject.create("ab3")),
+	PROP001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
+	PROP002("s='Ab3';f=s.toLocaleLowerCase;f.call(s,null);", StringLangObject.create("ab3")),
 	PROP003("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
 
 	// Attribute assigners
@@ -128,18 +128,25 @@ enum SemanticsSuccess implements ITestCase {
 	ASSIGNMENT004("a=41;++a;++a;--a;a;",Tests.N42),
 
 	// Functions and lambda support
-	FUNCTION001("function foo(){arguments.length;}foo(1,2,3);", NumberLangObject.create(3)),
+	FUNCTION001("function foo(a){a;}foo(3);", NumberLangObject.create(3)),
 	FUNCTION002("function foo(){this;}foo();", NullLangObject.getInstance()),
-	FUNCTION003("foo=''.toLowerCase;foo.call('BAR');", StringLangObject.create("bar")),
+	FUNCTION003("foo=''.toLocaleLowerCase;foo.call('BAR',null);", StringLangObject.create("bar")),
 	FUNCTION004("foo=->(){42;};foo();", Tests.N42),
-
+	FUNCTION005("function foo(arg1,arg2,args...){args;}foo(1,2);", ArrayLangObject.create()),
+	FUNCTION006("function foo(arg1,arg2,args...){args;}foo(1,2,3);", ArrayLangObject.create(NumberLangObject.create(3))),
+	FUNCTION007("function foo(arg1,arg2,args...){args;}foo(1,2,3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
+	FUNCTION008("function foo(args...){args;}foo();", ArrayLangObject.create()),
+	FUNCTION009("function foo(args...){args;}foo(3);", ArrayLangObject.create(NumberLangObject.create(3))),
+	FUNCTION010("function foo(args...){args;}foo(3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
+	FUNCTION011("function foo(arg1,arg2,args...){[arg1,arg2];}foo(1,2);", ArrayLangObject.create(NumberLangObject.create(1),NumberLangObject.create(2))),
+	
 	//General
 	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
 	GENERAL003("true ? 42 : 0;", Tests.N42), // Ternary
 	GENERAL004("function foo(){return 42;};foo();", Tests.N42), // Function return
-	GENERAL005("42;;;;;", Tests.N42), // Empty node is throughpass
-	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // should not take too long
+	GENERAL005("42;;;;;", Tests.N42), // Empty node is through-pass.
+	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // Should not take too long
 
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),

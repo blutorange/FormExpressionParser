@@ -42,13 +42,13 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
-	private final String varArgsName;
+	private final boolean hasVarArgs;
 
 	private EAttrAccessorFunction(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
-		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0 && varArgsName == null;
+		hasVarArgs = impl.hasVarArgs();
+		evalImmediately = argList.length == 0 && !hasVarArgs;
 	}
 
 	@Override
@@ -71,6 +71,11 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 	}
 
 	@Override
+	public int getDeclaredArgumentCount() {
+		return argList.length;
+	}
+
+	@Override
 	public Type getThisContextType() {
 		return Type.FUNCTION;
 	}
@@ -81,19 +86,19 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 	}
 
 	@Override
-	public String getVarArgsName() {
-		return varArgsName;
+	public boolean hasVarArgs() {
+		return hasVarArgs;
 	}
 
 	private static enum Impl implements IFunction<FunctionLangObject> {
-		name(null) {
+		name(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return StringLangObject.create(thisContext.functionValue().getDeclaredName());
 			}
 		},
-		apply(null, "thisContext", "argsArray") { //$NON-NLS-1$ //$NON-NLS-2$
+		apply(false, "thisContext", "argsArray") { //$NON-NLS-1$ //$NON-NLS-2$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -106,7 +111,7 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 				return thisContext.functionValue().evaluate(ec, thiz);
 			}
 		},
-		call("args", "thisContext") { //$NON-NLS-1$ //$NON-NLS-2$
+		call(true, "thisContext", "args") { //$NON-NLS-1$ //$NON-NLS-2$
 			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
@@ -122,21 +127,26 @@ public enum EAttrAccessorFunction implements IFunction<FunctionLangObject> {
 		};
 
 		@Nonnull private String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@SuppressWarnings("null")

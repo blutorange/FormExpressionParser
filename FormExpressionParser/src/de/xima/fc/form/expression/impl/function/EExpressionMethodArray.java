@@ -39,7 +39,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToAdd {@link ALangObject}. Element(s) to be added to this array. When an array, all of the array's elements are added at the end of this array. Otherwise, the object itself is added to the end of this array.
 		 * @return <code>this</code>, with the elements specified by the argument added.
 		 */
-		UNION(null, "elementsToAdd"){ //$NON-NLS-1$
+		UNION(false, "elementsToAdd"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -52,7 +52,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		 * @param elementsToRemove {@link ArrayLangObject}. Element(s) to be removed from this array. When an array, all of the array's elements are removed from this array. Otherwise, all occurences of the object are removed from this array.
 		 * @return <code>this</code>, with the elements specified by the argument removed.
 		 */
-		DIFFERENCE(null, "elementsToRemove"){ //$NON-NLS-1$
+		DIFFERENCE(false, "elementsToRemove"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -63,18 +63,17 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		},
 		;
 
-
 		@Nonnull private final String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@SuppressWarnings("null")
@@ -86,6 +85,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@Override

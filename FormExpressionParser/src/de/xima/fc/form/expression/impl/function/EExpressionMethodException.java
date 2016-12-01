@@ -37,7 +37,7 @@ public enum EExpressionMethodException implements IMethod2Function<ExceptionLang
 	private static enum Impl implements IFunction<ExceptionLangObject> {
 		// A dummy because I haven't implemented any methods yet.
 		@Deprecated
-		DUMMY(null, "comparand"){ //$NON-NLS-1$
+		DUMMY(false, "comparand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -47,16 +47,16 @@ public enum EExpressionMethodException implements IMethod2Function<ExceptionLang
 		;
 
 		@Nonnull private final String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@SuppressWarnings("null")
@@ -68,6 +68,11 @@ public enum EExpressionMethodException implements IMethod2Function<ExceptionLang
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@Override

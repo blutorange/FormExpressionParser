@@ -22,13 +22,13 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
-	private final String varArgsName;
+	private final boolean hasVarArgs;
 
 	private EAttrAccessorException(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
-		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0 && varArgsName == null;
+		hasVarArgs = impl.hasVarArgs();
+		evalImmediately = argList.length == 0 && !hasVarArgs;
 	}
 
 	@Override
@@ -49,6 +49,11 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 	}
 
 	@Override
+	public int getDeclaredArgumentCount() {
+		return argList.length;
+	}
+
+	@Override
 	public Type getThisContextType() {
 		return Type.EXCEPTION;
 	}
@@ -59,12 +64,12 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 	}
 
 	@Override
-	public String getVarArgsName() {
-		return varArgsName;
+	public boolean hasVarArgs() {
+		return hasVarArgs;
 	}
 
 	private static enum Impl implements IFunction<ExceptionLangObject> {
-		message(null) {
+		message(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -74,21 +79,26 @@ public enum EAttrAccessorException implements IFunction<ExceptionLangObject> {
 		;
 
 		@Nonnull private String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@SuppressWarnings("null")

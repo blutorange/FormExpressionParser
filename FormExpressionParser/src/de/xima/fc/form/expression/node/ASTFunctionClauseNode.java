@@ -28,18 +28,22 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	@Nonnull
 	private GenericSourceResolvable[] argResolvable = CmnCnst.NonnullConstant.EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY;
 
+	private boolean hasVarArgs;
+
 	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	@Override
-	public void init(final EMethod method) throws ParseException {
+	public void init(final EMethod method, final boolean hasVarArgs) throws ParseException {
 		assertChildrenAtLeast(2);
+		if (hasVarArgs && jjtGetNumChildren()==2)
+			throw new ParseException(CmnCnst.Error.VAR_ARGS_WITHOUT_ARGUMENTS);
 		final ASTVariableNode var = getNthChildAs(0, ASTVariableNode.class);
 		final String scope = var.getScope();
 		final String variableName = var.getVariableName();
 		super.init(method, scope, variableName);
 		argResolvable = ASTFunctionNode.getArgs(this, 1);
+		this.hasVarArgs = hasVarArgs;
 	}
 
 	@Override
@@ -123,5 +127,15 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	public void supplyScope(@Nullable final String scope) {
 		if (scope != null)
 			setScope(scope);
+	}
+
+	@Override
+	public boolean hasVarArgs() {
+		return hasVarArgs;
+	}
+	
+	@Override
+	public void additionalToStringFields(final StringBuilder sb) {
+		sb.append(hasVarArgs).append(',');
 	}
 }

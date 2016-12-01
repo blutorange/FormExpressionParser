@@ -11,26 +11,39 @@ import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.FunctionLangObject;
+import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 
 public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	/**
-	 * @param locale
-	 *            {@link StringLangObject} (optional). The (IETF BCP 47) name of
-	 *            the locale to be used for the conversion. Defaults to the
-	 *            English-like {@link Locale#ROOT}.
+     * Uses the the English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The upper-case version of the string.
 	 */
 	toUpperCase(Impl.toUpperCase),
 	/**
 	 * @param locale
 	 *            {@link StringLangObject} (optional). The (IETF BCP 47) name of
-	 *            the locale to be used for the conversion. Defaults to the
-	 *            English-like {@link Locale#ROOT}.
+	 *            the locale to be used for the conversion. When the argument
+	 *            is {@link NullLangObject}, defaults to the English-like
+	 *            {@link Locale#ROOT}.
+	 * @return {@link StringLangObject} The upper-case version of the string.
+	 */
+	toLocaleUpperCase(Impl.toLocaleUpperCase),
+	/**
+	 * @param locale Uses the English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The lower-case version of the string.
 	 */
 	toLowerCase(Impl.toLowerCase),
+	/**
+	 * @param locale
+	 *            {@link StringLangObject} (optional). The (IETF BCP 47) name of
+	 *            the locale to be used for the conversion. When the argument
+	 *            is {@link NullLangObject}, defaults to the English-like
+	 *            {@link Locale#ROOT}.
+	 * @return {@link StringLangObject} The lower-case version of the string.
+	 */
+	toLocaleLowerCase(Impl.toLocaleLowerCase),
 	/**
 	 * @return {@link NumberLangObject}. The length of this string, >=0.
 	 */
@@ -40,13 +53,13 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	@Nonnull private final FunctionLangObject impl;
 	private final boolean evalImmediately;
 	@Nonnull private final String[] argList;
-	private final String varArgsName;
+	private final boolean hasVarArgs;
 
 	private EAttrAccessorString(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
-		varArgsName = impl.getVarArgsName();
-		evalImmediately = argList.length == 0 && varArgsName == null;
+		hasVarArgs = impl.hasVarArgs();
+		evalImmediately = argList.length == 0 && !hasVarArgs;
 	}
 
 	@Override
@@ -69,13 +82,18 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	}
 
 	@Override
+	public int getDeclaredArgumentCount() {
+		return argList.length;
+	}
+
+	@Override
 	public Type getThisContextType() {
 		return Type.STRING;
 	}
 
 	@Override
-	public String getVarArgsName() {
-		return varArgsName;
+	public boolean hasVarArgs() {
+		return hasVarArgs;
 	}
 
 	@Override
@@ -84,23 +102,35 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	}
 
 	private static enum Impl implements IFunction<StringLangObject> {
-		toUpperCase(null, "locale") { //$NON-NLS-1$
+		toLocaleUpperCase(false, "locale") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				return thisContext.toUpperCase(
-						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+				return thisContext.toUpperCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
 		},
-		toLowerCase(null, "locale") { //$NON-NLS-1$
+		toLocaleLowerCase(false, "locale") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				return thisContext.toLowerCase(
-						args.length == 0 ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+				return thisContext.toLowerCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
 		},
-		length(null) {
+		toUpperCase(false) { 
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.toUpperCase(Locale.ROOT);
+			}
+		},
+		toLowerCase(false) { 
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.toLowerCase(Locale.ROOT);
+			}
+		},
+		length(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -110,21 +140,26 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 		;
 
 		@Nonnull private String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@SuppressWarnings("null")

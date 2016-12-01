@@ -25,15 +25,19 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	@Nonnull
 	private GenericSourceResolvable[] argResolvable = CmnCnst.NonnullConstant.EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY;
 
+	private boolean hasVarArgs;
+
 	public ASTFunctionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 	
-	@Override
-	public void init(final EMethod method) throws ParseException {
+	public void init(final EMethod method, final boolean hasVarArgs) throws ParseException {
 		assertChildrenAtLeast(1);
+		if (hasVarArgs && jjtGetNumChildren()==1)
+			throw new ParseException(CmnCnst.Error.VAR_ARGS_WITHOUT_ARGUMENTS);
 		super.init(method);
 		argResolvable = ASTFunctionNode.getArgs(this, 0);
+		this.hasVarArgs = hasVarArgs;
 	}
 	
 	@Override
@@ -104,5 +108,15 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	@Override
 	public ISourceResolvable getArgumentsResolvable() {
 		return argumentsResolvable;
+	}
+	
+	@Override
+	public boolean hasVarArgs() {
+		return hasVarArgs;
+	}
+	
+	@Override
+	public void additionalToStringFields(final StringBuilder sb) {
+		sb.append(hasVarArgs).append(',');
 	}
 }

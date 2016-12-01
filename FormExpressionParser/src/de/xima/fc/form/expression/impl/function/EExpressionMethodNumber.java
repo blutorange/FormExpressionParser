@@ -71,63 +71,63 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	}
 
 	private static enum Impl implements IFunction<NumberLangObject> {
-		IDENTITY(null) {
+		IDENTITY(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext;
 			}
 		},
-		ADD(null, "summand") { //$NON-NLS-1$
+		ADD(false, "summand") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
 		},
-		SUBTRACT(null, "subtrahend") { //$NON-NLS-1$
+		SUBTRACT(false, "subtrahend") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(args[0].coerceNumber(ec));
 			}
 		},
-		INCREMENT(null) {
+		INCREMENT(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(NumberLangObject.getOneInstance());
 			}
 		},
-		DECREMENT(null) {
+		DECREMENT(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(NumberLangObject.getOneInstance());
 			}
 		},
-		NEGATE(null) {
+		NEGATE(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext.negate();
 			}
 		},
-		MULTIPLY(null, "multiplicand") { //$NON-NLS-1$
+		MULTIPLY(false, "multiplicand") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 		},
-		DIVIDE(null, "dividend") { //$NON-NLS-1$
+		DIVIDE(false, "dividend") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.divide(args[0].coerceNumber(ec));
 			}
 		},
-		MODULO(null,"operand"){ //$NON-NLS-1$
+		MODULO(false,"operand"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -137,16 +137,16 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 		;
 
 		@Nonnull private final String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@SuppressWarnings("null")
@@ -158,6 +158,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@Override

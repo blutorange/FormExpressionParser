@@ -17,12 +17,12 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 
 	@Nonnull private final FunctionLangObject impl;
 	@Nonnull private final String[] argList;
-	private final String varArgsName;
+	private final boolean hasVarArgs;
 
 	private EAttrAssignerNumber(@Nonnull final Impl impl) {
 		this.impl = FunctionLangObject.create(impl);
 		argList = impl.getDeclaredArgumentList();
-		varArgsName = impl.getVarArgsName();
+		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
@@ -43,6 +43,11 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 	}
 
 	@Override
+	public int getDeclaredArgumentCount() {
+		return argList.length;
+	}
+
+	@Override
 	public Type getThisContextType() {
 		return Type.NUMBER;
 	}
@@ -53,29 +58,34 @@ public enum EAttrAssignerNumber implements IFunction<NumberLangObject> {
 	}
 
 	@Override
-	public String getVarArgsName() {
-		return varArgsName;
+	public boolean hasVarArgs() {
+		return hasVarArgs;
 	}
 
 	private static enum Impl implements IFunction<NumberLangObject> {
 		;
 
 		@Nonnull private String[] argList;
-		private String optionalArgumentsName;
+		private boolean hasVarArgs;
 
-		private Impl(final String optArg, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
 			this.argList = argList;
-			this.optionalArgumentsName = optArg;
+			this.hasVarArgs = hasVarArgs;
 		}
 
 		@Override
-		public String getVarArgsName() {
-			return optionalArgumentsName;
+		public boolean hasVarArgs() {
+			return hasVarArgs;
 		}
 
 		@Override
 		public String[] getDeclaredArgumentList() {
 			return argList;
+		}
+
+		@Override
+		public int getDeclaredArgumentCount() {
+			return argList.length;
 		}
 
 		@SuppressWarnings("null")

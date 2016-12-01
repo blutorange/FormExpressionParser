@@ -219,6 +219,8 @@ TOKEN :
 |
   < DashEqual : "-=" >
 |
+  < TripleDot : "..." >
+|
   < StarEqual : "*=" >
 |
   < SlashEqual : "/=" >
@@ -622,6 +624,7 @@ void VariableDeclarationExpressionWithAssignment(EMethod method) #VariableDeclar
 void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   Token t;
+  Token varArgs = null;
 }
 {
   (
@@ -632,6 +635,7 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
         (
           < Comma > IdentifierName(null)
         )*
+        [varArgs = < TripleDot >]
       ]
     )
     < ParenClose >
@@ -640,14 +644,14 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
     )
   )
   {
-    jjtThis.init(method);
-    
+    jjtThis.init(method, varArgs != null);
   }
 }
 
 void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
+  Token varArgs = null;
 }
 {
   (
@@ -658,6 +662,7 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
         (
           < Comma > IdentifierName(null)
         )*
+        [varArgs = < TripleDot >]
       ]
     )
     < ParenClose >
@@ -666,7 +671,7 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
     )
   )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, varArgs != null);
     
   }
 }
@@ -1771,6 +1776,7 @@ void Exception(EMethod method) #ExceptionNode :
 
 void Function(EMethod method) #FunctionNode :
 {
+  Token varArgs = null;
 }
 {
   (
@@ -1782,13 +1788,14 @@ void Function(EMethod method) #FunctionNode :
         (
           < Comma > IdentifierName(null)
         )*
+        [varArgs = < TripleDot >]
       ]
     )
     < ParenClose > 
     Block(null)
   )
   {
-    jjtThis.init(method);
+    jjtThis.init(method, varArgs != null);
   }
 }
 
