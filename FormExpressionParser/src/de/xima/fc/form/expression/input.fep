@@ -1,1 +1,20 @@
-'asd'.toLowerCase;
+global scope {
+  number n;
+  string s;
+  boolean b;
+  regex r;
+  error e;
+  array<boolean> a1;
+  array<array/*comment*/<boolean>> a2;
+  hash<string, string> h;
+  method<number, number> m;
+}
+
+function array<hash<string,string>> foo(){
+  number x;
+}
+
+-> string() {
+  string z;
+  for (x in [1,2,3]) loginfo(x);
+};

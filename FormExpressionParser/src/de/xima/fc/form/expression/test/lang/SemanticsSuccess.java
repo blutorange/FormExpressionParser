@@ -141,7 +141,7 @@ enum SemanticsSuccess implements ITestCase {
 	FUNCTION011("function foo(arg1,arg2,args...){[arg1,arg2];}foo(1,2);", ArrayLangObject.create(NumberLangObject.create(1),NumberLangObject.create(2))),
 	
 	//General
-	GENERAL001("a=-(b=1);for(i:20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
+	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
 	GENERAL003("true ? 42 : 0;", Tests.N42), // Ternary
 	GENERAL004("function foo(){return 42;};foo();", Tests.N42), // Function return

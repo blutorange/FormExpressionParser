@@ -40,6 +40,7 @@ import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
@@ -85,4 +86,5 @@ public interface IFormExpressionReturnVoidVisitor<R,E extends Throwable>
 	@Nonnull public R visit(@Nonnull ASTVariableDeclarationClauseNode node) throws E;
 	@Nonnull public R visit(@Nonnull ASTScopeManualNode node) throws E;
 	@Nonnull public R visit(@Nonnull ASTScopeGlobalNode node) throws E;
+	@Nonnull public R visit(@Nonnull ASTVariableTypeNode node) throws E;
 }

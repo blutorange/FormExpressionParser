@@ -71,6 +71,7 @@ import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -671,7 +672,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTExceptionNode node) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or
 		// return clause.
-		final StringLangObject message = jjtAccept(node, node.jjtGetChild(0), ec).coerceString(ec);
+		final StringLangObject message = jjtAccept(node, node.getErrorMessageNode(), ec).coerceString(ec);
 		return ExceptionLangObject.create(message.stringValue(), ec);
 	}
 
@@ -679,7 +680,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTThrowClauseNode node) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or
 		// return clause.
-		throw jjtAccept(node, node.jjtGetChild(0), ec).coerceException(ec).exceptionValue();
+		throw jjtAccept(node, node.getThrowNode(), ec).coerceException(ec).exceptionValue();
 	}
 
 	@Override
@@ -703,14 +704,14 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		jumpLabel = null;
 		jumpType = EJump.RETURN;
 		mustJump = true;
-		return node.jjtGetNumChildren() == 0 ? NullLangObject.getInstance() : jjtAccept(node, node.jjtGetChild(0), ec);
+		return node.hasReturn() ? NullLangObject.getInstance() : jjtAccept(node, node.getReturnNode(), ec);
 	}
 
 	@Override
 	public ALangObject visit(final ASTLogNode node) throws EvaluationException {
 		// Child must be an expression and cannot contain any break, continue,
 		// or return clause.
-		final StringLangObject message = jjtAccept(node, node.jjtGetChild(0), ec).coerceString(ec);
+		final StringLangObject message = jjtAccept(node, node.getLogMessageNode(), ec).coerceString(ec);
 		final ILogger logger = ec.getLogger();
 		switch (node.getLogLevel()) {
 		case DEBUG:
@@ -793,10 +794,10 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTTernaryExpressionNode node) throws EvaluationException {
-		if (jjtAccept(node, node.jjtGetChild(0), ec).coerceBoolean(ec).booleanValue()) {
-			return jjtAccept(node, node.jjtGetChild(1), ec);
+		if (jjtAccept(node, node.getConditionNode(), ec).coerceBoolean(ec).booleanValue()) {
+			return jjtAccept(node, node.getIfNode(), ec);
 		}
-		return jjtAccept(node, node.jjtGetChild(2), ec);
+		return jjtAccept(node, node.getElseNode(), ec);
 	}
 
 	@Override
@@ -899,6 +900,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTScopeGlobalNode node) throws EvaluationException {
 		throw new UncatchableEvaluationException(ec,
 				NullUtil.format(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
+	}
+
+	@Override
+	public ALangObject visit(final ASTVariableTypeNode node) throws EvaluationException {
+		throw new UncatchableEvaluationException(ec,
+				NullUtil.format(CmnCnst.Error.ILLEGAL_VARIABLE_TYPE_AT_EVALUATION, node.toString()));
 	}
 
 	/**

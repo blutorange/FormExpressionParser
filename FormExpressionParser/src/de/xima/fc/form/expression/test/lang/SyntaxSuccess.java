@@ -22,7 +22,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST009("i=j=bug=fail=0;if(i==0){bug(i);}else if(j==0){fail();fail();}"),
 	TEST010("i=j=bug=fail=success=0;if(i==0){bug(i);bug();}else if(j==0){fail();fail();}else{success(j);}"),
 	TEST011("a=b=c=0;if(a)a;else if(c)c;else b;"),
-	TEST012("nodeList=null;for(node:nodeList)loginfo(node);"),
+	TEST012("nodeList=null;for(node in nodeList)loginfo(node);"),
 	TEST013("for(i=0;i!=10;++i)loginfo(i);"),
 	TEST014("for(i=0,j=0;i!=10,i>=0;++i,++j){loginfo(i);logwarn(j);}"),
 	TEST015("spam=0;for(;;)spam();"),
@@ -41,7 +41,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST028("getFunction=foo=0;getFunction()(foo);"),
 	TEST029("a=b=foo=0;(a+b)(foo);"),
 	TEST030("a=b=bar=0;a[b.foo(bar)]().baz;"),
-	TEST031("for(i:10)if(i>5) break;"),
+	TEST031("for(i in 10)if(i>5) break;"),
 	TEST032("'012345'[0];"),
 	TEST033("bar::foobar=0;with(foo,bar)foobar;"),
 	TEST034("a=foobar=0;a.b.c=foobar=4+2;"),
@@ -52,7 +52,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST039(new Cfg("<foo>[%a=b=0;a+b;%]</foo>").template().fc()),
 	TEST040(new Cfg("<foo>[%a=b=0;a+b;%]").template().fc()),
 	TEST041(new Cfg("[%a=b=0;a+b;%]").template().fc()),
-	TEST042(new Cfg("<foo>[%k=0;for(i:10){%]</foo>[%k+1;%]<bar/>[%}%]").template().fc()),
+	TEST042(new Cfg("<foo>[%k=0;for(i in 10){%]</foo>[%k+1;%]<bar/>[%}%]").template().fc()),
 	TEST043(new Cfg("<foo>[%i=0;%][%j=0;%]</foo>").template().fc()),
 	TEST044(new Cfg("<foo>[%42%]</foo>").template().fc()),
 	TEST045(new Cfg("<foo>[%42;%]</foo>").template().fc()),
@@ -74,6 +74,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST061("a = 8;require scope math;"),
 	TEST062("scope foo{var ko;}foo::ko=0;"),
 	TEST063("scope myscope{function test(){for(var n=2;n<=10;++n){for(var r=n;r<=10;r+=n){}}}}"),
+	TEST064("global scope{number n;string s;boolean b;regex r;error e;array<boolean>a1;array<array/*comment*/<boolean>>a2;hash<string,string>h;method<number,number>m;}function array<hash<string,string>>foo(){number x;}->string(){string z;};"),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

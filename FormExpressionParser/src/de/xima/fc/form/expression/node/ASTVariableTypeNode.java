@@ -1,37 +1,33 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode implements IVariableTyped {
+public class ASTVariableTypeNode extends ANode {
+	
 	private static final long serialVersionUID = 1L;
+	
+	@Nonnull
+	private EVariableType variableType = EVariableType.UNKNOWN;
 
-	public ASTVariableDeclarationClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTVariableTypeNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
-
-	@Override
-	public void init(final EMethod method, final String variableName) throws ParseException {
-		assertChildrenBetween(1,2);
-		super.init(method, variableName);
-	}
 	
-	@Override
-	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		if (i==0)
-			return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
-		return null;
+	public ASTVariableTypeNode(@Nonnull final Node prototype, @Nonnull final EVariableType variableType) {
+		super(prototype, FormExpressionParserTreeConstants.JJTVARIABLETYPENODE);
+		this.variableType = variableType;
 	}
 
 	@Override
@@ -55,28 +51,36 @@ public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode impl
 	}
 
 	@Override
-	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
-		sb.append(getVariableName()).append(',');
-	}
-		
-	public boolean hasAssignment() {
-		return jjtGetNumChildren() == 2;
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return new ASTVariableTypeNode(jjtGetChild(i), EVariableType.UNKNOWN);
 	}
 	
 	@Override
-	public boolean hasType() {
-		return true;
+	public void additionalToStringFields(final StringBuilder sb) {
+		sb.append(variableType).append(',');
+	}
+	
+	public void init(final EMethod method, @Nonnull final EVariableType variableType) throws ParseException {
+		assertNonNull(variableType, CmnCnst.Error.NULL_VARIABLE_TYPE);
+		super.init(method);
+		this.variableType  = variableType;
 	}
 
-	@Override
-	public Node getTypeNode() {
-		return jjtGetChild(0);
+	@Nonnull
+	public EVariableType getVariableType() {
+		return variableType;
+	}
+
+	public boolean hasGenerics() {
+		return jjtGetNumChildren()>0;
 	}
 	
-	@Nullable
-	public Node getAssignmentNode() {
-		if (jjtGetNumChildren() == 1)
-			return null;
-		return jjtGetChild(1);
+	public int getGenericsCount() {
+		return jjtGetNumChildren();
+	}
+	
+	@Nonnull
+	public Node getGenericsNode(final int i) {
+		return jjtGetChild(i);
 	}
 }

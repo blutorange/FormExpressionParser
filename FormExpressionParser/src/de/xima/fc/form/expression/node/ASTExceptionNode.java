@@ -50,4 +50,9 @@ public class ASTExceptionNode extends ANode {
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
 	}
+
+	@Nonnull
+	public Node getErrorMessageNode() {
+		return jjtGetChild(0);
+	}
 }

@@ -7,7 +7,7 @@
 <body>
 <ul>
   [%% a=-(b=1); %]
-  [%% for (i : 25) { %]
+  [%% for (i in 25) { %]
     <li style="color: [%%= colors[i%4] %];">[%%= b=a+(a=b) %]</li>
   [%% } %]
 </ul>

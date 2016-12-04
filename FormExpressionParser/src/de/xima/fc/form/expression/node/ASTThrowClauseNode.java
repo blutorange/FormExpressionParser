@@ -49,4 +49,9 @@ public class ASTThrowClauseNode extends ANode {
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		throw new ArrayIndexOutOfBoundsException();
 	}
+
+	@Nonnull
+	public Node getThrowNode() {
+		return jjtGetChild(0);
+	}
 }

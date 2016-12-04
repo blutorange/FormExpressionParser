@@ -3,6 +3,9 @@ package de.xima.fc.form.expression;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +34,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 /**
  * TODO
  * - unparse: los nicer
- * - optional variable types
+ * - optional variable types -> syntax for func param types
  * - support closures for lambda expressions (nestLocal -> nest ?)
  * - update formatting js
  * - update highlighter with new token types (global, scope, require etc)
@@ -43,7 +46,7 @@ public class FormExpressionDemo {
 	@Nonnull
 	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
-	private static final UnparseVisitorConfig UNPARSE_CONFIG = UnparseVisitorConfig.getUnstyledWithoutCommentsConfig();
+	private static final UnparseVisitorConfig UNPARSE_CONFIG = UnparseVisitorConfig.getStyledWithCommentsConfig();
 
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
@@ -92,7 +95,10 @@ public class FormExpressionDemo {
 	private static void showWarnings(final IFormExpression<FormcycleExternalContext> expression) {
 		System.out.println("===Warnings==="); //$NON-NLS-1$
 		try {
-			for (final IEvaluationWarning warning : expression.analyze(new FormcycleExternalContext())) {
+			final List<IEvaluationWarning> warningList = new ArrayList<IEvaluationWarning>(
+					expression.analyze(new FormcycleExternalContext()));
+			Collections.sort(warningList, IEvaluationWarning.COMPARATOR);
+			for (final IEvaluationWarning warning : warningList) {
 				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getLine(),
 						warning.getColumn(), warning.getMessage()));
 				System.out.println();

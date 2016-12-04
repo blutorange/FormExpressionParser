@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 
-public class DumpVisitor extends GenericDepthFirstVisitor<String, String, IOException> {
+public class DumpVisitor extends FormExpressionReturnDataVisitorAdapter<String, String, IOException> {
 	private static class InstanceHolder {
 		@Nonnull public final static DumpVisitor SYSTEM_OUT_DUMPER = new DumpVisitor(System.out);
 		@Nonnull public final static DumpVisitor SYSTEM_ERR_DUMPER = new DumpVisitor(System.err);

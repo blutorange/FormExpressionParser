@@ -72,10 +72,10 @@ for (i = 0; i < 10; i+=1) {
 }
 
 // Enhanced for loop.
-for (i : [1,2,3]) loginfo(i); // => 1 2 3
-for (i : 3) loginfo(i);       // => 1 2 3
-for (i : "123") loginfo(i);   // => 1 2 3
-for (key : {1:null,2:null,3:null})
+for (i in [1,2,3]) loginfo(i); // => 1 2 3
+for (i in 3) loginfo(i);       // => 1 2 3
+for (i in "123") loginfo(i);   // => 1 2 3
+for (key in {1:null,2:null,3:null})
   loginfo(key);              // => 1 2 3
 
 // While loop, Do-While loop

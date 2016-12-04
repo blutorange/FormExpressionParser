@@ -187,7 +187,7 @@ public final class CmnCnst {
 		@Nonnull public static final String COLON = ":";
 		@Nonnull public static final String SEMI_COLON = ";";
 		@Nonnull public static final String SCOPE_SEPARATOR = "::";
-		@Nonnull public static final String ENHANCED_FOR_LOOP_SEPARATOR = ":";
+		@Nonnull public static final String ENHANCED_FOR_LOOP_SEPARATOR = "in";
 		@Nonnull public static final String LINEFEED = "\n";
 		@Nonnull public static final String INDENT = "  ";
 		@Nonnull public static final String TRUE = "true";
@@ -200,6 +200,14 @@ public final class CmnCnst {
 		@Nonnull public static final String MULTI_LINE_COMMENT_START = "/*";
 		@Nonnull public static final String MULTI_LINE_COMMENT_END = "*/";
 		@Nonnull public static final String TRIPLE_DOT = "...";
+		@Nonnull public static final String BOOLEAN = "boolean";
+		@Nonnull public static final String STRING = "string";
+		@Nonnull public static final String NUMBER = "number";
+		@Nonnull public static final String ARRAY = "array";
+		@Nonnull public static final String HASH = "hash";
+		@Nonnull public static final String REGEX = "regex";
+		@Nonnull public static final String ERROR = "error";
+		@Nonnull public static final String METHOD = "method";
 	}
 
 	public static final class Error {
@@ -335,6 +343,8 @@ public final class CmnCnst {
 		@Nonnull public static final String UNDEFINED_EMBEDMENT = "Embedment %s is not defined.";
 		@Nonnull public static final String VAR_ARGS_WITHOUT_ARGUMENTS = "Function cannot have varArgs without any arguments. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires %d parameters, but %d were given.";
+		@Nonnull public static final String NULL_VARIABLE_TYPE = "Variable type must not be null. " + INTERNAL_ERROR;
+		@Nonnull public static final String ILLEGAL_VARIABLE_TYPE_AT_EVALUATION = "Variable type declaration %s cannot occur in the main program. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

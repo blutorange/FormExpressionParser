@@ -51,6 +51,7 @@ package de.xima.fc.form.expression.grammar;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +89,7 @@ PARSER_END(FormExpressionParser)
 
 TOKEN_MGR_DECLS :
 {
-  private int nestLevelTypeDecl = 0;
+  private int typeLevel = 0;
   void CommonTokenAction(final Token token) {
     // Retrieve all comments, if there are any.
     if (parser == null) return;
@@ -103,6 +104,43 @@ TOKEN_MGR_DECLS :
   }
 }
 
+< TYPE >
+TOKEN :
+{
+  < TypeAngleOpen : "<" > { ++typeLevel;}
+| < TypeAngleClose : ">" > { --typeLevel; if (typeLevel == 0) SwitchTo(FormExpressionParserConstants.CODE); }
+| < TypeComma : "," >
+| < TypeHash : "hash" >
+| < TypeError : "error" >
+| < TypeRegex : "regex" >
+| < TypeArray : "array" >
+| < TypeMethod : "method" >
+| < TypeString : "string" >
+| < TypeNumber : "number" >
+| < TypeBoolean : "boolean" >
+}
+
+< TYPE >
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+< TYPE >
+SPECIAL_TOKEN:
+{ 
+  < TypeSingleLineComment: "//" (~["\n"])* ("\n")?>
+}
+
+< TYPE >
+MORE:
+{ 
+  < "/*" > : TYPE_MULTI_LINE_COMMENT
+}
+
 < LOS >
 TOKEN :
 {
@@ -114,6 +152,19 @@ TOKEN :
 | 
   < LosChar : ~[ ] >
 }
+
+< TYPE_MULTI_LINE_COMMENT >
+SPECIAL_TOKEN :
+{
+  < TypeMultiLineComment: "*/" > : TYPE
+}
+
+< TYPE_MULTI_LINE_COMMENT >
+MORE :
+{
+  < ~[ ] >
+}
+
 
 < MULTI_LINE_COMMENT >
 SPECIAL_TOKEN :
@@ -245,6 +296,8 @@ TOKEN :
 | 
   < DoubleEqual : "==" >
 | 
+  < In : "in" >
+| 
   < If : "if" >
 | 
   < Do : "do" >
@@ -286,7 +339,7 @@ TOKEN :
   < Try : "try" >
 | 
   < Var : "var" >
-| 
+|
   < With : "with" >
 | 
   < Else : "else" >
@@ -295,6 +348,8 @@ TOKEN :
 |
   < True : "true" >
 | 
+  < Hash : "hash" > { typeLevel = 0; } : TYPE
+| 
   < Null : "null" >
 | 
   < Break : "break" >
@@ -302,20 +357,32 @@ TOKEN :
   < While : "while" >
 | 
   < Catch : "catch" >
-|
-  < __Exception : "exception" >
 | 
   < Throw : "throw" >
+| 
+  < Array : "array" > { typeLevel = 0; } : TYPE
+| 
+  < __Error : "error" >
 | 
   < Scope : "scope" >
 | 
   < False : "false" >
 | 
+  < Regex : "regex" >
+| 
+  < Number : "number" >
+| 
   < Return : "return" >
+| 
+  < Method : "method" > { typeLevel = 0; } : TYPE
 | 
   < Switch : "switch" >
 | 
   < Global : "global" >
+| 
+  < String : "string" >
+| 
+  < Boolean : "boolean" >
 | 
   < Require : "require" >
 | 
@@ -332,6 +399,8 @@ TOKEN :
   < LogError : "logerror" >
 | 
   < LogDebug : "logdebug" >
+|
+  < __Exception : "exception" >
 | 
   < Identifier : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* >
 | 
@@ -588,7 +657,8 @@ void VariableDeclarationClauseWithoutAssignment(EMethod method) #VariableDeclara
 }
 {
   (
-    < Var > t = < Identifier > < SemiColon >
+      VariableType(null)    
+      t = < Identifier > < SemiColon >
   )
   {
     jjtThis.init(method, t.image);
@@ -601,7 +671,21 @@ void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
 }
 {
   (
-    < Var > t = < Identifier > [ < Equal > Expression(null) ] < SemiColon >
+      VariableType(null)    
+      t = < Identifier > [ < Equal > Expression(null) ] < SemiColon >
+  )
+  {
+    jjtThis.init(method, t.image);
+  }
+}
+
+void VariableDeclarationExpression(EMethod method) #VariableDeclarationClauseNode :
+{
+  Token t;
+}
+{
+  (
+      VariableType(null) t = < Identifier >
   )
   {
     jjtThis.init(method, t.image);
@@ -614,21 +698,159 @@ void VariableDeclarationExpressionWithAssignment(EMethod method) #VariableDeclar
 }
 {
   (
-    < Var > t = < Identifier > [ < Equal > Expression(null) ]
+      VariableType(null) t = < Identifier > [ < Equal > Expression(null) ]
   )
   {
     jjtThis.init(method, t.image);
   }
 }
 
+void VariableType(EMethod method) #void :
+{
+}
+{
+  (
+    UnspecificVariableType(method) | SpecificVariableType(method)
+  )
+}
+
+void UnspecificVariableType(EMethod method) #VariableTypeNode :
+{
+}
+{
+  (
+    < Var >
+  )
+  {
+    jjtThis.init(method, EVariableType.UNKNOWN);
+  }
+}
+
+void SpecificVariableType(EMethod method) #VariableTypeNode :
+{
+  EVariableType type;
+}
+{
+  (
+    ( < Boolean >  | < TypeBoolean > )
+    {
+      type = EVariableType.BOOLEAN;
+    }
+  | (< Number > | < TypeNumber >)
+    {
+      type = EVariableType.NUMBER;
+    }
+  | (< String >  | < TypeString >)
+    {
+      type = EVariableType.STRING;
+    }
+  |
+    (
+      ( < Array > | < TypeArray > )
+      GenericsArray(null)
+      {
+        type = EVariableType.ARRAY;
+      }
+    )
+  |
+    (
+      ( < Hash > | < TypeHash > )
+      GenericsHash(null)
+      {
+        type = EVariableType.HASH;
+      }
+    )
+  | ( < __Error > | < TypeError > )
+    {
+      type = EVariableType.ERROR;
+    }
+  | ( < Regex > | < TypeRegex > )
+    {
+      type = EVariableType.REGEX;
+    }
+  |
+    (
+      ( < Method >  | < TypeMethod > )
+      GenericsMethod(null)
+      {
+        type = EVariableType.METHOD;
+      }
+    )
+  )
+  {
+    jjtThis.init(method, type);
+  }
+}
+
+void GenericsHash(EMethod method) #void:
+{
+}
+{
+  (
+    < AngleOpen >
+  | < TypeAngleOpen >
+  )
+  SpecificVariableType(method)
+  (
+    < Comma >
+  | < TypeComma >
+  )
+  SpecificVariableType(method)
+  (
+    < AngleClose >
+  | < TypeAngleClose >
+  )
+}
+
+void GenericsArray(EMethod method) #void:
+{
+}
+{
+  (
+    < AngleOpen >
+  | < TypeAngleOpen >
+  )
+  SpecificVariableType(method)
+  (
+    < AngleClose >
+  | < TypeAngleClose >
+  )
+}
+
+void GenericsMethod(EMethod method) #void:
+{
+}
+{
+  (
+    < AngleOpen >
+  | < TypeAngleOpen >
+  )
+  SpecificVariableType(method)
+  (
+    (
+      < Comma >
+    | < TypeComma >
+    )
+    SpecificVariableType(method)
+  )*
+  (
+    < AngleClose >
+  | < TypeAngleClose >
+  )
+}
+
 void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   Token t;
   Token varArgs = null;
+  boolean hasType = false;
 }
 {
   (
-    < Function > VariableWithOptionalScope(null) < ParenOpen >
+    < Function >
+    [ SpecificVariableType(null) ] { hasType = true; }
+    VariableWithOptionalScope(null)
+    < ParenOpen >
     (
       [
         IdentifierName(null)
@@ -644,7 +866,7 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
     )
   )
   {
-    jjtThis.init(method, varArgs != null);
+    jjtThis.init(method, varArgs != null, hasType);
   }
 }
 
@@ -652,10 +874,14 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
   Token varArgs = null;
+  boolean hasType = false;
 }
 {
   (
-    < Function > Variable(null) < ParenOpen >
+    < Function >
+    [ SpecificVariableType(null) { hasType = true; } ]
+    Variable(null)
+    < ParenOpen >
     (
       [
         IdentifierName(null)
@@ -671,7 +897,7 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
     )
   )
   {
-    jjtThis.init(method, varArgs != null);
+    jjtThis.init(method, varArgs != null, hasType);
     
   }
 }
@@ -856,14 +1082,18 @@ void ForLoop(EMethod method) #ForLoopNode :
 {
   Token label = null;
   Token iteratingLoopVariable = null;
+  boolean hasType = false;
 }
 {
   (
     < For > [ < AngleOpen > label = < Identifier > < AngleClose > ] < ParenOpen >
     (
-      LOOKAHEAD(< Identifier > < Colon >)
+      LOOKAHEAD([ SpecificVariableType(null) ] < Identifier > < In >)
       (
-        iteratingLoopVariable = < Identifier > < Colon > Expression(null)
+        [ SpecificVariableType(null) { hasType = true; } ]
+        iteratingLoopVariable = < Identifier >
+        < In >
+        Expression(null)
       )
     |
       (
@@ -874,8 +1104,10 @@ void ForLoop(EMethod method) #ForLoopNode :
     BlockOrClause(null)
   )
   {
-    jjtThis.init(method, iteratingLoopVariable != null ? iteratingLoopVariable.image : null, label != null ? label.image : null);
-    
+    jjtThis.init(method,
+      iteratingLoopVariable != null ? iteratingLoopVariable.image : null,
+      label != null ? label.image : null,
+      hasType);
   }
 }
 
@@ -1774,13 +2006,16 @@ void Exception(EMethod method) #ExceptionNode :
   }
 }
 
+
 void Function(EMethod method) #FunctionNode :
 {
   Token varArgs = null;
+  boolean hasType = false;
 }
 {
   (
     < LambdaArrow >
+    [ SpecificVariableType(null) { hasType = true; } ]
     < ParenOpen >
     (
       [
@@ -1795,7 +2030,7 @@ void Function(EMethod method) #FunctionNode :
     Block(null)
   )
   {
-    jjtThis.init(method, varArgs != null);
+    jjtThis.init(method, varArgs != null, hasType);
   }
 }
 

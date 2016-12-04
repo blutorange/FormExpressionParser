@@ -41,10 +41,11 @@ import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
-public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implements IFormExpressionReturnDataVisitor<R, T, E> {
+public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Throwable> implements IFormExpressionReturnDataVisitor<R, T, E> {
 
 	protected static class Node {
 		private de.xima.fc.form.expression.grammar.Node node;
@@ -84,7 +85,7 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 
 	@Nonnull private final Node wrapper;
 
-	public GenericDepthFirstVisitor() {
+	public FormExpressionReturnDataVisitorAdapter() {
 		wrapper = new Node();
 	}
 
@@ -324,4 +325,8 @@ public abstract class GenericDepthFirstVisitor<R, T, E extends Throwable> implem
 		return processNode(node, data);
 	}
 
+	@Override
+	public R visit(final ASTVariableTypeNode node, final T data) throws E {
+		return processNode(node, data);
+	}
 }

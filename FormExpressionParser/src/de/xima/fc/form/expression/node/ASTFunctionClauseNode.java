@@ -4,11 +4,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
@@ -17,7 +19,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvable {
+public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvable, IVariableTyped {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull
@@ -29,37 +31,36 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	private GenericSourceResolvable[] argResolvable = CmnCnst.NonnullConstant.EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY;
 
 	private boolean hasVarArgs;
-
+	private boolean hasType;
+	
 	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	public void init(final EMethod method, final boolean hasVarArgs) throws ParseException {
+	public void init(final EMethod method, final boolean hasVarArgs, final boolean hasType) throws ParseException {
 		assertChildrenAtLeast(2);
-		if (hasVarArgs && jjtGetNumChildren()==2)
+		if (hasVarArgs && jjtGetNumChildren() == (hasType ? 3 : 2))
 			throw new ParseException(CmnCnst.Error.VAR_ARGS_WITHOUT_ARGUMENTS);
-		final ASTVariableNode var = getNthChildAs(0, ASTVariableNode.class);
+		final ASTVariableNode var = getNthChildAs(hasType ? 1 : 0, ASTVariableNode.class);
 		final String scope = var.getScope();
 		final String variableName = var.getVariableName();
 		super.init(method, scope, variableName);
-		argResolvable = ASTFunctionNode.getArgs(this, 1);
+		argResolvable = ASTFunctionNode.getArgs(this, hasType ? 2 : 1);
 		this.hasVarArgs = hasVarArgs;
+		this.hasType = hasType;
 	}
 
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		if (i == 0)
+		if (i == (hasType ? 1 : 0))
 			throw new ArrayIndexOutOfBoundsException();
-		if (i != jjtGetNumChildren() -1)
+		if (i == 0 && hasType)
+			return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
+		if (i != jjtGetNumChildren() - 1)
 			return null;
 		return nullNode();
 	}
 	
-	@Nonnull
-	public Node getFunctionNameNode() {
-		return jjtGetChild(0);
-	}
-
 	@Override
 	@Nonnull
 	public Node getBodyNode() {
@@ -100,7 +101,7 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	
 	@Override
 	public Node getArgumentNode(final int i) {
-		return jjtGetChild(i+1);
+		return jjtGetChild(i + (hasType ? 2 : 1));
 	}
 
 	@SuppressWarnings("null")
@@ -121,7 +122,7 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 
 	@Nonnull
 	public ASTVariableNode getVariableNode() {
-		return (ASTVariableNode) jjtGetChild(0);
+		return (ASTVariableNode) jjtGetChild(hasType ? 1 : 0);
 	}
 
 	public void supplyScope(@Nullable final String scope) {
@@ -132,6 +133,17 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	@Override
 	public boolean hasVarArgs() {
 		return hasVarArgs;
+	}
+	
+	@Override
+	public boolean hasType() {
+		return hasType;
+	}
+	
+	@Override
+	@Nonnull
+	public Node getTypeNode() {
+		return jjtGetChild(0);
 	}
 	
 	@Override

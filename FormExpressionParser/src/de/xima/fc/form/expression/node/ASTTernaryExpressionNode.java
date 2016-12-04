@@ -48,4 +48,19 @@ public class ASTTernaryExpressionNode extends ANode {
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
 	}
+
+	@Nonnull
+	public Node getConditionNode() {
+		return jjtGetChild(0);
+	}
+	
+	@Nonnull
+	public Node getIfNode() {
+		return jjtGetChild(1);
+	}
+	
+	@Nonnull
+	public Node getElseNode() {
+		return jjtGetChild(2);
+	}
 }

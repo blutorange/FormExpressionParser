@@ -4,23 +4,27 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.ILabelled;
+import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled {
+public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, IVariableTyped {
 	private static final long serialVersionUID = 1L;
 
 	@Nullable
 	private String label;
 
 	private boolean isEnhancedLoop;
+
+	private boolean hasType;
 
 	public ASTForLoopNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -49,17 +53,23 @@ public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled {
 	}
 
 	public void init(@Nullable final EMethod method, @Nullable final String iteratingLoopVariable,
-			@Nullable final String label) throws ParseException {
-		assertChildrenExactly(iteratingLoopVariable != null ? 2 : 4);
-		super.init(method, iteratingLoopVariable != null ? iteratingLoopVariable : CmnCnst.NonnullConstant.STRING_EMPTY);
+			@Nullable final String label, final boolean hasType) throws ParseException {
+		assertChildrenExactly(iteratingLoopVariable != null ? (hasType ? 3 : 2) : 4);
+		super.init(method,
+				iteratingLoopVariable != null ? iteratingLoopVariable : CmnCnst.NonnullConstant.STRING_EMPTY);
 		this.isEnhancedLoop = iteratingLoopVariable != null;
 		this.label = label;
+		this.hasType = hasType;
 	}
-	
+
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		if (isEnhancedLoop && i == 0)
-			throw new ArrayIndexOutOfBoundsException();
+		if (isEnhancedLoop) {
+			if (i == (hasType ? 1 : 0))
+				throw new ArrayIndexOutOfBoundsException();
+			if (hasType && i == 0)
+				return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
+		}
 		return nullNode();
 	}
 
@@ -79,14 +89,24 @@ public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled {
 		return !isEnhancedLoop;
 	}
 
+	@Override
+	public boolean hasType() {
+		return hasType;
+	}
+
+	@Override
+	public Node getTypeNode() {
+		return jjtGetChild(0);
+	}
+
 	@Nonnull
 	public Node getBodyNode() {
-		return isEnhancedLoop ? jjtGetChild(1) : jjtGetChild(3);
+		return isEnhancedLoop ? jjtGetChild(hasType ? 2 : 1) : jjtGetChild(3);
 	}
 
 	@Nonnull
 	public Node getEnhancedIteratorNode() {
-		return jjtGetChild(0);
+		return jjtGetChild(hasType ? 1 : 0);
 	}
 
 	@Nonnull

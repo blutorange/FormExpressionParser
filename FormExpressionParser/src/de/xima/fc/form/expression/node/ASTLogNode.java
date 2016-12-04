@@ -67,4 +67,9 @@ public class ASTLogNode extends ANode {
 		return logLevel;
 	}
 
+	@Nonnull
+	public Node getLogMessageNode() {
+		return jjtGetChild(0);
+	}
+
 }

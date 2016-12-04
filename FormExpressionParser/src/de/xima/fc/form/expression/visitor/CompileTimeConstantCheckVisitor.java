@@ -41,6 +41,7 @@ import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTUnaryExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -284,6 +285,11 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	@Override
 	public Boolean visit(final ASTScopeGlobalNode node) {
 		// Meta language, not a data lanugage construct.
+		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+	}
+
+	@Override
+	public Boolean visit(final ASTVariableTypeNode node) throws RuntimeException {
 		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 	}
 }

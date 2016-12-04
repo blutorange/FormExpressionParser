@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class GraphvizVisitor extends GenericDepthFirstVisitor<byte[], byte[], IOException> {
+public class GraphvizVisitor extends FormExpressionReturnDataVisitorAdapter<byte[], byte[], IOException> {
 	private static class InstanceHolder {
 		public final static GraphvizVisitor SYSTEM_OUT_GRAPHVIZ = new GraphvizVisitor(System.out);
 		public final static GraphvizVisitor SYSTEM_ERR_GRAPHVIZ = new GraphvizVisitor(System.err);

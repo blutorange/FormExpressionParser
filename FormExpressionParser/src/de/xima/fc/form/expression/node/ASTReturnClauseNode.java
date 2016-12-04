@@ -47,4 +47,13 @@ public class ASTReturnClauseNode extends ANode {
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;
 	}
+
+	@Nonnull
+	public Node getReturnNode() {
+		return jjtGetChild(0);
+	}
+
+	public boolean hasReturn() {
+		return jjtGetNumChildren() != 0;
+	}
 }

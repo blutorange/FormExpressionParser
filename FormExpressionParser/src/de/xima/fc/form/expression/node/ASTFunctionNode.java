@@ -3,11 +3,13 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
@@ -15,7 +17,7 @@ import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTFunctionNode extends ANode implements IArgumentResolvable {
+public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVariableTyped {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull
@@ -26,22 +28,26 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	private GenericSourceResolvable[] argResolvable = CmnCnst.NonnullConstant.EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY;
 
 	private boolean hasVarArgs;
+	private boolean hasType;
 
 	public ASTFunctionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 	
-	public void init(final EMethod method, final boolean hasVarArgs) throws ParseException {
-		assertChildrenAtLeast(1);
-		if (hasVarArgs && jjtGetNumChildren()==1)
+	public void init(final EMethod method, final boolean hasVarArgs, final boolean hasType) throws ParseException {
+		assertChildrenAtLeast(hasType ? 2 : 1);
+		if (hasVarArgs && jjtGetNumChildren() == (hasType ? 2 : 1))
 			throw new ParseException(CmnCnst.Error.VAR_ARGS_WITHOUT_ARGUMENTS);
 		super.init(method);
-		argResolvable = ASTFunctionNode.getArgs(this, 0);
+		argResolvable = ASTFunctionNode.getArgs(this, hasType ? 1 : 0);
 		this.hasVarArgs = hasVarArgs;
+		this.hasType = hasType;
 	}
 	
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		if (hasType && i == 0)
+			return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
 		return i == jjtGetNumChildren() - 1 ? nullNode() : null;
 	}
 
@@ -72,26 +78,13 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 	
 	@Override
 	public Node getArgumentNode(final int i) {
-		return jjtGetChild(i);
+		return jjtGetChild(i + (hasType ? 1 : 0));
 	}
 
 	@SuppressWarnings("null")
 	@Override
 	public final ISourceResolvable getArgResolvable(final int i) {
 		return argResolvable[i];
-	}
-
-	@Nonnull
-	static GenericSourceResolvable[] getArgs(final Node node, final int paramStartIndex) throws ParseException {
-		final int paramAfterEndIndex = node.jjtGetNumChildren() - 1;
-		final GenericSourceResolvable[] argResolvable = new GenericSourceResolvable[paramAfterEndIndex-paramStartIndex];
-		for (int i = paramStartIndex; i < paramAfterEndIndex; ++i) {
-			final ASTIdentifierNameNode argNode = node.getNthChildAs(i, ASTIdentifierNameNode.class);
-			argResolvable[i-paramStartIndex] = new GenericSourceResolvable(argNode.getName());
-		}
-		for (int i = paramAfterEndIndex; i-- > paramStartIndex;)
-			node.clearChild(i);
-		return argResolvable;
 	}
 
 	@Override
@@ -115,8 +108,31 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable {
 		return hasVarArgs;
 	}
 	
+	public boolean hasType() {
+		return hasType;
+	}
+
+	@Nonnull
+	public Node getTypeNode() {
+		return jjtGetChild(0);
+	}
+
 	@Override
 	public void additionalToStringFields(final StringBuilder sb) {
 		sb.append(hasVarArgs).append(',');
 	}
+	
+	@Nonnull
+	static GenericSourceResolvable[] getArgs(final Node node, final int paramStartIndex) throws ParseException {
+		final int paramAfterEndIndex = node.jjtGetNumChildren() - 1;
+		final GenericSourceResolvable[] argResolvable = new GenericSourceResolvable[paramAfterEndIndex-paramStartIndex];
+		for (int i = paramStartIndex; i < paramAfterEndIndex; ++i) {
+			final ASTIdentifierNameNode argNode = node.getNthChildAs(i, ASTIdentifierNameNode.class);
+			argResolvable[i-paramStartIndex] = new GenericSourceResolvable(argNode.getName());
+		}
+		for (int i = paramAfterEndIndex; i-- > paramStartIndex;)
+			node.clearChild(i);
+		return argResolvable;
+	}
+
 }
