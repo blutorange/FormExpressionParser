@@ -15,6 +15,7 @@ import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionArgumentNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -271,6 +272,11 @@ implements IFormExpressionVoidDataVisitor<T, E> {
 	
 	@Override
 	public void visit(final ASTVariableTypeNode node, final T data) throws E {
+		visitChildren(node, data);
+	}
+	
+	@Override
+	public void visit(final ASTFunctionArgumentNode node, final T data) throws E {
 		visitChildren(node, data);
 	}
 }

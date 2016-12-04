@@ -19,9 +19,8 @@ enum SemanticsFailure implements ITestCase {
 	TEST003("foo=''.toLocaleLowerCase;foo.call(null);", IllegalThisContextException.class, "Provided this context <null> of type NULL does not match the expected type STRING for function <toLocaleLowerCase>."),
 	TEST004("function foo(arg1,arg2){}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameters, but 1 were given."),
 	TEST005("function foo(arg1,arg2,args...){args;}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameters, but 1 were given."),
-	TEST006("function foo(){arguments.length;}foo(1,2,3);", IllegalNumberOfFunctionParametersException.class, "Function requires 0 parameters, but 3 were given."),
+	TEST006("function foo(){42;}foo(1,2,3);", IllegalNumberOfFunctionParametersException.class, "Function requires 0 parameters, but 3 were given."),
 	;
-
 	@Nonnull private final String code;
 	@Nonnull private final EContextType context;
 	private final String errorBegin;

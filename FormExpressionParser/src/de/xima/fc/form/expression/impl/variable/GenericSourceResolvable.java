@@ -27,6 +27,7 @@ public class GenericSourceResolvable implements ISourceResolvable, Serializable 
 	public int getSource() {
 		return source;
 	}
+	
 	@Override
 	public boolean isResolved() {
 		return source != EVariableSource.ID_UNRESOLVED;

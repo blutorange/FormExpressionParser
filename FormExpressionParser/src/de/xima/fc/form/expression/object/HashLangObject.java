@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -26,8 +27,13 @@ public class HashLangObject extends ALangObject {
 	private final Map<ALangObject, ALangObject> value;
 
 	private HashLangObject(@Nonnull final Map<ALangObject, ALangObject> value) {
-		super(Type.HASH);
+		super();
 		this.value = value;
+	}
+
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.HASH;
 	}
 
 	// Coercion

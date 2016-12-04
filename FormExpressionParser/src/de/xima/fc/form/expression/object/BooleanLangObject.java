@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.object;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -15,8 +16,13 @@ public class BooleanLangObject extends ALangObject {
 	private final boolean value;
 
 	private BooleanLangObject(final boolean value) {
-		super(Type.BOOLEAN);
+		super();
 		this.value = value;
+	}
+	
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.BOOLEAN;
 	}
 
 	private static class InstanceHolder {

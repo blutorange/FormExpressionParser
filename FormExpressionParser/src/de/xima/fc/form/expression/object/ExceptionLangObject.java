@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.CustomRuntimeException;
@@ -19,8 +20,13 @@ public class ExceptionLangObject extends ALangObject {
 	private final CatchableEvaluationException value;
 
 	private ExceptionLangObject(@Nonnull final CatchableEvaluationException value) {
-		super(Type.EXCEPTION);
+		super();
 		this.value = value;
+	}
+	
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.EXCEPTION;
 	}
 
 	@Override

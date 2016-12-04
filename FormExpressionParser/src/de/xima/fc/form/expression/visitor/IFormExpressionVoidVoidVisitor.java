@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionArgumentNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -87,4 +88,5 @@ public interface IFormExpressionVoidVoidVisitor<E extends Throwable>
 	public void visit(@Nonnull ASTScopeManualNode node) throws E;
 	public void visit(@Nonnull ASTScopeGlobalNode node) throws E;
 	public void visit(@Nonnull ASTVariableTypeNode node) throws E;
+	public void visit(@Nonnull ASTFunctionArgumentNode node) throws E;
 }

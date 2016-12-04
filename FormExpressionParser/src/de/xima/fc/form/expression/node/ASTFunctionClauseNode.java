@@ -3,8 +3,8 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -24,11 +24,6 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 
 	@Nonnull
 	private final GenericSourceResolvable thisResolvable = new GenericSourceResolvable(CmnCnst.Name.VARIABLE_THIS);
-	@Nonnull
-	private final GenericSourceResolvable argumentsResolvable = new GenericSourceResolvable(
-			CmnCnst.Name.VARIABLE_ARGUMENTS);
-	@Nonnull
-	private GenericSourceResolvable[] argResolvable = CmnCnst.NonnullConstant.EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY;
 
 	private boolean hasVarArgs;
 	private boolean hasType;
@@ -45,7 +40,6 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		final String scope = var.getScope();
 		final String variableName = var.getVariableName();
 		super.init(method, scope, variableName);
-		argResolvable = ASTFunctionNode.getArgs(this, hasType ? 2 : 1);
 		this.hasVarArgs = hasVarArgs;
 		this.hasType = hasType;
 	}
@@ -55,7 +49,7 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		if (i == (hasType ? 1 : 0))
 			throw new ArrayIndexOutOfBoundsException();
 		if (i == 0 && hasType)
-			return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
+			return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
 		if (i != jjtGetNumChildren() - 1)
 			return null;
 		return nullNode();
@@ -96,28 +90,21 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 
 	@Override
 	public final int getArgumentCount() {
-		return argResolvable.length;
+		return jjtGetNumChildren() - (hasType ? 3 : 2);
 	}
 	
-	@Override
 	public Node getArgumentNode(final int i) {
 		return jjtGetChild(i + (hasType ? 2 : 1));
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public final ISourceResolvable getArgResolvable(final int i) {
-		return argResolvable[i];
+	public final ASTFunctionArgumentNode getArgResolvable(final int i) {
+		return (ASTFunctionArgumentNode)jjtGetChild(i + (hasType ? 2 : 1));
 	}
 
 	@Override
 	public ISourceResolvable getThisResolvable() {
 		return thisResolvable;
-	}
-
-	@Override
-	public ISourceResolvable getArgumentsResolvable() {
-		return argumentsResolvable;
 	}
 
 	@Nonnull

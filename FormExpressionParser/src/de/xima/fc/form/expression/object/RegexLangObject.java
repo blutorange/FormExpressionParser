@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidRegexPatternException;
@@ -29,8 +30,13 @@ public class RegexLangObject extends ALangObject {
 	@Nonnull private final Pattern value;
 
 	private RegexLangObject(@Nonnull final Pattern value) {
-		super(Type.REGEX);
+		super();
 		this.value = value;
+	}
+
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.REGEX;
 	}
 
 	@Nonnull

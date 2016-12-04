@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.EVariableType;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -68,7 +68,7 @@ public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, 
 			if (i == (hasType ? 1 : 0))
 				throw new ArrayIndexOutOfBoundsException();
 			if (hasType && i == 0)
-				return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
+				return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
 		}
 		return nullNode();
 	}

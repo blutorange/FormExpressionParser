@@ -5,29 +5,30 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
-import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
-public class ASTVariableTypeNode extends ANode {
-	
+public class ASTFunctionArgumentNode extends ASourceResolvableNode implements IVariableTyped {
 	private static final long serialVersionUID = 1L;
-	
-	@Nonnull
-	private ELangObjectType variableType = ELangObjectType.NULL;
 
-	public ASTVariableTypeNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTFunctionArgumentNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
+
+	@Override
+	public void init(final EMethod method, final String variableName) throws ParseException {
+		assertChildrenBetween(0,1);
+		super.init(method, variableName);
+	}
 	
-	public ASTVariableTypeNode(@Nonnull final Node prototype, @Nonnull final ELangObjectType variableType) {
-		super(prototype, FormExpressionParserTreeConstants.JJTVARIABLETYPENODE);
-		this.variableType = variableType;
+	@Override
+	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
+		return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
 	}
 
 	@Override
@@ -51,36 +52,17 @@ public class ASTVariableTypeNode extends ANode {
 	}
 
 	@Override
-	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return new ASTVariableTypeNode(jjtGetChild(i), ELangObjectType.NULL);
+	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
+		sb.append(getVariableName()).append(',');
 	}
-	
+
 	@Override
-	public void additionalToStringFields(final StringBuilder sb) {
-		sb.append(variableType).append(',');
-	}
-	
-	public void init(final EMethod method, @Nonnull final ELangObjectType variableType) throws ParseException {
-		assertNonNull(variableType, CmnCnst.Error.NULL_VARIABLE_TYPE);
-		super.init(method);
-		this.variableType  = variableType;
+	public boolean hasType() {
+		return jjtGetNumChildren() > 0;
 	}
 
-	@Nonnull
-	public ELangObjectType getVariableType() {
-		return variableType;
-	}
-
-	public boolean hasGenerics() {
-		return jjtGetNumChildren()>0;
-	}
-	
-	public int getGenericsCount() {
-		return jjtGetNumChildren();
-	}
-	
-	@Nonnull
-	public Node getGenericsNode(final int i) {
-		return jjtGetChild(i);
+	@Override
+	public Node getTypeNode() {
+		return jjtGetChild(0);
 	}
 }

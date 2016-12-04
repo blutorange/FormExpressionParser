@@ -29,6 +29,7 @@ import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.CompileTimeConstantCheckVisitor;
 import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
@@ -37,6 +38,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
+import de.xima.fc.form.expression.visitor.VariableTypeCollectVisitor;
 
 public final class FormExpressionFactory {
 	private FormExpressionFactory() {
@@ -291,9 +293,10 @@ public final class FormExpressionFactory {
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, strictMode);
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, strictMode);
 		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, strictMode);
-		final IScopeDefinitions scopeDef = scopeDefBuilder.build();
-		checkScopeDefsConstancy(scopeDef);
-		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDef, contractFactory, symbolTableSize);
+		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
+		checkScopeDefsConstancy(scopeDefs);
+		final IVariableType[] varTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs, strictMode);
+		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDefs, contractFactory, symbolTableSize);
 	}
 
 	private static void checkScopeDefsConstancy(final IScopeDefinitions scopeDef)

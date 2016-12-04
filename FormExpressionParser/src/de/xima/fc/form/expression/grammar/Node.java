@@ -215,4 +215,9 @@ public interface Node extends Serializable, ITraceElement {
 	 * @see FormExpressionParserTreeConstants
 	 */
 	public boolean isA(int jjtvariablenode);
+
+	/**
+	 * @return Whether this node is a leaf node, ie. without any children.
+	 */
+	public boolean isLeaf();
 }

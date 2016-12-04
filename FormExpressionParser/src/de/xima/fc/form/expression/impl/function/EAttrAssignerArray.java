@@ -2,12 +2,12 @@ package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
@@ -52,8 +52,8 @@ public enum EAttrAssignerArray implements IFunction<ArrayLangObject> {
 	}
 
 	@Override
-	public Type getThisContextType() {
-		return Type.ARRAY;
+	public ELangObjectType getThisContextType() {
+		return ELangObjectType.ARRAY;
 	}
 
 	@Override
@@ -108,8 +108,8 @@ public enum EAttrAssignerArray implements IFunction<ArrayLangObject> {
 		}
 
 		@Override
-		public Type getThisContextType() {
-			return Type.ARRAY;
+		public ELangObjectType getThisContextType() {
+			return ELangObjectType.ARRAY;
 		}
 
 		@Override

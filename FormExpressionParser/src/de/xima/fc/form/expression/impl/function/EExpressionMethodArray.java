@@ -3,13 +3,13 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.iface.context.IMethod2Function;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 
 public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> {
@@ -43,7 +43,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				if (args[0].getType() == Type.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
+				if (args[0].getType() == ELangObjectType.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
 				else thisContext.add(args[0]);
 				return thisContext;
 			}
@@ -56,7 +56,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				if (args[0].getType() == Type.ARRAY) thisContext.removeAll(args[0].coerceArray(ec));
+				if (args[0].getType() == ELangObjectType.ARRAY) thisContext.removeAll(args[0].coerceArray(ec));
 				else thisContext.remove(args[0]);
 				return thisContext;
 			}
@@ -93,8 +93,8 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		}
 
 		@Override
-		public Type getThisContextType() {
-			return Type.ARRAY;
+		public ELangObjectType getThisContextType() {
+			return ELangObjectType.ARRAY;
 		}
 
 		@Override

@@ -2,16 +2,16 @@ package de.xima.fc.form.expression.exception.evaluation;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class IllegalThisContextException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
-	public IllegalThisContextException(@Nonnull final ALangObject thisContext, @Nonnull final Type expectedType,
+	public IllegalThisContextException(@Nonnull final ALangObject thisContext, @Nonnull final ELangObjectType expectedType,
 			@Nonnull final IFunction<ALangObject> function, @Nonnull final IEvaluationContext ec) {
 		super(ec,
 				NullUtil.format(
@@ -24,7 +24,7 @@ public class IllegalThisContextException extends CatchableEvaluationException {
 	}
 
 	public final ALangObject thisContext;
-	public final ALangObject.Type expectedType;
+	public final ELangObjectType expectedType;
 	public final IFunction<ALangObject> function;
 
 }

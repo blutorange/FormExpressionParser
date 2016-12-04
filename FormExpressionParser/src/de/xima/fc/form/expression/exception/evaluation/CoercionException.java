@@ -4,6 +4,7 @@ package de.xima.fc.form.expression.exception.evaluation;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -18,12 +19,12 @@ public class CoercionException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 
-	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ALangObject.Type to, @Nonnull final IEvaluationContext ec) {
+	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ELangObjectType to, @Nonnull final IEvaluationContext ec) {
 		super(ec, NullUtil.format(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
 		this.from = from;
 		this.to = to;
 	}
 
 	public final ALangObject from;
-	public final ALangObject.Type to;
+	public final ELangObjectType to;
 }

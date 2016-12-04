@@ -52,6 +52,7 @@ import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionArgumentNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -694,7 +695,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// Function argument (foo, bar)
 		writer.write(Syntax.PAREN_OPEN);
 		for (int i = 0; i < node.getArgumentCount(); ++i) {
-			writer.write(node.getArgResolvable(i).getVariableName());
+			expression(node.getArgumentNode(i), prefix);
 			if (count != 1 && i < count - 1) {
 				writer.write(Syntax.COMMA);
 				writer.write(config.optionalSpace);
@@ -811,7 +812,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		writer.write(insideManualDefs ? node.getVariableName() : node.getCanonicalName());
 		writer.write(Syntax.PAREN_OPEN);
 		for (int i = 0; i < count; ++i) {
-			writer.write(node.getArgResolvable(i).getVariableName());
+			expression(node.getArgumentNode(i), prefix);
 			if (count != 1 && i < count - 1) {
 				writer.write(Syntax.COMMA);
 				writer.write(config.optionalSpace);
@@ -890,7 +891,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	@Override
 	public void visit(final ASTVariableDeclarationClauseNode node, final String prefix) throws IOException {
-		expression(node.getTypeNode(), prefix);
+		if (node.hasType())
+			expression(node.getTypeNode(), prefix);
 		writer.write(config.requiredSpace);
 		writer.write(node.getVariableName());
 		writer.write(config.optionalSpace);
@@ -945,7 +947,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	@Override
 	public void visit(final ASTVariableTypeNode node, final String prefix) throws IOException {
-		writer.write(node.getVariableType().getSyntacticalName());
+		writer.write(node.getVariableType().getSyntacticalTypeName());
 		if (node.hasGenerics()) {
 			final int count = node.getGenericsCount();
 			writer.write(Syntax.ANGLE_OPEN);
@@ -958,5 +960,14 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			}
 			writer.write(Syntax.ANGLE_CLOSE);
 		}
+	}
+
+	@Override
+	public void visit(final ASTFunctionArgumentNode node, final String prefix) throws IOException {
+		if (node.hasType()) {
+			expression(node.getTypeNode(), prefix);
+			writer.write(config.requiredSpace);
+		}
+		writer.write(node.getVariableName());
 	}
 }

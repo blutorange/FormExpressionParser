@@ -152,7 +152,7 @@ public class GraphvizVisitor extends FormExpressionReturnDataVisitorAdapter<byte
 	}
 
 	@Override
-	protected byte[] visitNode(final Node node, final byte[] parentId) throws IOException {
+	protected byte[] visitNode(final WrappedNode node, final byte[] parentId) throws IOException {
 		final String label = StringEscapeUtils.escapeHtml4(node.toString());
 		final byte[] nodeId = String.valueOf(node.getId()).getBytes(charset);
 		outputStream.write(nodeId);

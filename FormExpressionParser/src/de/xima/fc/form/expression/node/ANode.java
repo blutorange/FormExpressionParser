@@ -486,6 +486,11 @@ public abstract class ANode implements Node {
 		}
 	}
 	
+	@Override
+	public final boolean isLeaf() {
+		return children.length == 0;
+	}
+
 	/** @return A newly created empty node. */
 	protected final Node nullNode() {
 		return new ASTNullNode(this);

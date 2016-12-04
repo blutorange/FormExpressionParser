@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
@@ -22,6 +21,7 @@ import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.impl.binding.CloneBinding;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionArgumentNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTIfClauseNode;
@@ -70,12 +70,14 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		// We need to visit the children first. Consider
 		//  var i = i;
 		// Here, i at the right hand side has not been initialized.
-		visitChildren(node);
-		if (binding.isGlobal())
-			throw new IllegalVariableDeclarationAtGlobalScopeException(node);
-		if (binding.hasVariableAtCurrentLevel(node.getVariableName()))
-			throw new VariableDeclaredTwiceException(node);
-		binding.defineVariable(node.getVariableName(), getNewObjectToSet(node));
+		if (node.hasAssignment())
+			node.getAssignmentNode().jjtAccept(this);
+		visitSourceResolvable(node);
+	}
+
+	@Override
+	public final void visit(final ASTFunctionArgumentNode node) throws ParseException {
+		visitSourceResolvable(node);
 	}
 
 	@Override
@@ -85,14 +87,12 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		visitNestedNullable(node.getElseNode());
 	}
 
-	@OverridingMethodsMustInvokeSuper
 	@Override
 	public final void visit(final ASTDoWhileLoopNode node) throws ParseException {
 		visitNested(node.getBodyNode());
 		node.getDoFooterNode().jjtAccept(this);
 	}
 
-	@OverridingMethodsMustInvokeSuper
 	@Override
 	public final void visit(final ASTWhileLoopNode node) throws ParseException {
 		node.getWhileHeaderNode().jjtAccept(this);
@@ -145,9 +145,6 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 
 		final T objectThis = getNewObjectToSet(node.getThisResolvable());
 		binding.defineVariable(node.getThisResolvable().getVariableName(), objectThis);
-
-		final T objectArguments = getNewObjectToSet(node.getArgumentsResolvable());
-		binding.defineVariable(node.getArgumentsResolvable().getVariableName(), objectArguments);
 
 		try {
 			for (int i = 0; i < node.getArgumentCount(); ++i) {
@@ -214,6 +211,14 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 			if (nested)
 				binding.gotoBookmark(bookmark);
 		}
+	}
+
+	private final <S extends ISourceResolvable & Node> void visitSourceResolvable(final S node) throws ParseException {
+		if (binding.isGlobal())
+			throw new IllegalVariableDeclarationAtGlobalScopeException(node);
+		if (binding.hasVariableAtCurrentLevel(node.getVariableName()))
+			throw new VariableDeclaredTwiceException(node);
+		binding.defineVariable(node.getVariableName(), getNewObjectToSet(node));
 	}
 
 	/**

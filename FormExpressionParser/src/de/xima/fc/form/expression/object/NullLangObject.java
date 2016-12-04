@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectAccessException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectAssignException;
@@ -16,17 +17,22 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 public class NullLangObject extends ALangObject {
 	private NullLangObject() {
-		super(Type.NULL);
+		super();
 	}
 
 	private static class InstanceHolder {
 		@Nonnull private static NullLangObject INSTANCE = new NullLangObject();
 	}
 
-	public Object nullValue() {
+	public Void nullValue() {
 		return null;
 	}
 
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.NULL;
+	}
+	
 	/** @deprecated Use {@link #getInstance()} */
 	@Deprecated
 	public static ALangObject create() {

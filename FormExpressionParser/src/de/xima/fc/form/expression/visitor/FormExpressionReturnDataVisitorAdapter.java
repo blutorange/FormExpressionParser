@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.visitor;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -15,6 +16,7 @@ import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionArgumentNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -47,8 +49,8 @@ import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
 public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Throwable> implements IFormExpressionReturnDataVisitor<R, T, E> {
 
-	protected static class Node {
-		private de.xima.fc.form.expression.grammar.Node node;
+	protected static class WrappedNode {
+		private Node node;
 		public int getId() {
 			return node.getId();
 		}
@@ -65,7 +67,7 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 		 * @param clazz Class to which this node should be casted to.
 		 * @return This node casted to the specified class, or <code>null</code> when it cannot be casted.
 		 */
-		public <T extends de.xima.fc.form.expression.grammar.Node> T cast(final Class<T> clazz) {
+		public <T extends Node> T cast(final Class<T> clazz) {
 			if (!clazz.isAssignableFrom(node.getClass())) return null;
 			return clazz.cast(node);
 		}
@@ -83,10 +85,10 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 		}
 	}
 
-	@Nonnull private final Node wrapper;
+	@Nonnull private final WrappedNode wrapper;
 
 	public FormExpressionReturnDataVisitorAdapter() {
-		wrapper = new Node();
+		wrapper = new WrappedNode();
 	}
 
 	/**
@@ -97,7 +99,7 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 	 * @return
 	 */
 	@Nonnull
-	protected abstract R visitNode(@Nonnull Node node, @Nonnull T data) throws E;
+	protected abstract R visitNode(@Nonnull WrappedNode node, @Nonnull T data) throws E;
 
 	/**
 	 * Reduces the return values from the parent node and its children.
@@ -116,7 +118,7 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 	}
 
 	@Nonnull
-	private R processNode(@Nonnull final de.xima.fc.form.expression.grammar.Node node, @Nonnull final T data) throws E {
+	private R processNode(@Nonnull final Node node, @Nonnull final T data) throws E {
 		wrapper.node = node;
 		final T childData = map(data);
 		R reduced = visitNode(wrapper, data);
@@ -327,6 +329,11 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 
 	@Override
 	public R visit(final ASTVariableTypeNode node, final T data) throws E {
+		return processNode(node, data);
+	}
+	
+	@Override
+	public R visit(final ASTFunctionArgumentNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 }

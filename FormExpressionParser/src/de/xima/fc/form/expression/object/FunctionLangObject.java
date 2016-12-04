@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.object;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -47,8 +48,8 @@ public class FunctionLangObject extends ALangObject {
 			}
 
 			@Override
-			public Type getThisContextType() {
-				return ALangObject.Type.NULL;
+			public ELangObjectType getThisContextType() {
+				return ELangObjectType.NULL;
 			}
 
 			@Override
@@ -59,10 +60,15 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	private FunctionLangObject(@Nonnull final IFunction<ALangObject> value) {
-		super(Type.FUNCTION);
+		super();
 		this.value = value;
 	}
 
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.FUNCTION;
+	}
+	
 	@Nonnull
 	public IFunction<ALangObject> functionValue() {
 		return value;

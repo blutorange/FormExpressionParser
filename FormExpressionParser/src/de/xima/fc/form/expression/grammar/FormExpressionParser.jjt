@@ -51,7 +51,7 @@ package de.xima.fc.form.expression.grammar;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import de.xima.fc.form.expression.enums.EVariableType;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import org.apache.commons.lang3.StringUtils;
@@ -679,13 +679,13 @@ void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
   }
 }
 
-void VariableDeclarationExpression(EMethod method) #VariableDeclarationClauseNode :
+void FunctionArgument(EMethod method) #FunctionArgumentNode :
 {
   Token t;
 }
 {
   (
-      VariableType(null) t = < Identifier >
+      [ SpecificVariableType(null) ] t = < Identifier >
   )
   {
     jjtThis.init(method, t.image);
@@ -722,34 +722,34 @@ void UnspecificVariableType(EMethod method) #VariableTypeNode :
     < Var >
   )
   {
-    jjtThis.init(method, EVariableType.UNKNOWN);
+    jjtThis.init(method, ELangObjectType.NULL);
   }
 }
 
 void SpecificVariableType(EMethod method) #VariableTypeNode :
 {
-  EVariableType type;
+  ELangObjectType type;
 }
 {
   (
     ( < Boolean >  | < TypeBoolean > )
     {
-      type = EVariableType.BOOLEAN;
+      type = ELangObjectType.BOOLEAN;
     }
   | (< Number > | < TypeNumber >)
     {
-      type = EVariableType.NUMBER;
+      type = ELangObjectType.NUMBER;
     }
   | (< String >  | < TypeString >)
     {
-      type = EVariableType.STRING;
+      type = ELangObjectType.STRING;
     }
   |
     (
       ( < Array > | < TypeArray > )
       GenericsArray(null)
       {
-        type = EVariableType.ARRAY;
+        type = ELangObjectType.ARRAY;
       }
     )
   |
@@ -757,23 +757,23 @@ void SpecificVariableType(EMethod method) #VariableTypeNode :
       ( < Hash > | < TypeHash > )
       GenericsHash(null)
       {
-        type = EVariableType.HASH;
+        type = ELangObjectType.HASH;
       }
     )
   | ( < __Error > | < TypeError > )
     {
-      type = EVariableType.ERROR;
+      type = ELangObjectType.EXCEPTION;
     }
   | ( < Regex > | < TypeRegex > )
     {
-      type = EVariableType.REGEX;
+      type = ELangObjectType.REGEX;
     }
   |
     (
       ( < Method >  | < TypeMethod > )
       GenericsMethod(null)
       {
-        type = EVariableType.METHOD;
+        type = ELangObjectType.FUNCTION;
       }
     )
   )
@@ -848,14 +848,14 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   (
     < Function >
-    [ SpecificVariableType(null) ] { hasType = true; }
+    [ SpecificVariableType(null) { hasType = true; } ]
     VariableWithOptionalScope(null)
     < ParenOpen >
     (
       [
-        IdentifierName(null)
+        FunctionArgument(null)
         (
-          < Comma > IdentifierName(null)
+          < Comma > FunctionArgument(null)
         )*
         [varArgs = < TripleDot >]
       ]
@@ -884,9 +884,9 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
     < ParenOpen >
     (
       [
-        IdentifierName(null)
+        FunctionArgument(null)
         (
-          < Comma > IdentifierName(null)
+          < Comma > FunctionArgument(null)
         )*
         [varArgs = < TripleDot >]
       ]
@@ -2019,9 +2019,9 @@ void Function(EMethod method) #FunctionNode :
     < ParenOpen >
     (
       [
-        IdentifierName(null)
+        FunctionArgument(null)
         (
-          < Comma > IdentifierName(null)
+          < Comma > FunctionArgument(null)
         )*
         [varArgs = < TripleDot >]
       ]

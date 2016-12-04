@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -33,7 +34,7 @@ public class StringLangObject extends ALangObject {
 	}
 
 	private StringLangObject(@Nonnull final String value) {
-		super(Type.STRING);
+		super();
 		this.value = value;
 	}
 
@@ -43,13 +44,18 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.STRING;
+	}
+
+	@Override
 	public ALangObject shallowClone() {
 		return this;
 	}
 
 	@Override
 	public ALangObject deepClone() {
-		return shallowClone();
+		return this;
 	}
 
 	@Override

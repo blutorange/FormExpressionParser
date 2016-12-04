@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.visitor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UnresolvedVariableSourceException;
@@ -13,7 +14,6 @@ import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -80,7 +80,6 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 		// TODO remove the arguments variable, not needed and wont work with var
 		// types
 		set(ec, node.getThisResolvable(), thisContext);
-		set(ec, node.getArgumentsResolvable(), ArrayLangObject.create(args));
 		final int normalArgCount;
 		if (node.hasVarArgs()) {
 			normalArgCount = node.getArgumentCount() - 1;
@@ -111,8 +110,8 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	}
 
 	@Override
-	public Type getThisContextType() {
-		return Type.NULL;
+	public ELangObjectType getThisContextType() {
+		return ELangObjectType.NULL;
 	}
 
 	@Override

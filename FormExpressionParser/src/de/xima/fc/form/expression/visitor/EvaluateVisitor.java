@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EJump;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
@@ -45,6 +46,7 @@ import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
 import de.xima.fc.form.expression.node.ASTExpressionNode;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
+import de.xima.fc.form.expression.node.ASTFunctionArgumentNode;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTHashNode;
@@ -75,7 +77,6 @@ import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
@@ -217,12 +218,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 					throw new IllegalNumberOfFunctionParametersException(func, args.length, ec);
 				
 				// Check thisContext of the function.
-				if (func.getThisContextType() != Type.NULL && func.getThisContextType() != thisContext.getType())
+				if (func.getThisContextType() != ELangObjectType.NULL && func.getThisContextType() != thisContext.getType())
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
 
 				ec.getTracer().descend(parentNode);
 				try {
-					if (func.getThisContextType() == Type.NULL)
+					if (func.getThisContextType() == ELangObjectType.NULL)
 						thisContext = NullLangObject.getInstance();
 					// Evaluate function
 					thisContext = res = func.evaluate(ec, thisContext, args);
@@ -704,7 +705,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		jumpLabel = null;
 		jumpType = EJump.RETURN;
 		mustJump = true;
-		return node.hasReturn() ? NullLangObject.getInstance() : jjtAccept(node, node.getReturnNode(), ec);
+		return node.hasReturn() ? jjtAccept(node, node.getReturnNode(), ec) : NullLangObject.getInstance();
 	}
 
 	@Override
@@ -878,9 +879,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTVariableDeclarationClauseNode node) throws EvaluationException {
-		final Node n = node.getAssignmentNode();
-		if (n != null)
-			return setSimpleVariable(node, n.jjtAccept(this), ec);
+		if (node.hasAssignment())
+			return setSimpleVariable(node, node.getAssignmentNode().jjtAccept(this), ec);
 		return NullLangObject.getInstance();
 	}
 
@@ -908,6 +908,14 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				NullUtil.format(CmnCnst.Error.ILLEGAL_VARIABLE_TYPE_AT_EVALUATION, node.toString()));
 	}
 
+	@Override
+	public ALangObject visit(final ASTFunctionArgumentNode node) throws EvaluationException {
+		//if (node.hasAssignment())
+		//	return setSimpleVariable(node, node.getAssignmentNode().jjtAccept(this), ec);
+		return NullLangObject.getInstance();
+	}
+
+	
 	/**
 	 * Evaluates the given node as a complete program or template with the given
 	 * context. This method itself may be used by multiple threads, however, the

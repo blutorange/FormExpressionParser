@@ -2,12 +2,12 @@ package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -54,8 +54,8 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 	}
 
 	@Override
-	public Type getThisContextType() {
-		return Type.BOOLEAN;
+	public ELangObjectType getThisContextType() {
+		return ELangObjectType.BOOLEAN;
 	}
 
 	@Override
@@ -108,8 +108,8 @@ public enum EAttrAccessorBoolean implements IFunction<BooleanLangObject> {
 		}
 
 		@Override
-		public Type getThisContextType() {
-			return Type.BOOLEAN;
+		public ELangObjectType getThisContextType() {
+			return ELangObjectType.BOOLEAN;
 		}
 
 		@Override

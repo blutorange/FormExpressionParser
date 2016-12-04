@@ -4,12 +4,12 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -87,8 +87,8 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 	}
 
 	@Override
-	public Type getThisContextType() {
-		return Type.STRING;
+	public ELangObjectType getThisContextType() {
+		return ELangObjectType.STRING;
 	}
 
 	@Override
@@ -169,8 +169,8 @@ public enum EAttrAccessorString implements IFunction<StringLangObject> {
 		}
 
 		@Override
-		public Type getThisContextType() {
-			return Type.STRING;
+		public ELangObjectType getThisContextType() {
+			return ELangObjectType.STRING;
 		}
 
 		@Override

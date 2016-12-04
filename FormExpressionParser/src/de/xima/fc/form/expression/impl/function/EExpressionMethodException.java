@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -10,7 +11,6 @@ import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.iface.context.IMethod2Function;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
 
 public enum EExpressionMethodException implements IMethod2Function<ExceptionLangObject> {
@@ -76,8 +76,8 @@ public enum EExpressionMethodException implements IMethod2Function<ExceptionLang
 		}
 
 		@Override
-		public Type getThisContextType() {
-			return Type.EXCEPTION;
+		public ELangObjectType getThisContextType() {
+			return ELangObjectType.EXCEPTION;
 		}
 
 		@Override

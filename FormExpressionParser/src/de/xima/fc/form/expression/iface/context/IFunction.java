@@ -3,10 +3,10 @@ package de.xima.fc.form.expression.iface.context;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.NullLangObject;
 
 /**
@@ -54,10 +54,10 @@ public interface IFunction<T extends ALangObject> {
 	public ALangObject evaluate(@Nonnull IEvaluationContext ec, @Nonnull T thisContext, @Nonnull ALangObject... args) throws EvaluationException;
 
 	/**
-	 * @return Such that {@link Type#clazz} equals the type parameter T.
+	 * @return Such that {@link ELangObjectType#clazz} equals the type parameter T.
 	 */
 	@Nonnull
-	public Type getThisContextType();
+	public ELangObjectType getThisContextType();
 
 	/**
 	 * @return May be null for native code. The node with the user-defined code

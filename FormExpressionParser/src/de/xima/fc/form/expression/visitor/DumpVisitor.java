@@ -112,7 +112,7 @@ public class DumpVisitor extends FormExpressionReturnDataVisitorAdapter<String, 
 	}
 
 	@Override
-	protected String visitNode(final Node node, final String prefix) throws IOException {
+	protected String visitNode(final WrappedNode node, final String prefix) throws IOException {
 		outputStream.write(prefix.getBytes(charset));
 		outputStream.write(node.toString().getBytes(charset));
 		outputStream.write(lineSeparator);

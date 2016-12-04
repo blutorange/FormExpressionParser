@@ -345,6 +345,12 @@ public final class CmnCnst {
 		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires %d parameters, but %d were given.";
 		@Nonnull public static final String NULL_VARIABLE_TYPE = "Variable type must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_VARIABLE_TYPE_AT_EVALUATION = "Variable type declaration %s cannot occur in the main program. " + INTERNAL_ERROR;
+		@Nonnull public static final String ILLEGAL_FUNCTION_ARGUMENT_AT_EVALUATION = "Function argument declaration %s cannot occur in the main program. " + INTERNAL_ERROR;
+		@Nonnull public static final String NOT_A_SIMPLE_TYPE = "Lang object type %s is not a simple type. " + INTERNAL_ERROR;
+		@Nonnull public static final String NOT_A_COMPOUND_TYPE = "Lang object type %s is not a compound type. " + INTERNAL_ERROR;
+		@Nonnull public static final String NULL_LANG_OBJECT_TYPE = "Basic lang object type must not be null. " + INTERNAL_ERROR;
+		@Nonnull public static final String MISSING_TYPE_DECLARATION = "Variable %s without type declaration. Type declarations are required in strict mode.";
+		@Nonnull public static final String EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE = "Manually declared variable resolved to external scope. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

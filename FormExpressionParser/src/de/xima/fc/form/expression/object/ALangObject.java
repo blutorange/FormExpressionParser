@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.IterationNotSupportedException;
@@ -150,30 +151,13 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
 	private static AtomicLong ID_COUNTER = new AtomicLong();
 
-	private final Type type;
 	private final long id;
 
-	public static enum Type {
-		NULL(NullLangObject.class, 0),
-		BOOLEAN(BooleanLangObject.class, 1),
-		NUMBER(NumberLangObject.class, 2),
-		STRING(StringLangObject.class, 3),
-		REGEX(RegexLangObject.class, 4),
-		FUNCTION(FunctionLangObject.class, 5),
-		EXCEPTION(ExceptionLangObject.class, 6),
-		ARRAY(ArrayLangObject.class, 7),
-		HASH(HashLangObject.class, 8),
-		;
-
-		public final Class<? extends ALangObject> clazz;
-		public final int order;
-
-		private Type(final Class<? extends ALangObject> clazz, final int order) {
-			this.clazz = clazz;
-			this.order = order;
-		}
+	@Nonnull
+	protected ALangObject() {
+		id = ID_COUNTER.incrementAndGet();
 	}
-
+	
 	@Nonnull
 	public abstract ALangObject shallowClone();
 
@@ -207,30 +191,30 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 */
 	@Nonnull
 	public StringLangObject coerceString(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.STRING)
+		if (getType() == ELangObjectType.STRING)
 			return (StringLangObject) this;
 		return StringLangObject.create(toString());
 	}
 
 	@Nonnull
 	public ArrayLangObject coerceArray(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.ARRAY)
+		if (getType() == ELangObjectType.ARRAY)
 			return (ArrayLangObject) this;
-		throw new CoercionException(this, Type.ARRAY, ec);
+		throw new CoercionException(this, ELangObjectType.ARRAY, ec);
 	}
 
 	@Nonnull
 	public HashLangObject coerceHash(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.HASH)
+		if (getType() == ELangObjectType.HASH)
 			return (HashLangObject) this;
-		throw new CoercionException(this, Type.HASH, ec);
+		throw new CoercionException(this, ELangObjectType.HASH, ec);
 	}
 
 	@Nonnull
 	public NumberLangObject coerceNumber(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.NUMBER)
+		if (getType() == ELangObjectType.NUMBER)
 			return (NumberLangObject) this;
-		throw new CoercionException(this, Type.NUMBER, ec);
+		throw new CoercionException(this, ELangObjectType.NUMBER, ec);
 	}
 
 	/**
@@ -256,23 +240,23 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 
 	@Nonnull
 	public ExceptionLangObject coerceException(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.EXCEPTION)
+		if (getType() == ELangObjectType.EXCEPTION)
 			return (ExceptionLangObject) this;
-		throw new CoercionException(this, Type.EXCEPTION, ec);
+		throw new CoercionException(this, ELangObjectType.EXCEPTION, ec);
 	}
 
 	@Nonnull
 	public FunctionLangObject coerceFunction(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.FUNCTION)
+		if (getType() == ELangObjectType.FUNCTION)
 			return (FunctionLangObject) this;
-		throw new CoercionException(this, Type.FUNCTION, ec);
+		throw new CoercionException(this, ELangObjectType.FUNCTION, ec);
 	}
 
 	@Nonnull
 	public RegexLangObject coerceRegex(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		if (getType() == Type.REGEX)
+		if (getType() == ELangObjectType.REGEX)
 			return (RegexLangObject) this;
-		throw new CoercionException(this, Type.REGEX, ec);
+		throw new CoercionException(this, ELangObjectType.REGEX, ec);
 	}
 
 	/**
@@ -291,10 +275,10 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 */
 	@Nonnull
 	@SuppressWarnings("unchecked")
-	public final <T extends ALangObject> T coerce(@Nonnull final Type type, @Nonnull final Class<T> clazz,
+	public final <T extends ALangObject> T coerce(@Nonnull final ELangObjectType type, @Nonnull final Class<T> clazz,
 			@Nonnull final IEvaluationContext ec) throws CoercionException, EvaluationException {
 		// This error can happen only if a subclass is constructed with the wrong type, or the Type enum contains the wrong class.
-		if (clazz != type.clazz) throw new EvaluationException(ec, CmnCnst.Error.COERCION_TYPE_NOT_MATCHING);
+		if (clazz != type.getLangObjectClass()) throw new EvaluationException(ec, CmnCnst.Error.COERCION_TYPE_NOT_MATCHING);
 		if (type == getType())
 			return (T)this;
 		switch (type) {
@@ -303,7 +287,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 		case HASH:
 			return (T)coerceHash(ec);
 		case NULL:
-			throw new CoercionException(this, Type.NULL, ec);
+			throw new CoercionException(this, ELangObjectType.NULL, ec);
 		case NUMBER:
 			return (T)coerceNumber(ec);
 		case STRING:
@@ -336,14 +320,8 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 *            Type to check against.
 	 * @return Whether this object is of the given type.
 	 */
-	public boolean is(@Nonnull final Type type) {
-		return this.type == type;
-	}
-
-	@Nonnull
-	protected ALangObject(@Nonnull final Type type) {
-		this.type = type;
-		id = ID_COUNTER.incrementAndGet();
+	public boolean is(@Nonnull final ELangObjectType type) {
+		return getType() == type;
 	}
 
 	public long getId() {
@@ -429,7 +407,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 *
 	 * <p>This holds true. When the comparand is null <code>o.type</code> throws a
 	 * NullPointerException. When the two objects are of different type, they are ordered
-	 * according to {@link Type#order} and cannot be equal. When the two objects are
+	 * according to {@link ELangObjectType#order} and cannot be equal. When the two objects are
 	 * of the same type, the abstract method {@link ALangObject#compareToSameType(ALangObject)}
 	 * is called. Subclasses are required to adhere to the above contract.
 	 * </p>
@@ -437,7 +415,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 */
 	@Override
 	public final int compareTo(final ALangObject o) {
-		if (type != o.type) return type.order - o.type.order;
+		if (getType() != o.getType()) return getType().order - o.getType().order;
 		return compareToSameType(o);
 	}
 
@@ -449,6 +427,10 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 		return isSingletonLike() ? equals(o) : id == o.id;
 	}
 
+	/**
+	 * @return Whether two separate, but equal, instances should be treated as
+	 *         the same object. Should be true for numbers and booleans.
+	 */
 	protected abstract boolean isSingletonLike();
 
 	/**
@@ -477,34 +459,34 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 		return value;
 	}
 
-	public final Type getType() {
-		return type;
-	}
+	@Nonnull
+	public abstract ELangObjectType getType();
+	
 	public final boolean isArray() {
-		return type == Type.ARRAY;
+		return getType() == ELangObjectType.ARRAY;
 	}
 	public final boolean isNumber() {
-		return type == Type.NUMBER;
+		return getType() == ELangObjectType.NUMBER;
 	}
 	public final boolean isString() {
-		return type == Type.STRING;
+		return getType() == ELangObjectType.STRING;
 	}
 	public final boolean isHash() {
-		return type == Type.HASH;
+		return getType() == ELangObjectType.HASH;
 	}
 	public final boolean isBoolean() {
-		return type == Type.BOOLEAN;
+		return getType() == ELangObjectType.BOOLEAN;
 	}
 	public final boolean isFunction() {
-		return type == Type.FUNCTION;
+		return getType() == ELangObjectType.FUNCTION;
 	}
 	public final boolean isException() {
-		return type == Type.EXCEPTION;
+		return getType() == ELangObjectType.EXCEPTION;
 	}
 	public final boolean isRegex() {
-		return type == Type.REGEX;
+		return getType() == ELangObjectType.REGEX;
 	}
 	public final boolean isNull() {
-		return type == Type.NULL;
+		return getType() == ELangObjectType.NULL;
 	}
 }

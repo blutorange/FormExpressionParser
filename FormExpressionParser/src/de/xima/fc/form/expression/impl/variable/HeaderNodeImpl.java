@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -22,11 +23,13 @@ public class HeaderNodeImpl implements IHeaderNode {
 	private final String variableName;
 	private final boolean isFunction;
 	private final boolean hasNode;
+	@Nullable
+	private final Node typedNode;
 	private int source = EVariableSource.ID_UNRESOLVED;
 	
 	public HeaderNodeImpl(@Nonnull final ASTVariableDeclarationClauseNode node) {
-		final Node assignmentNode = node.getAssignmentNode();
-		this.node = assignmentNode != null ? assignmentNode : new ASTNullNode(node);
+		this.node = node.hasAssignment() ? node.getAssignmentNode() : new ASTNullNode(node);
+		this.typedNode = node.hasType() ? node.getTypeNode() : null;
 		this.isFunction = false;
 		this.variableName = node.getVariableName();
 		this.hasNode = true;
@@ -34,6 +37,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 	
 	public HeaderNodeImpl(@Nonnull final ASTFunctionClauseNode node) {
 		this.node = node;
+		this.typedNode = node.hasType() ? node.getTypeNode() : null;
 		this.isFunction = true;
 		this.variableName = node.getVariableName();
 		this.hasNode = true;
@@ -44,6 +48,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 	 * @param variableName Variable name.
 	 */
 	public HeaderNodeImpl(@Nonnull final String variableName, @Nonnull final Node prototype) {
+		this.typedNode = null;
 		this.isFunction = false;
 		this.variableName = variableName;
 		this.node = new ASTNullNode(prototype);
@@ -58,6 +63,11 @@ public class HeaderNodeImpl implements IHeaderNode {
 	@Override
 	public boolean isFunction() {
 		return isFunction;
+	}
+	
+	@Override
+	public Node getType() {
+		return typedNode;
 	}
 	
 	@Override

@@ -4,12 +4,12 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
 import de.xima.fc.form.expression.iface.context.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ALangObject.Type;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
@@ -60,8 +60,8 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 	}
 
 	@Override
-	public Type getThisContextType() {
-		return Type.REGEX;
+	public ELangObjectType getThisContextType() {
+		return ELangObjectType.REGEX;
 	}
 
 	@Override
@@ -115,8 +115,8 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 		}
 
 		@Override
-		public Type getThisContextType() {
-			return Type.REGEX;
+		public ELangObjectType getThisContextType() {
+			return ELangObjectType.REGEX;
 		}
 
 		@Override

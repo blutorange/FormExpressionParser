@@ -1,10 +1,9 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.EVariableType;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -30,7 +29,7 @@ public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode impl
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (i==0)
-			return new ASTVariableTypeNode(jjtGetChild(0), EVariableType.UNKNOWN);
+			return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
 		return null;
 	}
 
@@ -73,10 +72,8 @@ public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode impl
 		return jjtGetChild(0);
 	}
 	
-	@Nullable
+	@Nonnull
 	public Node getAssignmentNode() {
-		if (jjtGetNumChildren() == 1)
-			return null;
 		return jjtGetChild(1);
 	}
 }

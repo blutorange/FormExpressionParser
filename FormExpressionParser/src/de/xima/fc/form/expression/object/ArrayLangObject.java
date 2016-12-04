@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.context.IEvaluationContext;
@@ -22,10 +23,15 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class ArrayLangObject extends ALangObject {
 	@Nonnull private final List<ALangObject> value;
 	private ArrayLangObject(@Nonnull final List<ALangObject> value) {
-		super(Type.ARRAY);
+		super();
 		this.value = value;
 	}
 
+	@Override
+	public ELangObjectType getType() {
+		return ELangObjectType.ARRAY;
+	}
+	
 	@Nonnull
 	public static ArrayLangObject create() {
 		return new ArrayLangObject(new ArrayList<ALangObject>());
