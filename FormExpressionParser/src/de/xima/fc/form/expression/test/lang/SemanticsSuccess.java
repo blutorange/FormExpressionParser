@@ -71,7 +71,7 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE011("k=42;foo::k=0;with(foo){k;}", Tests.N42), // first global, then default scope
 	SCOPE012("function foo(){0;}function foo::bar(){42;};with(foo)bar();", Tests.N42), // scoped function
 	SCOPE013("scope myscope{var a=42;}with(myscope){a;}", Tests.N42), // resolving scopes
-	
+
 	//Attribute accessors
 	PROP001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
 	PROP002("s='Ab3';f=s.toLocaleLowerCase;f.call(s,null);", StringLangObject.create("ab3")),
@@ -80,7 +80,7 @@ enum SemanticsSuccess implements ITestCase {
 	// Attribute assigners
 	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
 	ATTRASS002("a=[1,2,3,4];a.length=2;a.length;", NumberLangObject.create(2)),
-	
+
 	// Expression methods number.
 	EMETHODUN000("-42;", NumberLangObject.create(-42)),
 	EMETHODUN001("-(-42);", Tests.N42),
@@ -107,7 +107,25 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
 	EMETHODBIN009("48%7;;", NumberLangObject.create(6)),
 	EMETHODBIN010("-50%7;;", NumberLangObject.create(6)),
-	
+	EMETHODBIN011("1==1;", Tests.TRUE),
+	EMETHODBIN012("1===1;", Tests.TRUE),
+	EMETHODBIN013("1<2;", Tests.TRUE),
+	EMETHODBIN014("2<1;", Tests.FALSE),
+	EMETHODBIN015("1<=1;", Tests.TRUE),
+	EMETHODBIN016("1>=1;", Tests.TRUE),
+	EMETHODBIN017("1!=1;", Tests.FALSE),
+	EMETHODBIN018("1!==1;", Tests.FALSE),
+	EMETHODBIN019("'1'=='1';", Tests.TRUE),
+	EMETHODBIN020("'1'==='1';", Tests.FALSE),
+	EMETHODBIN021("'1'<'2';", Tests.TRUE),
+	EMETHODBIN022("'2'<'1';", Tests.FALSE),
+	EMETHODBIN023("'1'<='1';", Tests.TRUE),
+	EMETHODBIN024("'1'>='1';", Tests.TRUE),
+	EMETHODBIN025("'1'!='1';", Tests.FALSE),
+	EMETHODBIN026("'1'!=='1';", Tests.TRUE),
+	EMETHODBIN027("1<'1';", Tests.TRUE),
+
+
 	// Variable resolution
 	RESOLUTION001("i=0;if(true)i=42;i;", Tests.N42),
 	RESOLUTION002("i=42;if(true)var i=0;i;", Tests.N42),
@@ -139,7 +157,7 @@ enum SemanticsSuccess implements ITestCase {
 	FUNCTION009("function foo(args...){args;}foo(3);", ArrayLangObject.create(NumberLangObject.create(3))),
 	FUNCTION010("function foo(args...){args;}foo(3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
 	FUNCTION011("function foo(arg1,arg2,args...){[arg1,arg2];}foo(1,2);", ArrayLangObject.create(NumberLangObject.create(1),NumberLangObject.create(2))),
-	
+
 	//General
 	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
@@ -200,7 +218,7 @@ enum SemanticsSuccess implements ITestCase {
 	public String getErrorBegin() {
 		return null;
 	}
-	
+
 	@Override
 	public boolean isUseStrictMode() {
 		return false;
