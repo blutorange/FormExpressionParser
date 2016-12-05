@@ -16,20 +16,24 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 	private ELangObjectType type;
 	@Nullable
 	private List<IVariableType> children;
-	
+
 	public VariableTypeBuilder() {
 	}
-	
+
+	@Override
 	public VariableTypeBuilder append(@Nonnull final IVariableType type) {
 		getChildren().add(type);
 		return this;
-	}	
+	}
+
 	@Nonnull
 	private List<IVariableType> getChildren() {
 		if (children != null)
 			return children;
 		return children = new ArrayList<>();
 	}
+
+	@Override
 	@Nonnull
 	public IVariableType build() throws IllegalStateException {
 		final List<IVariableType> c = children;
@@ -40,7 +44,8 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 			return new SimpleVariableType(t);
 		return new GenericVariableType(t, c);
 	}
-	
+
+	@Override
 	public void setBasicType(@Nonnull final ELangObjectType type) {
 		this.type = type;
 	}

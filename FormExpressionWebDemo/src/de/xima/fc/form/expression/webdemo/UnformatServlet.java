@@ -37,7 +37,6 @@ public class UnformatServlet extends AFormExpressionServlet {
 			public JSONObject call() throws Exception {
 				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
 				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
-				final String indent = request.getParameter(CmnCnst.URL_PARAM_KEY_INDENT);
 				final UnparseVisitorConfig config = UnparseVisitorConfig.getUnstyledWithoutCommentsConfig();
 				final JSONObject json = new JSONObject();
 				if (code == null) {

@@ -178,6 +178,16 @@ public enum EMethod {
 	// <   t f f
 	// >=  f t t
 	// <=  t t f
+	/**
+	 * Takes the result of a Java-comparison {@link Comparable#compareTo(Object)} and checks
+	 * the result when compared with this comparison method. For example, assume the two
+	 * objects are <code>o1 = 2</code> and <code>o2 = 1</code>. The Java-comparison yields
+	 * the result <code>1</code>. Then the comparison method {@link #ANGLE_OPEN} returns
+	 * <code>true</code> because <code>2 > 1 == true</code>; the comparison method {@link #ANGLE_CLOSE}
+	 * returns <code>false</code> because <code>2 < 1 == false</code>;
+	 * @param comp Result of the comparison of two object, eg. <code>o1.compareTo(o2)</code>
+	 * @return <code>true</code> iff the are in the order as specified by this comparison method.
+	 */
 	public boolean checkComparison(final int comp) {
 		switch (this) {
 		case ANGLE_OPEN: return comp < 0;

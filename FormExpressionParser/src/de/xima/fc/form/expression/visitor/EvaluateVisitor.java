@@ -216,7 +216,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				if (!func.hasVarArgs() && args.length != func.getDeclaredArgumentCount()
 						|| func.hasVarArgs() && args.length < func.getDeclaredArgumentCount() - 1)
 					throw new IllegalNumberOfFunctionParametersException(func, args.length, ec);
-				
+
 				// Check thisContext of the function.
 				if (func.getThisContextType() != ELangObjectType.NULL && func.getThisContextType() != thisContext.getType())
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
@@ -407,22 +407,21 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTExpressionNode node) throws EvaluationException {
-		// Arguments are expressions which cannot be clause/continue/return
-		// clauses
-		final Node[] childrenArray = node.getChildArray();
+		// Arguments are expressions which cannot be or contain clause/continue/return
+		// clauses.
 
 		// Empty expression node.
-		if (childrenArray.length == 0)
+		if (node.jjtGetNumChildren() == 0)
 			return NullLangObject.getInstance();
 
 		// Binary expression node.
 		// Children are expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(node, childrenArray[0], ec);
-		for (int i = 1; i != childrenArray.length; ++i) {
-			final Node arg = childrenArray[i];
+		ALangObject res = jjtAccept(node, node.getFirstChildOrNull(), ec);
+		for (int i = 1; i != node.jjtGetNumChildren(); ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
+			final Node arg = node.jjtGetChild(i);
 			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, jjtAccept(node, arg, ec));
 		}
 
@@ -760,14 +759,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTAssignmentExpressionNode node) throws EvaluationException {
-		final Node[] children = node.getChildArray();
 		// Iterate from the end of each assignment pair and assign the rvalue to
 		// the lvalue.
 		// Child must be an expression and cannot contain break/continue/return.
-		ALangObject assignee = jjtAccept(node, children[children.length - 1], ec);
-		for (int i = children.length - 2; i >= 0; --i) {
-			final EMethod method = children[i + 1].getSiblingMethod();
-			assignee = performAssignment(node, children[i], method, assignee, ec);
+		ALangObject assignee = jjtAccept(node, node.getAssignValueNode(), ec);
+		for (int i = node.getAssignableNodeCount(); i-- > 0;) {
+			final EMethod method = node.getAssignMethod(i);
+			assignee = performAssignment(node, node.getAssignableNode(i), method, assignee, ec);
 		}
 		return assignee;
 	}
@@ -808,23 +806,22 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTComparisonExpressionNode node) throws EvaluationException {
-		// Arguments are expressions which cannot be clause/continue/return
-		// clauses
-		final Node[] childrenArray = node.getChildArray();
+		// Arguments are expressions which cannot be nor contain clause/continue/return
+		// clauses.
 
 		// Empty expression node.
-		if (childrenArray.length == 0)
+		if (node.isLeaf())
 			return NullLangObject.getInstance();
 
 		// Binary expression node.
 		// Children are expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(node, childrenArray[0], ec);
-		for (int i = 1; i != childrenArray.length; ++i) {
+		ALangObject res = jjtAccept(node, node.getFirstChildOrNull(), ec);
+		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
-			res = BooleanLangObject.create(childrenArray[i].getSiblingMethod()
-					.checkComparison(res.compareTo(jjtAccept(node, childrenArray[i], ec))));
+			res = BooleanLangObject.create(node.jjtGetChild(i).getSiblingMethod()
+					.checkComparison(res.compareTo(jjtAccept(node, node.jjtGetChild(i), ec))));
 		}
 		return res;
 	}
@@ -915,7 +912,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return NullLangObject.getInstance();
 	}
 
-	
+
 	/**
 	 * Evaluates the given node as a complete program or template with the given
 	 * context. This method itself may be used by multiple threads, however, the

@@ -45,7 +45,8 @@ public abstract class ANode implements Node {
 	@Nullable private Node parent;
 
 	/** List of this node's children. */
-	@Nonnull private Node[] children = CmnCnst.NonnullConstant.EMPTY_NODE_ARRAY;
+	@Nonnull
+	protected Node[] children = CmnCnst.NonnullConstant.EMPTY_NODE_ARRAY;
 
 	/** Used during evaluation, stores operator information. */
 	@Nonnull private EMethod siblingMethod = EMethod.NONE;
@@ -467,7 +468,7 @@ public abstract class ANode implements Node {
 			}
 		}
 	}
-	
+
 	@Override
 	public final boolean isA(final int nodeType) {
 		return this.nodeId == nodeType;
@@ -485,7 +486,7 @@ public abstract class ANode implements Node {
 			children = ArrayUtils.remove(children, i);
 		}
 	}
-	
+
 	@Override
 	public final boolean isLeaf() {
 		return children.length == 0;
@@ -495,7 +496,7 @@ public abstract class ANode implements Node {
 	protected final Node nullNode() {
 		return new ASTNullNode(this);
 	}
-	
+
 	/** @return A newly created empty node. */
 	protected final Node emptyNode() {
 		return new ASTEmptyNode(this);
@@ -517,5 +518,5 @@ public abstract class ANode implements Node {
 	 * @see #clearChild(int)
 	 */
 	@Nullable
-	protected abstract Node replacementOnChildRemoval(int i) throws ArrayIndexOutOfBoundsException;	
+	protected abstract Node replacementOnChildRemoval(int i) throws ArrayIndexOutOfBoundsException;
 }
