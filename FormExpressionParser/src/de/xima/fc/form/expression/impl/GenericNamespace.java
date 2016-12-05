@@ -13,9 +13,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.iface.context.IFunction;
-import de.xima.fc.form.expression.iface.context.IMethod2Function;
-import de.xima.fc.form.expression.iface.context.INamespace;
+import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
 import de.xima.fc.form.expression.impl.function.EAttrAccessorException;

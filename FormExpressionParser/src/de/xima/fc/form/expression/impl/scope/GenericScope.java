@@ -8,8 +8,8 @@ import javax.annotation.concurrent.Immutable;
 import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
-import de.xima.fc.form.expression.iface.context.ICustomScope;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.ICustomScope;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 
 @Immutable

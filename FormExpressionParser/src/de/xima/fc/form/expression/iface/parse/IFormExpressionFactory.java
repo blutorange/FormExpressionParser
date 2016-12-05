@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public interface IFormExpressionFactory {

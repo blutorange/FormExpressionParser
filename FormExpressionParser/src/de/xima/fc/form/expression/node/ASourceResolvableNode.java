@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -50,6 +51,12 @@ public abstract class ASourceResolvableNode extends ANode implements ISourceReso
 	@Override
 	public final String getVariableName() {
 		return name;
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	@Override
+	protected void additionalToStringFields(final StringBuilder sb) {
+		sb.append(name).append(',').append(source).append(',');
 	}
 
 	public void init(@Nullable final EMethod method, @Nonnull final String name) throws ParseException {

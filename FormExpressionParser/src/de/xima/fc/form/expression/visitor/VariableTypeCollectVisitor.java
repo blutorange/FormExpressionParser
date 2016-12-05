@@ -27,8 +27,12 @@ import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+/**
+ * Creates a symbol table and fills it with the type of each variable.
+ * @author madgaksha
+ */
 public final class VariableTypeCollectVisitor
-		extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
+extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
 
 	private final IVariableType[] table;
 	private final boolean treatMissingTypeAsError;
@@ -84,10 +88,13 @@ public final class VariableTypeCollectVisitor
 		// TODO varArgs -> array
 		// TODO set type for *this* variable
 		// TODO type for functions: function foo(){return 42;};foo();
+		builder.setBasicType(ELangObjectType.FUNCTION);
+		builder.append(getType(node));
 		for (int i = node.getArgumentCount(); i-->0;) {
-			visitTypedNode(node.getArgResolvable(i));
+			IVariableType type = visitTypedNode(node.getArgResolvable(i));
 			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
-				wrapVarArgs(node, i);
+				type = wrapVarArgs(node, i);
+			builder.append(type);
 		}
 		node.getBodyNode().jjtAccept(this, builder);
 	}
@@ -104,77 +111,74 @@ public final class VariableTypeCollectVisitor
 		node.getBodyNode().jjtAccept(this, builder);
 	}
 
-	private void wrapVarArgs(final IArgumentResolvable node, final int i) {
+	@Nonnull
+	private IVariableType wrapVarArgs(final IArgumentResolvable node, final int i) {
 		final int source = node.getArgResolvable(i).getSource();
 		final VariableTypeBuilder b = new VariableTypeBuilder();
 		b.setBasicType(ELangObjectType.ARRAY);
 		final IVariableType type = table[source];
 		b.append(type != null ? type : new SimpleVariableType(ELangObjectType.NULL));
-		table[source] = b.build();
+		return table[source] = b.build();
 	}
 
 	@Nonnull
 	private <T extends IVariableTyped & Node> IVariableType getType(@Nonnull final T typedNode) throws SemanticsException {
-		final IVariableType type;
-		if (!typedNode.hasType()) {
-			type = new SimpleVariableType(ELangObjectType.NULL);
-		}
-		else {
-			final VariableTypeBuilder newBuilder = new VariableTypeBuilder();
-			typedNode.getTypeNode().jjtAccept(this, newBuilder);
-			try {
-				type = newBuilder.build();
-			}
-			catch (final IllegalStateException e) {
-				throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), typedNode);
-			}
-		}
-		return type;
-	}
-	
-	private <T extends IVariableTyped & ISourceResolvable & Node, S extends ISourceResolvable & Node> void visitTypedNode(
-			@Nonnull final T typedResolvableNode) throws SemanticsException {
-		final IVariableType type = getType(typedResolvableNode);
-		visitTypedNode(typedResolvableNode, type);
+		return getType(typedNode, typedNode);
 	}
 
-	private <T extends ISourceResolvable & Node> void visitTypedNode(@Nonnull final T resolvableNode,
-			@Nonnull final IVariableType type) throws SemanticsException {
-		visitTypedNode(resolvableNode, resolvableNode, type);
+	@Nonnull
+	private IVariableType getType(@Nonnull final IVariableTyped typed, @Nonnull final Node node) throws SemanticsException {
+		if (!typed.hasType()) {
+			return new SimpleVariableType(ELangObjectType.NULL);
+		}
+		final VariableTypeBuilder newBuilder = new VariableTypeBuilder();
+		typed.getTypeNode().jjtAccept(this, newBuilder);
+		try {
+			return newBuilder.build();
+		}
+		catch (final IllegalStateException e) {
+			throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), node);
+		}
 	}
-	
-	private void visitTypedNode(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node,
+
+	@Nonnull
+	private <T extends IVariableTyped & ISourceResolvable & Node> IVariableType visitTypedNode(
+			@Nonnull final T typedResolvableNode) throws SemanticsException {
+		final IVariableType type = getType(typedResolvableNode);
+		return visitTypedNode(typedResolvableNode, type);
+	}
+
+	@Nonnull
+	private <T extends ISourceResolvable & Node> IVariableType visitTypedNode(@Nonnull final T resolvableNode,
+			@Nonnull final IVariableType type) throws SemanticsException {
+		return resolveTypedNode(resolvableNode, resolvableNode, type);
+	}
+
+	@Nonnull
+	private IVariableType resolveTypedNode(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node,
 			@Nonnull final IVariableType type) throws SemanticsException {
 		if (type.getBasicLangType() == ELangObjectType.NULL && treatMissingTypeAsError)
 			throw new MissingVariableTypeDeclarationException(resolvable, node);
 		final int source = resolvable.getSource();
 		if (source < 0)
 			throw new SemanticsException(CmnCnst.Error.EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE, node);
-		table[source] = type;
+		return table[source] = type;
 	}
 
 	private IVariableType[] getTable() {
 		return table;
 	}
 
-
+	//TODO if function, wrap in method<ret,arg1,...>
 	private void visitHeaderNode(final IHeaderNode header) throws SemanticsException {
-		final Node typedNode = header.getType();
 		final IVariableType type;
-		if (typedNode == null)
+		if (header.hasType())
+			type = getType(header, header.getNode());
+		else
 			type = new SimpleVariableType(ELangObjectType.NULL);
-		else {
-			//TODO if function, wrap in method<ret,arg1,...>
-			final IVariableTypeBuilder builder = new VariableTypeBuilder();
-			typedNode.jjtAccept(this, builder);
-			try {
-				type = builder.build();
-			}
-			catch (final IllegalStateException e) {
-				throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), header.getNode());
-			}
-		}
-		visitTypedNode(header, header.getNode(), type);
+		if (type.getBasicLangType() == ELangObjectType.NULL && treatMissingTypeAsError)
+			throw new MissingVariableTypeDeclarationException(header, header.getNode());
+		resolveTypedNode(header, header.getNode(), type);
 		if (header.hasNode())
 			header.getNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
 	}
@@ -190,7 +194,7 @@ public final class VariableTypeCollectVisitor
 
 	public static IVariableType[] collect(@Nonnull final Node node, final int symbolTableSize,
 			@Nonnull final IScopeDefinitions scopeDefs, final boolean treatMissingTypeAsError)
-			throws SemanticsException {
+					throws SemanticsException {
 		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize, treatMissingTypeAsError);
 		v.visitScopeDefs(scopeDefs);
 		node.jjtAccept(v, DummyVariableTypeBuilder.INSTANCE);

@@ -6,11 +6,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.iface.context.ITraceElement;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.ITraceElement;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships

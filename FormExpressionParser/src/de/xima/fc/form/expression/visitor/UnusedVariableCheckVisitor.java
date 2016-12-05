@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;

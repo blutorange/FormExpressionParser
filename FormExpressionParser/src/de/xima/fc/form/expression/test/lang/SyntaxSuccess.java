@@ -75,22 +75,23 @@ enum SyntaxSuccess implements ITestCase {
 	TEST062("scope foo{var ko;}foo::ko=0;"),
 	TEST063("scope myscope{function test(){for(var n=2;n<=10;++n){for(var r=n;r<=10;r+=n){}}}}"),
 	TEST064("global scope{number n;string s;boolean b;regex r;error e;array<boolean>a1;array<array/*comment*/<boolean>>a2;hash<string,string>h;method<number,number>m;}function array<hash<string,string>>foo(){number x;}->string(){string z;};"),
+	TEST065("global scope {method<void, string> bar;}function void foo(string x){return x;};bar=foo;"),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;
 	@Nonnull private final EContextType context;
 	private final boolean strictMode;
-	
+
 	private SyntaxSuccess(@Nonnull final String code) {
 		this(new Cfg(code));
 	}
-	
+
 	private SyntaxSuccess(@Nonnull final Cfg cfg) {
 		this.code = cfg.code;
 		this.type = cfg.type;
 		this.context = cfg.context;
 		this.strictMode = cfg.strict;
-	}	
+	}
 
 	@Override
 	public ETestType getTestType() {

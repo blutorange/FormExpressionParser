@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.impl.warning;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class MissingFormFieldWarning extends GenericWarning {

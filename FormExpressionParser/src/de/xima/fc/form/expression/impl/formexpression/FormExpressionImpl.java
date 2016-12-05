@@ -8,9 +8,9 @@ import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IEvaluationWarning;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IComment;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;

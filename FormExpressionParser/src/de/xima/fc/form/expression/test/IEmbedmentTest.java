@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-import de.xima.fc.form.expression.iface.context.IEmbedment;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
 import de.xima.fc.form.expression.impl.GenericEmbedment;
 
 public class IEmbedmentTest extends IFaceTest<IEmbedment> {

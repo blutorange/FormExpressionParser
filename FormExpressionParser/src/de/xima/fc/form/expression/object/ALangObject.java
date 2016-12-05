@@ -14,8 +14,8 @@ import de.xima.fc.form.expression.exception.evaluation.IterationNotSupportedExce
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAssignerException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchMethodException;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 

@@ -10,9 +10,9 @@ import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
-import de.xima.fc.form.expression.iface.context.ICustomScope;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalScope;
+import de.xima.fc.form.expression.iface.evaluate.ICustomScope;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalScope;
 import de.xima.fc.form.expression.impl.scope.GenericScope;
 import de.xima.fc.form.expression.object.ALangObject;
 

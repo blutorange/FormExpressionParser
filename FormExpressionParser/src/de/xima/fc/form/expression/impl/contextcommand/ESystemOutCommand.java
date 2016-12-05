@@ -7,7 +7,7 @@ import com.google.common.base.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 
 public enum ESystemOutCommand implements IExternalContextCommand {
 	DISABLE_OUTPUT,

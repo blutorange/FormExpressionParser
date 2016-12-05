@@ -7,9 +7,9 @@ import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IFunction;
-import de.xima.fc.form.expression.iface.context.IMethod2Function;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 

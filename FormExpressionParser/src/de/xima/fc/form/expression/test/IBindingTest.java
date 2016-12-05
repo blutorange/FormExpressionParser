@@ -19,7 +19,7 @@ import org.junit.runners.Parameterized;
 import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.evaluate.IBinding;
 
 @SuppressWarnings("null")
 @RunWith(Parameterized.class)

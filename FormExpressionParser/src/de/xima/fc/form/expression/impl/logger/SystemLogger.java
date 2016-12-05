@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.iface.context.ILogger;
+import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class SystemLogger implements ILogger {

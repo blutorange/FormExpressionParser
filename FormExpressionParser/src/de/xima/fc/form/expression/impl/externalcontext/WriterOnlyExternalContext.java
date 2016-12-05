@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.Writer;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
-import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 
 public class WriterOnlyExternalContext extends AGenericExternalContext implements IExternalContext {

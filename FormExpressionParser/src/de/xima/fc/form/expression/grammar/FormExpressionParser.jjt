@@ -90,8 +90,10 @@ PARSER_END(FormExpressionParser)
 TOKEN_MGR_DECLS :
 {
   private int typeLevel = 0;
+  private Token lastToken;
   void CommonTokenAction(final Token token) {
     // Retrieve all comments, if there are any.
+    lastToken = token;
     if (parser == null) return;
     Token special = token;
     if (token.specialToken != null) {
@@ -111,6 +113,7 @@ TOKEN :
 | < TypeAngleClose : ">" > { --typeLevel; if (typeLevel == 0) SwitchTo(FormExpressionParserConstants.CODE); }
 | < TypeComma : "," >
 | < TypeHash : "hash" >
+| < TypeVoid : "void" >
 | < TypeError : "error" >
 | < TypeRegex : "regex" >
 | < TypeArray : "array" >
@@ -208,7 +211,12 @@ SPECIAL_TOKEN:
 < CODE >
 TOKEN :
 {
-  < AngleOpen : "<" >
+  < AngleOpen : "<" > {
+    if (lastToken != null && lastToken.kind == FormExpressionParserConstants.Function) {
+      typeLevel = 1;
+      SwitchTo(FormExpressionParserConstants.TYPE);
+    }
+  }
 |
   < AngleClose : ">" >
 |
@@ -349,6 +357,8 @@ TOKEN :
   < True : "true" >
 | 
   < Hash : "hash" > { typeLevel = 0; } : TYPE
+| 
+  < Void : "void" >
 | 
   < Null : "null" >
 | 
@@ -726,6 +736,17 @@ void UnspecificVariableType(EMethod method) #VariableTypeNode :
   }
 }
 
+void VoidVariableType(EMethod method) #VariableTypeNode :
+{
+}
+{
+  (
+    < TypeVoid > | < Void >  )
+  {
+    jjtThis.init(method, ELangObjectType.NULL);
+  }
+}
+
 void SpecificVariableType(EMethod method) #VariableTypeNode :
 {
   ELangObjectType type;
@@ -825,7 +846,10 @@ void GenericsMethod(EMethod method) #void:
     < AngleOpen >
   | < TypeAngleOpen >
   )
-  SpecificVariableType(method)
+  (
+    SpecificVariableType(method)
+  | VoidVariableType(method)
+  )
   (
     (
       < Comma >
@@ -839,6 +863,16 @@ void GenericsMethod(EMethod method) #void:
   )
 }
 
+void GenericsFunction(EMethod method) #void :
+{
+}
+{
+  (
+    SpecificVariableType(method)
+  | VoidVariableType(method)
+  )
+}
+
 void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   Token t;
@@ -848,7 +882,7 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   (
     < Function >
-    [ SpecificVariableType(null) { hasType = true; } ]
+    [ GenericsFunction(null) { hasType = true; } ]
     VariableWithOptionalScope(null)
     < ParenOpen >
     (
@@ -879,7 +913,7 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   (
     < Function >
-    [ SpecificVariableType(null) { hasType = true; } ]
+    [ GenericsFunction(null) { hasType = true; } ]
     Variable(null)
     < ParenOpen >
     (

@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.VariableDeclaredTwiceException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.evaluate.IBinding;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;

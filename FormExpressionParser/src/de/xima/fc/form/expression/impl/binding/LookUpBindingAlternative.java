@@ -7,7 +7,7 @@ import java.util.Map;
 import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.evaluate.IBinding;
 
 /**
  * Similar to {@link OnDemandLookUpBinding}, but uses a map of arrays (

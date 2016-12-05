@@ -8,8 +8,8 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.iface.context.IEvaluationWarning;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 
 public interface IFormExpression<T extends IExternalContext> extends Serializable {

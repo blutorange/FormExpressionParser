@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class EmbedmentOutputException extends CatchableEvaluationException {

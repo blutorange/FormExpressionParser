@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.context.ICustomScope;
-import de.xima.fc.form.expression.iface.context.IEmbedment;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalScope;
-import de.xima.fc.form.expression.iface.context.ITracer;
+import de.xima.fc.form.expression.iface.evaluate.ICustomScope;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalScope;
+import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IScopeInfo;
 import de.xima.fc.form.expression.impl.GenericEmbedment;

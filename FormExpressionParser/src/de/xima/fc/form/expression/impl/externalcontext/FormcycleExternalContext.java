@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.parse.IScopeInfo;
 import de.xima.fc.form.expression.impl.scope.FormcycleScope;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;

@@ -1,1 +1,7 @@
-function foo(){return 42;};foo();
+global scope {
+  method<void, string> bar;
+}
+function void foo(string x) {
+  return x;
+}
+bar=foo;

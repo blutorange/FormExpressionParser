@@ -7,11 +7,11 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
 public class ASTFunctionArgumentNode extends ASourceResolvableNode implements IVariableTyped {
 	private static final long serialVersionUID = 1L;
@@ -25,7 +25,7 @@ public class ASTFunctionArgumentNode extends ASourceResolvableNode implements IV
 		assertChildrenBetween(0,1);
 		super.init(method, variableName);
 	}
-	
+
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
@@ -49,11 +49,6 @@ public class ASTFunctionArgumentNode extends ASourceResolvableNode implements IV
 	@Override
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
-	}
-
-	@Override
-	protected void additionalToStringFields(@Nonnull final StringBuilder sb) {
-		sb.append(getVariableName()).append(',');
 	}
 
 	@Override

@@ -6,10 +6,10 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 
 public class ASTHashNode extends ANode {
 	private static final long serialVersionUID = 1L;

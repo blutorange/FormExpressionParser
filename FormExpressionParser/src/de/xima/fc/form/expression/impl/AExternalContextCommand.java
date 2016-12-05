@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Optional;
 
-import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 
 public abstract class AExternalContextCommand implements IExternalContextCommand {
 	@SuppressWarnings("unchecked") // We check the class beforehand.

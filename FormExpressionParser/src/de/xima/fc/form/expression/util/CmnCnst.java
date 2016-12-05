@@ -21,7 +21,7 @@ public final class CmnCnst {
 
 	@Nonnull public static final String SYSTEM_LOGGER_FORMAT = "[%s] (%s) %s %s";
 	@Nonnull public static final Pattern PATTERN_FORM_FIELD_NAME = NullUtil.checkNotNull(Pattern.compile("^[a-zA-Z0-9_]+$"));
-	
+
 	public final static class Warning {
 		private Warning(){}
 		@Nonnull public static final String UNUSED_VARIABLE = "Variable %s is never used.";
@@ -351,6 +351,7 @@ public final class CmnCnst {
 		@Nonnull public static final String NULL_LANG_OBJECT_TYPE = "Basic lang object type must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String MISSING_TYPE_DECLARATION = "Variable %s without type declaration. Type declarations are required in strict mode.";
 		@Nonnull public static final String EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE = "Manually declared variable resolved to external scope. " + INTERNAL_ERROR;
+		@Nonnull public static final String GET_TYPE_NODE_CALLED_BUT_NO_TYPE_NODE_PRESENT = "No type node present, use hasType() to check. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

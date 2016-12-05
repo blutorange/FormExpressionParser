@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.iface.context;
+package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nonnull;
 
@@ -11,15 +11,13 @@ import de.xima.fc.form.expression.object.ALangObject;
  * @author madgaksha
  *
  */
-public interface ICustomScope {
+public interface IParametrizedCustomScope<T> {
 	/**
-	 * @param variableName Name of the variable to fetch.
-	 * @return Value of the variable in this scope.
-	 * @throws EvaluationException When an illegal variable was requested.
+	 * @see ICustomScope#fetch(String)
+	 * @throws EvaluationException When an illegal variable is requested.
 	 */
 	@Nonnull
-	public ALangObject fetch(@Nonnull String variableName, @Nonnull IEvaluationContext ec) throws EvaluationException;
-	/** @return Name of the scope that can be used by programs to access variables in this scope. */
+	public ALangObject fetch(@Nonnull String variableName, @Nonnull T object, @Nonnull final IEvaluationContext ec) throws EvaluationException;
 	@Nonnull
 	public String getScopeName();
 }

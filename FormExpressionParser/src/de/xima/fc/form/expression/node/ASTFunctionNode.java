@@ -7,15 +7,15 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
+import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionReturnVoidVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidDataVisitor;
-import de.xima.fc.form.expression.visitor.IFormExpressionVoidVoidVisitor;
 
 public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVariableTyped {
 	private static final long serialVersionUID = 1L;

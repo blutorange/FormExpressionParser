@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import de.xima.fc.form.expression.exception.parse.CannotUnnestGlobalNestingException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
-import de.xima.fc.form.expression.iface.context.IBinding;
+import de.xima.fc.form.expression.iface.evaluate.IBinding;
 
 /**
  * Create a new binding instance with a new map for each nesting level. May not

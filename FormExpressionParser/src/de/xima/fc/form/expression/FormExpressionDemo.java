@@ -18,7 +18,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
-import de.xima.fc.form.expression.iface.context.IEvaluationWarning;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;

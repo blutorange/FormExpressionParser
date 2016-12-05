@@ -9,9 +9,9 @@ import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
-import de.xima.fc.form.expression.iface.context.IEmbedment;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandler;
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleFormcycle;

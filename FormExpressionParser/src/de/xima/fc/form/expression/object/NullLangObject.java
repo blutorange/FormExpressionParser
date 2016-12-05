@@ -10,8 +10,8 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectAccessException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectAssignException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectMethodException;
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 

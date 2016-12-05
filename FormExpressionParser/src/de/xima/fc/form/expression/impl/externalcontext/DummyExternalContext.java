@@ -2,9 +2,9 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.iface.context.IEvaluationContext;
-import de.xima.fc.form.expression.iface.context.IExternalContext;
-import de.xima.fc.form.expression.iface.context.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 
 public class DummyExternalContext extends AGenericExternalContext implements IExternalContext {
 
