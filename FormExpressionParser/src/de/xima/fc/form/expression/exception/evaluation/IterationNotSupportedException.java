@@ -19,7 +19,7 @@ public class IterationNotSupportedException extends CatchableEvaluationException
 	private static final long serialVersionUID = 1L;
 
 	public IterationNotSupportedException(@Nonnull final ALangObject thisContext, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.format(CmnCnst.Error.ITERATION_NOT_SUPPORTED, thisContext.toString(), thisContext.getType()));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.ITERATION_NOT_SUPPORTED, thisContext.toString(), thisContext.getType()));
 		this.thisContext = thisContext;
 	}
 

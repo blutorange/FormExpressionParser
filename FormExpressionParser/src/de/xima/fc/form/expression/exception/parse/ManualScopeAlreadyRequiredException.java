@@ -10,7 +10,7 @@ public class ManualScopeAlreadyRequiredException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 
 	public ManualScopeAlreadyRequiredException(@Nonnull final ASTScopeManualNode node) {
-		super(NullUtil.format(CmnCnst.Error.MANUAL_SCOPE_ALREADY_REQUIRED, node.getScopeName()),
+		super(NullUtil.stringFormat(CmnCnst.Error.MANUAL_SCOPE_ALREADY_REQUIRED, node.getScopeName()),
 				node.getStartLine(), node.getStartColumn());
 	}
 }

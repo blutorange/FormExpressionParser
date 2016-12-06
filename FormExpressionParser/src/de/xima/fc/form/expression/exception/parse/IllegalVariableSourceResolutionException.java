@@ -15,7 +15,7 @@ public class IllegalVariableSourceResolutionException extends IllegalVariableRes
 	}
 	public IllegalVariableSourceResolutionException(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node,
 			final int newSource) {
-		super(NullUtil.format(CmnCnst.Error.VARIABLE_SOURCE_ALREADY_RESOLVED, resolvable.getVariableName(), newSource,
+		super(NullUtil.stringFormat(CmnCnst.Error.VARIABLE_SOURCE_ALREADY_RESOLVED, resolvable.getVariableName(), newSource,
 				resolvable.getSource()), resolvable, node);
 		this.newSource = newSource;
 		this.oldSource = resolvable.getSource();

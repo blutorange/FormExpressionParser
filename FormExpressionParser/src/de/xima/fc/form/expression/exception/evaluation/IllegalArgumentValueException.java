@@ -23,7 +23,7 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 	public IllegalArgumentValueException(@Nullable final IFunction<?> function, @Nonnull final String functionName,
 			@Nonnull final ALangObject thisContext, @Nonnull final ALangObject argument, final int index,
 			@Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.format(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index, functionName, argument.inspect()));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index, functionName, argument.inspect()));
 		this.functionName = functionName;
 		this.thisContext = thisContext;
 		this.index = index;

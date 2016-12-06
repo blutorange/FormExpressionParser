@@ -42,7 +42,7 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 		if (b == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		if (node.jjtGetNumChildren() == 0)
-			throw new UncatchableEvaluationException(ec, NullUtil.format(CmnCnst.Error.NODE_COUNT_AT_LEAST, 1, 0));
+			throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.NODE_COUNT_AT_LEAST, 1, 0));
 		this.visitor = visitor;
 		this.name = name;
 		this.node = node;

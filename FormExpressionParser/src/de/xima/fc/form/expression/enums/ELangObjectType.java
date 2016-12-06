@@ -25,8 +25,8 @@ public enum ELangObjectType {
 			return NullLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return false;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
 		}
 	},
 	BOOLEAN(1) {
@@ -39,8 +39,8 @@ public enum ELangObjectType {
 			return BooleanLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return false;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
 		}
 	},
 	NUMBER(2) {
@@ -53,8 +53,8 @@ public enum ELangObjectType {
 			return NumberLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return false;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
 		}
 	},
 	STRING(3) {
@@ -67,8 +67,8 @@ public enum ELangObjectType {
 			return StringLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return false;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
 		}
 	},
 	REGEX(4) {
@@ -81,8 +81,8 @@ public enum ELangObjectType {
 			return RegexLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return false;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
 		}
 	},
 	FUNCTION(5) {
@@ -95,8 +95,8 @@ public enum ELangObjectType {
 			return FunctionLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return true;
+		public boolean allowsGenericsCount(final int i) {
+			return i > 0;
 		}
 	},
 	EXCEPTION(6) {
@@ -109,8 +109,8 @@ public enum ELangObjectType {
 			return ExceptionLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return false;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
 		}
 	},
 	ARRAY(7) {
@@ -123,8 +123,8 @@ public enum ELangObjectType {
 			return ArrayLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return true;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 1;
 		}
 	},
 	HASH(8) {
@@ -137,8 +137,8 @@ public enum ELangObjectType {
 			return HashLangObject.class;
 		}
 		@Override
-		public boolean isCompound() {
-			return true;
+		public boolean allowsGenericsCount(final int i) {
+			return i == 2;
 		}
 	},
 	;
@@ -157,5 +157,5 @@ public enum ELangObjectType {
 	 * A compound (generic) type requires additional type parameters, eg. <code>array&lt;string&gt;</code>.
 	 * @return Whether this type is compound.
 	 */
-	public abstract boolean isCompound();
+	public abstract boolean allowsGenericsCount(int i);
 }

@@ -13,7 +13,7 @@ public class ArrayIndexOutOfBoundsException extends CatchableEvaluationException
 
 	public ArrayIndexOutOfBoundsException(@Nonnull final ArrayLangObject array, final int index,
 			@Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.format(CmnCnst.Error.ARRAY_INDEX_OUT_OF_BOUNDS, new Integer(index), array));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.ARRAY_INDEX_OUT_OF_BOUNDS, new Integer(index), array));
 		this.array = array.toArray();
 		this.index = index;
 	}

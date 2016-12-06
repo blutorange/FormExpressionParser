@@ -20,7 +20,7 @@ public class CoercionException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
 	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ELangObjectType to, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.format(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
 		this.from = from;
 		this.to = to;
 	}

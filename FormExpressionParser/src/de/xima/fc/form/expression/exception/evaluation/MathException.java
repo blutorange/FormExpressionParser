@@ -10,7 +10,7 @@ public class MathException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
 	public MathException(@Nonnull final String details, @Nonnull final IEvaluationContext ec)  {
-		super(ec, NullUtil.format(CmnCnst.Error.MATH, details));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.MATH, details));
 		this.details = details;
 	}
 

@@ -10,7 +10,7 @@ public class ScopeMissingVariableException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 
 	public ScopeMissingVariableException(@Nonnull final String scope, @Nonnull final String name, @Nonnull final Node node) {
-		super(NullUtil.format(CmnCnst.Error.SCOPE_MISSING_VARIABLE, scope, name), node);
+		super(NullUtil.stringFormat(CmnCnst.Error.SCOPE_MISSING_VARIABLE, scope, name), node);
 		this.name = name;
 		this.scope = scope;
 		

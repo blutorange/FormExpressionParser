@@ -125,7 +125,7 @@ public enum EMethod {
 		case CIRCUMFLEX_EQUAL: return EMethod.CIRCUMFLEX;
 		//$CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.format(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
+			throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
 		}
 	}
 
@@ -140,7 +140,7 @@ public enum EMethod {
 		case EXCLAMATION_TILDE: return EMethod.EQUAL_TILDE;
 		//$CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.format(CmnCnst.Error.INVALID_COMPARISON_METHOD, this));
+			throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.INVALID_COMPARISON_METHOD, this));
 		}
 	}
 

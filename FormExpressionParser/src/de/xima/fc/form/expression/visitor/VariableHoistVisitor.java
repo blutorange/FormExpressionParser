@@ -110,7 +110,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
 				break;
 			default:
-				throw new SemanticsException(NullUtil.format(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+				throw new SemanticsException(NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 						node.jjtGetChild(i).jjtGetNodeId(), node.getClass().getSimpleName()), node.jjtGetChild(i));
 			}
 		}

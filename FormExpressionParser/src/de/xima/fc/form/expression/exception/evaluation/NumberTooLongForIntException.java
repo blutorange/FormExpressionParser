@@ -10,7 +10,7 @@ public class NumberTooLongForIntException extends MathException {
 	private static final long serialVersionUID = 1L;
 
 	public NumberTooLongForIntException(final double number, @Nonnull final IEvaluationContext ec)  {
-		super(NullUtil.format(CmnCnst.Error.NUMBER_TOO_LONG_FOR_INT, number), ec);
+		super(NullUtil.stringFormat(CmnCnst.Error.NUMBER_TOO_LONG_FOR_INT, number), ec);
 		this.number = number;
 	}
 

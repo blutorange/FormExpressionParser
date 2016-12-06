@@ -19,8 +19,8 @@ public class UnresolvedVariableSourceException extends UncatchableEvaluationExce
 	@Nonnull
 	private static String format(@Nullable final String scope, @Nonnull final String name) {
 		if (scope == null)
-			return NullUtil.format(CmnCnst.Error.UNSCOPED_VARIABLE_NOT_RESOLVED, name);
-		return NullUtil.format(CmnCnst.Error.SCOPED_VARIABLE_NOT_RESOLVED, scope, name);
+			return NullUtil.stringFormat(CmnCnst.Error.UNSCOPED_VARIABLE_NOT_RESOLVED, name);
+		return NullUtil.stringFormat(CmnCnst.Error.SCOPED_VARIABLE_NOT_RESOLVED, scope, name);
 	}
 	
 	@Nullable

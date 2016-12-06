@@ -12,7 +12,7 @@ public class IllegalVariableScopeResolutionException extends IllegalVariableReso
 
 	public IllegalVariableScopeResolutionException(@Nonnull final IScopedSourceResolvable resolvable, @Nonnull final Node node,
 			@Nonnull final String newScope) {
-		super(NullUtil.format(CmnCnst.Error.VARIABLE_SCOPE_ALREADY_RESOLVED, resolvable.getVariableName(), newScope,
+		super(NullUtil.stringFormat(CmnCnst.Error.VARIABLE_SCOPE_ALREADY_RESOLVED, resolvable.getVariableName(), newScope,
 				resolvable.getScope()), resolvable, node);
 		this.newScope = newScope;
 		this.oldScope = NullUtil.orEmpty(resolvable.getScope());

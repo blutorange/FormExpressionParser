@@ -11,7 +11,7 @@ public class StringIndexOutOfBoundsException extends CatchableEvaluationExceptio
 
 	public StringIndexOutOfBoundsException(@Nonnull final String string, final int index,
 			@Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.format(CmnCnst.Error.STRING_INDEX_OUT_OF_BOUNDS, new Integer(index), string));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.STRING_INDEX_OUT_OF_BOUNDS, new Integer(index), string));
 		this.string = string;
 		this.index = index;
 	}

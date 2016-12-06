@@ -12,7 +12,7 @@ public class HeaderAssignmentNotCompileTimeConstantException extends SemanticsEx
 
 	public HeaderAssignmentNotCompileTimeConstantException(@Nullable final String scope,
 			@Nonnull final String variableName, @Nonnull final Node node) {
-		super(NullUtil.format(CmnCnst.Error.HEADER_ASSIGNMENT_NOT_COMPILE_TIME_CONSTANT,
+		super(NullUtil.stringFormat(CmnCnst.Error.HEADER_ASSIGNMENT_NOT_COMPILE_TIME_CONSTANT,
 				formatName(scope, variableName)), node);
 	}
 

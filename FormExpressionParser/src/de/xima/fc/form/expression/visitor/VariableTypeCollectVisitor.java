@@ -5,6 +5,7 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.MissingVariableTypeDeclarationException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -52,7 +53,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 			try {
 				type = newBuilder.build();
 			}
-			catch (final IllegalStateException e) {
+			catch (final IllegalVariableTypeException e) {
 				throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), node);
 			}
 			builder.append(type);
@@ -136,7 +137,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		try {
 			return newBuilder.build();
 		}
-		catch (final IllegalStateException e) {
+		catch (final IllegalVariableTypeException e) {
 			throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), node);
 		}
 	}

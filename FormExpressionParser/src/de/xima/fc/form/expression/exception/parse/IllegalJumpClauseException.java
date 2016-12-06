@@ -25,9 +25,9 @@ public class IllegalJumpClauseException extends SemanticsException {
 	private static String getMessage(@Nonnull final EJump jump, @Nullable final String label) {
 		switch(jump) {
 		case BREAK:
-			return NullUtil.format(CmnCnst.Error.BREAK_CLAUSE, NullUtil.or(label, CmnCnst.Name.EMPTY_LABEL));
+			return NullUtil.stringFormat(CmnCnst.Error.BREAK_CLAUSE, NullUtil.or(label, CmnCnst.Name.EMPTY_LABEL));
 		case CONTINUE:
-			return NullUtil.format(CmnCnst.Error.CONTINUE_CLAUSE, NullUtil.or(label, CmnCnst.Name.EMPTY_LABEL));
+			return NullUtil.stringFormat(CmnCnst.Error.CONTINUE_CLAUSE, NullUtil.or(label, CmnCnst.Name.EMPTY_LABEL));
 		case RETURN:
 			return CmnCnst.Error.RETURN_CLAUSE;
 		default:

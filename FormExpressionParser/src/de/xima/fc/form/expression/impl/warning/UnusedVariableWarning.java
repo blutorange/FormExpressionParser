@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 
 public class UnusedVariableWarning extends GenericWarning implements IEvaluationWarning {
 	public UnusedVariableWarning(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node) {
-		super(NullUtil.format(CmnCnst.Warning.UNUSED_VARIABLE, resolvable.getVariableName()), node);
+		super(NullUtil.stringFormat(CmnCnst.Warning.UNUSED_VARIABLE, resolvable.getVariableName()), node);
 		variableName = resolvable.getVariableName();
 	}
 	@Nonnull public final String variableName;

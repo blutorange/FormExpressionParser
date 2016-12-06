@@ -10,7 +10,7 @@ public class OperationNotYetImplementedException extends UncatchableEvaluationEx
 	private static final long serialVersionUID = 1L;
 
 	public OperationNotYetImplementedException(@Nonnull final String name, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.format(CmnCnst.Error.OPERATION_NOT_YET_IMPLEMENTED, name));
+		super(ec, NullUtil.stringFormat(CmnCnst.Error.OPERATION_NOT_YET_IMPLEMENTED, name));
 		this.operationName = name;
 	}
 

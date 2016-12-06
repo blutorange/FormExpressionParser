@@ -13,7 +13,7 @@ public class MissingVariableTypeDeclarationException extends SemanticsException 
 		this(node, node);
 	}
 	public MissingVariableTypeDeclarationException(@Nonnull final ISourceResolvable resolvable , @Nonnull final Node node) {
-		super(NullUtil.format(CmnCnst.Error.MISSING_TYPE_DECLARATION, resolvable.getVariableName()), node);
+		super(NullUtil.stringFormat(CmnCnst.Error.MISSING_TYPE_DECLARATION, resolvable.getVariableName()), node);
 		this.variableName = resolvable.getVariableName();
 	}
 	public final String variableName;

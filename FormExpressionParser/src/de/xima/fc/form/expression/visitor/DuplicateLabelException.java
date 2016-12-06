@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class DuplicateLabelException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 	public <T extends ILabelled & Node> DuplicateLabelException(@Nonnull final T node) {
-		super(NullUtil.format(CmnCnst.Error.DUPLICATE_LABEL, node.getLabel()), node);
+		super(NullUtil.stringFormat(CmnCnst.Error.DUPLICATE_LABEL, node.getLabel()), node);
 		this.label = NullUtil.orEmpty(node.getLabel());
 	}
 	@Nonnull public final String label;

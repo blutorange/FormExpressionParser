@@ -10,13 +10,13 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class MathDivisionByZeroException extends MathException {
 	private static final long serialVersionUID = 1L;
 	public MathDivisionByZeroException(final double divisor, final double dividend, @Nonnull final IEvaluationContext ec)  {
-		super(NullUtil.format(CmnCnst.Error.MATH_DIVISION_BY_ZERO, new Double(divisor), new Double(dividend)), ec);
+		super(NullUtil.stringFormat(CmnCnst.Error.MATH_DIVISION_BY_ZERO, new Double(divisor), new Double(dividend)), ec);
 		this.divisor = divisor;
 		this.dividend = dividend;
 	}
 
 	public MathDivisionByZeroException(final ALangObject divisor, final ALangObject dividend, @Nonnull final IEvaluationContext ec)  {
-		super(NullUtil.format(CmnCnst.Error.MATH_DIVISION_BY_ZERO,divisor.inspect(), dividend.inspect()), ec);
+		super(NullUtil.stringFormat(CmnCnst.Error.MATH_DIVISION_BY_ZERO,divisor.inspect(), dividend.inspect()), ec);
 		this.divisor = divisor;
 		this.dividend = dividend;
 	}
