@@ -330,8 +330,8 @@ public final class CmnCnst {
 		@Nonnull public static final String MISSING_EXTERNAL_CONTEXT = "Evaluation context is missing external context, but it is required. " + INTERNAL_ERROR;
 		@Nonnull public static final String SCOPED_VARIABLE_NOT_RESOLVED = "Variable %s::%s is not resolved. " + INTERNAL_ERROR;
 		@Nonnull public static final String UNSCOPED_VARIABLE_NOT_RESOLVED = "Variable %s is not resolved. " + INTERNAL_ERROR;
-		@Nonnull public static final String ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE = "Variable %s::%s belongs to an external scope and cannot be assigned to.";
-		@Nonnull public static final String DUPLICATE_REQUIRE_SCOPE = "External scope %s was already required previously.";
+		@Nonnull public static final String ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE = "Variable {0}::{1} belongs to an external scope and cannot be assigned to.";
+		@Nonnull public static final String DUPLICATE_REQUIRE_SCOPE = "External scope {0} was already required previously.";
 		@Nonnull public static final String MANUAL_SCOPE_ALREADY_REQUIRED = "Cannot define manual scope %s, it was already required previously.";
 		@Nonnull public static final String VARIABLE_SOURCE_ALREADY_RESOLVED = "Illegal attempt to resolve variable %s to %s; it was already resolved to %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String VARIABLE_SCOPE_ALREADY_RESOLVED = "Illegal attempt to resolve the scope of variable %s, it was already resolved to scope %s. " + INTERNAL_ERROR;
@@ -359,6 +359,8 @@ public final class CmnCnst {
 		@Nonnull public static final String INCOMPATIBLE_ARRAY_ITEM_TYPE = "Found incompatible type at array index {0}: {1}";
 		@Nonnull public static final String INCOMPATIBLE_HASH_KEY_TYPE = "Found incompatible hash key type: {0}";
 		@Nonnull public static final String INCOMPATIBLE_HASH_VALUE_TYPE = "Found incompatible hash value type: {0}";
+		@Nonnull public static final String BRANCH_CONDITION_MUST_BE_BOOLEAN = "Condition must evaluate to boolean type.";
+		@Nonnull public static final String BRANCH_SPLIT_TYPE_INCOMPATIBLE = "Type of the else-branch not compatible with the type of the if-branch: {0}";
 	}
 
 	public static final class ToString {

@@ -38,6 +38,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
  * - support closures for lambda expressions (nestLocal -> nest ?)
  * - update formatting js
  * - update highlighter with new token types (global, scope, require etc)
+ * - everything returns a value; in strict mode, check that functions return explicitly
  */
 public class FormExpressionDemo {
 	private static final boolean STRICT_MODE = false;

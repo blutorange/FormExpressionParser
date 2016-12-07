@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -60,9 +59,13 @@ public class ASTIfClauseNode extends ANode {
 		return jjtGetChild(1);
 	}
 
-	@Nullable
-	public Node getElseNode() {
-		return jjtGetNumChildren() == 3 ? jjtGetChild(2) : null;
+	/**
+	 * @return The else node of this node.
+	 * @throws ArrayIndexOutOfBoundsException When there is no else node. Use {@link #hasElseNode()} to check.
+	 */
+	@Nonnull
+	public Node getElseNode() throws ArrayIndexOutOfBoundsException {
+		return jjtGetChild(2);
 	}
 
 	public boolean hasElseNode() {

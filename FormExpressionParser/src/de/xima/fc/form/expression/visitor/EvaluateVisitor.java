@@ -702,10 +702,11 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTReturnClauseNode node) throws EvaluationException {
+		final ALangObject res = node.hasReturn() ? jjtAccept(node, node.getReturnNode(), ec) : NullLangObject.getInstance();
 		jumpLabel = null;
 		jumpType = EJump.RETURN;
 		mustJump = true;
-		return node.hasReturn() ? jjtAccept(node, node.getReturnNode(), ec) : NullLangObject.getInstance();
+		return res;
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class IllegalExternalScopeAssignmentException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 	public IllegalExternalScopeAssignmentException(@Nonnull final ASTVariableNode node) {
-		super(NullUtil.stringFormat(CmnCnst.Error.ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE, node.getScope(), node.getVariableName()), node);
+		super(NullUtil.messageFormat(CmnCnst.Error.ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE, node.getScope(), node.getVariableName()), node);
 		this.scope = node.getScope();
 		this.name = node.getVariableName();
 	}

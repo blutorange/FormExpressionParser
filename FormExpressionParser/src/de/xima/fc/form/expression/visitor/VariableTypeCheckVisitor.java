@@ -1,10 +1,21 @@
 package de.xima.fc.form.expression.visitor;
 
+import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
+import static de.xima.fc.form.expression.enums.ELangObjectType.BOOLEAN;
+import static de.xima.fc.form.expression.enums.ELangObjectType.EXCEPTION;
+import static de.xima.fc.form.expression.enums.ELangObjectType.NULL;
+import static de.xima.fc.form.expression.enums.ELangObjectType.NUMBER;
+import static de.xima.fc.form.expression.enums.ELangObjectType.REGEX;
+import static de.xima.fc.form.expression.enums.ELangObjectType.STRING;
+import static de.xima.fc.form.expression.util.CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+import static de.xima.fc.form.expression.util.CmnCnst.NonnullConstant.BOOLEAN_TRUE;
+
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleArrayItemException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBranchConditionTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBranchSplitTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleHashEntryException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -57,6 +68,14 @@ import de.xima.fc.form.expression.util.CmnCnst;
 
 public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisitor<IVariableType, Boolean, SemanticsException> {
 
+	private boolean mustJump;
+	private final IVariableType[] table;
+	
+	private VariableTypeCheckVisitor(final IVariableType[] table) {
+		this.mustJump = false;
+		this.table = table;
+	}
+	
 	@Override
 	public IVariableType visit(final ASTExpressionNode node, final Boolean typeNeeded) throws SemanticsException {
 		// TODO Auto-generated method stub
@@ -71,19 +90,19 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTNumberNode node, final Boolean typeNeeded) throws SemanticsException {
-		return VariableTypeBuilder.forSimpleType(ELangObjectType.NUMBER);
+		return VariableTypeBuilder.forSimpleType(NUMBER);
 	}
 
 	@Override
 	public IVariableType visit(final ASTArrayNode node, final Boolean typeNeeded) throws SemanticsException {
-		IVariableType type = VariableTypeBuilder.forSimpleType(ELangObjectType.NULL);
+		IVariableType type = VariableTypeBuilder.forSimpleType(NULL);
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
-			final IVariableType newType = node.jjtGetChild(i).jjtAccept(this, CmnCnst.NonnullConstant.BOOLEAN_TRUE);
+			final IVariableType newType = node.jjtGetChild(i).jjtAccept(this, BOOLEAN_TRUE);
 			try {
 				type = type.union(newType);
 			}
 			catch (final IllegalVariableTypeException e) {
-				throw new IncompatibleArrayItemException(e.getMessage(), i, newType, type, node.jjtGetChild(i));
+				throw new IncompatibleArrayItemException(e, i, newType, type, node.jjtGetChild(i));
 			}
 		}
 		return wrapInArray(type);
@@ -91,22 +110,22 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTHashNode node, final Boolean typeNeeded) throws SemanticsException {
-		IVariableType typeKey = VariableTypeBuilder.forSimpleType(ELangObjectType.NULL);
-		IVariableType typeValue = VariableTypeBuilder.forSimpleType(ELangObjectType.NULL);
+		IVariableType typeKey = VariableTypeBuilder.forSimpleType(NULL);
+		IVariableType typeValue = VariableTypeBuilder.forSimpleType(NULL);
 		for (int i = 0; i < node.jjtGetNumChildren(); i += 2) {
-			final IVariableType newTypeKey = node.jjtGetChild(i).jjtAccept(this, CmnCnst.NonnullConstant.BOOLEAN_TRUE);
-			final IVariableType newTypeValue = node.jjtGetChild(i+1).jjtAccept(this,CmnCnst.NonnullConstant.BOOLEAN_TRUE);
+			final IVariableType newTypeKey = node.jjtGetChild(i).jjtAccept(this, BOOLEAN_TRUE);
+			final IVariableType newTypeValue = node.jjtGetChild(i+1).jjtAccept(this, BOOLEAN_TRUE);
 			try {
 				typeKey = typeKey.union(newTypeKey);
 			}
 			catch (final IllegalVariableTypeException e) {
-				throw new IncompatibleHashEntryException(e.getMessage(), true, newTypeKey, typeKey, node.jjtGetChild(i));
+				throw new IncompatibleHashEntryException(e, true, newTypeKey, typeKey, node.jjtGetChild(i));
 			}
 			try {
 				typeValue = typeValue.union(newTypeValue);
 			}
 			catch (final IllegalVariableTypeException e) {
-				throw new IncompatibleHashEntryException(e.getMessage(), false, newTypeValue, typeValue, node.jjtGetChild(i+1));
+				throw new IncompatibleHashEntryException(e, false, newTypeValue, typeValue, node.jjtGetChild(i+1));
 			}
 		}
 		return wrapInHash(typeKey, typeValue);
@@ -114,12 +133,12 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTNullNode node, final Boolean typeNeeded) throws SemanticsException {
-		return VariableTypeBuilder.forSimpleType(ELangObjectType.NULL);
+		return VariableTypeBuilder.forSimpleType(NULL);
 	}
 
 	@Override
 	public IVariableType visit(final ASTBooleanNode node, final Boolean typeNeeded) throws SemanticsException {
-		return VariableTypeBuilder.forSimpleType(ELangObjectType.BOOLEAN);
+		return VariableTypeBuilder.forSimpleType(BOOLEAN);
 	}
 
 	@Override
@@ -130,19 +149,90 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTStringNode node, final Boolean typeNeeded) throws SemanticsException {
-		return VariableTypeBuilder.forSimpleType(ELangObjectType.STRING);
+		return VariableTypeBuilder.forSimpleType(STRING);
 	}
 
+	/**
+	 * <p>
+	 * A list of statements executed sequentially. However, a statement
+	 * may contain a break, continue, or return clause statement which
+	 * skips the remaining statements.
+	 * <pre>
+	 *   while (condition) {
+	 *     var i = k + 2;
+	 *     if (i > 9) break;
+	 *     i *= 2;
+	 *   }
+	 * </pre>
+	 * </p><p>
+	 * To determine the return type, we check wether the return types
+	 * of all return points are mutually compatible; and return that
+	 * type. A return point any statement at which execution of the
+	 * block may end. By the language specifications, the last statement
+	 * is always a return point.
+	 * </p><p>
+	 * 
+	 * </p><p>
+	 * @param node
+	 * @param typeNeeded
+	 * @return
+	 * @throws SemanticsException
+	 */
 	@Override
 	public IVariableType visit(final ASTStatementListNode node, final Boolean typeNeeded) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		IVariableType type = null;
+		final int endIndex = node.jjtGetNumChildren() - 1;
+		for (int i = 0; i <= endIndex; ++i)
+			type = node.jjtAccept(this, i == endIndex ? BOOLEAN_TRUE : BOOLEAN_FALSE);		
+		return type != null ? type : VariableTypeBuilder.forSimpleType(NULL);
 	}
 
+	/**
+	 * <p>
+	 * An if-clause node always contains a condition an a node for when that
+	 * condition is satisfied. Optionally, it may contain an else-clause node.
+	 * </p>
+	 * <p>
+	 * The return type is the return type of the if or else-clause node. As we
+	 * cannot check the condition on compile-time, their return type needs to be
+	 * the same.
+	 * </p>
+	 * <p>
+	 * When there is no else-clause and the condition is not satisfied, the
+	 * return type is null. As null is compatible with every type, we can simply
+	 * return the return type of the if-clause node.
+	 * </p><p>
+	 * Additionally, it may happen that the if-clause or else-clause may
+	 * contain a return statement.
+	 * </p>
+	 * @param node
+	 * @param typeNeeded
+	 * @return
+	 * @throws SemanticsException
+	 *             When the if-clause and else-clause node return type are not
+	 *             compatible.
+	 */
 	@Override
 	public IVariableType visit(final ASTIfClauseNode node, final Boolean typeNeeded) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		asd
+		final IVariableType typeCondition = node.getConditionNode().jjtAccept(this, BOOLEAN_TRUE);
+		if (!typeCondition.equalsType(VariableTypeBuilder.forSimpleType(BOOLEAN)))
+			throw new IncompatibleBranchConditionTypeException(typeCondition, node.getConditionNode());
+		IVariableType type = node.getIfNode().jjtAccept(this, typeNeeded);
+		if (node.hasElseNode()) {
+			final IVariableType typeElse = node.getElseNode().jjtAccept(this, typeNeeded);
+			if (typeNeeded) {
+				final IVariableType typeMerged;
+				try {
+					typeMerged = type.union(typeElse);
+				}
+				catch (final IllegalVariableTypeException e) {
+					throw new IncompatibleBranchSplitTypeException(e, type, typeElse, node.getElseNode());
+				}
+				type = typeMerged;
+			}
+		}
+		return type;
 	}
 
 	@Override
@@ -177,8 +267,9 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTExceptionNode node, final Boolean typeNeeded) throws SemanticsException {
+		//TODO check if it can be coerced to string? probably not necessary
 		checkChildren(node, CmnCnst.NonnullConstant.BOOLEAN_FALSE);
-		return VariableTypeBuilder.forSimpleType(ELangObjectType.EXCEPTION);
+		return VariableTypeBuilder.forSimpleType(EXCEPTION);
 	}
 
 	@Override
@@ -201,8 +292,10 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTReturnClauseNode node, final Boolean typeNeeded) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		final IVariableType type = node.hasReturn() ? node.jjtAccept(this, typeNeeded)
+				: VariableTypeBuilder.forSimpleType(NULL);
+		mustJump = true;
+		return type;
 	}
 
 	@Override
@@ -261,7 +354,7 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Override
 	public IVariableType visit(final ASTRegexNode node, final Boolean typeNeeded) throws SemanticsException {
-		return VariableTypeBuilder.forSimpleType(ELangObjectType.REGEX);
+		return VariableTypeBuilder.forSimpleType(REGEX);
 	}
 
 	@Override
@@ -337,11 +430,11 @@ public class VariableTypeCheckVisitor implements IFormExpressionReturnDataVisito
 
 	@Nonnull
 	private static IVariableType wrapInArray(@Nonnull final IVariableType type) {
-		return new VariableTypeBuilder().setBasicType(ELangObjectType.ARRAY).append(type).build();
+		return new VariableTypeBuilder().setBasicType(ARRAY).append(type).build();
 	}
 
 	@Nonnull
 	private static IVariableType wrapInHash(@Nonnull final IVariableType typeKey, @Nonnull final IVariableType typeValue) {
-		return new VariableTypeBuilder().setBasicType(ELangObjectType.ARRAY).append(typeKey).append(typeValue).build();
+		return new VariableTypeBuilder().setBasicType(ARRAY).append(typeKey).append(typeValue).build();
 	}
 }
