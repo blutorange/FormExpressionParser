@@ -208,6 +208,7 @@ public final class CmnCnst {
 		@Nonnull public static final String REGEX = "regex";
 		@Nonnull public static final String ERROR = "error";
 		@Nonnull public static final String METHOD = "method";
+		@Nonnull public static final String OBJECT = "object";
 	}
 
 	public static final class Error {
@@ -352,15 +353,10 @@ public final class CmnCnst {
 		@Nonnull public static final String MISSING_TYPE_DECLARATION = "Variable %s without type declaration. Type declarations are required in strict mode.";
 		@Nonnull public static final String EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE = "Manually declared variable resolved to external scope. " + INTERNAL_ERROR;
 		@Nonnull public static final String GET_TYPE_NODE_CALLED_BUT_NO_TYPE_NODE_PRESENT = "No type node present, use hasType() to check. " + INTERNAL_ERROR;
-		@Nonnull public static final String NON_GENERIC_INCOMPATIBLE_WITH_GENERIC_TYPE = "Simple type not compatible with generic type.";
 		@Nonnull public static final String INCOMPATIBLE_SIMPLE_TYPES = "Incompatible simple types.";
 		@Nonnull public static final String INCOMPATIBLE_GENERIC_TYPES = "Incompatible generic types.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_TYPES = "Found variable type {0}, but expected {1}: {2}";
-		@Nonnull public static final String INCOMPATIBLE_ARRAY_ITEM_TYPE = "Found incompatible type at array index {0}: {1}";
-		@Nonnull public static final String INCOMPATIBLE_HASH_KEY_TYPE = "Found incompatible hash key type: {0}";
-		@Nonnull public static final String INCOMPATIBLE_HASH_VALUE_TYPE = "Found incompatible hash value type: {0}";
 		@Nonnull public static final String BRANCH_CONDITION_MUST_BE_BOOLEAN = "Condition must evaluate to boolean type.";
-		@Nonnull public static final String BRANCH_SPLIT_TYPE_INCOMPATIBLE = "Type of the else-branch not compatible with the type of the if-branch: {0}";
 	}
 
 	public static final class ToString {

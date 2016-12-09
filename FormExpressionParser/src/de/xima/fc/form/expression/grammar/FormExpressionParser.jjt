@@ -1943,7 +1943,6 @@ void Hash(EMethod method) #HashNode :
   )
   {
     jjtThis.init(method);
-    
   }
 }
 
@@ -1961,22 +1960,19 @@ void HashEntry(EMethod method) #void :
 
 void Null(EMethod method) #NullNode :
 {
-  
 }
 {
   < Null >
   {
     {
       jjtThis.init(method);
-      
     }
   }
 }
 
 void Boolean(EMethod method) #BooleanNode :
 {
-  boolean b;
-  
+  boolean b; 
 }
 {
   (
@@ -1992,7 +1988,6 @@ void Boolean(EMethod method) #BooleanNode :
   )
   {
     jjtThis.init(method, b);
-    
   }
 }
 

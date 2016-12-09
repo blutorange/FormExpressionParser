@@ -4,19 +4,25 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.ELangObjectType;
-import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 
 @Immutable
-public class SimpleVariableType implements IVariableType {
+public enum SimpleVariableType implements IVariableType {
+	OBJECT(ELangObjectType.OBJECT),
+	NULL(ELangObjectType.NULL),
+	BOOLEAN(ELangObjectType.BOOLEAN),
+	NUMBER(ELangObjectType.NUMBER),
+	STRING(ELangObjectType.STRING),
+	REGEX(ELangObjectType.REGEX),
+	EXCEPTION(ELangObjectType.EXCEPTION),
+	;
+	
 	@Nonnull
 	private final ELangObjectType type;
 	
-	public SimpleVariableType(@Nonnull final ELangObjectType type) throws IllegalVariableTypeException {
+	private SimpleVariableType(@Nonnull final ELangObjectType type) {
 		if (!type.allowsGenericsCount(0))
-			throw new IllegalVariableTypeException(NullUtil.stringFormat(CmnCnst.Error.NOT_A_SIMPLE_TYPE, type));
+			throw new RuntimeException();
 		this.type = type;
 	}
 	
@@ -46,14 +52,14 @@ public class SimpleVariableType implements IVariableType {
 	public String toString() {
 		return type.toString();
 	}
+
 	@Override
-	public IVariableType union(final IVariableType otherType) throws IllegalVariableTypeException {
-		if (type == otherType.getBasicLangType() || otherType.getBasicLangType() == ELangObjectType.NULL)
+	public IVariableType union(final IVariableType otherType) {
+		if (type == otherType.getBasicLangType() || otherType.getBasicLangType() == ELangObjectType.NULL
+				|| type == ELangObjectType.OBJECT)
 			return this;
-		if (type == ELangObjectType.NULL)
+		if (type == ELangObjectType.NULL || otherType.getBasicLangType() == ELangObjectType.OBJECT)
 			return otherType;
-		if (otherType.getGenericCount() != 0)
-			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NON_GENERIC_INCOMPATIBLE_WITH_GENERIC_TYPE, this.toString(), type.toString()));
-		throw new IllegalVariableTypeException(CmnCnst.Error.INCOMPATIBLE_SIMPLE_TYPES);
+		return SimpleVariableType.OBJECT;
 	}
 }

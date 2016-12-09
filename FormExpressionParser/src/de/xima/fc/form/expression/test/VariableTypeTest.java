@@ -19,6 +19,7 @@ import org.junit.Test;
 import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
 
 public class VariableTypeTest {
@@ -30,7 +31,7 @@ public class VariableTypeTest {
 
 		public Tuple(@Nonnull final ELangObjectType obj) {
 			this.obj = obj;
-			this.var = VariableTypeBuilder.forSimpleType(obj);
+			this.var = new VariableTypeBuilder().setBasicType(obj).build();
 		}
 		public Tuple(@Nonnull final IVariableType var, @Nonnull final ELangObjectType obj) {
 			this.var = var;
@@ -62,18 +63,9 @@ public class VariableTypeTest {
 			assertFalse(funcType.equalsType(arrayType));
 			assertFalse(funcType.equalsType(hashType));
 			assertTrue(funcType.union(funcNull).equalsType(funcType));
-			try {
-				funcType.union(funcSingle);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
-			try {
-				funcType.union(arrayType);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
-			try {
-				funcType.union(hashType);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
+			assertTrue(funcType.union(funcSingle).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(funcType.union(arrayType).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(funcType.union(hashType).equalsType(SimpleVariableType.OBJECT));
 		}
 	}
 	
@@ -104,14 +96,8 @@ public class VariableTypeTest {
 			assertFalse(hashType.equalsType(arrayType));
 			assertFalse(hashType.equalsType(funcType));
 			assertTrue(hashType.union(hashNull).equalsType(hashType));
-			try {
-				hashType.union(arrayType);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
-			try {
-				hashType.union(funcType);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
+			assertTrue(hashType.union(arrayType).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(hashType.union(funcType).equalsType(SimpleVariableType.OBJECT));
 		}
 	}
 
@@ -139,14 +125,8 @@ public class VariableTypeTest {
 			assertFalse(arrayType.equalsType(hashType));
 			assertFalse(arrayType.equalsType(funcType));
 			assertTrue(arrayType.union(arrayNull).equalsType(arrayType));
-			try {
-				arrayType.union(hashType);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
-			try {
-				arrayType.union(funcType);
-				fail();
-			} catch (final IllegalVariableTypeException e) {}
+			assertTrue(arrayType.union(hashType).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(arrayType.union(funcType).equalsType(SimpleVariableType.OBJECT));
 		}
 	}
 
@@ -165,19 +145,9 @@ public class VariableTypeTest {
 			assertTrue(t.var.union(t.var).equalsType(t.var));
 			assertTrue(t.var.getBasicLangType() == t.obj);
 			if (t.obj != NULL) {
-				try {
-					t.var.union(arrayType);
-					fail();
-				} catch (final IllegalVariableTypeException e) {}
-				try {
-					t.var.union(hashType);
-					fail();
-				}
-				catch (final IllegalVariableTypeException e) {}
-				try {
-					t.var.union(funcType);
-					fail();
-				} catch (final IllegalVariableTypeException e) {}
+				assertTrue(t.var.union(arrayType).equalsType(SimpleVariableType.OBJECT));
+				assertTrue(t.var.union(hashType).equalsType(SimpleVariableType.OBJECT));
+				assertTrue(t.var.union(funcType).equalsType(SimpleVariableType.OBJECT));
 			}
 		}
 	}
@@ -185,8 +155,8 @@ public class VariableTypeTest {
 	private void basicTests(final Tuple t) {
 		assertTrue(t.var.equalsType(t.var));
 		assertTrue(t.var.union(t.var).equalsType(t.var));
-		assertTrue(t.var.union(VariableTypeBuilder.forSimpleType(NULL)).equalsType(t.var));
-		assertTrue(VariableTypeBuilder.forSimpleType(NULL).union(t.var).equalsType(t.var));
+		assertTrue(t.var.union(SimpleVariableType.NULL).equalsType(t.var));
+		assertTrue(SimpleVariableType.NULL.union(t.var).equalsType(t.var));
 	}
 
 	@Nonnull

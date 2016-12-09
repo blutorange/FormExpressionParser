@@ -56,58 +56,29 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 		this.type = type;
 		return this;
 	}
-	
+
 	@Nonnull
-	public static IVariableType forSimpleType(@Nonnull final ELangObjectType type) throws IllegalVariableTypeException {
+	private static IVariableType forSimpleType(@Nonnull final ELangObjectType type) throws IllegalVariableTypeException {
 		switch (type) {
+		case OBJECT:
+			return SimpleVariableType.OBJECT;
 		case BOOLEAN:
-			return SingletonType.BOOLEAN;
+			return SimpleVariableType.BOOLEAN;
 		case EXCEPTION:
-			return SingletonType.EXCEPTION;
+			return SimpleVariableType.EXCEPTION;
 		case NULL:
-			return SingletonType.NULL;
+			return SimpleVariableType.NULL;
 		case NUMBER:
-			return SingletonType.NUMBER;
+			return SimpleVariableType.NUMBER;
 		case REGEX:
-			return SingletonType.REGEX;
+			return SimpleVariableType.REGEX;
 		case STRING:
-			return SingletonType.STRING;
+			return SimpleVariableType.STRING;
+		case ARRAY:
+		case FUNCTION:
+		case HASH:
 		default:
-			return new SimpleVariableType(type);
-		}
-	}
-	
-	private static enum SingletonType implements IVariableType {
-		NULL(ELangObjectType.NULL),
-		BOOLEAN(ELangObjectType.BOOLEAN),
-		NUMBER(ELangObjectType.NUMBER),
-		STRING(ELangObjectType.STRING),
-		REGEX(ELangObjectType.REGEX),
-		EXCEPTION(ELangObjectType.EXCEPTION),
-		;
-		@Nonnull private final IVariableType impl;
-		private SingletonType(@Nonnull final ELangObjectType type) {
-			impl = new SimpleVariableType(type);
-		}
-		@Override
-		public boolean equalsType(final IVariableType other) {
-			return impl.equalsType(other);
-		}
-		@Override
-		public ELangObjectType getBasicLangType() {
-			return impl.getBasicLangType();
-		}
-		@Override
-		public int getGenericCount() {
-			return impl.getGenericCount();
-		}
-		@Override
-		public IVariableType getGeneric(final int i) throws ArrayIndexOutOfBoundsException {
-			return impl.getGeneric(i);
-		}
-		@Override
-		public IVariableType union(final IVariableType type) throws IllegalVariableTypeException {
-			return impl.union(type);
+			throw new IllegalVariableTypeException(CmnCnst.Error.NOT_A_SIMPLE_TYPE);
 		}
 	}
 }

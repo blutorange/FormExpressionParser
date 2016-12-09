@@ -68,7 +68,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTTryClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		visitTypedNode(node, new SimpleVariableType(ELangObjectType.EXCEPTION));
+		visitTypedNode(node, SimpleVariableType.EXCEPTION);
 		node.getTryNode().jjtAccept(this, builder);
 		node.getCatchNode().jjtAccept(this, builder);
 	}
@@ -86,7 +86,6 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTFunctionClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		// TODO varArgs -> array
 		// TODO set type for *this* variable
 		// TODO type for functions: function foo(){return 42;};foo();
 		builder.setBasicType(ELangObjectType.FUNCTION);
@@ -102,7 +101,6 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTFunctionNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		// TODO varArgs -> array
 		// TODO set type for *this* variable
 		for (int i = node.getArgumentCount(); i-->0;) {
 			visitTypedNode(node.getArgResolvable(i));
@@ -118,7 +116,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		final VariableTypeBuilder b = new VariableTypeBuilder();
 		b.setBasicType(ELangObjectType.ARRAY);
 		final IVariableType type = table[source];
-		b.append(type != null ? type : new SimpleVariableType(ELangObjectType.NULL));
+		b.append(type != null ? type : SimpleVariableType.NULL);
 		return table[source] = b.build();
 	}
 
@@ -130,7 +128,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	@Nonnull
 	private IVariableType getType(@Nonnull final IVariableTyped typed, @Nonnull final Node node) throws SemanticsException {
 		if (!typed.hasType()) {
-			return new SimpleVariableType(ELangObjectType.NULL);
+			return SimpleVariableType.NULL;
 		}
 		final VariableTypeBuilder newBuilder = new VariableTypeBuilder();
 		typed.getTypeNode().jjtAccept(this, newBuilder);
@@ -170,13 +168,12 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		return table;
 	}
 
-	//TODO if function, wrap in method<ret,arg1,...>
 	private void visitHeaderNode(final IHeaderNode header) throws SemanticsException {
 		final IVariableType type;
 		if (header.hasType())
 			type = getType(header, header.getNode());
 		else
-			type = new SimpleVariableType(ELangObjectType.NULL);
+			type = SimpleVariableType.NULL;
 		if (type.getBasicLangType() == ELangObjectType.NULL && treatMissingTypeAsError)
 			throw new MissingVariableTypeDeclarationException(header, header.getNode());
 		resolveTypedNode(header, header.getNode(), type);

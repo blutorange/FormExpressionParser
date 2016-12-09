@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.IterationNotSupportedException;
@@ -282,6 +282,8 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 		if (type == getType())
 			return (T)this;
 		switch (type) {
+		case OBJECT:
+			return (T)this;
 		case ARRAY:
 			return (T)coerceArray(ec);
 		case HASH:

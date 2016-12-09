@@ -15,6 +15,20 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public enum ELangObjectType {
+	OBJECT(-1) {
+		@Override
+		public String getSyntacticalTypeName() {
+			return CmnCnst.Syntax.OBJECT;
+		}
+		@Override
+		public Class<ALangObject> getLangObjectClass() {
+			return ALangObject.class;
+		}
+		@Override
+		public boolean allowsGenericsCount(final int i) {
+			return i == 0;
+		}
+	},
 	NULL(0) {
 		@Override
 		public String getSyntacticalTypeName() {

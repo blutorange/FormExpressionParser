@@ -1,5 +1,8 @@
 package de.xima.fc.form.expression.impl.variable;
 
+import static de.xima.fc.form.expression.enums.ELangObjectType.NULL;
+import static de.xima.fc.form.expression.enums.ELangObjectType.OBJECT;
+
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -18,7 +21,7 @@ public class GenericVariableType implements IVariableType {
 	private final ELangObjectType type;
 	@Nonnull
 	private final IVariableType[] list;
-	
+
 	public GenericVariableType(@Nonnull final ELangObjectType type, @Nonnull final List<IVariableType> list) {
 		if (!type.allowsGenericsCount(list.size()))
 			throw new IllegalVariableTypeException(NullUtil.stringFormat(CmnCnst.Error.NOT_A_COMPOUND_TYPE, type));
@@ -32,7 +35,7 @@ public class GenericVariableType implements IVariableType {
 			return false;
 		if (list.length != other.getGenericCount())
 			return false;
-		for (int i = list.length; i --> 0;)
+		for (int i = list.length; i-- > 0;)
 			if (!list[i].equalsType(other.getGeneric(i)))
 				return false;
 		return true;
@@ -53,7 +56,7 @@ public class GenericVariableType implements IVariableType {
 	public IVariableType getGeneric(final int i) throws ArrayIndexOutOfBoundsException {
 		return list[i];
 	}
-	
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -61,7 +64,7 @@ public class GenericVariableType implements IVariableType {
 		sb.append('<');
 		for (int i = 0; i < list.length; ++i) {
 			sb.append(list[i].toString());
-			if (list.length != 1 && i < list.length -1)
+			if (list.length != 1 && i < list.length - 1)
 				sb.append(',');
 		}
 		sb.append('>');
@@ -69,21 +72,19 @@ public class GenericVariableType implements IVariableType {
 	}
 
 	@Override
-	public IVariableType union(final IVariableType otherType) throws IllegalVariableTypeException {
+	public IVariableType union(final IVariableType otherType) {
 		// optimize for the most common case
 		if (equalsType(otherType))
 			return this;
-		if (otherType.getBasicLangType() == ELangObjectType.NULL)
+		if (otherType.getBasicLangType() == NULL || type == OBJECT)
 			return this;
-		if (type == ELangObjectType.NULL)
+		if (type == ELangObjectType.NULL || otherType.getBasicLangType() == OBJECT)
 			return otherType;
-		if (otherType.getGenericCount() != list.length)
-			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NON_GENERIC_INCOMPATIBLE_WITH_GENERIC_TYPE, this.toString(), type.toString()));
-		if (type != otherType.getBasicLangType())
-			throw new IllegalVariableTypeException(CmnCnst.Error.INCOMPATIBLE_GENERIC_TYPES);
+		if (otherType.getGenericCount() != list.length || type != otherType.getBasicLangType())
+			return SimpleVariableType.OBJECT;
 		final IVariableTypeBuilder builder = new VariableTypeBuilder();
 		builder.setBasicType(type);
-		for (int i = list.length; i --> 0;)
+		for (int i = list.length; i-- > 0;)
 			builder.append(list[i].union(otherType.getGeneric(i)));
 		return builder.build();
 	}
