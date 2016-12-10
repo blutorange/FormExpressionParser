@@ -8,12 +8,12 @@ import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public class IncompatibleBranchConditionTypeException extends IncompatibleVariableTypeException {
+public class IncompatibleConditionTypeException extends IncompatibleVariableTypeException {
 	private static final long serialVersionUID = 1L;
 
-	public IncompatibleBranchConditionTypeException(@Nonnull final IVariableType typeCondition,
+	public IncompatibleConditionTypeException(@Nonnull final IVariableType typeCondition,
 			@Nonnull final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.BRANCH_CONDITION_MUST_BE_BOOLEAN),
+		super(NullUtil.messageFormat(CmnCnst.Error.CONDITION_MUST_BE_BOOLEAN),
 				SimpleVariableType.BOOLEAN, typeCondition, node);
 	}
 }

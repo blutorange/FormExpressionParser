@@ -1,2 +1,3 @@
-function foo() {
+function void foo(args...) {
+  var j;
 }

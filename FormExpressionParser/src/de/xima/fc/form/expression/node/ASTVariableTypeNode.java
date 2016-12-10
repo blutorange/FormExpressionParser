@@ -19,7 +19,7 @@ public class ASTVariableTypeNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	
 	@Nonnull
-	private ELangObjectType variableType = ELangObjectType.NULL;
+	private ELangObjectType variableType = ELangObjectType.OBJECT;
 
 	public ASTVariableTypeNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -52,7 +52,7 @@ public class ASTVariableTypeNode extends ANode {
 
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return new ASTVariableTypeNode(jjtGetChild(i), ELangObjectType.NULL);
+		return new ASTVariableTypeNode(jjtGetChild(i), ELangObjectType.OBJECT);
 	}
 	
 	@Override

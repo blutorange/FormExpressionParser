@@ -48,4 +48,9 @@ public class ASTParenthesisExpressionNode extends ANode {
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
 	}
+
+	@Nonnull
+	public Node getNode() {
+		return jjtGetChild(0);
+	}
 }

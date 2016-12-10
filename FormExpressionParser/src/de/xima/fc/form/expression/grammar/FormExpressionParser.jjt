@@ -732,7 +732,7 @@ void UnspecificVariableType(EMethod method) #VariableTypeNode :
     < Var >
   )
   {
-    jjtThis.init(method, ELangObjectType.NULL);
+    jjtThis.init(method, ELangObjectType.OBJECT);
   }
 }
 
@@ -1099,7 +1099,6 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
 void WhileLoop(EMethod method) #WhileLoopNode :
 {
   Token label = null;
-  
 }
 {
   (
@@ -1108,7 +1107,6 @@ void WhileLoop(EMethod method) #WhileLoopNode :
   )
   {
     jjtThis.init(method, label != null ? label.image : null);
-    
   }
 }
 
@@ -1178,7 +1176,6 @@ void BlockOrClause(EMethod method) #void :
 void Block(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1194,7 +1191,6 @@ void Block(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() !=
   {
     if (createNode) {
       jjtThis.init(method);
-      
     }
   }
 }

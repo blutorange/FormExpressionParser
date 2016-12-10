@@ -30,7 +30,6 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
-import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
@@ -714,24 +713,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Child must be an expression and cannot contain any break, continue,
 		// or return clause.
 		final StringLangObject message = jjtAccept(node, node.getLogMessageNode(), ec).coerceString(ec);
-		final ILogger logger = ec.getLogger();
-		switch (node.getLogLevel()) {
-		case DEBUG:
-			logger.debug(message.stringValue());
-			break;
-		case ERROR:
-			logger.error(message.stringValue());
-			break;
-		case INFO:
-			logger.info(message.stringValue());
-			break;
-		case WARN:
-			logger.warn(message.stringValue());
-			break;
-		default:
-			throw new UncatchableEvaluationException(ec,
-					NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_LOGLEVEL, node.getLogLevel()));
-		}
+		node.getLogLevel().log(ec.getLogger(), message.stringValue());
 		return message;
 	}
 

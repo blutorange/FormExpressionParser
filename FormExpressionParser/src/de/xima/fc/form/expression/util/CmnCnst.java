@@ -356,7 +356,9 @@ public final class CmnCnst {
 		@Nonnull public static final String INCOMPATIBLE_SIMPLE_TYPES = "Incompatible simple types.";
 		@Nonnull public static final String INCOMPATIBLE_GENERIC_TYPES = "Incompatible generic types.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_TYPES = "Found variable type {0}, but expected {1}: {2}";
-		@Nonnull public static final String BRANCH_CONDITION_MUST_BE_BOOLEAN = "Condition must evaluate to boolean type.";
+		@Nonnull public static final String CONDITION_MUST_BE_BOOLEAN = "Condition must evaluate to boolean type.";
+		@Nonnull public static final String UNREACHABLE_CODE = "Unreachable code, previous code never completes normally.";
+		@Nonnull public static final String ILLEGAL_NODE_DURING_TYPECHECKING = "Illegal node during variable type checking: {0}. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

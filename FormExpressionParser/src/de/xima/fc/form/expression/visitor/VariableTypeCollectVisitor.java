@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
-import de.xima.fc.form.expression.exception.parse.MissingVariableTypeDeclarationException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
@@ -36,11 +35,9 @@ public final class VariableTypeCollectVisitor
 extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
 
 	private final IVariableType[] table;
-	private final boolean treatMissingTypeAsError;
 
-	public VariableTypeCollectVisitor(final int symbolTableSize, final boolean treatMissingTypeAsError) {
+	public VariableTypeCollectVisitor(final int symbolTableSize) {
 		table = new IVariableType[symbolTableSize];
-		this.treatMissingTypeAsError = treatMissingTypeAsError;
 	}
 
 	@Override
@@ -111,13 +108,12 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	}
 
 	@Nonnull
-	private IVariableType wrapVarArgs(final IArgumentResolvable node, final int i) {
-		final int source = node.getArgResolvable(i).getSource();
+	private <T extends IArgumentResolvable & Node> IVariableType wrapVarArgs(final T node, final int i) throws SemanticsException, IllegalVariableTypeException {
 		final VariableTypeBuilder b = new VariableTypeBuilder();
 		b.setBasicType(ELangObjectType.ARRAY);
-		final IVariableType type = table[source];
-		b.append(type != null ? type : SimpleVariableType.NULL);
-		return table[source] = b.build();
+		final IVariableType type = table[node.getArgResolvable(i).getSource()];
+		b.append(type != null ? type : SimpleVariableType.OBJECT);
+		return resolveTypedNode(node.getArgResolvable(i), node, b.build());
 	}
 
 	@Nonnull
@@ -128,7 +124,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	@Nonnull
 	private IVariableType getType(@Nonnull final IVariableTyped typed, @Nonnull final Node node) throws SemanticsException {
 		if (!typed.hasType()) {
-			return SimpleVariableType.NULL;
+			return SimpleVariableType.OBJECT;
 		}
 		final VariableTypeBuilder newBuilder = new VariableTypeBuilder();
 		typed.getTypeNode().jjtAccept(this, newBuilder);
@@ -156,8 +152,6 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	@Nonnull
 	private IVariableType resolveTypedNode(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node,
 			@Nonnull final IVariableType type) throws SemanticsException {
-		if (type.getBasicLangType() == ELangObjectType.NULL && treatMissingTypeAsError)
-			throw new MissingVariableTypeDeclarationException(resolvable, node);
 		final int source = resolvable.getSource();
 		if (source < 0)
 			throw new SemanticsException(CmnCnst.Error.EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE, node);
@@ -173,9 +167,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		if (header.hasType())
 			type = getType(header, header.getNode());
 		else
-			type = SimpleVariableType.NULL;
-		if (type.getBasicLangType() == ELangObjectType.NULL && treatMissingTypeAsError)
-			throw new MissingVariableTypeDeclarationException(header, header.getNode());
+			type = SimpleVariableType.OBJECT;
 		resolveTypedNode(header, header.getNode(), type);
 		if (header.hasNode())
 			header.getNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
@@ -193,7 +185,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	public static IVariableType[] collect(@Nonnull final Node node, final int symbolTableSize,
 			@Nonnull final IScopeDefinitions scopeDefs, final boolean treatMissingTypeAsError)
 					throws SemanticsException {
-		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize, treatMissingTypeAsError);
+		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize);
 		v.visitScopeDefs(scopeDefs);
 		node.jjtAccept(v, DummyVariableTypeBuilder.INSTANCE);
 		return v.getTable();

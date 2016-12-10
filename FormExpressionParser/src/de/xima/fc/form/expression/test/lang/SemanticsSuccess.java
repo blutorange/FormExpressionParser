@@ -165,6 +165,7 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL004("function foo(){return 42;};foo();", Tests.N42), // Function return
 	GENERAL005("42;;;;;", Tests.N42), // Empty node is through-pass.
 	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // Should not take too long
+	GENERAL007("loginfo('42');", StringLangObject.create("42")), // Log node return
 
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),

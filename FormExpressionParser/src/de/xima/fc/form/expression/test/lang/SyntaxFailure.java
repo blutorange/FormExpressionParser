@@ -61,7 +61,9 @@ enum SyntaxFailure implements ITestCase {
 	// Closures not supported currently.
 	TEST039(new Cfg("function foo(){var i = 10;->(){i;};}foo();").err("Error during parsing at line 1, column 32: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	TEST040(new Cfg("function foo(){arguments.length;}foo(1,2,3);").err("Error during parsing at line 1, column 16: Variable arguments cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
-
+	TEST041(new Cfg("\"foo\\\";").err(TokenMgrError.class).err("Lexical error at line 1, column 8.  Encountered: <EOF> after : \"\\\"foo\\\\\\\";\"")),
+	TEST042(new Cfg("#(\\d#;").err(ParseException.class).err("Encountered invalid regex at line 1, column 1: Unclosed group near index 3")),
+	
 	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),
 	STRICT003(new Cfg("math::pi;").err("Error during parsing at line 1, column 1: Scope math is provided by the evaluation context, but require scope statement is missing.").err(MissingRequireScopeStatementException.class).strict()),
