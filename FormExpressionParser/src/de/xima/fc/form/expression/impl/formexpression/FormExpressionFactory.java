@@ -38,6 +38,7 @@ import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
+import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCollectVisitor;
 
 public final class FormExpressionFactory {
@@ -77,7 +78,7 @@ public final class FormExpressionFactory {
 	 *     &lt;/body&gt;
 	 *   &lt;/html&gt;
 	 * </pre>
-	 * 
+	 *
 	 * @see #forProgram()
 	 */
 	@Nonnull
@@ -87,7 +88,7 @@ public final class FormExpressionFactory {
 
 	/**
 	 * Methods for parsing code as one complete program.
-	 * 
+	 *
 	 * @see #forTemplate()
 	 */
 	@Nonnull
@@ -102,7 +103,7 @@ public final class FormExpressionFactory {
 		@Nonnull
 		public <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
 				@Nonnull final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
-				throws ParseException, TokenMgrError, SemanticsException {
+						throws ParseException, TokenMgrError, SemanticsException {
 			Preconditions.checkNotNull(code);
 			Preconditions.checkNotNull(factory);
 			try (final StringReader reader = new StringReader(code)) {
@@ -182,7 +183,7 @@ public final class FormExpressionFactory {
 		@Override
 		public <T extends IExternalContext> IFormExpression<T> parse(final String code,
 				final IEvaluationContextContractFactory<T> factory, final boolean strictMode)
-				throws ParseException, TokenMgrError {
+						throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			Preconditions.checkNotNull(factory);
 			try (final StringReader reader = new StringReader(code)) {
@@ -284,19 +285,35 @@ public final class FormExpressionFactory {
 		return res;
 	}
 
+	/**
+	 * Performs several static semantic code checks.
+	 * <ul>
+	 *   <li>Whether all <code>break</code>, <code>continue</code>, and <code>return</code> statements are legal.</li>
+	 *   <li>Whether the initial value of all variables declared within a scope block is compile-time constant.</li>
+	 *   <li>Whether all variables used were declared.</li>
+	 *   <li>Whether all declared variable types match.</li>
+	 * </ul>
+	 * @param node
+	 * @param parser
+	 * @param contractFactory
+	 * @param strictMode
+	 * @return
+	 * @throws ParseException
+	 */
 	@Nonnull
 	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node,
 			@Nonnull final FormExpressionParser parser,
 			@Nonnull final IEvaluationContextContractFactory<T> contractFactory, final boolean strictMode)
-			throws ParseException {
+					throws ParseException {
 		JumpCheckVisitor.check(node);
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, strictMode);
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, strictMode);
 		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, strictMode);
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
 		checkScopeDefsConstancy(scopeDefs);
-		final IVariableType[] varTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs, strictMode);
-		return new FormExpressionImpl<T>(node, parser.buildComments(), scopeDefs, contractFactory, symbolTableSize);
+		final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);
+		VariableTypeCheckVisitor.check(node, symbolTypeTable);
+		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, contractFactory, symbolTableSize);
 	}
 
 	private static void checkScopeDefsConstancy(final IScopeDefinitions scopeDef)
@@ -309,7 +326,7 @@ public final class FormExpressionFactory {
 
 	private static void checkScopeDefsConstancy(@Nullable final Collection<IHeaderNode> collection,
 			@Nonnull final CompileTimeConstantCheckVisitor visitor)
-			throws HeaderAssignmentNotCompileTimeConstantException {
+					throws HeaderAssignmentNotCompileTimeConstantException {
 		if (collection == null)
 			return;
 		for (final IHeaderNode hn : collection)

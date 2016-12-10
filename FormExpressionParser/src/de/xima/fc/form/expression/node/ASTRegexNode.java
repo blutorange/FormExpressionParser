@@ -43,7 +43,7 @@ public class ASTRegexNode extends ANode {
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 	}
-	
+
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

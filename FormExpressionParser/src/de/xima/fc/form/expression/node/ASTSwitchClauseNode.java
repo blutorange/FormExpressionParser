@@ -55,17 +55,17 @@ public class ASTSwitchClauseNode extends ANode  implements ILabelled {
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (i == 0) return nullNode();
-		if (i == jjtGetNumChildren() - 1 && jjtGetNumChildren() % 2 == 1) return null;
+		if (i == jjtGetNumChildren() - 1 && jjtGetNumChildren() % 2 != 0) return null;
 		removeChildUnconditionally(i % 2 == 0 ? i - 1 : i + 1);
 		return null;
-	}	
+	}
 
 	@Override
 	@Nullable
 	public String getLabel() {
 		return label;
 	}
-	
+
 	@Nonnull
 	public Node getSwitchValueNode() {
 		return jjtGetChild(0);

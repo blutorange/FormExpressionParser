@@ -88,4 +88,35 @@ public class GenericVariableType implements IVariableType {
 			builder.append(list[i].union(otherType.getGeneric(i)));
 		return builder.build();
 	}
+
+	@Override
+	public boolean isIterable() {
+		return getBasicLangType().isIterable();
+	}
+
+	@Override
+	public boolean isAssignableFrom(final IVariableType otherType) {
+		// @formatter:off
+		// this    null object string     ...
+		// null     o      x     x     x  ...
+		// object   o      o     o     o  ...
+		// string   o      x     o     x   x
+		//   .      o      x     x     o   x
+		//   .      o      x     x     x   o
+		//   .      o      x     x     x   x
+		// @formatter:on
+		if (otherType.getBasicLangType() == ELangObjectType.NULL || type == ELangObjectType.OBJECT)
+			return true;
+		if (type != otherType.getBasicLangType() || list.length != otherType.getGenericCount())
+			return false;
+		for (int i = list.length; i-- > 0;)
+			if (!list[i].isAssignableFrom(otherType.getGeneric(i)))
+				return false;
+		return true;
+	}
+
+	@Override
+	public IVariableType getIterableItemType() {
+		return type.getIterableItemType(list);
+	}
 }

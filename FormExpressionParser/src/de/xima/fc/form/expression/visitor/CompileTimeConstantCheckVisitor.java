@@ -57,12 +57,12 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 		final CompileTimeConstantCheckVisitor v = new CompileTimeConstantCheckVisitor();
 		return node.jjtAccept(v).booleanValue();
 	}
-	
+
 	public CompileTimeConstantCheckVisitor() {
 		// This visitor can be public as there are
 		// no fields and no special consideration are required.
 	}
-	
+
 	@Nonnull
 	private Boolean visitChildren(@Nonnull final Node node) {
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
@@ -71,7 +71,7 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 		}
 		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
-	
+
 	@Override
 	public Boolean visit(final ASTExpressionNode node) {
 		return visitChildren(node);
@@ -161,15 +161,15 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	@Override
 	public Boolean visit(final ASTExceptionNode node) {
 		// Exception is constant when the error message is constant
-		return visit(node);
+		return node.getErrorMessageNode().jjtAccept(this);
 	}
 
 	@Override
 	public Boolean visit(final ASTThrowClauseNode node) {
-		// Throwing an exception is not considers constant, but
-		// it might be caugh by a catch block. The try-catch-statement
+		// Throwing an exception is not considered constant, but
+		// it might be caught by a catch block. The try-catch-statement
 		// is then considered constant.
-		return visit(node);
+		return visitChildren(node);
 	}
 
 	@Override

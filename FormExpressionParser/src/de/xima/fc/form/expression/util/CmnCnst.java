@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 
 @SuppressWarnings("nls")
@@ -41,6 +42,7 @@ public final class CmnCnst {
 		@Nonnull public static final IVariableReference[] EMPTY_SYMBOL_TABLE = new IVariableReference[0];
 		@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
 		@Nonnull public static final GenericSourceResolvable[] EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY = new GenericSourceResolvable[0];
+		@Nonnull public static final IVariableType[] EMPTY_VARIABLE_TYPE_ARRAY = new IVariableType[0];
 	}
 
 	public final static class CustomScope {
@@ -359,6 +361,8 @@ public final class CmnCnst {
 		@Nonnull public static final String CONDITION_MUST_BE_BOOLEAN = "Condition must evaluate to boolean type.";
 		@Nonnull public static final String UNREACHABLE_CODE = "Unreachable code, previous code never completes normally.";
 		@Nonnull public static final String ILLEGAL_NODE_DURING_TYPECHECKING = "Illegal node during variable type checking: {0}. " + INTERNAL_ERROR;
+		@Nonnull public static final String INCOMPATIBLE_TYPE_IN_FOR_HEADER = "Iterable value cannot be assigned to the iteration variable.";
+		@Nonnull public static final String TYPE_NOT_ITERABLE = "Variable type {0} is not iterable.";
 	}
 
 	public static final class ToString {

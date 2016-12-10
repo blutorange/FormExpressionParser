@@ -157,7 +157,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	protected ALangObject() {
 		id = ID_COUNTER.incrementAndGet();
 	}
-	
+
 	@Nonnull
 	public abstract ALangObject shallowClone();
 
@@ -425,6 +425,10 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 		return Long.compare(id,  o.id);
 	}
 
+	/**
+	 * @param o Object to check.
+	 * @return Whether the given object is the same object as this object.
+	 */
 	public boolean equalsSameObject(@Nonnull final ALangObject o) {
 		return isSingletonLike() ? equals(o) : id == o.id;
 	}
@@ -463,7 +467,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 
 	@Nonnull
 	public abstract ELangObjectType getType();
-	
+
 	public final boolean isArray() {
 		return getType() == ELangObjectType.ARRAY;
 	}

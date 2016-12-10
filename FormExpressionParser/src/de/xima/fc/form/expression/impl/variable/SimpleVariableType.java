@@ -5,6 +5,7 @@ import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 @Immutable
 public enum SimpleVariableType implements IVariableType {
@@ -16,21 +17,21 @@ public enum SimpleVariableType implements IVariableType {
 	REGEX(ELangObjectType.REGEX),
 	EXCEPTION(ELangObjectType.EXCEPTION),
 	;
-	
+
 	@Nonnull
 	private final ELangObjectType type;
-	
+
 	private SimpleVariableType(@Nonnull final ELangObjectType type) {
 		if (!type.allowsGenericsCount(0))
 			throw new RuntimeException();
 		this.type = type;
 	}
-	
+
 	@Override
 	public ELangObjectType getBasicLangType() {
 		return type;
 	}
-	
+
 	@Override
 	public boolean equalsType(final IVariableType other) {
 		if (type != other.getBasicLangType())
@@ -61,5 +62,30 @@ public enum SimpleVariableType implements IVariableType {
 		if (type == ELangObjectType.NULL || otherType.getBasicLangType() == ELangObjectType.OBJECT)
 			return otherType;
 		return SimpleVariableType.OBJECT;
+	}
+
+	@Override
+	public boolean isAssignableFrom(final IVariableType otherType) {
+		// this    null object string     ...
+		// null     o      x     x     x  ...
+		// object   o      o     o     o  ...
+		// string   o      x     o     x   x
+		//   .      o      x     x     o   x
+		//   .      o      x     x     x   o
+		//   .      o      x     x     x   x
+		if (type == otherType.getBasicLangType() || otherType.getBasicLangType() == ELangObjectType.NULL
+				|| type == ELangObjectType.OBJECT)
+			return true;
+		return false;
+	}
+
+	@Override
+	public boolean isIterable() {
+		return getBasicLangType().isIterable();
+	}
+
+	@Override
+	public IVariableType getIterableItemType() {
+		return type.getIterableItemType(CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_ARRAY);
 	}
 }

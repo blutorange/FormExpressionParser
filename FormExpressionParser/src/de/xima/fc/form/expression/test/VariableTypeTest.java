@@ -4,6 +4,7 @@ import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
 import static de.xima.fc.form.expression.enums.ELangObjectType.FUNCTION;
 import static de.xima.fc.form.expression.enums.ELangObjectType.HASH;
 import static de.xima.fc.form.expression.enums.ELangObjectType.NULL;
+import static de.xima.fc.form.expression.enums.ELangObjectType.OBJECT;
 import static de.xima.fc.form.expression.enums.ELangObjectType.STRING;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -39,13 +40,14 @@ public class VariableTypeTest {
 		}
 	}
 
-	
+
 	@Test
 	public void testFuncType() {
 		final IVariableType arrayType = new VariableTypeBuilder().setBasicType(ARRAY).append(STRING).build();
 		final IVariableType hashType = new VariableTypeBuilder().setBasicType(HASH).append(STRING).append(STRING).build();
 		final IVariableType funcSingle = new VariableTypeBuilder().setBasicType(FUNCTION).append(NULL).build();
 		final IVariableType funcNull = new VariableTypeBuilder().setBasicType(FUNCTION).append(NULL).append(NULL).build();
+		final IVariableType funcObject = new VariableTypeBuilder().setBasicType(FUNCTION).append(OBJECT).append(OBJECT).build();
 		try {
 			new VariableTypeBuilder().setBasicType(FUNCTION).build();
 			fail("Function type needs exactly 1-... generics.");
@@ -66,9 +68,12 @@ public class VariableTypeTest {
 			assertTrue(funcType.union(funcSingle).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(funcType.union(arrayType).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(funcType.union(hashType).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(funcObject.isAssignableFrom(funcType));
+			if (t.obj != OBJECT)
+				assertFalse(funcType.isAssignableFrom(funcObject));
 		}
 	}
-	
+
 	@Test
 	public void testHashType() {
 		final IVariableType arrayType = new VariableTypeBuilder().setBasicType(ARRAY).append(STRING).build();
@@ -80,13 +85,14 @@ public class VariableTypeTest {
 		try {
 			new VariableTypeBuilder().setBasicType(HASH).append(STRING).build();
 			fail("Hash type needs exactly 2 generics.");
-		} catch (final IllegalVariableTypeException e) {}		
+		} catch (final IllegalVariableTypeException e) {}
 		try {
 			new VariableTypeBuilder().setBasicType(HASH).append(STRING).append(STRING).append(STRING).build();
 			fail("Hash type needs exactly 2 generics.");
-		} catch (final IllegalVariableTypeException e) {}		
+		} catch (final IllegalVariableTypeException e) {}
 		for (final Tuple t : getSimpleTypes()) {
 			final IVariableType hashType = new VariableTypeBuilder().setBasicType(HASH).append(t.var).append(t.var).build();
+			final IVariableType hashObject = new VariableTypeBuilder().setBasicType(HASH).append(OBJECT).append(OBJECT).build();
 			final IVariableType hashNull = new VariableTypeBuilder().setBasicType(HASH).append(NULL).append(NULL).build();
 			basicTests(new Tuple(hashType, HASH));
 			if (t.obj != NULL) {
@@ -98,6 +104,9 @@ public class VariableTypeTest {
 			assertTrue(hashType.union(hashNull).equalsType(hashType));
 			assertTrue(hashType.union(arrayType).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(hashType.union(funcType).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(hashObject.isAssignableFrom(hashType));
+			if (t.obj != OBJECT)
+				assertFalse(hashType.isAssignableFrom(hashObject));
 		}
 	}
 
@@ -113,8 +122,9 @@ public class VariableTypeTest {
 		try {
 			new VariableTypeBuilder().setBasicType(ARRAY).append(STRING).append(STRING).build();
 			fail("Array type needs exactly 1 generics.");
-		} catch (final IllegalVariableTypeException e) {}		
+		} catch (final IllegalVariableTypeException e) {}
 		for (final Tuple t : getSimpleTypes()) {
+			final IVariableType arrayObject = new VariableTypeBuilder().setBasicType(ARRAY).append(OBJECT).build();
 			final IVariableType arrayType = new VariableTypeBuilder().setBasicType(ARRAY).append(t.var).build();
 			final IVariableType arrayNull = new VariableTypeBuilder().setBasicType(ARRAY).append(NULL).build();
 			basicTests(new Tuple(arrayType, ARRAY));
@@ -127,6 +137,9 @@ public class VariableTypeTest {
 			assertTrue(arrayType.union(arrayNull).equalsType(arrayType));
 			assertTrue(arrayType.union(hashType).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(arrayType.union(funcType).equalsType(SimpleVariableType.OBJECT));
+			assertTrue(arrayObject.isAssignableFrom(arrayType));
+			if (t.obj != OBJECT)
+				assertFalse(arrayType.isAssignableFrom(arrayObject));
 		}
 	}
 
@@ -157,6 +170,13 @@ public class VariableTypeTest {
 		assertTrue(t.var.union(t.var).equalsType(t.var));
 		assertTrue(t.var.union(SimpleVariableType.NULL).equalsType(t.var));
 		assertTrue(SimpleVariableType.NULL.union(t.var).equalsType(t.var));
+		assertTrue(t.var.isAssignableFrom(t.var));
+		assertTrue(SimpleVariableType.OBJECT.isAssignableFrom(t.var));
+		assertTrue(t.var.isAssignableFrom(SimpleVariableType.NULL));
+		if (t.obj != NULL)
+			assertFalse(SimpleVariableType.NULL.isAssignableFrom(t.var));
+		if (t.obj != OBJECT)
+			assertFalse(t.var.isAssignableFrom(SimpleVariableType.OBJECT));
 	}
 
 	@Nonnull

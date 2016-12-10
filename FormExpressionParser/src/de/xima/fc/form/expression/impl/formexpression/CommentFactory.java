@@ -14,9 +14,15 @@ public final class CommentFactory {
 
 	@Nonnull
 	public static IComment fromToken(@Nonnull final Token token) {
-		if (token.kind != FormExpressionParserConstants.MultiLineComment
-				&& token.kind == FormExpressionParserConstants.MultiLineComment)
+		switch (token.kind) {
+		case FormExpressionParserConstants.MultiLineComment:
+		case FormExpressionParserConstants.TypeMultiLineComment:
+		case FormExpressionParserConstants.SingleLineComment:
+		case FormExpressionParserConstants.TypeSingleLineComment:
+			break;
+		default:
 			throw new IllegalArgumentException(String.format(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
+		}
 		final Token t = NullUtil.checkNotNull(token);
 		final ECommentType type = t.image.charAt(1) == '/' ? ECommentType.SINGLE_LINE : ECommentType.MULTI_LINE;
 		final int column = t.beginColumn;

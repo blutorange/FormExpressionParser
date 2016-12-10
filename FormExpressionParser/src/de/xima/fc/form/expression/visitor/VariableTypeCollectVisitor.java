@@ -183,7 +183,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	}
 
 	public static IVariableType[] collect(@Nonnull final Node node, final int symbolTableSize,
-			@Nonnull final IScopeDefinitions scopeDefs, final boolean treatMissingTypeAsError)
+			@Nonnull final IScopeDefinitions scopeDefs)
 					throws SemanticsException {
 		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize);
 		v.visitScopeDefs(scopeDefs);

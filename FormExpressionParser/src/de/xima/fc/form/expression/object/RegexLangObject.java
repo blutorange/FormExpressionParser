@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidRegexPatternException;
@@ -85,7 +85,7 @@ public class RegexLangObject extends ALangObject {
 
 	@Override
 	public int hashCode() {
-		return 37*value.pattern().hashCode() + value.flags();
+		return 37 * value.pattern().hashCode() + value.flags();
 	}
 
 	/**

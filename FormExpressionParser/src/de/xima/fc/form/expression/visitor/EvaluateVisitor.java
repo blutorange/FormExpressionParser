@@ -92,7 +92,6 @@ import de.xima.fc.form.expression.util.NullUtil;
 
 public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangObject, EvaluationException> {
 
-	//TODO use utility functions for node, and dont access children array directly
 	@Nonnull
 	private ALangObject currentResult = NullLangObject.getInstance();
 	@Nonnull
