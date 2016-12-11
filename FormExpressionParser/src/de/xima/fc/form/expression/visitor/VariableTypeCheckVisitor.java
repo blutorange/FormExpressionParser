@@ -4,14 +4,18 @@ import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleConditionTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleForLoopHeaderTypeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.UnreachableCodeException;
@@ -258,6 +262,7 @@ import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor.NodeInfo;
 public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoidVisitor<NodeInfo, SemanticsException> {
 
 	private final IVariableType[] table;
+	private final boolean treatUnmatchingSwitchTypeAsError;
 
 	private VariableTypeCheckVisitor(final IVariableType[] symbolTypeTable) {
 		this.table = symbolTypeTable;
@@ -292,7 +297,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			final IVariableType type = table[source];
 			return type != null ? type : SimpleVariableType.OBJECT;
 		}
-		//TODO
+		//TODO get from external context
 		return null;
 	}
 
@@ -528,7 +533,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	public NodeInfo visit(final ASTTryClauseNode node) throws SemanticsException {
 		return node.getTryNode().jjtAccept(this).unify(node.getCatchNode().jjtAccept(this));
 	}
-
+	
 	/**
 	 *<p>
 	 * In strict mode, we enforce the types of each case clause to be compatible
@@ -540,12 +545,66 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 * </p><p>
 	 * When there is code between a break or continue clause and the next case,
 	 * this is unreachable code and an error is thrown.
+	 * </p><p>
+	 * When there is no default case, we need to merge {@link NullLangObject}
+	 * to the list of implicit return types as it may happen that no case
+	 * applies.
 	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTSwitchClauseNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		final NodeInfo infoResult = new NodeInfo();
+		
+		// Type of the switch expression.
+		final NodeInfo infoSwitch = node.getSwitchValueNode().jjtAccept(this);
+		if (infoSwitch.hasLabel())
+			throw new IllegalJumpClauseException(EJump.BREAK, infoSwitch.getAnyLabel(), node.getSwitchValueNode());
+		if (infoSwitch.hasReturnType())
+			throw new IllegalJumpClauseException(EJump.RETURN, null, node.getSwitchValueNode());
+		if (!infoSwitch.hasImplicitType()) {
+			if (node.jjtGetNumChildren() > 1)
+				throw new UnreachableCodeException(node.jjtGetChild(1));
+			return infoSwitch;
+		}
+		final IVariableType typeSwitch = infoSwitch.getImplicitType();
+		infoResult.unifyError(infoSwitch);
+
+		// Check cases and case bodies.
+		for (int i = 0; i < node.getCaseCount(); ++i) {
+			switch(node.getCaseType(i)) {
+			case SWITCHCASE:
+				final NodeInfo infoCase = node.getCaseNode(i).jjtAccept(this);
+				if (infoCase.hasLabel())
+					throw new IllegalJumpClauseException(EJump.BREAK, infoCase.getAnyLabel(), node.getCaseNode(i));
+				if (infoCase.hasReturnType())
+					throw new IllegalJumpClauseException(EJump.RETURN, null, node.getCaseNode(i));
+				if (!infoCase.hasImplicitType()) { //FIXME we can still reacher other cases, dont throw!!!
+					if (i < node.getCaseCount() - 1)
+						throw new UnreachableCodeException(node.getCaseNode(i));
+				}
+				if (treatUnmatchingSwitchTypeAsError && !typeSwitch.isAssignableFrom(infoCase.getImplicitType()))
+					throw new IncompatibleSwitchCaseTypeException(typeSwitch, infoCase.getImplicitType(),
+							node.getCaseNode(i));
+				// TODO unifiyError to return type
+				infoResult.unifyError(infoSwitch);
+				break;
+			case SWITCHDEFAULT:
+				infoResult.unifiyImplicitType(SimpleVariableType.NULL);
+				// no break
+			case SWITCHCLAUSE:
+				final NodeInfo infoClause = node.getCaseNode(i).jjtAccept(this);
+				if (infoClause.removeLabel(node.getLabel()))
+					infoResult.unifiyImplicitType(SimpleVariableType.NULL);
+				infoResult.unify(infoClause);
+				break;
+			//$CASES-OMITTED$
+			default:
+				throw new SemanticsException(
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.getCaseType(i)),
+						node.getCaseNode(i));
+			}
+		}
+		return infoResult;
 	}
 
 	/**
@@ -606,6 +665,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 */
 	@Override
 	public NodeInfo visit(final ASTLogNode node) throws SemanticsException {
+		// TODO should we check if result can be coerced to string?
 		final NodeInfo info = node.getLogMessageNode().jjtAccept(this);
 		if (info.hasImplicitType())
 			info.replaceImplicitType(SimpleVariableType.STRING);
@@ -801,10 +861,22 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			return implicitReturnType != null;
 		}
 
+		public boolean hasLabel() {
+			return labelSet != null && !labelSet.isEmpty();
+		}
+		
 		public boolean removeLabel(@Nullable final String label) {
 			return labelSet != null ? labelSet.remove(label) : false;
 		}
 
+		@Nullable
+		public String getAnyLabel() {
+			final Set<String> set = labelSet;
+			if (set == null)
+				throw new NoSuchElementException();
+			return set.iterator().next();
+		}
+		
 		public boolean hasThrowingJump() {
 			return hasThrowingJump;
 		}
@@ -860,8 +932,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		public NodeInfo unifyJumps(final NodeInfo info) {
 			if (info.hasReturnType())
 				unifyReturnType(info.getReturnType());
-			if (info.hasThrowingJump)
-				addThrowingJump();
+			unifyError(info);
 			if (info.labelSet != null)
 				addLabel(info.labelSet);
 			return this;
@@ -879,6 +950,12 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				implicitReturnType = implicitReturnType.union(type);
 			else
 				implicitReturnType = type;
+		}
+		
+		public NodeInfo unifyError(final NodeInfo info) {
+			if (info.hasThrowingJump())
+				this.addThrowingJump();
+			return this;
 		}
 	}
 }

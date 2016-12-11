@@ -12,8 +12,8 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
- * This exception is thrown when an object support the division
- * operator, but not with a certain operand.
+ * This exception is thrown when an object support the division operator, but
+ * not with a certain operand.
  *
  */
 public class IllegalArgumentValueException extends CatchableEvaluationException {
@@ -23,7 +23,8 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 	public IllegalArgumentValueException(@Nullable final IFunction<?> function, @Nonnull final String functionName,
 			@Nonnull final ALangObject thisContext, @Nonnull final ALangObject argument, final int index,
 			@Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index, functionName, argument.inspect()));
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_VALUE, thisContext.inspect(), index,
+				functionName, argument.inspect()));
 		this.functionName = functionName;
 		this.thisContext = thisContext;
 		this.index = index;
@@ -31,7 +32,8 @@ public class IllegalArgumentValueException extends CatchableEvaluationException 
 		this.function = function;
 	}
 
-	public IllegalArgumentValueException(@Nonnull final IFunction<?> function, @Nonnull final ALangObject thisContext, @Nonnull final ALangObject argument, final int index, @Nonnull final IEvaluationContext ec) {
+	public IllegalArgumentValueException(@Nonnull final IFunction<?> function, @Nonnull final ALangObject thisContext,
+			@Nonnull final ALangObject argument, final int index, @Nonnull final IEvaluationContext ec) {
 		this(function, function.getDeclaredName(), thisContext, argument, index, ec);
 	}
 

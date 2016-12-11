@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class IllegalNumberOfFunctionParametersException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 	public IllegalNumberOfFunctionParametersException(final int shouldCount, final int isCount, final boolean isVarArgs, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_COUNT, shouldCount - (isVarArgs ? 1 : 0), isCount));
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_COUNT, shouldCount - (isVarArgs ? 1 : 0), isCount));
 		this.isCount = isCount;
 		this.isVarArgs = isVarArgs;
 		this.shouldCountMin = shouldCount - (isVarArgs ? 1 : 0);

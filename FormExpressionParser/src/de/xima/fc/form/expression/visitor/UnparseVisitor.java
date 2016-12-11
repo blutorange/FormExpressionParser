@@ -90,6 +90,7 @@ import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IOException> {
 	private final Writer writer;
@@ -579,8 +580,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new RuntimeException(
-						String.format(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()));
+				throw new IOException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()));
 			}
 		}
 		// footer }

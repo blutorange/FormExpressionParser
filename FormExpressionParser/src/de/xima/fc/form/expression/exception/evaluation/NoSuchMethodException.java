@@ -14,7 +14,7 @@ public class NoSuchMethodException extends NoSuchFunctionException {
 
 	public NoSuchMethodException(@Nonnull final EMethod method, @Nonnull final ALangObject thisContext,
 			@Nonnull final IEvaluationContext ec) {
-		super(CmnCnst.Name.METHOD, NullUtil.stringFormat(CmnCnst.Error.NO_SUCH_METHOD, method.name(), method.methodName),
+		super(CmnCnst.Name.METHOD, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_METHOD, method.name(), method.methodName),
 				thisContext, ec);
 		this.method = method;
 	}

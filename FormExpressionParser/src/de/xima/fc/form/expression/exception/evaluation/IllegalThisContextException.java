@@ -14,7 +14,7 @@ public class IllegalThisContextException extends CatchableEvaluationException {
 	public IllegalThisContextException(@Nonnull final ALangObject thisContext, @Nonnull final ELangObjectType expectedType,
 			@Nonnull final IFunction<ALangObject> function, @Nonnull final IEvaluationContext ec) {
 		super(ec,
-				NullUtil.stringFormat(
+				NullUtil.messageFormat(
 						CmnCnst.Error.ILLEGAL_THIS_CONTEXT,
 						thisContext.toString(), thisContext.getType(), expectedType,
 						function.getDeclaredName().length() == 0 ? CmnCnst.TRACER_POSITION_NAME_ANONYMOUS_FUNCTION : function.getDeclaredName()));

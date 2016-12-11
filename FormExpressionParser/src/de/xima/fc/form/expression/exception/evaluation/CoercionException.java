@@ -11,16 +11,16 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
- * This exception is thrown when an object is coerced to another type
- * and the object cannot be coerced to that type.
- *
+ * This exception is thrown when an object is coerced to another type and the
+ * object cannot be coerced to that type.
  */
 public class CoercionException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;
 
-	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ELangObjectType to, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.stringFormat(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
+	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ELangObjectType to,
+			@Nonnull final IEvaluationContext ec) {
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
 		this.from = from;
 		this.to = to;
 	}

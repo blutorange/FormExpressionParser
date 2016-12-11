@@ -148,7 +148,7 @@ public interface Node extends Serializable, ITraceElement {
 	public int getId();
 
 	/**
-	 * @return The method by which this node is linked to the previous sibling, or null.
+	 * @return The method by which this node is linked to the previous sibling.
 	 */
 	@Nonnull
 	public EMethod getSiblingMethod();

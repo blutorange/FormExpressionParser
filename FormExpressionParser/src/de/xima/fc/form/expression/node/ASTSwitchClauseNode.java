@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -13,11 +13,12 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.ILabelled;
 
+@ParametersAreNonnullByDefault
 public class ASTSwitchClauseNode extends ANode  implements ILabelled {
 	private static final long serialVersionUID = 1L;
 	@Nullable private String label;
 
-	public ASTSwitchClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTSwitchClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -52,6 +53,7 @@ public class ASTSwitchClauseNode extends ANode  implements ILabelled {
 		this.label = label;
 	}
 
+	@Nullable
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (i == 0) return nullNode();
@@ -66,8 +68,23 @@ public class ASTSwitchClauseNode extends ANode  implements ILabelled {
 		return label;
 	}
 
-	@Nonnull
 	public Node getSwitchValueNode() {
 		return jjtGetChild(0);
+	}
+
+	public int getCaseCount() {
+		return jjtGetNumChildren() - 1;
+	}
+	
+	public EMethod getCaseType(final int i) {
+		return jjtGetChild(i+1).getSiblingMethod();
+	}
+
+	public Node getCaseNode(final int i) {
+		return jjtGetChild(i+1);
+	}
+
+	public boolean hasDefaultCase() {
+		return jjtGetChild(jjtGetNumChildren()).getSiblingMethod() == EMethod.SWITCHDEFAULT;
 	}
 }

@@ -1,4 +1,4 @@
-for (number i in 9) {
-  break;
-  1+2;
+switch(9) {
+  case "9":
+    1;
 }

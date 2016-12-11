@@ -17,8 +17,6 @@ public final class CmnCnst {
 	// Used when constructing the stack trace.
 	@Nonnull public static final String TRACER_POSITION_NAME_ANONYMOUS_FUNCTION = "anonymous function";
 	@Nonnull public static final String TRACER_POSITION_NAME_GLOBAL = "main";
-	@Nonnull public static final String TRACER_POSITION_UNKNOWN = "unknown line";
-	@Nonnull public static final String TRACER_POSITION_NAME_UNKNOWN = "unknown";
 
 	@Nonnull public static final String SYSTEM_LOGGER_FORMAT = "[%s] (%s) %s %s";
 	@Nonnull public static final Pattern PATTERN_FORM_FIELD_NAME = NullUtil.checkNotNull(Pattern.compile("^[a-zA-Z0-9_]+$"));
@@ -215,35 +213,28 @@ public final class CmnCnst {
 
 	public static final class Error {
 		private Error() {}
-		@Nonnull public static final String ARRAY_INDEX_OUT_OF_BOUNDS = "Index %s out of bounds for array %s.";
-		@Nonnull public static final String BREAK_CLAUSE = "Break %s used outside of loop or switch, or label does not match any loop or switch.";
+		@Nonnull public static final String ARRAY_INDEX_OUT_OF_BOUNDS = "Index {0} out of bounds for array {1}.";
+		@Nonnull public static final String BREAK_CLAUSE = "Break {0} used outside of loop or switch, or label does not match any loop or switch.";
 		@Nonnull public static final String CANNOT_ACQUIRE_EVALUATION_CONTEXT = "Failed to acquire evaluation context.";
-		@Nonnull public static final String COERCION = "Object %s of class %s cannot be coerced to %s.";
-		@Nonnull public static final String CONTINUE_CLAUSE = "Continue %s used outside of loop or switch, or label does not match any loop or switch.";
+		@Nonnull public static final String COERCION = "Object {0} of class {1} cannot be coerced to {2}.";
+		@Nonnull public static final String CONTINUE_CLAUSE = "Continue {0} used outside of loop or switch, or label does not match any loop or switch.";
 		@Nonnull public static final String CUSTOM_RUNTIME_EXCEPTION = "Custom Exception: %s";
 		@Nonnull public static final String EMBEDMENT_OUPTUT = "Failed to write output due to an I/O exception.";
-		@Nonnull public static final String ILLEGAL_ARGUMENT_VALUE = "Illegal value %s for argument %d of function %s: %s.";
-		@Nonnull public static final String ILLEGAL_NUMBER_OF_ARGUMENTS_EXACT = "Encountered %s argument(s) for function %s, expected at least %d";
-		@Nonnull public static final String ILLEGAL_NUMBER_OF_ARGUMENTS_RANGE = "Encountered %d number of arguments for function %s, expected %d to %d.";
-		@Nonnull public static final String ILLEGAL_THIS_CONTEXT = "Provided this context <%s> of type %s does not match the expected type %s for function <%s>.";
-		@Nonnull public static final String INVALID_REGEX_PATTERN = "Invalid regex pattern %s and/or flags %s.";
-		@Nonnull public static final String ITERATION_NOT_SUPPORTED = "Object <%s> of type %s does not support iteration.";
-		@Nonnull public static final String MATH_DIVISION_BY_ZERO = "Division by zero: %s / %s";
-		@Nonnull public static final String MATH = "Error during math operation: %s";
-		@Nonnull public static final String NESTING_LEVEL_TOO_DEEP = "Nesting level too deep: %d.";
-		@Nonnull public static final String NO_SUCH_FUNCTION_1 = "No such %s named %s.";
-		@Nonnull public static final String NO_SUCH_FUNCTION_2 = "No such %s named <%s> for object <%s> of type %s.";
-		@Nonnull public static final String NO_SUCH_METHOD = "%s(%s)";
-		@Nonnull public static final String OPERATION_NOT_YET_IMPLEMENTED = "Operation %s has not yet been implemented yet.";
+		@Nonnull public static final String ILLEGAL_ARGUMENT_VALUE = "Illegal value {0} for argument {1} of function {2}: {3}.";
+		@Nonnull public static final String ILLEGAL_THIS_CONTEXT = "Provided this context <{0}> of type {1} does not match the expected type {2} for function <{3}>.";
+		@Nonnull public static final String INVALID_REGEX_PATTERN = "Invalid regex pattern {0} and/or flags {1}.";
+		@Nonnull public static final String ITERATION_NOT_SUPPORTED = "Object {0} of type {1} does not support iteration.";
+		@Nonnull public static final String MATH_DIVISION_BY_ZERO = "Division by zero: {0} / {1}";
+		@Nonnull public static final String MATH = "Error during math operation: {0}";
+		@Nonnull public static final String NESTING_LEVEL_TOO_DEEP = "Nesting level too deep: {0}.";
+		@Nonnull public static final String NO_SUCH_FUNCTION_1 = "No such {0} named {1}.";
+		@Nonnull public static final String NO_SUCH_FUNCTION_2 = "No such {0} named {1} for object {2} of type {3}.";
+		@Nonnull public static final String NO_SUCH_METHOD = "{0}({1})";
+		@Nonnull public static final String OPERATION_NOT_YET_IMPLEMENTED = "Operation {0} has not yet been implemented yet.";
 		@Nonnull public static final String RETURN_CLAUSE = "Return clause used outside a function.";
-		@Nonnull public static final String STRING_INDEX_OUT_OF_BOUNDS = "Index %s out of bounds for string <%s>";
-		@Nonnull public static final String VARIABLE_NOT_DEFINED_LOCAL = "Variable %s not resolvable to a defined variable.";
-		@Nonnull public static final String VARIABLE_NOT_DEFINED_SCOPED = "Variable %s::%s not defined at this point.";
-		@Nonnull public static final String EVALUATION_EXCEPTION_EC = "Evaluation context is";
-		@Nonnull public static final String EVALUATION_EXCEPTION_EX = "External context is";
-		@Nonnull public static final String EVALUATION_EXCEPTION_AT = "at";
-		@Nonnull public static final String EVALUATION_EXCEPTION_LINE = "line";
-		@Nonnull public static final String EVALUATION_EXCEPTION_COLUMN = "column";
+		@Nonnull public static final String STRING_INDEX_OUT_OF_BOUNDS = "Index {0} out of bounds for string {1}";
+		@Nonnull public static final String VARIABLE_NOT_DEFINED_LOCAL = "Variable {0} not resolvable to a defined variable.";
+		@Nonnull public static final String VARIABLE_NOT_DEFINED_SCOPED = "Scoped variable {0}::{1} not resolvable to a defined variable.";
 
 		@Nonnull public static final String INTERNAL_ERROR = "This is likely an error with the program. Contact support.";
 		@Nonnull public static final String VARIABLE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
@@ -272,7 +263,7 @@ public final class CmnCnst {
 		@Nonnull public static final String INVALID_JUMP_TYPE = "Invalid jump type %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_PROPERTY_EXPRESSION = "Illegal enum constant %s at ASTPropertyExpressionNode. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_ASSIGNMENT = "Illegal enum constant %s at %s. " + INTERNAL_ERROR;
-		@Nonnull public static final String ILLEGAL_ENUM_SWITCH = "Illegal enum for switch : %s. " + INTERNAL_ERROR;
+		@Nonnull public static final String ILLEGAL_ENUM_SWITCH = "Illegal enum for switch : {0}. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_LOGLEVEL = "No such log level %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_EQUAL = "Unexptected enum for equal expression: %s. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_ENUM_COMMENT = "Unexptected enum for comment: %s. " + INTERNAL_ERROR;
@@ -345,7 +336,7 @@ public final class CmnCnst {
 		@Nonnull public static final String SCOPED_FUNCTION_OUTSIDE_HEADER = "Occurence of function %s::%s at top level. Scoped function must be defined in a scope block in strict mode.";
 		@Nonnull public static final String UNDEFINED_EMBEDMENT = "Embedment %s is not defined.";
 		@Nonnull public static final String VAR_ARGS_WITHOUT_ARGUMENTS = "Function cannot have varArgs without any arguments. " + INTERNAL_ERROR;
-		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires %d parameters, but %d were given.";
+		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires {0} parameters, but {1} were given.";
 		@Nonnull public static final String NULL_VARIABLE_TYPE = "Variable type must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_VARIABLE_TYPE_AT_EVALUATION = "Variable type declaration %s cannot occur in the main program. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_FUNCTION_ARGUMENT_AT_EVALUATION = "Function argument declaration %s cannot occur in the main program. " + INTERNAL_ERROR;
@@ -363,6 +354,14 @@ public final class CmnCnst {
 		@Nonnull public static final String ILLEGAL_NODE_DURING_TYPECHECKING = "Illegal node during variable type checking: {0}. " + INTERNAL_ERROR;
 		@Nonnull public static final String INCOMPATIBLE_TYPE_IN_FOR_HEADER = "Iterable value cannot be assigned to the iteration variable.";
 		@Nonnull public static final String TYPE_NOT_ITERABLE = "Variable type {0} is not iterable.";
+		@Nonnull public static final String INCOMPATIBLE_SWITCH_CASE_TYPE = "Switch case type must be compatible with the value switched on in strict mode.";
+		@Nonnull public static final String JUMP_WITHOUT_MATCHING_LABEL_OR_FUNCTION = "Jump clause used without label or enclosing function.";
+		@Nonnull public static final String TRACER_KNOWN_POSITION = "at {0} (line {1}, column {2})";
+		@Nonnull public static final String TRACER_UNKNOWN_POSITION = "at unknown";
+		@Nonnull public static final String EVALUATION_EXCEPTION_KNOWN_EC = "Evaluation context is {0} ({1}).";
+		@Nonnull public static final String EVALUATION_EXCEPTION_UNKNOWN_EC = "Evaluation context is unknown.";
+		@Nonnull public static final String EVALUATION_EXCEPTION_KNOWN_EX = "External context is {0} ({1}).";
+		@Nonnull public static final String EVALUATION_EXCEPTION_UNKNOWN_EX = "External context is unknown.";
 	}
 
 	public static final class ToString {

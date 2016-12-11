@@ -25,7 +25,9 @@ public class NullUtil {
 	 * @param arguments Argument inserted into the pattern.
 	 * @return The formatted string.
 	 * @see String#format(String, Object...)
+	 * @deprecated Use {@link #messageFormat(String, Object...)} instead.
 	 */
+	@Deprecated
 	@Nonnull
 	public static String stringFormat(@Nonnull final String format, @Nonnull final Object... params) {
 		return checkNotNull(String.format(format, params));

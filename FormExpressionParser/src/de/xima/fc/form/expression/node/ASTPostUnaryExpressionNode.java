@@ -2,8 +2,6 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 
-import com.google.common.base.Preconditions;
-
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
@@ -13,6 +11,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class ASTPostUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
@@ -24,7 +23,7 @@ public class ASTPostUnaryExpressionNode extends ANode {
 
 	public final void init(final EMethod method, @Nonnull final EMethod unary) throws ParseException {
 		assertChildrenExactly(1);
-		Preconditions.checkNotNull(unary);
+		NullUtil.checkNotNull(unary);
 		if (unary.isAssigning())
 			assertChildrenAssignable(0, 1, CmnCnst.Name.SUFFIX_OPERATION);
 		super.init(method);

@@ -10,6 +10,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.ITraceElement;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class EvaluationException extends Exception {
 	private static final long serialVersionUID = 1L;
@@ -82,49 +83,30 @@ public class EvaluationException extends Exception {
 				appendTraceElement(sb, el);
 			}
 		}
-		sb.append(System.lineSeparator())
-		.append(CmnCnst.Error.EVALUATION_EXCEPTION_EC)
-		.append(' ')
-		.append(ec);
-		if (ec != null) {
-			sb.append('(')
-			.append(ec.getClass().getCanonicalName())
-			.append(')')
-			.append(System.lineSeparator())
-			.append(CmnCnst.Error.EVALUATION_EXCEPTION_EX)
-			.append(' ')
-			.append(ec.getExternalContext());
-			final IExternalContext ex = ec.getExternalContext();
-			if (ex != null) {
-				sb.append('(')
-				.append(ex.getClass().getCanonicalName())
-				.append(')');
-			}
-		}
+		sb.append(System.lineSeparator());
+		
+		if (ec != null)
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_KNOWN_EC, ec, ec.getClass().getCanonicalName()));
+		else 
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_UNKNOWN_EC));
+		
+		sb.append(System.lineSeparator());
+		
+		final IExternalContext ex = ec != null ? ec.getExternalContext() : null;
+		if (ex != null)
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_KNOWN_EX, ex, ex.getClass().getCanonicalName()));
+		else 
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_UNKNOWN_EX));
+
 		return sb.toString();
 	}
 
 	private static void appendTraceElement(@Nonnull final StringBuilder sb, @Nullable final ITraceElement el) {
-		sb.append('\t')
-		.append(CmnCnst.Error.EVALUATION_EXCEPTION_AT)
-		.append(' ')
-		.append(el == null ? CmnCnst.TRACER_POSITION_NAME_UNKNOWN : el.getMethodName())
-		.append(' ')
-		.append('(');
-		if (el == null) {
-			sb.append(CmnCnst.TRACER_POSITION_UNKNOWN);
-		}
-		else {
-			sb.append(CmnCnst.Error.EVALUATION_EXCEPTION_LINE)
-			.append(' ')
-			.append(el.getStartLine())
-			.append(',')
-			.append(' ')
-			.append(CmnCnst.Error.EVALUATION_EXCEPTION_COLUMN)
-			.append(' ')
-			.append(el.getStartColumn());
-		}
-		sb.append(')');
+		sb.append('\t');
+		if (el != null)
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_KNOWN_POSITION, el.getMethodName(), el.getStartLine(), el.getStartColumn()));
+		else
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_UNKNOWN_POSITION));
 	}
 
 	/**

@@ -202,7 +202,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 					//$CASES-OMITTED$
 				default:
 					throw new SemanticsException(
-							NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()),
+							NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()),
 							node.jjtGetChild(i));
 				}
 			}
