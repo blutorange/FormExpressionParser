@@ -24,7 +24,7 @@ public class GenericVariableType implements IVariableType {
 
 	public GenericVariableType(@Nonnull final ELangObjectType type, @Nonnull final List<IVariableType> list) {
 		if (!type.allowsGenericsCount(list.size()))
-			throw new IllegalVariableTypeException(NullUtil.stringFormat(CmnCnst.Error.NOT_A_COMPOUND_TYPE, type));
+			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMPOUND_TYPE, type));
 		this.type = type;
 		this.list = NullUtil.checkNotNull(list.toArray(new IVariableType[list.size()]));
 	}

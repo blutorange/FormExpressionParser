@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EJump;
+import de.xima.fc.form.expression.exception.parse.DuplicateLabelException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;

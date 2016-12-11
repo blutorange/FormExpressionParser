@@ -124,7 +124,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				throw new ReturnClauseException(ec);
 			default:
 				throw new UncatchableEvaluationException(ec,
-						NullUtil.stringFormat(CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
+						NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
 			}
 		}
 	}
@@ -241,14 +241,14 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 					case CONTINUE:
 						throw new ContinueClauseException(jumpLabel, ec);
 					default:
-						throw new EvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
+						throw new EvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
 					}
 				}
 				break;
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION, n.getSiblingMethod()));
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION, n.getSiblingMethod()));
 			}
 		}
 		return res;
@@ -281,7 +281,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			final Node last = prop.getLastChildOrNull();
 			if (last == null)
 				throw new UncatchableEvaluationException(ec,
-						NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
 			case DOT:
 				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
@@ -313,13 +313,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+				throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 						last.getSiblingMethod(), node.getClass().getSimpleName()));
 			}
 			break;
 			// $CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 					child.getSiblingMethod(), node.getClass().getSimpleName()));
 		}
 		return assignee;
@@ -347,7 +347,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			final Node last = prop.getLastChildOrNull();
 			if (last == null)
 				throw new UncatchableEvaluationException(ec,
-						NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
 			case DOT:
 				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
@@ -372,13 +372,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+				throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 						last.getSiblingMethod(), node.getClass().getSimpleName()));
 			}
 			break;
 			// $CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 					child.getSiblingMethod(), node.getClass().getSimpleName()));
 		}
 		return res;
@@ -851,7 +851,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				// $CASES-OMITTED$
 			default:
 				throw new UncatchableEvaluationException(ec,
-						NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_EQUAL, childrenArray[i].getSiblingMethod()));
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_EQUAL, childrenArray[i].getSiblingMethod()));
 			}
 		}
 		return res;
@@ -867,25 +867,25 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	@Override
 	public ALangObject visit(final ASTScopeExternalNode node) throws EvaluationException {
 		throw new UncatchableEvaluationException(ec,
-				NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
 	}
 
 	@Override
 	public ALangObject visit(final ASTScopeManualNode node) throws EvaluationException {
 		throw new UncatchableEvaluationException(ec,
-				NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
 	}
 
 	@Override
 	public ALangObject visit(final ASTScopeGlobalNode node) throws EvaluationException {
 		throw new UncatchableEvaluationException(ec,
-				NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_SCOPE_DEFINITIONS_AT_EVALUATION, node.getNodeName()));
 	}
 
 	@Override
 	public ALangObject visit(final ASTVariableTypeNode node) throws EvaluationException {
 		throw new UncatchableEvaluationException(ec,
-				NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_VARIABLE_TYPE_AT_EVALUATION, node.toString()));
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_VARIABLE_TYPE_AT_EVALUATION, node.toString()));
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class ASTNumberNode extends ANode {
 	private static final long serialVersionUID = 1L;
@@ -31,11 +32,11 @@ public class ASTNumberNode extends ANode {
 			doubleValue = Double.parseDouble(string);
 		}
 		catch (final NumberFormatException e) {
-			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_NUMBER, string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_NUMBER, string, new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 		super.init(method);
 	}
-	
+
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

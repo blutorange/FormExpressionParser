@@ -1,34 +1,61 @@
-package de.xima.fc.form.expression.visitor;
+package de.xima.fc.form.expression.impl.config;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.iface.config.IUnparseConfig;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 /**
- * A configuration affecting the output of {@link IFormExpression#unparse(UnparseVisitorConfig)}.
+ * A configuration affecting the output of {@link IFormExpression#unparse(UnparseConfig)}.
  * It offers several options to change how FormExpression code will be formatted.
  * @author mad_gaksha
  */
-public final class UnparseVisitorConfig {
-	@Nonnull public final String indentPrefix;
-	@Nonnull public final String linefeed;
-	@Nonnull public final String optionalSpace;
-	@Nonnull public final String requiredSpace;
-	public final boolean keepComments;
+@ParametersAreNonnullByDefault
+public final class UnparseConfig implements IUnparseConfig {
+	private final String indentPrefix;
+	private final String linefeed;
+	private final String optionalSpace;
+	private final String requiredSpace;
+	private final boolean keepComments;
 
-	private UnparseVisitorConfig(@Nonnull final String indentPrefix, @Nonnull final String linefeed,
-			@Nonnull final String optionalSpace, @Nonnull final String requiredSpace,
+	private UnparseConfig(final String indentPrefix, final String linefeed,
+			final String optionalSpace, final String requiredSpace,
 			final boolean keepComments) {
 		this.indentPrefix = indentPrefix;
 		this.linefeed = linefeed;
 		this.optionalSpace = optionalSpace;
 		this.requiredSpace = requiredSpace;
 		this.keepComments = keepComments;
+	}
+
+	@Override
+	public String getIndentPrefix() {
+		return indentPrefix;
+	}
+
+	@Override
+	public String getLinefeed() {
+		return linefeed;
+	}
+
+	@Override
+	public String getOptionalSpace() {
+		return optionalSpace;
+	}
+
+	@Override
+	public String getRequiredSpace() {
+		return requiredSpace;
+	}
+
+	@Override
+	public boolean isKeepComments() {
+		return keepComments;
 	}
 
 	public static class Builder {
@@ -43,7 +70,6 @@ public final class UnparseVisitorConfig {
 		 * @param indentPrefix Prefix for indentation. Defaults to two spaces (<code>  </code>).
 		 * @return this
 		 */
-		@Nonnull
 		public Builder setIndentPrefix(@Nullable final String indentPrefix) {
 			this.indentPrefix = indentPrefix;
 			return this;
@@ -53,7 +79,6 @@ public final class UnparseVisitorConfig {
 		 * @param linefeed Character to be used for linefeeds, defaults to \n.
 		 * @return this
 		 */
-		@Nonnull
 		public Builder setLinefeed(@Nullable final String linefeed) {
 			this.linefeed = linefeed;
 			return this;
@@ -65,7 +90,6 @@ public final class UnparseVisitorConfig {
 		 * @param requiredSpace Number of required spaces, defaults to 1.
 		 * @return this.
 		 */
-		@Nonnull
 		public Builder setOptionalSpace(int optionalSpace) {
 			if (optionalSpace < 0) optionalSpace = 0;
 			this.optionalSpace = StringUtils.repeat(' ', optionalSpace);
@@ -78,7 +102,6 @@ public final class UnparseVisitorConfig {
 		 * @param requiredSpace Number of required spaces, default 1.
 		 * @return this.
 		 */
-		@Nonnull
 		public Builder setRequiredSpace(int requiredSpace) {
 			if (requiredSpace < 1) requiredSpace = 1;
 			this.requiredSpace = StringUtils.repeat(' ', requiredSpace);
@@ -88,7 +111,6 @@ public final class UnparseVisitorConfig {
 		 * @param keepComments Whether the output should contain comments.
 		 * @return this
 		 */
-		@Nonnull
 		public Builder setKeepComments(final boolean keepComments) {
 			this.keepComments = keepComments;
 			return this;
@@ -98,14 +120,12 @@ public final class UnparseVisitorConfig {
 		 * @return this
 		 * @see #setLinefeed(String)
 		 */
-		@Nonnull
 		public Builder setLinefeed(final char linefeed) {
 			this.linefeed = Character.toString(linefeed);
 			return this;
 		}
 		/** @return A new, sane configuration with the configured options. */
-		@Nonnull
-		public UnparseVisitorConfig build() {
+		public UnparseConfig build() {
 			String indentPrefix = this.indentPrefix;
 			String linefeed = this.linefeed;
 			String optionalSpace = this.optionalSpace;
@@ -118,33 +138,33 @@ public final class UnparseVisitorConfig {
 			linefeed = linefeed.replaceAll("[^\r\n]", CmnCnst.NonnullConstant.STRING_EMPTY); //$NON-NLS-1$
 			if (indentPrefix == null) indentPrefix = CmnCnst.NonnullConstant.STRING_SPACE;
 			if (linefeed == null) linefeed = CmnCnst.NonnullConstant.STRING_LF;
-			return new UnparseVisitorConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
+			return new UnparseConfig(indentPrefix, linefeed, optionalSpace, requiredSpace, keepComments);
 		}
 	}
 
 	private final static class InstanceHolder {
-		@Nonnull public final static UnparseVisitorConfig STYLED = new Builder()
+		public final static UnparseConfig STYLED = new Builder()
 				.setLinefeed(Syntax.LINEFEED)
 				.setIndentPrefix(Syntax.INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(true)
 				.build();
-		@Nonnull public final static UnparseVisitorConfig STYLED_WITHOUT_COMMENTS = new Builder()
+		public final static UnparseConfig STYLED_WITHOUT_COMMENTS = new Builder()
 				.setLinefeed(Syntax.LINEFEED)
 				.setIndentPrefix(Syntax.INDENT)
 				.setOptionalSpace(1)
 				.setRequiredSpace(1)
 				.setKeepComments(false)
 				.build();
-		@Nonnull public final static UnparseVisitorConfig UNSTYLED_WITH_COMMENTS = new Builder()
+		public final static UnparseConfig UNSTYLED_WITH_COMMENTS = new Builder()
 				.setLinefeed(StringUtils.EMPTY)
 				.setIndentPrefix(StringUtils.EMPTY)
 				.setOptionalSpace(0)
 				.setRequiredSpace(1)
 				.setKeepComments(true)
 				.build();
-		@Nonnull public final static UnparseVisitorConfig UNSTYLED_WITHOUT_COMMENTS = new Builder()
+		public final static UnparseConfig UNSTYLED_WITHOUT_COMMENTS = new Builder()
 				.setLinefeed(StringUtils.EMPTY)
 				.setIndentPrefix(StringUtils.EMPTY)
 				.setOptionalSpace(0)
@@ -156,34 +176,29 @@ public final class UnparseVisitorConfig {
 	/**
 	 * @return Some (working) configuration, no guarantees on its details.
 	 */
-	@Nonnull
-	public static UnparseVisitorConfig getDefaultConfig() {
+	public static UnparseConfig getDefaultConfig() {
 		return InstanceHolder.STYLED;
 	}
 
-	@Nonnull
-	public static UnparseVisitorConfig getStyledWithCommentsConfig() {
+	public static UnparseConfig getStyledWithCommentsConfig() {
 		return InstanceHolder.STYLED;
 	}
 
-	@Nonnull
-	public static UnparseVisitorConfig getStyledWithoutCommentsConfig() {
+	public static UnparseConfig getStyledWithoutCommentsConfig() {
 		return InstanceHolder.STYLED_WITHOUT_COMMENTS;
 	}
 
 	/**
 	 * @return A config that keeps comments, but does not add any optional spaces or newlines.
 	 */
-	@Nonnull
-	public static UnparseVisitorConfig getUnstyledWithCommentsConfig() {
+	public static UnparseConfig getUnstyledWithCommentsConfig() {
 		return InstanceHolder.UNSTYLED_WITH_COMMENTS;
 	}
 
 	/**
 	 * @return A config that does not keep comments, nor does it add any optional spaces or newlines.
 	 */
-	@Nonnull
-	public static UnparseVisitorConfig getUnstyledWithoutCommentsConfig() {
+	public static UnparseConfig getUnstyledWithoutCommentsConfig() {
 		return InstanceHolder.UNSTYLED_WITHOUT_COMMENTS;
 	}
 }

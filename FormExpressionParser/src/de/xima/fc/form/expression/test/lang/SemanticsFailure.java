@@ -6,6 +6,8 @@ import de.xima.fc.form.expression.exception.evaluation.CustomRuntimeException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
+import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
@@ -66,7 +68,7 @@ enum SemanticsFailure implements ITestCase {
 		return errorBegin;
 	}
 	@Override
-	public boolean isUseStrictMode() {
-		return false;
+	public ISeverityConfig getSeverityConfig() {
+		return SeverityConfig.getLooseConfig();
 	}
 }

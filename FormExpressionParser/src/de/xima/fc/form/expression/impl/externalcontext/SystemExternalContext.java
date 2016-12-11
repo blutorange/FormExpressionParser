@@ -11,6 +11,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public final class SystemExternalContext extends AGenericExternalContext implements IExternalContext {
 	private final PrintStream printStream;
@@ -47,7 +48,8 @@ public final class SystemExternalContext extends AGenericExternalContext impleme
 				outputDisabled = false;
 				break;
 			default:
-				ec.getLogger().info(String.format(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
+				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT,
+						command.getClass().getCanonicalName(), command));
 				break;
 			}
 		}

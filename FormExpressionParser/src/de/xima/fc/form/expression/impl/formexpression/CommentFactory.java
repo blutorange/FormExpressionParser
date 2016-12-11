@@ -21,7 +21,7 @@ public final class CommentFactory {
 		case FormExpressionParserConstants.TypeSingleLineComment:
 			break;
 		default:
-			throw new IllegalArgumentException(String.format(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
+			throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
 		}
 		final Token t = NullUtil.checkNotNull(token);
 		final ECommentType type = t.image.charAt(1) == '/' ? ECommentType.SINGLE_LINE : ECommentType.MULTI_LINE;

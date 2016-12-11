@@ -5,13 +5,16 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class VariableTypeBuilder implements IVariableTypeBuilder {
 	@Nullable
 	private ELangObjectType type;
@@ -32,7 +35,6 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 		return append(forSimpleType(type));
 	}
 
-	@Nonnull
 	private List<IVariableType> getChildren() {
 		if (children != null)
 			return children;
@@ -57,8 +59,7 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 		return this;
 	}
 
-	@Nonnull
-	private static IVariableType forSimpleType(@Nonnull final ELangObjectType type) throws IllegalVariableTypeException {
+	private static IVariableType forSimpleType(final ELangObjectType type) throws IllegalVariableTypeException {
 		switch (type) {
 		case OBJECT:
 			return SimpleVariableType.OBJECT;
@@ -78,7 +79,7 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 		case FUNCTION:
 		case HASH:
 		default:
-			throw new IllegalVariableTypeException(CmnCnst.Error.NOT_A_SIMPLE_TYPE);
+			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_SIMPLE_TYPE, type));
 		}
 	}
 }

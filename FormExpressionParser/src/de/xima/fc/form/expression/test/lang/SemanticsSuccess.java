@@ -5,6 +5,8 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
+import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -221,8 +223,8 @@ enum SemanticsSuccess implements ITestCase {
 	}
 
 	@Override
-	public boolean isUseStrictMode() {
-		return false;
+	public ISeverityConfig getSeverityConfig() {
+		return SeverityConfig.getLooseConfig();
 	}
 
 }

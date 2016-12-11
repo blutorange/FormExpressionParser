@@ -13,6 +13,7 @@ import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException
 import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclarationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
@@ -57,17 +58,17 @@ enum SyntaxFailure implements ITestCase {
 	TEST035(new Cfg("do{continue foo;}while(true);").err("Error during parsing at line 1, column 4: Continue foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
 	TEST036(new Cfg("for<foo>(i in 10)continue;").err("Error during parsing at line 1, column 18: Continue without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
 	TEST037(new Cfg("switch<foo>(true){};while(true)continue foo;").err("Error during parsing at line 1, column 32: Continue foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
-	TEST038(new Cfg("if(true)var i = i;").err("Error during parsing at line 1, column 17: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),	
+	TEST038(new Cfg("if(true)var i = i;").err("Error during parsing at line 1, column 17: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	// Closures not supported currently.
 	TEST039(new Cfg("function foo(){var i = 10;->(){i;};}foo();").err("Error during parsing at line 1, column 32: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	TEST040(new Cfg("function foo(){arguments.length;}foo(1,2,3);").err("Error during parsing at line 1, column 16: Variable arguments cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	TEST041(new Cfg("\"foo\\\";").err(TokenMgrError.class).err("Lexical error at line 1, column 8.  Encountered: <EOF> after : \"\\\"foo\\\\\\\";\"")),
 	TEST042(new Cfg("#(\\d#;").err(ParseException.class).err("Encountered invalid regex at line 1, column 1: Unclosed group near index 3")),
-	
+
 	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),
 	STRICT003(new Cfg("math::pi;").err("Error during parsing at line 1, column 1: Scope math is provided by the evaluation context, but require scope statement is missing.").err(MissingRequireScopeStatementException.class).strict()),
-	
+
 	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.").err(ParseException.class)),
 	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.").err(ParseException.class)),
 	TEMPLATE003(new Cfg("<foo> [%foo=0;foo(); <bar>").template().err("Encountered \" \"<\" \"< \"\" at line 1, column 22.").err(ParseException.class)),
@@ -77,8 +78,8 @@ enum SyntaxFailure implements ITestCase {
 	@Nonnull private final EContextType context;
 	@Nullable private final String errorBegin;
 	@Nullable private final Class<? extends Throwable> errorClass;
-	private final boolean strictMode;
-	
+	@Nonnull private final ISeverityConfig config;
+
 	private SyntaxFailure(@Nonnull final String code, @Nonnull final String errMsg) {
 		this(new Cfg(code).err(errMsg).err(ParseException.class));
 	}
@@ -88,9 +89,9 @@ enum SyntaxFailure implements ITestCase {
 		this.errorBegin = cfg.errMsg;
 		this.context = cfg.context;
 		this.errorClass = cfg.errClass;
-		this.strictMode = cfg.strict;
+		this.config = cfg.config;
 	}
-	
+
 	@Override
 	public String getErrorBegin() {
 		return errorBegin;
@@ -125,9 +126,9 @@ enum SyntaxFailure implements ITestCase {
 	public Class<? extends Throwable> getExpectedException() {
 		return errorClass;
 	}
-	
+
 	@Override
-	public boolean isUseStrictMode() {
-		return strictMode;
+	public ISeverityConfig getSeverityConfig() {
+		return config;
 	}
 }

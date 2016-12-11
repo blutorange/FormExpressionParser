@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.visitor;
 
+import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_SCOPED_FUNCTION_OUTSIDE_HEADER_AS_ERROR;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +24,7 @@ import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderExc
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
@@ -47,22 +50,22 @@ implements IScopeDefinitionsBuilder {
 	@Nonnull
 	private final Map<String, Map<String, IHeaderNode>> manualMap;
 
-	private final boolean treatScopedFunctionOutsideHeaderAsError;
+	private final ISeverityConfig config;
 
 	@Nonnull
-	public static IScopeDefinitionsBuilder collect(final Node node, final boolean strictMode) throws ParseException {
-		final ScopeCollectVisitor v = new ScopeCollectVisitor(strictMode);
+	public static IScopeDefinitionsBuilder collect(final Node node, final ISeverityConfig config) throws ParseException {
+		final ScopeCollectVisitor v = new ScopeCollectVisitor(config);
 		node.jjtAccept(v, Optional.<Map<String,IHeaderNode>>absent());
 		v.currentScope = null;
 		v.detachNodes();
 		return v;
 	}
 
-	private ScopeCollectVisitor(final boolean treatScopedFunctionOutsideHeaderAsError) {
+	private ScopeCollectVisitor(final ISeverityConfig config) {
 		globalMap = new HashMap<>();
 		requiredSet = new HashSet<>();
 		manualMap = new HashMap<>();
-		this.treatScopedFunctionOutsideHeaderAsError = treatScopedFunctionOutsideHeaderAsError;
+		this.config = config;
 	}
 
 	private void detachNodes() throws ParseException {
@@ -95,7 +98,7 @@ implements IScopeDefinitionsBuilder {
 			throw new ManualScopeAlreadyRequiredException(node);
 		@Nullable Map<String,IHeaderNode> map = manualMap.get(currentScope);
 		if (map == null) {
-			map = new HashMap<String, IHeaderNode>();
+			map = new HashMap<>();
 			manualMap.put(node.getScopeName(), map);
 		}
 		visitChildren(node, Optional.of(map));
@@ -145,7 +148,7 @@ implements IScopeDefinitionsBuilder {
 			else {
 				if (hasManual(scope) && hasManual(scope, node.getVariableName()))
 					throw new FunctionNameAlreadyDefinedException(node);
-				if (treatScopedFunctionOutsideHeaderAsError)
+				if (config.hasOption(TREAT_SCOPED_FUNCTION_OUTSIDE_HEADER_AS_ERROR))
 					throw new ScopedFunctionOutsideHeaderException(node);
 				addManual(scope, node.getVariableName(), new HeaderNodeImpl(node));
 			}

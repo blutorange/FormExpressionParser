@@ -1,9 +1,12 @@
 package de.xima.fc.form.expression.visitor;
+
+import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR;
+
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
@@ -14,6 +17,7 @@ import de.xima.fc.form.expression.exception.parse.ScopeMissingVariableException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
@@ -24,27 +28,23 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
-	@Nonnull
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
-	@Nonnull
 	private final IEvaluationContextContractFactory<?> contractFactory;
-	@Nonnull
 	private final Stack<String> defaultScopeStack = new Stack<>();
-
-	private final boolean treatMissingRequireScopeAsError;
+	private final ISeverityConfig config;
 	private int symbolTableSize = 0;
 
-	private VariableResolveVisitor(final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
-			final @Nonnull IEvaluationContextContractFactory<?> contractFactory,
-			final boolean treatMissingRequireScopeAsError) {
+	private VariableResolveVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
+			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config) {
 		this.scopeDefBuilder = scopeDefBuilder;
 		this.contractFactory = contractFactory;
-		this.treatMissingRequireScopeAsError = treatMissingRequireScopeAsError;
+		this.config = config;
 	}
 
-	private boolean resolveVariableWithScope(@Nonnull final String scope, @Nonnull final String name,
-			final @Nonnull ASTVariableNode node, final boolean doThrow) throws ParseException {
+	private boolean resolveVariableWithScope(final String scope, final String name,
+			final ASTVariableNode node, final boolean doThrow) throws ParseException {
 		// First, look it up in manually defined scopes.
 		// Otherwise, try external scopes, including those from the external
 		// context.
@@ -73,7 +73,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 					throw new ScopeMissingVariableException(scope, name, node);
 				return false;
 			}
-			if (!scopeDefBuilder.hasExternal(scope) && treatMissingRequireScopeAsError) {
+			if (!scopeDefBuilder.hasExternal(scope) && config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR)) {
 				if (doThrow)
 					throw new MissingRequireScopeStatementException(scope, node);
 				return false;
@@ -137,7 +137,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 			for (final String defaultScope : embedmentScopeList)
 				if (defaultScope != null && resolveVariableWithScope(defaultScope, name, node, false))
 					return;
-		
+
 		throw new VariableNotResolvableException(node);
 	}
 
@@ -147,7 +147,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	@Override
 	public void visit(final ASTWithClauseNode node) throws ParseException {
 		try {
-			for (int i = node.getScopeCount(); i-->0;)
+			for (int i = node.getScopeCount(); i-- > 0;)
 				defaultScopeStack.push(node.getScope(i));
 			node.getBodyNode().jjtAccept(this);
 		}
@@ -173,7 +173,6 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		}
 	}
 
-	@Nonnull
 	private Integer getNewObjectToSet() {
 		return symbolTableSize++;
 	}
@@ -185,11 +184,10 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		return object;
 	}
 
-	public static int resolve(final Node node, final @Nonnull IScopeDefinitionsBuilder scopeDefBuilder,
-			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
-			final boolean treatMissingRequireScopeAsError) throws ParseException {
-		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, contractFactory,
-				treatMissingRequireScopeAsError);
+	public static int resolve(final Node node, final IScopeDefinitionsBuilder scopeDefBuilder,
+			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config)
+					throws ParseException {
+		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, contractFactory, config);
 		v.resolveScopeDefs(scopeDefBuilder);
 		v.bindScopeDefValues(scopeDefBuilder);
 		node.jjtAccept(v);

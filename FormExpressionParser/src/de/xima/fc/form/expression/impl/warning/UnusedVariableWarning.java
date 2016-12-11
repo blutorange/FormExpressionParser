@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.warning;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
@@ -8,10 +8,12 @@ import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class UnusedVariableWarning extends GenericWarning implements IEvaluationWarning {
-	public UnusedVariableWarning(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node) {
-		super(NullUtil.stringFormat(CmnCnst.Warning.UNUSED_VARIABLE, resolvable.getVariableName()), node);
+	public UnusedVariableWarning(final ISourceResolvable resolvable, final Node node) {
+		super(NullUtil.messageFormat(CmnCnst.Warning.UNUSED_VARIABLE, resolvable.getVariableName()), node);
 		variableName = resolvable.getVariableName();
 	}
-	@Nonnull public final String variableName;
+
+	public final String variableName;
 }

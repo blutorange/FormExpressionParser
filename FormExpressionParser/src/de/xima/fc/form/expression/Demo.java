@@ -18,10 +18,13 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
+import de.xima.fc.form.expression.impl.config.SeverityConfig;
+import de.xima.fc.form.expression.impl.config.UnparseConfig;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
 import de.xima.fc.form.expression.impl.factory.FormcycleEcContractFactory;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
@@ -29,7 +32,6 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
-import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 /**
  * TODO
@@ -40,14 +42,15 @@ import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
  * - update highlighter with new token types (global, scope, require etc)
  * - everything returns a value; in strict mode, check that functions return explicitly
  */
-public class FormExpressionDemo {
-	private static final boolean STRICT_MODE = false;
+public class Demo {
+	@Nonnull
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
 	@Nonnull
 	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
 	@Nonnull
 	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
-	private static final UnparseVisitorConfig UNPARSE_CONFIG = UnparseVisitorConfig.getStyledWithCommentsConfig();
+	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
@@ -96,7 +99,7 @@ public class FormExpressionDemo {
 	private static void showWarnings(final IFormExpression<FormcycleExternalContext> expression) {
 		System.out.println("===Warnings==="); //$NON-NLS-1$
 		try {
-			final List<IEvaluationWarning> warningList = new ArrayList<IEvaluationWarning>(
+			final List<IEvaluationWarning> warningList = new ArrayList<>(
 					expression.analyze(new FormcycleExternalContext()));
 			Collections.sort(warningList, IEvaluationWarning.COMPARATOR);
 			for (final IEvaluationWarning warning : warningList) {
@@ -181,7 +184,7 @@ public class FormExpressionDemo {
 		final IFormExpression<FormcycleExternalContext> ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = EXPRESSION_FACTORY.parse(code, CONTRACT_FACTORY, STRICT_MODE);
+			ex = EXPRESSION_FACTORY.parse(code, CONTRACT_FACTORY, SEVERITY_CONFIG);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}

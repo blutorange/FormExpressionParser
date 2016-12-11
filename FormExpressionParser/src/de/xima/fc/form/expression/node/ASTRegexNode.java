@@ -32,14 +32,14 @@ public class ASTRegexNode extends ANode {
 		assertChildrenExactly(0);
 		Preconditions.checkNotNull(regex, new ParseException(CmnCnst.Error.NODE_NULL_REGEX));
 		if (regex.length() < 2)
-			throw new ParseException(String.format(CmnCnst.Error.NODE_IMPROPER_REGEX_TERMINATION, regex));
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_IMPROPER_REGEX_TERMINATION, regex));
 		super.init(method);
 		final int lastHash = regex.lastIndexOf('#');
 		try {
 			pattern = NullUtil.checkNotNull(Pattern.compile(regex.substring(1, lastHash), flags(regex, lastHash+1)));
 		}
 		catch (final PatternSyntaxException e) {
-			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_REGEX,
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_REGEX,
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 	}

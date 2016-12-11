@@ -2040,7 +2040,7 @@ void Function(EMethod method) #FunctionNode :
 {
   (
     < LambdaArrow >
-    [ SpecificVariableType(null) { hasType = true; } ]
+    [ GenericsFunction(null) { hasType = true; } ]
     < ParenOpen >
     (
       [

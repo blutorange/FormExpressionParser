@@ -22,6 +22,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.contextcommand.PositionedDocumentCommand;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 
 public abstract class AHtmlExternalContext implements IExternalContext{
@@ -76,7 +77,7 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 		if (docCommand.isPresent())
 			docCommandList.add(new PositionedDocumentCommand(docCommand.get(), builder.length(), ++priority));
 		else
-			ec.getLogger().info(String.format(CmnCnst.Error.UNKNOWN_COMMAND_FOR_HTML_CONTEXT,
+			ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_HTML_CONTEXT,
 					command.getClass().getCanonicalName(), command));
 	}
 

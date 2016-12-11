@@ -1,6 +1,10 @@
 package de.xima.fc.form.expression.visitor;
 
-import javax.annotation.Nonnull;
+import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_DECLARATION_AS_ERROR;
+import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR;
+import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_SCOPE_DECLARATION_AS_ERROR;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.NoSuchEmbedmentException;
@@ -10,6 +14,7 @@ import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclaration
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
@@ -25,21 +30,17 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  * @author madgaksha
  */
+@ParametersAreNonnullByDefault
 public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 	private final IEvaluationContextContractFactory<?> contractFactory;
-	private final boolean treatMissingDeclarationAsError;
-	private final boolean treatMissingRequireScopeAsError;
-	private final boolean treatMissingScopeDeclarationAsError;
+	private final ISeverityConfig config;
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
 
 	public VariableHoistVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> contractFactory, final boolean treatMissingDeclarationAsError,
-			final boolean treatMissingRequireScopeAsError, final boolean treatMissingScopeDeclarationAsError) {
+			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config) {
 		this.scopeDefBuilder = scopeDefBuilder;
-		this.treatMissingDeclarationAsError = treatMissingDeclarationAsError;
-		this.treatMissingRequireScopeAsError = treatMissingRequireScopeAsError;
+		this.config = config;
 		this.contractFactory = contractFactory;
-		this.treatMissingScopeDeclarationAsError = treatMissingScopeDeclarationAsError;
 	}
 
 	private void processAssignment(final ASTVariableNode node) throws ParseException {
@@ -48,19 +49,19 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		final String scope = node.getScope();
 		if (scope != null && !scopeDefBuilder.hasManual(scope) && !scopeDefBuilder.hasExternal(scope)) {
 			if (contractFactory.isProvidingExternalScope(scope)) {
-				if (treatMissingRequireScopeAsError)
+				if (config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR))
 					throw new MissingRequireScopeStatementException(scope, node);
 				scopeDefBuilder.addExternal(scope);
 			}
 			else {
-				if (treatMissingScopeDeclarationAsError)
+				if (config.hasOption(TREAT_MISSING_SCOPE_DECLARATION_AS_ERROR))
 					throw new NoSuchScopeException(scope, node);
 				scopeDefBuilder.addManual(scope, node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
 			}
 		}
 		else if (scope == null && binding.getVariable(node.getVariableName()) == null) {
 			if (!scopeDefBuilder.hasGlobal(node.getVariableName())) {
-				if (treatMissingDeclarationAsError)
+				if (config.hasOption(TREAT_MISSING_DECLARATION_AS_ERROR))
 					throw new VariableUsageBeforeDeclarationException(node);
 				scopeDefBuilder.addGlobal(node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
 			}
@@ -80,7 +81,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		for (final String scope : scopes) {
 			if (scope != null && !(scopeDefBuilder.hasManual(scope) || scopeDefBuilder.hasExternal(scope))) {
 				if (contractFactory.isProvidingExternalScope(scope)) {
-					if (treatMissingRequireScopeAsError)
+					if (config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR))
 						throw new MissingRequireScopeStatementException(scope, node);
 					scopeDefBuilder.addExternal(scope);
 				}
@@ -110,7 +111,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
 				break;
 			default:
-				throw new SemanticsException(NullUtil.stringFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+				throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
 						node.jjtGetChild(i).jjtGetNodeId(), node.getClass().getSimpleName()), node.jjtGetChild(i));
 			}
 		}
@@ -122,18 +123,10 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
-	public static void hoist(@Nonnull final Node node, @Nonnull final IScopeDefinitionsBuilder scopeDefBuilder,
-			@Nonnull final IEvaluationContextContractFactory<?> contractFactory, final boolean strictMode)
-			throws ParseException {
-		hoist(node, scopeDefBuilder, contractFactory, strictMode, strictMode, strictMode);
-	}
-
-	public static void hoist(@Nonnull final Node node, @Nonnull final IScopeDefinitionsBuilder scopeDefBuilder,
-			@Nonnull final IEvaluationContextContractFactory<?> contractFactory,
-			final boolean treatMissingDeclarationAsError, final boolean treatMissingRequireScopeAsError,
-			final boolean treatMissingScopeDeclarationAsError) throws ParseException {
-		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory,
-				treatMissingDeclarationAsError, treatMissingRequireScopeAsError, treatMissingScopeDeclarationAsError);
+	public static void hoist(final Node node, final IScopeDefinitionsBuilder scopeDefBuilder,
+			final IEvaluationContextContractFactory<?> contractFactory,
+			final ISeverityConfig config) throws ParseException {
+		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory, config);
 		v.bindScopeDefValues(scopeDefBuilder);
 		node.jjtAccept(v);
 		v.binding.reset();

@@ -8,11 +8,11 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.impl.config.UnparseConfig;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
-import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
 public class FunctionLangObject extends ALangObject {
 	@Nonnull
@@ -99,7 +99,7 @@ public class FunctionLangObject extends ALangObject {
 		if (n == null)
 			builder.append(Syntax.NATIVE_CODE);
 		else {
-			final String unparse = UnparseVisitor.unparse(n, UnparseVisitorConfig.getUnstyledWithoutCommentsConfig());
+			final String unparse = UnparseVisitor.unparse(n, UnparseConfig.getUnstyledWithoutCommentsConfig());
 			builder.append(unparse);
 		}
 		builder.append(Syntax.BRACE_CLOSE).append(Syntax.SEMI_COLON);

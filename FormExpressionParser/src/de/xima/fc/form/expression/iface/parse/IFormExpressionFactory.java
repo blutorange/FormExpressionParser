@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.iface.parse;
 import java.io.Reader;
 import java.util.Iterator;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTokenManager;
@@ -11,13 +11,14 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
+import de.xima.fc.form.expression.iface.config.IUnparseConfig;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
-import de.xima.fc.form.expression.visitor.UnparseVisitorConfig;
 
+@ParametersAreNonnullByDefault
 public interface IFormExpressionFactory {
 
-	@Nonnull
-	Node asNode(@Nonnull String code) throws ParseException, TokenMgrError;
+	Node asNode(String code) throws ParseException, TokenMgrError;
 
 	/**
 	 * Parses the given string and returns the top level node of the parse
@@ -35,13 +36,12 @@ public interface IFormExpressionFactory {
 	 *             semantically invalid. This is a subclass of
 	 *             {@link ParseException}.
 	 */
-	@Nonnull
-	<T extends IExternalContext> IFormExpression<T> parse(@Nonnull String code,
-			@Nonnull IEvaluationContextContractFactory<T> factory, boolean strictMode)
-			throws ParseException, TokenMgrError;
+	<T extends IExternalContext> IFormExpression<T> parse(String code,
+			IEvaluationContextContractFactory<T> factory, ISeverityConfig config)
+					throws ParseException, TokenMgrError;
 
 	/**
-	 * Formats the given code. Formatting can be controlled with a {@link UnparseVisitorConfig}.
+	 * Formats the given code. Formatting can be controlled with a {@link IUnparseConfig}.
 	 * @param code Code to format.
 	 * @param config Configuration for formatting.
 	 * @return The formatted code.
@@ -52,8 +52,7 @@ public interface IFormExpressionFactory {
 	 *             When the code is not a valid program. Specifically, when
 	 *             the code cannot be parsed into valid tokens.
 	 */
-	@Nonnull
-	String format(@Nonnull String code, @Nonnull UnparseVisitorConfig config)
+	String format(String code, IUnparseConfig config)
 			throws ParseException, TokenMgrError;
 
 	/**
@@ -62,18 +61,15 @@ public interface IFormExpressionFactory {
 	 * @return An iterator for the tokens the code consists of.
 	 * @throws TokenMgrError When the code is invalid.
 	 */
-	@Nonnull
-	Iterator<Token> asTokenStream(@Nonnull Reader reader) throws TokenMgrError;
+	Iterator<Token> asTokenStream(Reader reader) throws TokenMgrError;
 
-	@Nonnull
-	Token[] asTokenArray(@Nonnull String code) throws TokenMgrError;
+	Token[] asTokenArray(String code) throws TokenMgrError;
 
 	/**
 	 * @param reader
 	 *            Reader to read from.
 	 * @return A token manager for tokenizing the stream.
 	 */
-	@Nonnull
-	FormExpressionParserTokenManager asTokenManager(@Nonnull Reader reader);
+	FormExpressionParserTokenManager asTokenManager(Reader reader);
 
 }

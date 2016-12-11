@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.test.lang;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
@@ -80,7 +81,7 @@ enum SyntaxSuccess implements ITestCase {
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;
 	@Nonnull private final EContextType context;
-	private final boolean strictMode;
+	@Nonnull private final ISeverityConfig config;
 
 	private SyntaxSuccess(@Nonnull final String code) {
 		this(new Cfg(code));
@@ -90,7 +91,7 @@ enum SyntaxSuccess implements ITestCase {
 		this.code = cfg.code;
 		this.type = cfg.type;
 		this.context = cfg.context;
-		this.strictMode = cfg.strict;
+		this.config = cfg.config;
 	}
 
 	@Override
@@ -129,7 +130,7 @@ enum SyntaxSuccess implements ITestCase {
 	}
 
 	@Override
-	public boolean isUseStrictMode() {
-		return strictMode;
+	public ISeverityConfig getSeverityConfig() {
+		return config;
 	}
 }

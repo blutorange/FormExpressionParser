@@ -3,8 +3,8 @@ package de.xima.fc.form.expression.visitor;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
@@ -40,15 +40,15 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @param <T>
  *            Type of the objects of the binding.
  */
+@ParametersAreNonnullByDefault
 public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidVisitorAdapter<ParseException> {
-	@Nonnull
 	protected final IBinding<T> binding;
 
 	protected AVariableBindingVisitor() {
-		this.binding = new CloneBinding<T>();
+		this.binding = new CloneBinding<>();
 	}
 
-	private void visitNested(@Nonnull final Node node) throws ParseException {
+	private void visitNested(final Node node) throws ParseException {
 		final int bookmark = binding.getBookmark();
 		binding.nest();
 		try {
@@ -228,7 +228,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	 * @param scopeDefBuilder
 	 * @throws ParseException
 	 */
-	protected void bindScopeDefValues(@Nonnull final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
+	protected void bindScopeDefValues(final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
 		// Global scope.
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode hn = it.next().getValue();
@@ -250,13 +250,12 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 			}
 		}
 	}
-	
+
 	/**
 	 * When a variable is declared, it is set to this value initially.
 	 *
 	 * @return The object to set.
 	 * @throws IllegalVariableSourceResolutionException
 	 */
-	@Nonnull
 	protected abstract T getNewObjectToSet(ISourceResolvable res) throws IllegalVariableSourceResolutionException;
 }

@@ -15,7 +15,7 @@ public class VariableNotResolvableException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 
 	public VariableNotResolvableException(@Nullable final String scope, final String name, final Node node) {
-		super(NullUtil.stringFormat(CmnCnst.Error.VARIABLE_NOT_RESOLVABLE, varToString(scope, name)), node);
+		super(NullUtil.messageFormat(CmnCnst.Error.VARIABLE_NOT_RESOLVABLE, varToString(scope, name)), node);
 		this.name = name;
 		this.scope = scope;
 	}

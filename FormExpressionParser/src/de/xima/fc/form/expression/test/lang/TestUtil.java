@@ -13,9 +13,11 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.impl.externalcontext.AGenericExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
 import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
@@ -61,21 +63,22 @@ public final class TestUtil {
 		@Nullable
 		public String getErrorBegin();
 
-		public boolean isUseStrictMode();
+		@Nonnull
+		public ISeverityConfig getSeverityConfig();
 	}
 
 	static class Cfg {
-		boolean strict  = false;
 		@Nonnull final String code;
 		@Nullable String errMsg = null;
 		@Nonnull ETestType type = ETestType.PROGRAM;
 		@Nonnull EContextType context = EContextType.GENERIC;
 		@Nullable Class<? extends Throwable> errClass;
+		@Nonnull ISeverityConfig config = SeverityConfig.getLooseConfig();
 		Cfg(@Nonnull final  String code) {
 			this.code = code;
 		}
 		@Nonnull Cfg strict() {
-			strict = true;
+			config = SeverityConfig.getStrictConfig();
 			return this;
 		}
 		@Nonnull Cfg prog() {
@@ -104,7 +107,7 @@ public final class TestUtil {
 		}
 	}
 
-	
+
 	public static void test(final Class<? extends ITestCase> clazz) throws IllegalArgumentException, AssertionError {
 		if (!clazz.isEnum())
 			throw new IllegalAccessError(String.format("%s is not an enum.", clazz));
@@ -116,13 +119,13 @@ public final class TestUtil {
 				switch (test.getContextType()) {
 				case FORMCYCLE:
 					final IFormExpression<FormcycleExternalContext> feForm = parse(test.getCode(), test.getTestType(),
-							FormcycleEcContractFactory.INSTANCE, test.isUseStrictMode());
+							FormcycleEcContractFactory.INSTANCE, test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateFormcycle(feForm, test.getTestType());
 					break;
 				case GENERIC:
 					final IFormExpression<AGenericExternalContext> feGeneric = parse(test.getCode(), test.getTestType(),
-							GenericEcContractFactory.INSTANCE, test.isUseStrictMode());
+							GenericEcContractFactory.INSTANCE, test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
@@ -232,16 +235,16 @@ public final class TestUtil {
 
 	@Nonnull
 	private static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
-			@Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider, final boolean strictMode)
-			throws ParseException, TokenMgrError {
+			@Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider,
+			@Nonnull final ISeverityConfig config) throws ParseException, TokenMgrError {
 		final IFormExpression<T> res;
 		final Date t1 = new Date();
 		switch (type) {
 		case PROGRAM:
-			res = FormExpressionFactory.forProgram().parse(code, provider, strictMode);
+			res = FormExpressionFactory.forProgram().parse(code, provider, config);
 			break;
 		case TEMPLATE:
-			res = FormExpressionFactory.forTemplate().parse(code, provider, strictMode);
+			res = FormExpressionFactory.forTemplate().parse(code, provider, config);
 			break;
 		default:
 			throw new ParseException("Unkown enum: " + type);

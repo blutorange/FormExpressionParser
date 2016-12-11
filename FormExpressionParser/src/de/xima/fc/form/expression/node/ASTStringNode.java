@@ -31,7 +31,7 @@ public class ASTStringNode extends ANode {
 	}
 
 	public ASTStringNode(@Nonnull final Node prototype, @Nonnull final String string) {
-		super(prototype, FormExpressionParserTreeConstants.JJTSTRINGNODE);		
+		super(prototype, FormExpressionParserTreeConstants.JJTSTRINGNODE);
 		this.stringValue = string;
 	}
 
@@ -46,7 +46,7 @@ public class ASTStringNode extends ANode {
 		final String s = parseString(value);
 		stringValue = s;
 	}
-	
+
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;
@@ -55,12 +55,12 @@ public class ASTStringNode extends ANode {
 	@Nonnull
 	public String parseString(@Nonnull final String literal) throws ParseException {
 		if (literal.length() < 2)
-			throw new ParseException(String.format(CmnCnst.Error.NODE_IMPROPER_STRING_TERMINATION, literal));
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_IMPROPER_STRING_TERMINATION, literal));
 		try {
 			return NullUtil.checkNotNull(StringEscapeUtils.unescapeJava(literal.substring(1, literal.length() - 1)));
 		}
 		catch (final IllegalArgumentException e) {
-			throw new ParseException(String.format(CmnCnst.Error.NODE_INVALID_STRING,
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING,
 					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
 		}
 	}
