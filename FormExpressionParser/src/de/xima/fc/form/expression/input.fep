@@ -1,6 +1,10 @@
-->number(){
-  switch(9){
-    case 9:
-      return 5;
+->number(m){
+  switch(0) {
+  case 0:
+    return [];
+  case 1:
+    return [];
+  default:
+    return [];
   }
 };

@@ -44,7 +44,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  */
 public class Demo {
 	@Nonnull
-	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getLooseConfig();
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
 	@Nonnull
 	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
 	@Nonnull

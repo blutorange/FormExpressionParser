@@ -221,6 +221,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
 
 				ec.getTracer().descend(parentNode);
+				//TODO make void function return null, no matter what
 				try {
 					if (func.getThisContextType() == ELangObjectType.NULL)
 						thisContext = NullLangObject.getInstance();

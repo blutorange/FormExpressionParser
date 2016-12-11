@@ -85,6 +85,6 @@ public class ASTSwitchClauseNode extends ANode  implements ILabelled {
 	}
 
 	public boolean hasDefaultCase() {
-		return jjtGetChild(jjtGetNumChildren()).getSiblingMethod() == EMethod.SWITCHDEFAULT;
+		return jjtGetChild(jjtGetNumChildren()-1).getSiblingMethod() == EMethod.SWITCHDEFAULT;
 	}
 }

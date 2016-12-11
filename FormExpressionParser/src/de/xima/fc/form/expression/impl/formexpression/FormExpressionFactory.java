@@ -306,16 +306,17 @@ public final class FormExpressionFactory {
 	@Nonnull
 	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node,
 			@Nonnull final FormExpressionParser parser,
-			@Nonnull final IEvaluationContextContractFactory<T> contractFactory, @Nonnull final ISeverityConfig config)
-					throws ParseException {
+			@Nonnull final IEvaluationContextContractFactory<T> contractFactory,
+			@Nonnull final ISeverityConfig severityConfig) throws ParseException {
 		JumpCheckVisitor.check(node);
-		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, config);
-		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, config);
-		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory, config);
+		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, severityConfig);
+		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, severityConfig);
+		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory,
+				severityConfig);
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
 		checkScopeDefsConstancy(scopeDefs);
 		final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);
-		VariableTypeCheckVisitor.check(node, symbolTypeTable, config);
+		VariableTypeCheckVisitor.check(node, symbolTypeTable, contractFactory, severityConfig, scopeDefs);
 		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, contractFactory, symbolTableSize);
 	}
 

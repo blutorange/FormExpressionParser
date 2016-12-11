@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import java.util.Collection;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
@@ -31,6 +31,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * Creates a symbol table and fills it with the type of each variable.
  * @author madgaksha
  */
+@ParametersAreNonnullByDefault
 public final class VariableTypeCollectVisitor
 extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
 
@@ -107,7 +108,6 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		node.getBodyNode().jjtAccept(this, builder);
 	}
 
-	@Nonnull
 	private <T extends IArgumentResolvable & Node> IVariableType wrapVarArgs(final T node, final int i) throws SemanticsException, IllegalVariableTypeException {
 		final VariableTypeBuilder b = new VariableTypeBuilder();
 		b.setBasicType(ELangObjectType.ARRAY);
@@ -116,13 +116,11 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		return resolveTypedNode(node.getArgResolvable(i), node, b.build());
 	}
 
-	@Nonnull
-	private <T extends IVariableTyped & Node> IVariableType getType(@Nonnull final T typedNode) throws SemanticsException {
+	private <T extends IVariableTyped & Node> IVariableType getType(final T typedNode) throws SemanticsException {
 		return getType(typedNode, typedNode);
 	}
 
-	@Nonnull
-	private IVariableType getType(@Nonnull final IVariableTyped typed, @Nonnull final Node node) throws SemanticsException {
+	private IVariableType getType(final IVariableTyped typed, final Node node) throws SemanticsException {
 		if (!typed.hasType()) {
 			return SimpleVariableType.OBJECT;
 		}
@@ -136,22 +134,19 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		}
 	}
 
-	@Nonnull
 	private <T extends IVariableTyped & ISourceResolvable & Node> IVariableType visitTypedNode(
-			@Nonnull final T typedResolvableNode) throws SemanticsException {
+			final T typedResolvableNode) throws SemanticsException {
 		final IVariableType type = getType(typedResolvableNode);
 		return visitTypedNode(typedResolvableNode, type);
 	}
 
-	@Nonnull
-	private <T extends ISourceResolvable & Node> IVariableType visitTypedNode(@Nonnull final T resolvableNode,
-			@Nonnull final IVariableType type) throws SemanticsException {
+	private <T extends ISourceResolvable & Node> IVariableType visitTypedNode(final T resolvableNode,
+			final IVariableType type) throws SemanticsException {
 		return resolveTypedNode(resolvableNode, resolvableNode, type);
 	}
 
-	@Nonnull
-	private IVariableType resolveTypedNode(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node,
-			@Nonnull final IVariableType type) throws SemanticsException {
+	private IVariableType resolveTypedNode(final ISourceResolvable resolvable, final Node node,
+			final IVariableType type) throws SemanticsException {
 		final int source = resolvable.getSource();
 		if (source < 0)
 			throw new SemanticsException(CmnCnst.Error.EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE, node);
@@ -175,15 +170,17 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	private void visitScopeDefs(final IScopeDefinitions scopeDefs) throws SemanticsException {
 		for (final IHeaderNode header : scopeDefs.getGlobal()) {
-			visitHeaderNode(header);
+			if (header != null)
+				visitHeaderNode(header);
 		}
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
 			for (final IHeaderNode header : coll)
-				visitHeaderNode(header);
+				if (header != null)
+					visitHeaderNode(header);
 	}
 
-	public static IVariableType[] collect(@Nonnull final Node node, final int symbolTableSize,
-			@Nonnull final IScopeDefinitions scopeDefs)
+	public static IVariableType[] collect(final Node node, final int symbolTableSize,
+			final IScopeDefinitions scopeDefs)
 					throws SemanticsException {
 		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize);
 		v.visitScopeDefs(scopeDefs);

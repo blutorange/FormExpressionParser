@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
 import static de.xima.fc.form.expression.enums.ELangObjectType.FUNCTION;
+import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_UNMATCHING_SWITCH_TYPE_AS_ERROR;
 
 import java.util.Collection;
@@ -19,14 +20,18 @@ import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleConditionTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleForLoopHeaderTypeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
+import de.xima.fc.form.expression.exception.parse.MissingReturnException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.UnreachableCodeException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
@@ -269,10 +274,13 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	private final IVariableType[] table;
 	private final ISeverityConfig config;
-
-	private VariableTypeCheckVisitor(final IVariableType[] symbolTypeTable, final ISeverityConfig config) {
+	private final IEvaluationContextContractFactory<?> factory;
+	
+	private VariableTypeCheckVisitor(final IVariableType[] symbolTypeTable,
+			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config) {
 		this.table = symbolTypeTable;
 		this.config = config;
+		this.factory = factory;
 	}
 
 	private NodeInfo visitLoop(final Node conditionNode, final Node bodyNode, @Nullable final String label,
@@ -305,7 +313,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			final IVariableType type = table[source];
 			return type != null ? type : SimpleVariableType.OBJECT;
 		}
-		//TODO get from external context
+		//TODO get from scope / external context
+		//return factory.getVariableType(scope, variableName);
 		return null;
 	}
 
@@ -340,6 +349,41 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			info.unifyJumps(infoClause);
 		}
 		return i;
+	}
+
+	private IVariableType getFunctionType(final IVariableType typeDeclaredReturn, final ASTFunctionNode node) throws SemanticsException {
+		final IVariableTypeBuilder builder = new VariableTypeBuilder();
+		builder.setBasicType(FUNCTION);
+		builder.append(typeDeclaredReturn);
+		for (int i = 0; i < node.getArgumentCount(); ++i) {
+			final NodeInfo infoArg = node.getArgumentNode(i).jjtAccept(this);
+			final IVariableType typeArg = infoArg.hasImplicitType() ? infoArg.getImplicitType() : SimpleVariableType.OBJECT;
+			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
+				builder.append(wrapInArray(typeArg));
+			else
+				builder.append(typeArg);
+		}
+		try {
+			return builder.build();
+		}
+		catch (final IllegalVariableTypeException e) {
+			throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), node);
+		}
+	}
+	
+	private void assertFunctionReturnType(final NodeInfo infoActual, final IVariableType typeDeclared, final Node node) throws SemanticsException {
+		if (infoActual.hasReturnType()
+				&& !typeDeclared.isAssignableFrom(infoActual.getReturnType()))
+			throw new IncompatibleFunctionReturnTypeException(typeDeclared, infoActual.getReturnType(), node);
+		if (typeDeclared.getBasicLangType() != ELangObjectType.NULL) {
+			// non-void function
+			if (config.hasOption(TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR)
+					&& infoActual.hasImplicitType())
+				throw new MissingReturnException(typeDeclared, node);
+			if (infoActual.hasImplicitType()
+					&& !typeDeclared.isAssignableFrom(infoActual.getImplicitType()))
+				throw new IncompatibleFunctionReturnTypeException(typeDeclared, infoActual.getImplicitType(), node);
+		}
 	}
 
 	@Override
@@ -627,7 +671,6 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				++i;
 				break;
 			case SWITCHDEFAULT:
-				infoResult.unifiyImplicitType(SimpleVariableType.NULL);
 				++i;
 				break;
 			case SWITCHCLAUSE:
@@ -644,6 +687,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 						node.getCaseNode(i));
 			}
 		}
+		// Switch may return null when there is no default case
+		// and no other case is taken.
+		if (!node.hasDefaultCase())
+			infoResult.unifiyImplicitType(SimpleVariableType.NULL);
 		return infoResult;
 	}
 
@@ -732,33 +779,12 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 		// Check with actual return type.
 		final NodeInfo infoActualReturn = node.getBodyNode().jjtAccept(this);
+		assertFunctionReturnType(infoActualReturn, typeDeclaredReturn, node);
 
-		//TODO unify, check, void functions only use return type not implicit etc.
-		//     also consider the case where there is only an exception thrown.
-
-		// Return type of function.
-		final IVariableTypeBuilder builder = new VariableTypeBuilder();
-		builder.setBasicType(FUNCTION);
-		builder.append(typeDeclaredReturn);
-		for (int i = 0; i < node.getArgumentCount(); ++i) {
-			final NodeInfo infoArg = node.getArgumentNode(i).jjtAccept(this);
-			final IVariableType typeArg = infoArg.hasImplicitType() ? infoArg.getImplicitType() : SimpleVariableType.OBJECT;
-			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
-				builder.append(wrapInArray(typeArg));
-			else
-				builder.append(typeArg);
-		}
-
-		IVariableType typeFunction;
-		try {
-			typeFunction = builder.build();
-		}
-		catch (final IllegalVariableTypeException e) {
-			throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), node);
-		}
-		return new NodeInfo(null, typeFunction);
+		// Return type of function.	
+		return new NodeInfo(null, getFunctionType(typeDeclaredReturn, node));
 	}
-
+	
 	@Override
 	public NodeInfo visit(final ASTUnaryExpressionNode node) throws SemanticsException {
 		// TODO Auto-generated method stub
@@ -785,10 +811,22 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return node.getBodyNode().jjtAccept(this);
 	}
 
+	/**
+	 * Same as anonymous functions.
+	 * @see #visit(ASTFunctionNode)
+	 */
 	@Override
 	public NodeInfo visit(final ASTFunctionClauseNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		// Declared return type.
+		final IVariableType typeFunction = getDeclaredType(node);
+		final IVariableType typeDeclaredReturn = typeFunction.getGeneric(0);
+		
+		// Check with actual return type.
+		final NodeInfo infoActualReturn = node.getBodyNode().jjtAccept(this);
+		assertFunctionReturnType(infoActualReturn, typeDeclaredReturn, node);
+
+		// Return type of function.
+		return new NodeInfo(null, typeFunction);
 	}
 
 	@Override
@@ -910,8 +948,11 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	@Nullable
-	public static IVariableType check(final Node node, final IVariableType[] symbolTypeTable, final ISeverityConfig config) throws SemanticsException {
-		final VariableTypeCheckVisitor v = new VariableTypeCheckVisitor(symbolTypeTable, config);
+	public static IVariableType check(final Node node, final IVariableType[] symbolTypeTable,
+			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config,
+			final IScopeDefinitions scopeDefs) throws SemanticsException {
+		final VariableTypeCheckVisitor v = new VariableTypeCheckVisitor(symbolTypeTable, factory, config);
+		// TODO check and process scope defs
 		final NodeInfo info = node.jjtAccept(v);
 		return info.hasImplicitType() ? info.getImplicitType() : null;
 	}
@@ -1049,12 +1090,6 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			if (info.hasThrowingJump())
 				this.addThrowingJump();
 			return this;
-		}
-
-		@SuppressWarnings("deprecation")
-		@Override
-		public String toString() {
-			return NullUtil.stringFormat("returnType:%s, implicitType:%s, labelSet:%s, throwingJump: %s", unifiedReturnType, implicitReturnType, labelSet, hasThrowingJump);
 		}
 	}
 }

@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.visitor;
 
 import java.util.Collection;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -19,7 +18,6 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 
 @ParametersAreNonnullByDefault
 public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<EvaluationException> {
-	@Nonnull
 	private final IEvaluationContext ec;
 	@Nullable
 	private final IExternalContext ex;
