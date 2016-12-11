@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -12,15 +13,18 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
+import de.xima.fc.form.expression.impl.warning.EmptyStatementWarning;
+import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 
+@ParametersAreNonnullByDefault
 public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<EvaluationException> {
 	@Nonnull
 	private final IEvaluationContext ec;
 	@Nullable
 	private final IExternalContext ex;
 
-	private SimulateVisitor(@Nonnull final IEvaluationContext ec) {
+	private SimulateVisitor(final IEvaluationContext ec) {
 		this.ec = ec;
 		ex = ec.getExternalContext();
 	}
@@ -46,8 +50,13 @@ public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<Evalua
 		}
 	}
 
-	public static void simulate(@Nonnull final Node node,
-			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final IEvaluationContext ec) throws EvaluationException {
+	@Override
+	public void visit(final ASTEmptyNode node) throws EvaluationException {
+		ec.getTracer().appendWarning(new EmptyStatementWarning(node));
+	}
+
+	public static void simulate(final Node node, final IScopeDefinitions scopeDefs, final IEvaluationContext ec)
+			throws EvaluationException {
 		ec.getTracer().enableWarnings();
 		final SimulateVisitor v = new SimulateVisitor(ec);
 		v.acceptScopeDefs(scopeDefs);

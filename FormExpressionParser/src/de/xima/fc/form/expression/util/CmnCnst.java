@@ -24,6 +24,7 @@ public final class CmnCnst {
 	public final static class Warning {
 		private Warning(){}
 		@Nonnull public static final String UNUSED_VARIABLE = "Variable {0} is never used.";
+		@Nonnull public static final String EMPTY_STATEMENT = "Encountered an empty statement.";
 	}
 
 	public final static class NonnullConstant {

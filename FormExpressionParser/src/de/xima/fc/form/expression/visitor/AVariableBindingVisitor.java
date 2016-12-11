@@ -3,9 +3,9 @@ package de.xima.fc.form.expression.visitor;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
@@ -59,12 +59,6 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		}
 	}
 
-	private void visitNestedNullable(@Nullable final Node node) throws ParseException {
-		if (node == null)
-			return;
-		visitNested(node);
-	}
-
 	@Override
 	public final void visit(final ASTVariableDeclarationClauseNode node) throws ParseException {
 		// We need to visit the children first. Consider
@@ -84,7 +78,8 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	public final void visit(final ASTIfClauseNode node) throws ParseException {
 		node.getConditionNode().jjtAccept(this);
 		visitNested(node.getIfNode());
-		visitNestedNullable(node.getElseNode());
+		if (node.hasElseNode())
+			visitNested(node.getElseNode());
 	}
 
 	@Override
@@ -181,28 +176,33 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		boolean nested = false;
 		int bookmark = 0;
 		try {
-			for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
-				switch (node.jjtGetChild(i).getSiblingMethod()) {
-				case SWITCHCASE:
-					bookmark = binding.getBookmark();
-					binding.nest();
-					node.jjtGetChild(i).jjtAccept(this);
-					nested = true;
-					break;
+			int i = 0;
+			while (i < node.getCaseCount()) {
+				switch (node.getCaseType(i)) {
 				case SWITCHCLAUSE:
-				case SWITCHDEFAULT:
 					if (!nested) {
 						bookmark = binding.getBookmark();
 						binding.nest();
 					}
-					node.jjtGetChild(i).jjtAccept(this);
+					while (i < node.getCaseCount() && node.getCaseType(i) == EMethod.SWITCHCLAUSE)
+						node.getCaseNode(i++).jjtAccept(this);
 					binding.gotoBookmark(bookmark);
 					nested = false;
+					break;
+				case SWITCHCASE:
+					bookmark = binding.getBookmark();
+					binding.nest();
+					node.getCaseNode(i).jjtAccept(this);
+					nested = true;
+					++i;
+					break;
+				case SWITCHDEFAULT:
+					++i;
 					break;
 					//$CASES-OMITTED$
 				default:
 					throw new SemanticsException(
-							NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()),
+							NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.getCaseNode(i).getSiblingMethod()),
 							node.jjtGetChild(i));
 				}
 			}

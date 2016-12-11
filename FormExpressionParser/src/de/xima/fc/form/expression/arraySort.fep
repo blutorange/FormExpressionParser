@@ -1,16 +1,18 @@
-function arraySort(array) {
-  len = array.length;
-  for (i = 0; i < len; i+=1) {
-    for (j=i+1; j<len; j+=1) {
-      tmp1 = array[i];
-      tmp2 = array[j];
-      if (tmp1 > tmp2) {
-        array[i] = tmp2;
-        array[j] = tmp1;
+scope algo {
+  function array<var> arraySort(array<var> array) {
+    number len = array.length;
+    for (number i = 0; i < len; ++i) {
+      for (number j = i + 1; j < len; ++j) {
+        var tmp1 = array[i];
+        var tmp2 = array[j];
+        if (tmp1 > tmp2) {
+          array[i] = tmp2;
+          array[j] = tmp1;
+        }
       }
     }
+    return array;
   }
-  array;
 }
 
-arraySort(["Anton","Alfred","Andre","Abigel"]);
+algo::arraySort(["Anton","Alfred","Andre","Abigel"]);

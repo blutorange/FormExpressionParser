@@ -306,7 +306,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			return type != null ? type : SimpleVariableType.OBJECT;
 		}
 		//TODO get from external context
-		throw new RuntimeException();
+		return null;
 	}
 
 	private <T extends ISourceResolvable & Node> NodeInfo getInfo(final T node) throws VariableNotResolvableException {
