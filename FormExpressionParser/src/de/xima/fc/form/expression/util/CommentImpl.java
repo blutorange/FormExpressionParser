@@ -1,11 +1,11 @@
-package de.xima.fc.form.expression.impl.formexpression;
+package de.xima.fc.form.expression.util;
 
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.ECommentType;
 import de.xima.fc.form.expression.iface.parse.IComment;
 
-public class CommentImpl implements IComment {
+class CommentImpl implements IComment {
 	private static final long serialVersionUID = 1L;
 	@Nonnull private final String text;
 	@Nonnull private final ECommentType type;

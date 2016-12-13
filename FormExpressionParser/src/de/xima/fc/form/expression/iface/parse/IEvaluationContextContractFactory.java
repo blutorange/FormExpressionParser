@@ -2,11 +2,17 @@ package de.xima.fc.form.expression.iface.parse;
 
 import java.io.Serializable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
+import de.xima.fc.form.expression.iface.evaluate.ILibraryContractFactory;
+import de.xima.fc.form.expression.iface.evaluate.ILogger;
+import de.xima.fc.form.expression.iface.evaluate.INamespaceContractFactory;
+import de.xima.fc.form.expression.iface.evaluate.ITracer;
 
 /**
  * Contains methods for getting details on the {@link IEvaluationContext}
@@ -15,32 +21,38 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
  * @author madgaksha
  *
  * @param <T>
- *            Type of the required external context.
+ *            Type of the required object for the external context.
  */
-public interface IEvaluationContextContractFactory<T extends IExternalContext> extends Serializable {
-	@Nonnull
-	public IEvaluationContext getContextWithExternal(@Nonnull T ex);
+@ParametersAreNonnullByDefault
+public interface IEvaluationContextContractFactory<T> extends Serializable {
 	/**
-	 * Provides information about the scopes provided by all {@link IEvaluationContext}s this factory
-	 * creates.
-	 * @param scope Name of the scope to get info for.
-	 * @return Information on the given scope. <code>null</code> iff the given scope is not provided.
-	 * @see #isProvidingExternalScope(String)
+	 * Returns an embedment factory for creating embedments and providing
+	 * information such as which scopes the embedment provides.
+	 * @return An embedment factory with info.
 	 */
-	@Nullable
-	public IScopeInfo getExternalScopeInfo(@Nonnull String scope);
+	public IEmbedmentContractFactory getEmbedmentFactory();
+
 	/**
-	 * Provides information on whether all {@link IEvaluationContext} created by this
-	 * factory provide a certain scope.
-	 * @param scope Scope to check for.
-	 * @return Whether the scope is provided.
+	 * @return A tracer to be used when creating evaluation contexts.
 	 */
-	public boolean isProvidingExternalScope(@Nonnull String scope);
+	public ITracer<Node> makeTracer();
+
+	public ILogger makeLogger();
+
+	public INamespaceContractFactory getNamespaceFactory();
+
 	/**
-	 * Provides information about the scopes a certain embedment defines.
-	 * @param embedment Embedment to get info for.
-	 * @return List of scopes the given embedment defines.
+	 * Returns a contract factory which should be used by all {@link IEvaluationContext}
+	 * created by this factory.
+	 * @return Library factory with info.
 	 */
-	@Nullable
-	public String[] getScopesForEmbedment(@Nonnull String embedment);
+	public ILibraryContractFactory getLibraryFactory();
+
+	/**
+	 * Returns an external factory for creating external contexts and
+	 * providing information such as which scopes and variables that
+	 * external context can provide.
+	 * @return External factory with info.
+	 */
+	public IExternalContextContractFactory<T> getExternalFactory();
 }

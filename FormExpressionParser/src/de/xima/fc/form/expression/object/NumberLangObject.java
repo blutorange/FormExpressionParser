@@ -7,8 +7,8 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathDivisionByZeroException;
@@ -61,7 +61,7 @@ public class NumberLangObject extends ALangObject {
 	public ELangObjectType getType() {
 		return ELangObjectType.NUMBER;
 	}
-	
+
 	public double doubleValue() {
 		return value;
 	}
@@ -371,12 +371,12 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Nonnull
-	public static ALangObject getPiInstance() {
+	public static NumberLangObject getPiInstance() {
 		return InstanceHolder.PI;
 	}
 
 	@Nonnull
-	public static ALangObject getEInstance() {
+	public static NumberLangObject getEInstance() {
 		return InstanceHolder.E;
 	}
 

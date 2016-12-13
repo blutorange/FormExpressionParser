@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl;
+package de.xima.fc.form.expression.impl.namespace;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -478,6 +478,7 @@ public class GenericNamespace implements INamespace {
 			attrAssignerRegex = null;
 		}
 
+		//TODO make this return a INamespaceContractFactory
 		@Nonnull
 		public final INamespace build() throws IllegalStateException {
 			if (count != FIELDS_TO_FILL)

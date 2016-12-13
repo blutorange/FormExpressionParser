@@ -2,12 +2,15 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import java.io.PrintStream;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Optional;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -16,11 +19,6 @@ import de.xima.fc.form.expression.util.NullUtil;
 public final class SystemExternalContext extends AGenericExternalContext implements IExternalContext {
 	private final PrintStream printStream;
 	protected boolean outputDisabled = false;
-
-	private static class InstanceHolder {
-		public final static SystemExternalContext OUT = new SystemExternalContext(System.out);
-		public final static SystemExternalContext ERR = new SystemExternalContext(System.err);
-	}
 
 	private SystemExternalContext(final PrintStream printStream) {
 		this.printStream = printStream;
@@ -62,10 +60,21 @@ public final class SystemExternalContext extends AGenericExternalContext impleme
 		SystemWriter.getSystemOutInstance().flush();
 	}
 
-	public static AGenericExternalContext getSystemOutInstance() {
-		return InstanceHolder.OUT;
+
+	@Nonnull
+	public static IExternalContextContractFactory<PrintStream> getFactory() {
+		return InstanceHolder.INSTANCE;
 	}
-	public static AGenericExternalContext getSystemErrInstance() {
-		return InstanceHolder.ERR;
+
+	private static class InstanceHolder {
+		@Nonnull public final static IExternalContextContractFactory<PrintStream> INSTANCE = new SystemExternalContextFactory();
+	}
+
+	private static class SystemExternalContextFactory extends AGenericExternalContextFactory<PrintStream> {
+		private static final long serialVersionUID = 1L;
+		@Override
+		public AGenericExternalContext makeExternalContext(final PrintStream printStream) {
+			return new SystemExternalContext(printStream);
+		}
 	}
 }

@@ -43,12 +43,17 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		this.contractFactory = contractFactory;
 	}
 
+	private boolean provides(final String scope) {
+		return contractFactory.getLibraryFactory().isProvidingScope(scope)
+				|| contractFactory.getExternalFactory().isProvidingScope(scope);
+	}
+
 	private void processAssignment(final ASTVariableNode node) throws ParseException {
 		// Check if scope of scoped variable exists.
 		// If not, add the required "import", or create a new manual scope.
 		final String scope = node.getScope();
 		if (scope != null && !scopeDefBuilder.hasManual(scope) && !scopeDefBuilder.hasExternal(scope)) {
-			if (contractFactory.isProvidingExternalScope(scope)) {
+			if (provides(scope)) {
 				if (config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR))
 					throw new MissingRequireScopeStatementException(scope, node);
 				scopeDefBuilder.addExternal(scope);
@@ -56,7 +61,8 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			else {
 				if (config.hasOption(TREAT_MISSING_SCOPE_DECLARATION_AS_ERROR))
 					throw new NoSuchScopeException(scope, node);
-				scopeDefBuilder.addManual(scope, node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
+				scopeDefBuilder.addManual(scope, node.getVariableName(),
+						new HeaderNodeImpl(node.getVariableName(), node));
 			}
 		}
 		else if (scope == null && binding.getVariable(node.getVariableName()) == null) {
@@ -75,12 +81,12 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		final String embedment = node.getEmbedment();
 		if (embedment == null)
 			return;
-		final String[] scopes = contractFactory.getScopesForEmbedment(embedment);
+		final String[] scopes = contractFactory.getEmbedmentFactory().getScopesForEmbedment(embedment);
 		if (scopes == null)
 			throw new NoSuchEmbedmentException(embedment, node);
 		for (final String scope : scopes) {
 			if (scope != null && !(scopeDefBuilder.hasManual(scope) || scopeDefBuilder.hasExternal(scope))) {
-				if (contractFactory.isProvidingExternalScope(scope)) {
+				if (provides(scope)) {
 					if (config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR))
 						throw new MissingRequireScopeStatementException(scope, node);
 					scopeDefBuilder.addExternal(scope);
@@ -99,10 +105,10 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		// Otherwise, add it as a global variable.
 
 		// We need to visit nodes in reverse order. Consider eg.
-		//   j = 0;
-		//   k = i = (k = j);
-		node.jjtGetChild(node.jjtGetNumChildren()-1).jjtAccept(this);
-		for (int i = node.jjtGetNumChildren() - 1; i --> 0;) {
+		// j = 0;
+		// k = i = (k = j);
+		node.jjtGetChild(node.jjtGetNumChildren() - 1).jjtAccept(this);
+		for (int i = node.jjtGetNumChildren() - 1; i-- > 0;) {
 			switch (node.jjtGetChild(i).jjtGetNodeId()) {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
 				final ASTVariableNode n = (ASTVariableNode) node.jjtGetChild(i);
@@ -111,8 +117,10 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
 				break;
 			default:
-				throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-						node.jjtGetChild(i).jjtGetNodeId(), node.getClass().getSimpleName()), node.jjtGetChild(i));
+				throw new SemanticsException(
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+								node.jjtGetChild(i).jjtGetNodeId(), node.getClass().getSimpleName()),
+						node.jjtGetChild(i));
 			}
 		}
 		visitChildren(node);
@@ -124,8 +132,8 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 	}
 
 	public static void hoist(final Node node, final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> contractFactory,
-			final ISeverityConfig config) throws ParseException {
+			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config)
+					throws ParseException {
 		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory, config);
 		v.bindScopeDefValues(scopeDefBuilder);
 		node.jjtAccept(v);

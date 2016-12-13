@@ -3,28 +3,32 @@ package de.xima.fc.form.expression.test;
 import static org.junit.Assert.fail;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.junit.Test;
 
-import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
+import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
+import de.xima.fc.form.expression.iface.evaluate.ILibraryContractFactory;
+import de.xima.fc.form.expression.iface.evaluate.ILogger;
+import de.xima.fc.form.expression.iface.evaluate.INamespaceContractFactory;
+import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
-import de.xima.fc.form.expression.iface.parse.IScopeInfo;
-import de.xima.fc.form.expression.impl.GenericEmbedment;
-import de.xima.fc.form.expression.impl.GenericEvaluationContext;
-import de.xima.fc.form.expression.impl.GenericExternalScope;
-import de.xima.fc.form.expression.impl.GenericNamespace;
+import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
+import de.xima.fc.form.expression.impl.embedment.DummyEmbedment;
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
-import de.xima.fc.form.expression.impl.logger.SystemLogger;
+import de.xima.fc.form.expression.impl.formexpression.EvaluationContextImpl;
+import de.xima.fc.form.expression.impl.library.DummyLibraryContractFactory;
+import de.xima.fc.form.expression.impl.logger.DummyLogger;
+import de.xima.fc.form.expression.impl.namespace.DummyNamespaceContractFactory;
 import de.xima.fc.form.expression.impl.tracer.DummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
 
 @SuppressWarnings("nls")
 public class HtmlDocumentCommandTest {
@@ -91,7 +95,10 @@ public class HtmlDocumentCommandTest {
 	}
 
 	private static class DummyHtmlExternalContext extends AHtmlExternalContext {
-		private final StringBuilder sb = new StringBuilder();
+		private final StringBuilder sb;
+		public DummyHtmlExternalContext(final StringBuilder sb) {
+			this.sb = sb;
+		}
 		@Override
 		protected void output(final String html) throws EmbedmentOutputException {
 			sb.append(html);
@@ -109,48 +116,53 @@ public class HtmlDocumentCommandTest {
 			throw new VariableNotDefinedException(scope, name, ec);
 		}
 	}
-	private static enum DummyContractFactory implements IEvaluationContextContractFactory<DummyHtmlExternalContext> {
+	private static enum DummyHtmlExternalContextContractFactory implements IExternalContextContractFactory<StringBuilder> {
 		INSTANCE;
-		final static IScopeInfo scopeInfo = new IScopeInfo() {
-			@Override
-			public boolean isProviding(final String variableName) {
-				return false;
-			}
-			@Override
-			public EVariableSource getSource() {
-				return EVariableSource.LIBRARY;
-			}
-			@Override
-			public String getScopeName() {
-				return "[%%";
-			}
-		};
 		@Override
-		public IEvaluationContext getContextWithExternal(@Nullable final DummyHtmlExternalContext ex) {
-			final IEvaluationContext ec = new GenericEvaluationContext.Builder().setTracer(DummyTracer.INSTANCE)
-					.setScope(new GenericExternalScope.Builder().build()).setLogger(SystemLogger.getDebugLogger())
-					.setNamespace(GenericNamespace.getGenericNamespaceInstance())
-					.setEmbedment(new GenericEmbedment.Builder().build()).build();
-			ec.setExternalContext(ex);
-			return ec;
+		public DummyHtmlExternalContext makeExternalContext(final StringBuilder sb) {
+			return new DummyHtmlExternalContext(sb);
 		}
 		@Override
-		public IScopeInfo getExternalScopeInfo(final String scope) {
-			return scopeInfo;
-		}
-		@Override
-		public boolean isProvidingExternalScope(final String scope) {
+		public boolean isProvidingScope(final String scope) {
 			return false;
 		}
 		@Override
-		public String[] getScopesForEmbedment(final String embedment) {
-			return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+		public ILibraryScopeContractFactory<StringBuilder> getScopeFactory(final String scope) {
+			return null;
+		}
+	}
+	private static enum DummyContractFactory implements IEvaluationContextContractFactory<StringBuilder> {
+		INSTANCE;
+		@Override
+		public IEmbedmentContractFactory getEmbedmentFactory() {
+			return DummyEmbedment.INSTANCE;
+		}
+		@Override
+		public ITracer<Node> makeTracer() {
+			return DummyTracer.INSTANCE;
+		}
+		@Override
+		public ILogger makeLogger() {
+			return DummyLogger.INSTANCE;
+		}
+		@Override
+		public INamespaceContractFactory getNamespaceFactory() {
+			return DummyNamespaceContractFactory.INSTANCE;
+		}
+		@Override
+		public ILibraryContractFactory getLibraryFactory() {
+			return DummyLibraryContractFactory.INSTANCE;
+		}
+		@Override
+		public DummyHtmlExternalContextContractFactory getExternalFactory() {
+			return DummyHtmlExternalContextContractFactory.INSTANCE;
 		}
 	}
 
 	private static String process(final Object... stuffToWrite) throws Exception {
-		final DummyHtmlExternalContext hec = new DummyHtmlExternalContext();
-		final IEvaluationContext ec = DummyContractFactory.INSTANCE.getContextWithExternal(hec);
+		final StringBuilder sb = new StringBuilder();
+		final DummyHtmlExternalContext hec = DummyContractFactory.INSTANCE.getExternalFactory().makeExternalContext(sb);
+		final IEvaluationContext ec = new EvaluationContextImpl(DummyContractFactory.INSTANCE);
 		hec.beginWriting();
 		try {
 			for (final Object stuff : stuffToWrite) {

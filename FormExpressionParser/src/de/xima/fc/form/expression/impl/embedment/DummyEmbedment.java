@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.impl.embedment;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -10,7 +11,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
  * @author madgaksha
  *
  */
-public enum DummyEmbedment implements IEmbedment {
+public enum DummyEmbedment implements IEmbedment, IEmbedmentContractFactory {
 	INSTANCE;
 
 	@Override
@@ -41,5 +42,15 @@ public enum DummyEmbedment implements IEmbedment {
 	@Override
 	public String[] getEmbedmentList() {
 		return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+	}
+
+	@Override
+	public IEmbedment makeEmbedment() {
+		return this;
+	}
+
+	@Override
+	public String[] getScopesForEmbedment(final String embedment) {
+		return null;
 	}
 }

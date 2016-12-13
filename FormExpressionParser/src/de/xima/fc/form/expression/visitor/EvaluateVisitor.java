@@ -484,7 +484,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		case EVariableSource.ID_LIBRARY:
 			if (scope == null)
 				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
-			return ec.getScope().getVariable(scope, node.getVariableName(), ec);
+			return ec.getLibrary().getVariable(scope, node.getVariableName(), ec);
 		case EVariableSource.ID_EXTERNAL_CONTEXT:
 			final IExternalContext ex = ec.getExternalContext();
 			if (ex == null)

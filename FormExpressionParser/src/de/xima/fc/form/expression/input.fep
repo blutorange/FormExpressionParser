@@ -1,10 +1,7 @@
-->number(m){
-  switch(0) {
-  case 0:
-    return [];
-  case 1:
-    return [];
+require scope math;
+switch(3.14) {
+  case math::pi:
+    throw exception("pi");
   default:
-    return [];
-  }
-};
+    "Hooray";
+}

@@ -3,16 +3,19 @@ package de.xima.fc.form.expression.impl.externalcontext;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.annotation.Nonnull;
+
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
+import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 
 public class WriterOnlyExternalContext extends AGenericExternalContext implements IExternalContext {
 	private final Writer writer;
 
-	public WriterOnlyExternalContext(final Writer writer) {
+	private WriterOnlyExternalContext(final Writer writer) {
 		this.writer = writer;
 	}
 
@@ -48,5 +51,22 @@ public class WriterOnlyExternalContext extends AGenericExternalContext implement
 
 	@Override
 	public void beginWriting() {
+	}
+
+	@Nonnull
+	public static IExternalContextContractFactory<Writer> getFactory() {
+		return InstanceHolder.INSTANCE;
+	}
+
+	private static class InstanceHolder {
+		@Nonnull public final static IExternalContextContractFactory<Writer> INSTANCE = new WriterOnlyExternalContextContractFactory();
+	}
+
+	private static class WriterOnlyExternalContextContractFactory extends AGenericExternalContextFactory<Writer> {
+		private static final long serialVersionUID = 1L;
+		@Override
+		public AGenericExternalContext makeExternalContext(final Writer writer) {
+			return new WriterOnlyExternalContext(writer);
+		}
 	}
 }

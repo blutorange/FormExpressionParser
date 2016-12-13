@@ -76,7 +76,7 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	@Override
 	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final NullLangObject thisContext,
 			@Nonnull final ALangObject... args) throws EvaluationException {
-		// Set special variables 'this' and 'arguments'.
+		// Set special variables 'this'
 		// TODO remove the arguments variable, not needed and wont work with var
 		// types
 		set(ec, node.getThisResolvable(), thisContext);

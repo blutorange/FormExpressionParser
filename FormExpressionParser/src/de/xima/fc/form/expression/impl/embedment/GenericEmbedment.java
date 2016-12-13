@@ -1,26 +1,24 @@
-package de.xima.fc.form.expression.impl;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package de.xima.fc.form.expression.impl.embedment;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 import com.google.common.collect.ImmutableMap;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
+import de.xima.fc.form.expression.iface.evaluate.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
-import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandler;
-import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
-import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleFormcycle;
-import de.xima.fc.form.expression.impl.embedment.handler.EmbedmentHandlerBundleGeneral;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
  * Generic embedment allowing you to inject different implementations.
- * 
+ *
  * @author madgaksha
  *
  * @param Type
@@ -70,7 +68,7 @@ public class GenericEmbedment implements IEmbedment {
 			checkNotNull(name);
 			checkNotNull(handlerList);
 			for (@Nonnull
-			final IEmbedmentHandler handler : handlerList)
+					final IEmbedmentHandler handler : handlerList)
 				getMap().put(name, handler);
 			return this;
 		}
@@ -89,10 +87,10 @@ public class GenericEmbedment implements IEmbedment {
 		}
 
 		@Nonnull
-		public GenericEmbedment build() {
-			final GenericEmbedment embedment = new GenericEmbedment(getMap().build());
+		public IEmbedmentContractFactory build() {
+			final IEmbedmentContractFactory factory = new EmbedmentFactoryImpl(getMap().build());
 			reinit();
-			return embedment;
+			return factory;
 		}
 	}
 
@@ -144,7 +142,7 @@ public class GenericEmbedment implements IEmbedment {
 		final IEmbedmentHandler handler = map.get(embedment);
 		return handler != null ? handler.getScopeList() : null;
 	}
-	
+
 	@Override
 	public String[] getEmbedmentList() {
 		return map.keySet().toArray(CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY);
@@ -157,16 +155,21 @@ public class GenericEmbedment implements IEmbedment {
 			ex.write(data);
 	}
 
-	@SuppressWarnings("all")
-	@Nonnull
-	public static IEmbedment getNewGeneralEmbedment() {
-		return new Builder().addHandler(EmbedmentHandlerBundleGeneral.values()).build();
-	}
-
-	@SuppressWarnings("all")
-	@Nonnull
-	public static IEmbedment getNewFormcycleEmbedment() {
-		return new Builder().addHandler(EmbedmentHandlerBundleGeneral.values())
-				.addHandler(EmbedmentHandlerBundleFormcycle.values()).build();
+	@Immutable
+	private static class EmbedmentFactoryImpl implements IEmbedmentContractFactory {
+		private static final long serialVersionUID = 1L;
+		@Nonnull
+		public final ImmutableMap<String, IEmbedmentHandler> map;
+		public EmbedmentFactoryImpl(@Nonnull final ImmutableMap<String, IEmbedmentHandler> map) {
+			this.map = map;
+		}
+		@Override
+		public IEmbedment makeEmbedment() {
+			return new GenericEmbedment(map);
+		}
+		@Override
+		public String[] getScopesForEmbedment(final String embedment) {
+			return map.get(embedment).getScopeList();
+		}
 	}
 }

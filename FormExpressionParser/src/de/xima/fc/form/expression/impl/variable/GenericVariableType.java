@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.impl.variable;
 import static de.xima.fc.form.expression.enums.ELangObjectType.NULL;
 import static de.xima.fc.form.expression.enums.ELangObjectType.OBJECT;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -27,6 +28,13 @@ public class GenericVariableType implements IVariableType {
 			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMPOUND_TYPE, type));
 		this.type = type;
 		this.list = NullUtil.checkNotNull(list.toArray(new IVariableType[list.size()]));
+	}
+
+	public GenericVariableType(@Nonnull final ELangObjectType type, @Nonnull final IVariableType... list) {
+		if (!type.allowsGenericsCount(list.length))
+			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMPOUND_TYPE, type));
+		this.type = type;
+		this.list = NullUtil.checkNotNull(Arrays.copyOf(list, list.length));
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.config.IUnparseConfig;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 
 @ParametersAreNonnullByDefault
 public interface IFormExpressionFactory {
@@ -36,7 +35,7 @@ public interface IFormExpressionFactory {
 	 *             semantically invalid. This is a subclass of
 	 *             {@link ParseException}.
 	 */
-	<T extends IExternalContext> IFormExpression<T> parse(String code,
+	<T> IFormExpression<T> parse(String code,
 			IEvaluationContextContractFactory<T> factory, ISeverityConfig config)
 					throws ParseException, TokenMgrError;
 

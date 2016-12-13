@@ -24,6 +24,8 @@ import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnType
 import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingReturnException;
+import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
+import de.xima.fc.form.expression.exception.parse.ScopeMissingVariableException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.UnreachableCodeException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
@@ -31,7 +33,9 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
+import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
@@ -88,7 +92,6 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor.NodeInfo;
-
 
 /**
  * <p>
@@ -275,7 +278,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	private final IVariableType[] table;
 	private final ISeverityConfig config;
 	private final IEvaluationContextContractFactory<?> factory;
-	
+
 	private VariableTypeCheckVisitor(final IVariableType[] symbolTypeTable,
 			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config) {
 		this.table = symbolTypeTable;
@@ -305,7 +308,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return infoBody;
 	}
 
-	private <T extends ISourceResolvable & Node> IVariableType getDeclaredType(final T node) throws VariableNotResolvableException {
+	private <T extends ISourceResolvable & Node> IVariableType getDeclaredType(@Nullable final String scope,
+			final T node) throws SemanticsException {
 		if (!node.isResolved())
 			throw new VariableNotResolvableException(node);
 		final int source = node.getSource();
@@ -313,26 +317,46 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			final IVariableType type = table[source];
 			return type != null ? type : SimpleVariableType.OBJECT;
 		}
-		//TODO get from scope / external context
-		//return factory.getVariableType(scope, variableName);
-		return null;
+		if (scope == null)
+			throw new VariableNotResolvableException(node);
+		final ILibraryScopeContractFactory<?> info = getScopeInfo(scope);
+		if (info == null)
+			throw new NoSuchScopeException(scope, node);
+		final IVariableType type = info.getVariableType(node.getVariableName());
+		if (type == null)
+			throw new ScopeMissingVariableException(scope, node.getVariableName(), node);
+		return type;
 	}
 
-	private <T extends ISourceResolvable & Node> NodeInfo getInfo(final T node) throws VariableNotResolvableException {
-		return new NodeInfo(null, getDeclaredType(node));
+	@Nullable
+	private ILibraryScopeContractFactory<?> getScopeInfo(final String scope) {
+		final ILibraryScopeContractFactory<?> f1 = factory.getLibraryFactory().getScopeFactory(scope);
+		final ILibraryScopeContractFactory<?> f2 = factory.getExternalFactory().getScopeFactory(scope);
+		return f1 == null ? f2 : f1;
+	}
+
+	private <T extends IScopedSourceResolvable & Node> NodeInfo getInfo(final T node) throws SemanticsException {
+		return new NodeInfo(null, getDeclaredType(node.getScope(), node));
 	}
 
 	/**
-	 * Starting at the first clause node of a switch, visits all nodes
-	 * until the next case or default node. Works the same way as for
-	 * an {@link ASTStatementListNode}.
-	 * @param node Switch node.
-	 * @param startIndex Index of the first clause node.
-	 * @param NodeInfo Should be a new, empty {@link NodeInfo} and stores the return type.
+	 * Starting at the first clause node of a switch, visits all nodes until the
+	 * next case or default node. Works the same way as for an
+	 * {@link ASTStatementListNode}.
+	 *
+	 * @param node
+	 *            Switch node.
+	 * @param startIndex
+	 *            Index of the first clause node.
+	 * @param NodeInfo
+	 *            Should be a new, empty {@link NodeInfo} and stores the return
+	 *            type.
 	 * @return The next index that is not a clause node.
-	 * @throws SemanticsException When there is a semantic error.
+	 * @throws SemanticsException
+	 *             When there is a semantic error.
 	 */
-	private int visitSwitchClause(final ASTSwitchClauseNode node, final int startIndex, final NodeInfo info) throws SemanticsException {
+	private int visitSwitchClause(final ASTSwitchClauseNode node, final int startIndex, final NodeInfo info)
+			throws SemanticsException {
 		info.unifiyImplicitType(SimpleVariableType.NULL);
 		int i;
 		for (i = startIndex; i < node.getCaseCount() && node.getCaseType(i) == EMethod.SWITCHCLAUSE; ++i) {
@@ -351,13 +375,15 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return i;
 	}
 
-	private IVariableType getFunctionType(final IVariableType typeDeclaredReturn, final ASTFunctionNode node) throws SemanticsException {
+	private IVariableType getFunctionType(final IVariableType typeDeclaredReturn, final ASTFunctionNode node)
+			throws SemanticsException {
 		final IVariableTypeBuilder builder = new VariableTypeBuilder();
 		builder.setBasicType(FUNCTION);
 		builder.append(typeDeclaredReturn);
 		for (int i = 0; i < node.getArgumentCount(); ++i) {
 			final NodeInfo infoArg = node.getArgumentNode(i).jjtAccept(this);
-			final IVariableType typeArg = infoArg.hasImplicitType() ? infoArg.getImplicitType() : SimpleVariableType.OBJECT;
+			final IVariableType typeArg = infoArg.hasImplicitType() ? infoArg.getImplicitType()
+					: SimpleVariableType.OBJECT;
 			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
 				builder.append(wrapInArray(typeArg));
 			else
@@ -370,18 +396,16 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			throw new SemanticsException(NullUtil.orEmpty(e.getMessage()), node);
 		}
 	}
-	
-	private void assertFunctionReturnType(final NodeInfo infoActual, final IVariableType typeDeclared, final Node node) throws SemanticsException {
-		if (infoActual.hasReturnType()
-				&& !typeDeclared.isAssignableFrom(infoActual.getReturnType()))
+
+	private void assertFunctionReturnType(final NodeInfo infoActual, final IVariableType typeDeclared, final Node node)
+			throws SemanticsException {
+		if (infoActual.hasReturnType() && !typeDeclared.isAssignableFrom(infoActual.getReturnType()))
 			throw new IncompatibleFunctionReturnTypeException(typeDeclared, infoActual.getReturnType(), node);
 		if (typeDeclared.getBasicLangType() != ELangObjectType.NULL) {
 			// non-void function
-			if (config.hasOption(TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR)
-					&& infoActual.hasImplicitType())
+			if (config.hasOption(TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR) && infoActual.hasImplicitType())
 				throw new MissingReturnException(typeDeclared, node);
-			if (infoActual.hasImplicitType()
-					&& !typeDeclared.isAssignableFrom(infoActual.getImplicitType()))
+			if (infoActual.hasImplicitType() && !typeDeclared.isAssignableFrom(infoActual.getImplicitType()))
 				throw new IncompatibleFunctionReturnTypeException(typeDeclared, infoActual.getImplicitType(), node);
 		}
 	}
@@ -404,9 +428,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * An array literal consists of any number of array times, eg. <code>[1,2,3]</code>.
-	 * It cannot contain any return clauses. The implicit return type is the unified
-	 * return type of all all array items.
+	 * An array literal consists of any number of array times, eg.
+	 * <code>[1,2,3]</code>. It cannot contain any return clauses. The implicit
+	 * return type is the unified return type of all all array items.
 	 */
 	@Override
 	public NodeInfo visit(final ASTArrayNode node) throws SemanticsException {
@@ -418,7 +442,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			// the array cannot be constructed.
 			if (!newInfo.hasImplicitType()) {
 				if (i < node.jjtGetNumChildren() - 1)
-					throw new UnreachableCodeException(node.jjtGetChild(i+1));
+					throw new UnreachableCodeException(node.jjtGetChild(i + 1));
 				return newInfo;
 			}
 		}
@@ -427,9 +451,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * A hash literal consists of any number of hash entries, eg. <code>{3:4,0:1}</code>.
-	 * It cannot contain any return clauses. The implicit return type is the unified
-	 * return type of all all hash entries.
+	 * A hash literal consists of any number of hash entries, eg.
+	 * <code>{3:4,0:1}</code>. It cannot contain any return clauses. The
+	 * implicit return type is the unified return type of all all hash entries.
 	 */
 	@Override
 	public NodeInfo visit(final ASTHashNode node) throws SemanticsException {
@@ -439,19 +463,19 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			// Hash key can be an identifier, as in {key: "value"}
 			final NodeInfo infoKey = (node.jjtGetChild(i) instanceof ASTIdentifierNameNode)
 					? new NodeInfo(null, SimpleVariableType.STRING) : node.jjtGetChild(i).jjtAccept(this);
-					final NodeInfo infoValue = node.jjtGetChild(i+1).jjtAccept(this);
+					final NodeInfo infoValue = node.jjtGetChild(i + 1).jjtAccept(this);
 					// When any item of the hash cannot complete normally
 					// the hash can never be constructed successfully.
 					unitKey.unify(infoKey);
 					if (!infoKey.hasImplicitType()) {
 						if (i < node.jjtGetNumChildren() - 3)
-							throw new UnreachableCodeException(node.jjtGetChild(i+2));
+							throw new UnreachableCodeException(node.jjtGetChild(i + 2));
 						return infoKey;
 					}
 					unitValue.unify(infoValue);
 					if (!infoValue.hasImplicitType()) {
 						if (i < node.jjtGetNumChildren() - 3)
-							throw new UnreachableCodeException(node.jjtGetChild(i+3));
+							throw new UnreachableCodeException(node.jjtGetChild(i + 3));
 						return infoValue;
 					}
 		}
@@ -471,8 +495,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>For a local variable, the type is as specified by the symbol table.
-	 * Otherwise, we ask the external scope for the variable type.</p>
+	 * <p>
+	 * For a local variable, the type is as specified by the symbol table.
+	 * Otherwise, we ask the external scope for the variable type.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTVariableNode node) throws SemanticsException {
@@ -487,25 +513,27 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	/**
 	 * <p>
 	 * A list of statements executed sequentially. However, a statement may
-	 * contain a break, continue, return, or throw clause statement which skips the
-	 * remaining statements.
-	 * </p><p>
-	 * We start at the first statement and proceed sequentially. When a statement
-	 * never completes normally and it is not the last statement, the remaining
-	 * statements are dead code and we issue an error. Otherwise, we unify all
-	 * return types and take the implicit return type of the last statement.
+	 * contain a break, continue, return, or throw clause statement which skips
+	 * the remaining statements.
+	 * </p>
+	 * <p>
+	 * We start at the first statement and proceed sequentially. When a
+	 * statement never completes normally and it is not the last statement, the
+	 * remaining statements are dead code and we issue an error. Otherwise, we
+	 * unify all return types and take the implicit return type of the last
+	 * statement.
 	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTStatementListNode node) throws SemanticsException {
 		final NodeInfo info = new NodeInfo(null, SimpleVariableType.NULL);
-		for (int i = 0 ; i < node.jjtGetNumChildren(); ++i) {
+		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
 			final NodeInfo infoChild = node.jjtGetChild(i).jjtAccept(this);
 			if (infoChild.hasImplicitType())
 				info.replaceImplicitType(infoChild.getImplicitType());
 			else if (i < node.jjtGetNumChildren() - 1)
 				// Unreachable code
-				throw new UnreachableCodeException(node.jjtGetChild(i+1));
+				throw new UnreachableCodeException(node.jjtGetChild(i + 1));
 			else
 				info.clearImplicitType();
 			info.unifyJumps(infoChild);
@@ -515,16 +543,16 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	/**
 	 * <p>
-	 * The condition cannot contain any return clauses. When it does
-	 * not return normally, the if-else-clause never returns normally.
-	 * Otherwise, the implicit return type must be a boolean.
-	 * </p><p>
-	 * When there is an else-clause, we unify both types. In case
-	 * both branches do not return normally, the if-else-clause
-	 * does not return normally. When there is no else-clause,
-	 * this node may return {@link NullLangObject} and we unify
-	 * the if-clause type with {@link ELangObjectType#NULL}.
-	 * Finally, we return the unified type.
+	 * The condition cannot contain any return clauses. When it does not return
+	 * normally, the if-else-clause never returns normally. Otherwise, the
+	 * implicit return type must be a boolean.
+	 * </p>
+	 * <p>
+	 * When there is an else-clause, we unify both types. In case both branches
+	 * do not return normally, the if-else-clause does not return normally. When
+	 * there is no else-clause, this node may return {@link NullLangObject} and
+	 * we unify the if-clause type with {@link ELangObjectType#NULL}. Finally,
+	 * we return the unified type.
 	 * </p>
 	 */
 	@Override
@@ -544,15 +572,19 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	/**
 	 * <p>
-	 * For a plain loop, first we need to check the variable types of the for-header. The implicit
-	 * return type of the for-loop is then determined solely by the body node.
-	 * </p><p>
-	 * For an enhanced loop, first we need to get the type of the object for iteration; and
-	 * we need to check whether it matches the declared or inferred type of the iterating variable.
-	 * The implicit return type of the for-loop is then determined solely by the body node.
-	 * </p><p>
-	 * Also, when there is any matching break or continue clause, we add {@link NullLangObject} to
-	 * the list of implicit return types.
+	 * For a plain loop, first we need to check the variable types of the
+	 * for-header. The implicit return type of the for-loop is then determined
+	 * solely by the body node.
+	 * </p>
+	 * <p>
+	 * For an enhanced loop, first we need to get the type of the object for
+	 * iteration; and we need to check whether it matches the declared or
+	 * inferred type of the iterating variable. The implicit return type of the
+	 * for-loop is then determined solely by the body node.
+	 * </p>
+	 * <p>
+	 * Also, when there is any matching break or continue clause, we add
+	 * {@link NullLangObject} to the list of implicit return types.
 	 * </p>
 	 */
 	@Override
@@ -568,7 +600,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			if (!info.getImplicitType().isIterable())
 				throw new IterationNotSupportedException(info.getImplicitType(), node.getEnhancedIteratorNode());
 			// Get type of the iteration variable and verify its type.
-			final IVariableType typeVariable = getDeclaredType(node);
+			final IVariableType typeVariable = getDeclaredType(null, node);
 			if (!typeVariable.isAssignableFrom(info.getImplicitType().getIterableItemType()))
 				throw new IncompatibleForLoopHeaderTypeAssignmentException(typeVariable,
 						info.getImplicitType().getIterableItemType(), node.getEnhancedIteratorNode());
@@ -587,20 +619,26 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>The expression in the while header must be of type {@link BooleanLangObject}.
-	 * The return type of the while clause is the return type of its body node.
-	 * </p><p>
-	 * When the body contains any break or continue clauses for this loop,
-	 * the body may return {@link NullLangObject}, so we add it to the list
-	 * of implicit return types.
+	 * <p>
+	 * The expression in the while header must be of type
+	 * {@link BooleanLangObject}. The return type of the while clause is the
+	 * return type of its body node.
 	 * </p>
+	 * <p>
+	 * When the body contains any break or continue clauses for this loop, the
+	 * body may return {@link NullLangObject}, so we add it to the list of
+	 * implicit return types.
+	 * </p>
+	 *
 	 * <pre>
 	 *   while(randomBoolean()) {
 	 *     if (randomBoolean()) break;
 	 *     2;
 	 *   }
 	 * </pre>
-	 * The above code can return {@link NullLangObject} or {@link NumberLangObject}.
+	 *
+	 * The above code can return {@link NullLangObject} or
+	 * {@link NumberLangObject}.
 	 */
 	@Override
 	public NodeInfo visit(final ASTWhileLoopNode node) throws SemanticsException {
@@ -608,9 +646,12 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>This is similar to a {@link ASTTernaryExpressionNode}, minus the condition.
-	 * As try-catch clause returns either the result of the try clause
-	 * or the result of the catch clause. Thus we need to unify both types.</p>
+	 * <p>
+	 * This is similar to a {@link ASTTernaryExpressionNode}, minus the
+	 * condition. As try-catch clause returns either the result of the try
+	 * clause or the result of the catch clause. Thus we need to unify both
+	 * types.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTTryClauseNode node) throws SemanticsException {
@@ -618,20 +659,22 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 *<p>
+	 * <p>
 	 * In strict mode, we enforce the types of each case clause to be compatible
 	 * with the type to switch on.
-	 * </p><p>
-	 * Other than that, we check all child nodes. The return type is the combination
-	 * of all cases, including the default case. When there is a break, we merge
-	 * the implicit return type with {@link NullLangObject}.
-	 * </p><p>
+	 * </p>
+	 * <p>
+	 * Other than that, we check all child nodes. The return type is the
+	 * combination of all cases, including the default case. When there is a
+	 * break, we merge the implicit return type with {@link NullLangObject}.
+	 * </p>
+	 * <p>
 	 * When there is code between a break or continue clause and the next case,
 	 * this is unreachable code and an error is thrown.
-	 * </p><p>
-	 * When there is no default case, we need to merge {@link NullLangObject}
-	 * to the list of implicit return types as it may happen that no case
-	 * applies.
+	 * </p>
+	 * <p>
+	 * When there is no default case, we need to merge {@link NullLangObject} to
+	 * the list of implicit return types as it may happen that no case applies.
 	 * </p>
 	 */
 	@Override
@@ -652,14 +695,16 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		// Check cases and case bodies.
 		int i = 0;
 		while (i < node.getCaseCount()) {
-			switch(node.getCaseType(i)) {
+			switch (node.getCaseType(i)) {
 			case SWITCHCASE:
 				final NodeInfo infoCase = node.getCaseNode(i).jjtAccept(this);
 				if (infoCase.hasLabel())
 					throw new IllegalJumpClauseException(EJump.BREAK, infoCase.getAnyLabel(), node.getCaseNode(i));
 				if (infoCase.hasReturnType())
 					throw new IllegalJumpClauseException(EJump.RETURN, null, node.getCaseNode(i));
-				if (!infoCase.hasImplicitType()) { //FIXME we can still reacher other cases, dont throw!!!
+				if (!infoCase.hasImplicitType()) { // FIXME we can still reacher
+					// other cases, dont
+					// throw!!!
 					if (i < node.getCaseCount() - 1)
 						throw new UnreachableCodeException(node.getCaseNode(i));
 				}
@@ -680,7 +725,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					infoClause.unifiyImplicitType(SimpleVariableType.NULL);
 				infoResult.unify(infoClause);
 				break;
-				//$CASES-OMITTED$
+				// $CASES-OMITTED$
 			default:
 				throw new SemanticsException(
 						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.getCaseType(i)),
@@ -703,8 +748,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>Any object can be converted to a string, so we only need to check the error
-	 * message node itself.</p>
+	 * <p>
+	 * Any object can be converted to a string, so we only need to check the
+	 * error message node itself.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTExceptionNode node) throws SemanticsException {
@@ -716,7 +763,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>Never completes normally and never returns anything.</p>
+	 * <p>
+	 * Never completes normally and never returns anything.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTThrowClauseNode node) throws SemanticsException {
@@ -734,8 +783,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>Never completes normally and returns the type of its first node,
-	 * if it exists, or nothing.</p>
+	 * <p>
+	 * Never completes normally and returns the type of its first node, if it
+	 * exists, or nothing.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTReturnClauseNode node) throws SemanticsException {
@@ -748,7 +799,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>Message node always returns the message coerced to a {@link StringLangObject}.</p>
+	 * <p>
+	 * Message node always returns the message coerced to a
+	 * {@link StringLangObject}.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTLogNode node) throws SemanticsException {
@@ -761,9 +815,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	/**
 	 * <p>
-	 * This node requires two steps. Firstly, getting the return type of the function body and checking
-	 * whether it is compatible with the declared type. Secondly, acquiring the types of all arguments
-	 * and return the function type.
+	 * This node requires two steps. Firstly, getting the return type of the
+	 * function body and checking whether it is compatible with the declared
+	 * type. Secondly, acquiring the types of all arguments and return the
+	 * function type.
 	 * </p>
 	 */
 	@Override
@@ -781,10 +836,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		final NodeInfo infoActualReturn = node.getBodyNode().jjtAccept(this);
 		assertFunctionReturnType(infoActualReturn, typeDeclaredReturn, node);
 
-		// Return type of function.	
+		// Return type of function.
 		return new NodeInfo(null, getFunctionType(typeDeclaredReturn, node));
 	}
-	
+
 	@Override
 	public NodeInfo visit(final ASTUnaryExpressionNode node) throws SemanticsException {
 		// TODO Auto-generated method stub
@@ -804,7 +859,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	/**
-	 * <p>With header does not affect the return type, so we return the body type.</p>
+	 * <p>
+	 * With header does not affect the return type, so we return the body type.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTWithClauseNode node) throws SemanticsException {
@@ -813,14 +870,15 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	/**
 	 * Same as anonymous functions.
+	 *
 	 * @see #visit(ASTFunctionNode)
 	 */
 	@Override
 	public NodeInfo visit(final ASTFunctionClauseNode node) throws SemanticsException {
 		// Declared return type.
-		final IVariableType typeFunction = getDeclaredType(node);
+		final IVariableType typeFunction = getDeclaredType(node.getScope(), node);
 		final IVariableType typeDeclaredReturn = typeFunction.getGeneric(0);
-		
+
 		// Check with actual return type.
 		final NodeInfo infoActualReturn = node.getBodyNode().jjtAccept(this);
 		assertFunctionReturnType(infoActualReturn, typeDeclaredReturn, node);
@@ -836,14 +894,14 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		// TODO think about whether 23;;; should implicitly return
 		// 23 or nul
 		// TODO throws an error in strict mode (unreachable code)
-		//  so lets just allow it in non strict mode
+		// so lets just allow it in non strict mode
 		return null;
 	}
 
 	@Override
 	public NodeInfo visit(final ASTLosNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO What do we return here?
+		return new NodeInfo(null, SimpleVariableType.NULL);
 	}
 
 	@Override
@@ -866,8 +924,11 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return node.getIfNode().jjtAccept(this).unify(node.getElseNode().jjtAccept(this));
 	}
 
-	/** <p> Contains only an expression in parentheses, eg. <code>(1+2)</code>,
-	 * so we simply return the type of this node's  only child.</p>
+	/**
+	 * <p>
+	 * Contains only an expression in parentheses, eg. <code>(1+2)</code>, so we
+	 * simply return the type of this node's only child.
+	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTParenthesisExpressionNode node) throws SemanticsException {
@@ -894,7 +955,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTScopeExternalNode node) throws SemanticsException {
-		throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING, node.toString()), node);
+		throw new SemanticsException(
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING, node.toString()), node);
 	}
 
 	@Override
@@ -905,12 +967,14 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTScopeManualNode node) throws SemanticsException {
-		throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING, node.toString()), node);
+		throw new SemanticsException(
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING, node.toString()), node);
 	}
 
 	@Override
 	public NodeInfo visit(final ASTScopeGlobalNode node) throws SemanticsException {
-		throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING, node.toString()), node);
+		throw new SemanticsException(
+				NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING, node.toString()), node);
 	}
 
 	@Override
@@ -942,8 +1006,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return new VariableTypeBuilder().setBasicType(ARRAY).append(type).build();
 	}
 
-	private static IVariableType wrapInHash(final IVariableType typeKey,
-			final IVariableType typeValue) {
+	private static IVariableType wrapInHash(final IVariableType typeKey, final IVariableType typeValue) {
 		return new VariableTypeBuilder().setBasicType(ARRAY).append(typeKey).append(typeValue).build();
 	}
 

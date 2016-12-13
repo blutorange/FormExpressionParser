@@ -14,16 +14,14 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.config.SeverityConfig;
-import de.xima.fc.form.expression.impl.externalcontext.AGenericExternalContext;
-import de.xima.fc.form.expression.impl.externalcontext.DummyExternalContext;
-import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
+import de.xima.fc.form.expression.impl.ec.EFormcycleContractFactory;
+import de.xima.fc.form.expression.impl.ec.GenericContractFactory;
+import de.xima.fc.form.expression.impl.embedment.EEmbedmentFactory;
+import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
 import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
-import de.xima.fc.form.expression.impl.factory.FormcycleEcContractFactory;
-import de.xima.fc.form.expression.impl.factory.GenericEcContractFactory;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -118,14 +116,16 @@ public final class TestUtil {
 			try {
 				switch (test.getContextType()) {
 				case FORMCYCLE:
-					final IFormExpression<FormcycleExternalContext> feForm = parse(test.getCode(), test.getTestType(),
-							FormcycleEcContractFactory.INSTANCE, test.getSeverityConfig());
+					final IFormExpression<Formcycle> feForm = parse(test.getCode(), test.getTestType(),
+							EFormcycleContractFactory.GENERAL, test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateFormcycle(feForm, test.getTestType());
 					break;
 				case GENERIC:
-					final IFormExpression<AGenericExternalContext> feGeneric = parse(test.getCode(), test.getTestType(),
-							GenericEcContractFactory.INSTANCE, test.getSeverityConfig());
+					final IFormExpression<Writer> feGeneric = parse(test.getCode(), test.getTestType(),
+							new GenericContractFactory<>(EEmbedmentFactory.GENERAL,
+									WriterOnlyExternalContext.getFactory()),
+							test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
@@ -191,38 +191,39 @@ public final class TestUtil {
 		}
 	}
 
-	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<AGenericExternalContext> fe,
+	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<Writer> fe,
 			@Nonnull final ETestType type) throws EvaluationException {
 		final ALangObject res;
 		final Date t1 = new Date();
-		switch (type) {
-		case PROGRAM:
-			res = fe.evaluate(DummyExternalContext.getInstance());
-			break;
-		case TEMPLATE:
-			final WriterOnlyExternalContext woec = new WriterOnlyExternalContext(new StringBuilderWriter());
-			fe.evaluate(woec);
-			res = StringLangObject.create(woec.toString());
-			break;
-		default:
-			throw new RuntimeException("Unkown enum: " + type);
+		try (final StringBuilderWriter writer = new StringBuilderWriter()) {
+			switch (type) {
+			case PROGRAM:
+				res = fe.evaluate(writer);
+				break;
+			case TEMPLATE:
+				fe.evaluate(writer);
+				res = StringLangObject.create(writer.toString());
+				break;
+			default:
+				throw new RuntimeException("Unkown enum: " + type);
+			}
 		}
 		final Date t2 = new Date();
 		System.out.println(String.format("Evaluation took %s ms.", t2.getTime() - t1.getTime()));
 		return res;
 	}
 
-	private static ALangObject evaluateFormcycle(@Nonnull final IFormExpression<FormcycleExternalContext> fe,
+	private static ALangObject evaluateFormcycle(@Nonnull final IFormExpression<Formcycle> fe,
 			@Nonnull final ETestType type) throws EvaluationException {
 		final ALangObject res;
 		final Date t1 = new Date();
 		switch (type) {
 		case PROGRAM:
-			res = fe.evaluate(new FormcycleExternalContext());
+			res = fe.evaluate(new Formcycle());
 			break;
 		case TEMPLATE:
 			final Writer sbw = new StringBuilderWriter();
-			fe.evaluate(new FormcycleExternalContext(sbw));
+			fe.evaluate(new Formcycle(sbw));
 			res = StringLangObject.create(sbw.toString());
 			break;
 		default:
@@ -234,7 +235,7 @@ public final class TestUtil {
 	}
 
 	@Nonnull
-	private static <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
+	private static <T> IFormExpression<T> parse(@Nonnull final String code,
 			@Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider,
 			@Nonnull final ISeverityConfig config) throws ParseException, TokenMgrError {
 		final IFormExpression<T> res;

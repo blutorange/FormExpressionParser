@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.object.ALangObject;
 
-public interface IFormExpression<T extends IExternalContext> extends Serializable {
+public interface IFormExpression<T> extends Serializable {
 	/**
 	 * Evaluates (executes) this program and returns the result. You must supply the
 	 * evaluation context yourself.
@@ -22,7 +22,7 @@ public interface IFormExpression<T extends IExternalContext> extends Serializabl
 	 * @throws EvaluationException When any error occurred during the evaluation.
 	 */
 	@Nonnull
-	public ALangObject evaluate(@Nonnull final T ex) throws EvaluationException;
+	public ALangObject evaluate(@Nonnull final T object) throws EvaluationException;
 
 	/**
 	 * @return A list of comment this program contains.
@@ -47,7 +47,7 @@ public interface IFormExpression<T extends IExternalContext> extends Serializabl
 	 * </p>
 	 * @param ex The external context to check with.
 	 * @return A list of warnings.
-	 * @throws EvaluationException 
+	 * @throws EvaluationException
 	 */
 	@Nonnull
 	public ImmutableCollection<IEvaluationWarning> analyze(@Nonnull final T ex) throws EvaluationException;

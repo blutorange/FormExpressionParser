@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Stack;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -20,8 +21,8 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
+import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
-import de.xima.fc.form.expression.iface.parse.IScopeInfo;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
@@ -31,15 +32,15 @@ import de.xima.fc.form.expression.util.CmnCnst;
 @ParametersAreNonnullByDefault
 public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
-	private final IEvaluationContextContractFactory<?> contractFactory;
+	private final IEvaluationContextContractFactory<?> factory;
 	private final Stack<String> defaultScopeStack = new Stack<>();
 	private final ISeverityConfig config;
 	private int symbolTableSize = 0;
 
 	private VariableResolveVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config) {
+			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config) {
 		this.scopeDefBuilder = scopeDefBuilder;
-		this.contractFactory = contractFactory;
+		this.factory = factory;
 		this.config = config;
 	}
 
@@ -66,7 +67,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		}
 
 		// Try external scope.
-		final IScopeInfo info = contractFactory.getExternalScopeInfo(scope);
+		final ILibraryScopeContractFactory<?> info = scopeInfo(scope);
 		if (info != null) {
 			if (!info.isProviding(name)) {
 				if (doThrow)
@@ -87,6 +88,13 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		if (doThrow)
 			throw new NoSuchScopeException(scope, node);
 		return false;
+	}
+
+	@Nullable
+	private ILibraryScopeContractFactory<?> scopeInfo(final String scope) {
+		final ILibraryScopeContractFactory<?> f1 = factory.getLibraryFactory().getScopeFactory(scope);
+		final ILibraryScopeContractFactory<?> f2 = factory.getExternalFactory().getScopeFactory(scope);
+		return f1 == null ? f2 : f1;
 	}
 
 	@Override
@@ -131,7 +139,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		// Check if variable exists within any scope introduced by the current
 		// embedment.
 		final String embedment = node.getEmbedment();
-		final String[] embedmentScopeList = embedment != null ? contractFactory.getScopesForEmbedment(embedment)
+		final String[] embedmentScopeList = embedment != null ? factory.getEmbedmentFactory().getScopesForEmbedment(embedment)
 				: CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 		if (embedmentScopeList != null)
 			for (final String defaultScope : embedmentScopeList)
@@ -185,9 +193,9 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	}
 
 	public static int resolve(final Node node, final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config)
+			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config)
 					throws ParseException {
-		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, contractFactory, config);
+		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, factory, config);
 		v.resolveScopeDefs(scopeDefBuilder);
 		v.bindScopeDefValues(scopeDefBuilder);
 		node.jjtAccept(v);

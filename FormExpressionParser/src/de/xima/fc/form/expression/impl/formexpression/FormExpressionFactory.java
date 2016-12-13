@@ -24,7 +24,6 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.config.IUnparseConfig;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
@@ -102,7 +101,7 @@ public final class FormExpressionFactory {
 
 		@Override
 		@Nonnull
-		public <T extends IExternalContext> IFormExpression<T> parse(@Nonnull final String code,
+		public <T> IFormExpression<T> parse(@Nonnull final String code,
 				@Nonnull final IEvaluationContextContractFactory<T> factory, final ISeverityConfig config)
 						throws ParseException, TokenMgrError, SemanticsException {
 			Preconditions.checkNotNull(code);
@@ -183,7 +182,7 @@ public final class FormExpressionFactory {
 		}
 
 		@Override
-		public <T extends IExternalContext> IFormExpression<T> parse(final String code,
+		public <T> IFormExpression<T> parse(final String code,
 				final IEvaluationContextContractFactory<T> factory, final ISeverityConfig config)
 						throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
@@ -304,7 +303,7 @@ public final class FormExpressionFactory {
 	 * @throws ParseException
 	 */
 	@Nonnull
-	private static <T extends IExternalContext> IFormExpression<T> postProcess(final @Nonnull Node node,
+	private static <T> IFormExpression<T> postProcess(final @Nonnull Node node,
 			@Nonnull final FormExpressionParser parser,
 			@Nonnull final IEvaluationContextContractFactory<T> contractFactory,
 			@Nonnull final ISeverityConfig severityConfig) throws ParseException {

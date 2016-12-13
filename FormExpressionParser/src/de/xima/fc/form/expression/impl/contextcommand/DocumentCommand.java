@@ -6,7 +6,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.impl.AExternalContextCommand;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -68,7 +67,7 @@ public class DocumentCommand extends AExternalContextCommand {
 		return InstanceHolder.NO_OP;
 	}
 
-	public static DocumentCommand newInsertLink(final String href, final String text, final String target) {
+	public static DocumentCommand newInsertLink(final String href, @Nullable final String text, @Nullable final String target) {
 		return new DocumentCommand(EDocumentCommandType.INSERT_LINK, href, text, target);
 	}
 

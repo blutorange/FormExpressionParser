@@ -355,6 +355,7 @@ public final class CmnCnst {
 		@Nonnull public static final String MISSING_REQUIRE_SCOPE_STATEMENT = "Scope {0} is provided by the evaluation context, but require scope statement is missing.";
 		@Nonnull public static final String MISSING_EXPLICIT_RETURN = "Function must explicitly return a value of type {0} for all code paths in strict mode.";
 		@Nonnull public static final String INCOMPATIBLE_FUNCTION_RETURN_TYPE = "Type returned is not compatible with the declared return type.";
+		@Nonnull public static final String NULL_MAP_VALUE = "Map must not contain any null value.";
 	}
 
 	public static final class ToString {

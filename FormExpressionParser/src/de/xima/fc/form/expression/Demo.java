@@ -25,8 +25,8 @@ import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
 import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.impl.config.UnparseConfig;
-import de.xima.fc.form.expression.impl.externalcontext.FormcycleExternalContext;
-import de.xima.fc.form.expression.impl.factory.FormcycleEcContractFactory;
+import de.xima.fc.form.expression.impl.ec.EFormcycleContractFactory;
+import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -46,7 +46,7 @@ public class Demo {
 	@Nonnull
 	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
 	@Nonnull
-	private static final IEvaluationContextContractFactory<FormcycleExternalContext> CONTRACT_FACTORY = FormcycleEcContractFactory.INSTANCE;
+	private static final IEvaluationContextContractFactory<Formcycle> CONTRACT_FACTORY = EFormcycleContractFactory.GENERAL;
 	@Nonnull
 	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
@@ -63,7 +63,7 @@ public class Demo {
 
 		showHighlighting(tokenArray);
 
-		IFormExpression<FormcycleExternalContext> expression = parseCode(code);
+		IFormExpression<Formcycle> expression = parseCode(code);
 
 		if (expression == null)
 			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
@@ -83,12 +83,12 @@ public class Demo {
 	}
 
 	@Nonnull
-	private static IFormExpression<FormcycleExternalContext> showSerialization(@Nonnull final IFormExpression<FormcycleExternalContext> ex) {
+	private static IFormExpression<Formcycle> showSerialization(@Nonnull final IFormExpression<Formcycle> ex) {
 		System.out.println("===Serialization===");
 		final byte[] bytes = SerializationUtils.serialize(ex);
 		SerializationUtils.deserialize(bytes);
 		final long t1 = System.nanoTime();
-		final IFormExpression<FormcycleExternalContext> dex = SerializationUtils.deserialize(bytes);
+		final IFormExpression<Formcycle> dex = SerializationUtils.deserialize(bytes);
 		final long t2 = System.nanoTime();
 		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms");
 		if (dex == null)
@@ -96,11 +96,11 @@ public class Demo {
 		return dex;
 	}
 
-	private static void showWarnings(final IFormExpression<FormcycleExternalContext> expression) {
+	private static void showWarnings(final IFormExpression<Formcycle> expression) {
 		System.out.println("===Warnings==="); //$NON-NLS-1$
 		try {
 			final List<IEvaluationWarning> warningList = new ArrayList<>(
-					expression.analyze(new FormcycleExternalContext()));
+					expression.analyze(new Formcycle()));
 			Collections.sort(warningList, IEvaluationWarning.COMPARATOR);
 			for (final IEvaluationWarning warning : warningList) {
 				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getLine(),
@@ -180,8 +180,8 @@ public class Demo {
 		System.out.println();
 	}
 
-	private static IFormExpression<FormcycleExternalContext> parseCode(@Nonnull final String code) {
-		final IFormExpression<FormcycleExternalContext> ex;
+	private static IFormExpression<Formcycle> parseCode(@Nonnull final String code) {
+		final IFormExpression<Formcycle> ex;
 		try {
 			final long t1 = System.nanoTime();
 			ex = EXPRESSION_FACTORY.parse(code, CONTRACT_FACTORY, SEVERITY_CONFIG);
@@ -236,15 +236,15 @@ public class Demo {
 		System.out.println();
 	}
 
-	private static void showEvaluatedResult(@Nonnull final IFormExpression<FormcycleExternalContext> ex) {
+	private static void showEvaluatedResult(@Nonnull final IFormExpression<Formcycle> ex) {
 		final ALangObject result;
 		try {
 			// Do it once so we don't measure setup times.
-			ex.evaluate(new FormcycleExternalContext());
+			ex.evaluate(new Formcycle());
 
 			// Measure how long it takes in practice.
 			final long t1 = System.nanoTime();
-			result = ex.evaluate(new FormcycleExternalContext());
+			result = ex.evaluate(new Formcycle());
 			final long t2 = System.nanoTime();
 
 			System.out.println("Evaluation took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$

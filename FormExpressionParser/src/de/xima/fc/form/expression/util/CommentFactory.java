@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.impl.formexpression;
+package de.xima.fc.form.expression.util;
 
 import javax.annotation.Nonnull;
 
@@ -6,8 +6,6 @@ import de.xima.fc.form.expression.enums.ECommentType;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 
 public final class CommentFactory {
 	private CommentFactory() {}

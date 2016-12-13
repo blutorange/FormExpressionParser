@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.impl.formexpression;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableCollection;
@@ -10,7 +11,6 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.parse.IComment;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
@@ -21,34 +21,31 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.SimulateVisitor;
 import de.xima.fc.form.expression.visitor.UnusedVariableCheckVisitor;
 
-class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<T> {
+@ParametersAreNonnullByDefault
+class FormExpressionImpl<T> implements IFormExpression<T> {
 	private static final long serialVersionUID = 1L;
 
 	private final int symbolTableSize;
-	@Nonnull
 	private final IScopeDefinitions scopeDefs;
-	@Nonnull
-	private final IEvaluationContextContractFactory<T> specs;
-	@Nonnull
+	private final IEvaluationContextContractFactory<T> ecFactory;
 	private final Node node;
-	@Nonnull
 	private final ImmutableList<IComment> comments;
 
-	FormExpressionImpl(@Nonnull final Node node, @Nonnull final ImmutableList<IComment> comments,
-			@Nonnull final IScopeDefinitions scopeDefs, @Nonnull final IEvaluationContextContractFactory<T> specs,
+	FormExpressionImpl(final Node node, final ImmutableList<IComment> comments,
+			final IScopeDefinitions scopeDefs, final IEvaluationContextContractFactory<T> specs,
 			final int heapSize) {
 		this.node = node;
 		this.comments = comments;
-		this.specs = specs;
+		this.ecFactory = specs;
 		this.scopeDefs = scopeDefs;
 		this.symbolTableSize = heapSize;
 	}
 
 	@Override
 	@Nonnull
-	public ALangObject evaluate(@Nonnull final T ex) throws EvaluationException {
-		Preconditions.checkNotNull(ex, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
-		final IEvaluationContext ec = specs.getContextWithExternal(ex);
+	public ALangObject evaluate(@Nonnull final T object) throws EvaluationException {
+		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
+		final IEvaluationContext ec = makeEc(object);
 		ec.createSymbolTable(symbolTableSize);
 		final ALangObject result = EvaluateVisitor.evaluateCode(node, scopeDefs, ec);
 		ec.reset();
@@ -58,16 +55,16 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 	public ImmutableList<IComment> getComments() {
 		return comments;
 	}
-	
+
 	@Override
 	public IEvaluationContextContractFactory<T> getSpecs() {
-		return specs;
+		return ecFactory;
 	}
 
 	@Override
-	public ImmutableCollection<IEvaluationWarning> analyze(final T ex) throws EvaluationException {
-		Preconditions.checkNotNull(ex, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
-		final IEvaluationContext ec = specs.getContextWithExternal(ex);
+	public ImmutableCollection<IEvaluationWarning> analyze(final T object) throws EvaluationException {
+		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
+		final IEvaluationContext ec = makeEc(object);
 		final ImmutableCollection<IEvaluationWarning> result;
 		try {
 			SimulateVisitor.simulate(node, scopeDefs, ec);
@@ -78,5 +75,11 @@ class FormExpressionImpl<T extends IExternalContext> implements IFormExpression<
 			ec.reset();
 		}
 		return result;
+	}
+
+	private IEvaluationContext makeEc(final T object) {
+		final IEvaluationContext ec = new EvaluationContextImpl(ecFactory);
+		ec.setExternalContext(ecFactory.getExternalFactory().makeExternalContext(object));
+		return ec;
 	}
 }

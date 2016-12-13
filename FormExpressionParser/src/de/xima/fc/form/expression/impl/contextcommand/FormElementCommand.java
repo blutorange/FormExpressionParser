@@ -1,7 +1,5 @@
 package de.xima.fc.form.expression.impl.contextcommand;
 
-import de.xima.fc.form.expression.impl.AExternalContextCommand;
-
 public class FormElementCommand extends AExternalContextCommand {
 	private final EFormElementCommandType type;
 	private final Object data;

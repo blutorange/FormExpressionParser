@@ -43,7 +43,7 @@ enum SyntaxFailure implements ITestCase {
 	TEST019("if (true) require scope math;", "Encountered \" \"require\" \"require \"\" at line 1, column 11."),
 	TEST020("scoped::var.works['great']();", "Encountered \" \"var\" \"var \"\" at line 1, column 9."),
 	TEST021("a = var b = c;", "Encountered \" \"var\" \"var \"\" at line 1, column 5."),
-	TEST022(new Cfg("var i = i;").err("Error during parsing at line 1, column 1: Encountered variable declaration for i at global scope. Global variable must be declared in a global{} block.").err(IllegalVariableDeclarationAtGlobalScopeException.class)),
+	TEST022(new Cfg("var i = i;").err("Error during parsing at line 1, column 1: Encountered variable declaration for i at global scope. Global variable must be declared in a global block.").err(IllegalVariableDeclarationAtGlobalScopeException.class)),
 	TEST024("if(false){function foo(){}}", "Encountered \" \"function\" \"function \"\" at line 1, column 11."),
 	TEST025(new Cfg("global scope {var i=0;var j=i;}j;").err("Error during parsing at line 1, column 29: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
 	TEST026(new Cfg("scope myscope{var j=''.lower();}myscope::j;").err("Error during parsing at line 1, column 21: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
