@@ -4,6 +4,8 @@ import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
 import static de.xima.fc.form.expression.enums.ELangObjectType.FUNCTION;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_UNMATCHING_SWITCH_TYPE_AS_ERROR;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,6 +24,7 @@ import de.xima.fc.form.expression.exception.parse.IncompatibleConditionTypeExcep
 import de.xima.fc.form.expression.exception.parse.IncompatibleForLoopHeaderTypeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVariableAssignmentTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingReturnException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
@@ -418,8 +421,43 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTAssignmentExpressionNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		final NodeInfo infoResult = node.getAssignValueNode().jjtAccept(this);
+		if (!infoResult.hasImplicitType())
+			throw new UnreachableCodeException(node.getAssignableNode(node.getAssignableNodeCount()));
+		for (int i = node.getAssignableNodeCount(); i-- > 0;) {
+			final EMethod method = node.getAssignMethod(i);
+			switch (node.getAssignableNode(i).jjtGetNodeId()) {
+			case JJTVARIABLENODE:
+				final NodeInfo infoVar = node.getAssignableNode(i).jjtAccept(this);
+				if (method != EMethod.EQUAL) {
+					// TODO check if method call works and get result
+					// method.equalMethod(node)
+					throw new RuntimeException();
+				}
+				if (!infoVar.hasImplicitType()) {
+					if (i > 0)
+						throw new UnreachableCodeException(node.getAssignableNode(i - 1));
+				}
+				else if (!infoVar.getImplicitType().isAssignableFrom(infoResult.getImplicitType())) {
+					throw new IncompatibleVariableAssignmentTypeException((ASTVariableNode) node.getAssignableNode(i),
+							infoVar.getImplicitType(), infoResult.getImplicitType());
+				}
+				else
+					infoResult.replaceImplicitType(infoVar.getImplicitType());
+				infoResult.unifyJumps(infoVar);
+				break;
+			case JJTPROPERTYEXPRESSIONNODE:
+				// TODO
+				if(true) throw new RuntimeException();
+				break;
+			default:
+				throw new SemanticsException(
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+								node.getAssignableNode(i).jjtGetNodeId(), node.getClass().getSimpleName()),
+						node.getAssignableNode(i));
+			}
+		}
+		return infoResult;
 	}
 
 	@Override
@@ -961,8 +999,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTVariableDeclarationClauseNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		if (node.hasType())
+			return node.getTypeNode().jjtAccept(this);
+		return new NodeInfo(null, SimpleVariableType.OBJECT);
 	}
 
 	@Override

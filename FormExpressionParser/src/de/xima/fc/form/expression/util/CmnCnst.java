@@ -52,16 +52,20 @@ public final class CmnCnst {
 		@Nonnull public static final String PREFIX_FORM_FIELD_VERBOSE = "[%";
 		/** Scope with variables for system variables/placeholders. */
 		@Nonnull public static final String FC_SYSTEM = "fcsystem";
+		@Nonnull public static final Object ACTION_VARIABLE_NAME_RESULT = "RESULT";
 		@Nonnull public static final String PREFIX_FC_SYSTEM_SILENT = "[%$@";
 		@Nonnull public static final String PREFIX_FC_SYSTEM_VERBOSE = "[%$";
 		/** Scope with variables for system variables/placeholders. */
 		@Nonnull public static final String TEMPLATE = "template";
 		@Nonnull public static final String PREFIX_TEMPLATE_SILENT = "[%$$@";
 		@Nonnull public static final String PREFIX_TEMPLATE_VERBOSE = "[%$$";
+		@Nonnull public static final String GENERAL_NO_OUTPUT = "[%%";
+		@Nonnull public static final String GENERAL_YES_OUTPUT = "[%%=";
 		/** Scope with functions for retrieving form field values etc. */
 		@Nonnull public static final String FORM_FUNCTIONS = "form";
 		/** Scope for math-related utilities. */
 		@Nonnull public static final String MATH = "math";
+
 	}
 
 	public final static class Name {
@@ -352,10 +356,11 @@ public final class CmnCnst {
 		@Nonnull public static final String EVALUATION_EXCEPTION_KNOWN_EX = "External context is {0} ({1}).";
 		@Nonnull public static final String EVALUATION_EXCEPTION_UNKNOWN_EX = "External context is unknown.";
 		@Nonnull public static final String NO_SUCH_SCOPE = "No such scope {0}.";
-		@Nonnull public static final String MISSING_REQUIRE_SCOPE_STATEMENT = "Scope {0} is provided by the evaluation context, but require scope statement is missing.";
+		@Nonnull public static final String MISSING_REQUIRE_SCOPE_STATEMENT = "Scope {0} is provided by the context, but require scope statement is missing. Strict mode requires importing scopes explicitly.";
 		@Nonnull public static final String MISSING_EXPLICIT_RETURN = "Function must explicitly return a value of type {0} for all code paths in strict mode.";
 		@Nonnull public static final String INCOMPATIBLE_FUNCTION_RETURN_TYPE = "Type returned is not compatible with the declared return type.";
 		@Nonnull public static final String NULL_MAP_VALUE = "Map must not contain any null value.";
+		@Nonnull public static final String INCOMPATIBLE_VARIABLE_ASSIGNMENT_TYPE = "Variable {0} cannot be assigned to this type.";
 	}
 
 	public static final class ToString {

@@ -36,8 +36,8 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 /**
  * TODO
  * - unparse: los nicer
- * - optional variable types -> syntax for func param types
- * - support closures for lambda expressions (nestLocal -> nest ?)
+ * - variable typing: allow var for "object" everywhere (for loop header etc, hash<var,var> etc.)
+ * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
  * - update formatting js
  * - update highlighter with new token types (global, scope, require etc)
  * - everything returns a value; in strict mode, check that functions return explicitly
@@ -237,16 +237,20 @@ public class Demo {
 	}
 
 	private static void showEvaluatedResult(@Nonnull final IFormExpression<Formcycle> ex) {
+		System.out.println("===Evaluation===");
 		final ALangObject result;
 		try {
 			// Do it once so we don't measure setup times.
 			ex.evaluate(new Formcycle());
+			System.out.println();
 
 			// Measure how long it takes in practice.
 			final long t1 = System.nanoTime();
 			result = ex.evaluate(new Formcycle());
 			final long t2 = System.nanoTime();
 
+			System.out.println();
+			System.out.println();
 			System.out.println("Evaluation took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final EvaluationException e) {

@@ -321,7 +321,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			// $CASES-OMITTED$
 		default:
 			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-					child.getSiblingMethod(), node.getClass().getSimpleName()));
+					child.jjtGetNodeId(), node.getClass().getSimpleName()));
 		}
 		return assignee;
 	}

@@ -20,11 +20,13 @@ import de.xima.fc.form.expression.exception.parse.DuplicateRequireScopeDeclarati
 import de.xima.fc.form.expression.exception.parse.DuplicateScopedVariableDeclarationException;
 import de.xima.fc.form.expression.exception.parse.FunctionNameAlreadyDefinedException;
 import de.xima.fc.form.expression.exception.parse.ManualScopeAlreadyRequiredException;
+import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
 import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
@@ -36,7 +38,8 @@ import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
-public class ScopeCollectVisitor extends FormExpressionVoidDataVisitorAdapter<Optional<Map<String, IHeaderNode>>, SemanticsException>
+public class ScopeCollectVisitor
+extends FormExpressionVoidDataVisitorAdapter<Optional<Map<String, IHeaderNode>>, SemanticsException>
 implements IScopeDefinitionsBuilder {
 	@Nullable
 	private String currentScope;
@@ -49,22 +52,28 @@ implements IScopeDefinitionsBuilder {
 	private final Set<String> requiredSet;
 	@Nonnull
 	private final Map<String, Map<String, IHeaderNode>> manualMap;
-
+	@Nonnull
+	private final IEvaluationContextContractFactory<?> factory;
+	@Nonnull
 	private final ISeverityConfig config;
 
 	@Nonnull
-	public static IScopeDefinitionsBuilder collect(final Node node, final ISeverityConfig config) throws ParseException {
-		final ScopeCollectVisitor v = new ScopeCollectVisitor(config);
-		node.jjtAccept(v, Optional.<Map<String,IHeaderNode>>absent());
+	public static IScopeDefinitionsBuilder collect(@Nonnull final Node node,
+			@Nonnull final IEvaluationContextContractFactory<?> factory, @Nonnull final ISeverityConfig config)
+					throws ParseException {
+		final ScopeCollectVisitor v = new ScopeCollectVisitor(config, factory);
+		node.jjtAccept(v, Optional.<Map<String, IHeaderNode>> absent());
 		v.currentScope = null;
 		v.detachNodes();
 		return v;
 	}
 
-	private ScopeCollectVisitor(final ISeverityConfig config) {
+	private ScopeCollectVisitor(@Nonnull final ISeverityConfig config,
+			@Nonnull final IEvaluationContextContractFactory<?> factory) {
 		globalMap = new HashMap<>();
 		requiredSet = new HashSet<>();
 		manualMap = new HashMap<>();
+		this.factory = factory;
 		this.config = config;
 	}
 
@@ -74,15 +83,22 @@ implements IScopeDefinitionsBuilder {
 		getDetachQueue().clear();
 	}
 
+	private boolean provides(@Nonnull final String scope) {
+		return factory.getLibraryFactory().isProvidingScope(scope) || factory.getExternalFactory().isProvidingScope(scope);
+	}
+
 	@Nonnull
 	private List<Node> getDetachQueue() {
-		return detachQueue != null ? detachQueue  : (detachQueue = new ArrayList<>());
+		return detachQueue != null ? detachQueue : (detachQueue = new ArrayList<>());
 	}
 
 	@Override
-	public void visit(final ASTScopeExternalNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
+	public void visit(final ASTScopeExternalNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo)
+			throws SemanticsException {
 		// Throw an error when the scope has already been required.
 		// Otherwise, add it to the list of required scopes.
+		if (!provides(node.getScopeName()))
+			throw new NoSuchScopeException(node.getScopeName(), node);
 		if (requiredSet.contains(node.getScopeName()) || manualMap.containsKey(node.getScopeName()))
 			throw new DuplicateRequireScopeDeclarationException(node);
 		requiredSet.add(node.getScopeName());
@@ -90,13 +106,15 @@ implements IScopeDefinitionsBuilder {
 	}
 
 	@Override
-	public void visit(final ASTScopeManualNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
+	public void visit(final ASTScopeManualNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo)
+			throws SemanticsException {
 		// Throw an error when the scope has already been required.
 		// Otherwise, add the scope and the variable.
 		currentScope = node.getScopeName();
 		if (requiredSet.contains(currentScope))
 			throw new ManualScopeAlreadyRequiredException(node);
-		@Nullable Map<String,IHeaderNode> map = manualMap.get(currentScope);
+		@Nullable
+		Map<String, IHeaderNode> map = manualMap.get(currentScope);
 		if (map == null) {
 			map = new HashMap<>();
 			manualMap.put(node.getScopeName(), map);
@@ -107,18 +125,20 @@ implements IScopeDefinitionsBuilder {
 	}
 
 	@Override
-	public void visit(final ASTScopeGlobalNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
+	public void visit(final ASTScopeGlobalNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo)
+			throws SemanticsException {
 		currentScope = null;
 		visitChildren(node, Optional.of(globalMap));
 		getDetachQueue().add(node);
 	}
 
 	@Override
-	public void visit(final ASTVariableDeclarationClauseNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo) throws SemanticsException {
+	public void visit(final ASTVariableDeclarationClauseNode node, final Optional<Map<String, IHeaderNode>> mapToAddTo)
+			throws SemanticsException {
 		// Add the node to a manual or global scope.
 		if (mapToAddTo.isPresent()) {
 			final Map<String, IHeaderNode> map = mapToAddTo.get();
-			visitChildren(node, Optional.<Map<String,IHeaderNode>>absent());
+			visitChildren(node, Optional.<Map<String, IHeaderNode>> absent());
 			if (map.containsKey(node.getVariableName()))
 				throw new DuplicateScopedVariableDeclarationException(node, currentScope);
 			map.put(node.getVariableName(), new HeaderNodeImpl(node));
@@ -154,7 +174,7 @@ implements IScopeDefinitionsBuilder {
 			}
 		}
 		// Collect everything from function bodies as well.
-		node.getBodyNode().jjtAccept(this, Optional.<Map<String,IHeaderNode>>absent());
+		node.getBodyNode().jjtAccept(this, Optional.<Map<String, IHeaderNode>> absent());
 		getDetachQueue().add(node);
 	}
 
@@ -165,7 +185,7 @@ implements IScopeDefinitionsBuilder {
 
 	@Override
 	public boolean hasManual(final String scope, final String name) {
-		final Map<String,?> m = manualMap.get(scope);
+		final Map<String, ?> m = manualMap.get(scope);
 		return m == null ? false : m.containsKey(scope);
 	}
 
@@ -247,14 +267,17 @@ implements IScopeDefinitionsBuilder {
 	private class ManIter implements Iterator<IHeaderNode> {
 		private final Iterator<Map<String, IHeaderNode>> it = manualMap.values().iterator();
 		private Iterator<IHeaderNode> it2;
+
 		@Override
 		public boolean hasNext() {
 			return it2.hasNext() || it.hasNext();
 		}
+
 		@Override
 		public IHeaderNode next() {
 			return (it2.hasNext() ? it2 : (it2 = it.next().values().iterator())).next();
 		}
+
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();

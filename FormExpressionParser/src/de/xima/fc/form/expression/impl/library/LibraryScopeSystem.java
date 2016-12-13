@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.Void;
 
 @ParametersAreNonnullByDefault
-public enum SystemLibrary implements ILibraryScopeContractFactory<Void> {
+public enum LibraryScopeSystem implements ILibraryScopeContractFactory<Void> {
 	MATH(
 		new GenericLibraryScopeFactory.Builder(CmnCnst.CustomScope.MATH)
 			.addVariable("pi", new LibVar(NumberLangObject.getPiInstance()))
@@ -22,7 +22,7 @@ public enum SystemLibrary implements ILibraryScopeContractFactory<Void> {
 
 	private final ILibraryScopeContractFactory<Void> impl;
 
-	private SystemLibrary(final ILibraryScopeContractFactory<Void> impl) {
+	private LibraryScopeSystem(final ILibraryScopeContractFactory<Void> impl) {
 		this.impl = impl;
 	}
 

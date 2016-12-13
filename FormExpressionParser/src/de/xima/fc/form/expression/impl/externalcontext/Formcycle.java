@@ -1,19 +1,32 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
 import java.io.Writer;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import de.xima.fc.form.expression.impl.writer.SystemWriter;
+import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.ArrayLangObject;
+import de.xima.fc.form.expression.object.HashLangObject;
+import de.xima.fc.form.expression.object.StringLangObject;
 
 public class Formcycle {
 	@Nonnull
 	private final Writer writer;
+	private ALangObject actionResult;
+	@Nonnull
 	private static final ImmutableMap<String, String> nameMap;
+	@Nonnull
 	private static final ImmutableMap<String, String> aliasMap;
+	@Nonnull
+	private static final List<Map<String,String>> actionResultMap;
 	public Formcycle() {
 		this(SystemWriter.getSystemOutInstance());
 	}
@@ -38,6 +51,21 @@ public class Formcycle {
 		nameMap = builderName.build();
 		aliasMap = builderAlias.build();
 	}
+	static {
+		final ImmutableList.Builder<Map<String,String>> builderList = new ImmutableList.Builder<>();
+
+		final ImmutableMap.Builder<String, String> builderMap1 = new ImmutableMap.Builder<>();
+		builderMap1.put("foo", "bar");
+		builderMap1.put("hello", "world");
+		builderList.add(builderMap1.build());
+
+		final ImmutableMap.Builder<String, String> builderMap2 = new ImmutableMap.Builder<>();
+		builderMap2.put("error", "true");
+		builderMap2.put("message", "This is an error");
+		builderList.add(builderMap2.build());
+
+		actionResultMap = builderList.build();
+	}
 	@Nonnull
 	public Writer getWriter() {
 		return writer;
@@ -49,5 +77,22 @@ public class Formcycle {
 	@Nullable
 	public String getByName(final String name) {
 		return nameMap.get(name);
+	}
+	@Nonnull
+	private List<Map<String,String>> getActionResult() {
+		return actionResultMap;
+	}
+	@Nonnull
+	public ALangObject getActionResultAsLangObject() {
+		if (actionResult != null)
+			return actionResult;
+		final ArrayLangObject array = ArrayLangObject.create();
+		for (final Map<String,String> map : getActionResult()) {
+			final HashLangObject hash = HashLangObject.create();
+			for (final Entry<String,String> entry : map.entrySet())
+				hash.put(StringLangObject.create(entry.getKey()), StringLangObject.create(entry.getValue()));
+			array.add(hash);
+		}
+		return actionResult = array;
 	}
 }

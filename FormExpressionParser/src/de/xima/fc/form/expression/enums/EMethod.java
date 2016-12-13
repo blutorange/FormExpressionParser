@@ -1,8 +1,11 @@
 package de.xima.fc.form.expression.enums;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
+import de.xima.fc.form.expression.exception.parse.SemanticsException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.ExpressionMethod;
@@ -101,8 +104,9 @@ public enum EMethod {
 		this.methodName = name;
 	}
 
-	@Nonnull
-	public EMethod equalMethod(@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
+
+	@Nullable
+	private EMethod equalMethod() {
 		switch (this) {
 		case DOUBLE_PLUS_PREFIX: return EMethod.DOUBLE_PLUS_PREFIX;
 		case DOUBLE_DASH_PREFIX: return EMethod.DOUBLE_DASH_PREFIX;
@@ -125,9 +129,24 @@ public enum EMethod {
 		case CIRCUMFLEX_EQUAL: return EMethod.CIRCUMFLEX;
 		//$CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
+			return null;
 		}
 	}
+
+	@Nonnull
+	public EMethod equalMethod(@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
+		final EMethod m = equalMethod();
+		if (m != null) return m;
+		throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.INVALID_EQUAL_METHOD, this));
+	}
+
+	@Nonnull
+	public EMethod equalMethod(@Nonnull final Node node) throws SemanticsException {
+		final EMethod m = equalMethod();
+		if (m != null) return m;
+		throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.INVALID_EQUAL_METHOD, this), node);
+	}
+
 
 	@Nonnull
 	public EMethod comparisonMethod(@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {

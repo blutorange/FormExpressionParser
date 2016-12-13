@@ -20,8 +20,9 @@ public enum EFormcycleContractFactory implements IEvaluationContextContractFacto
 	;
 	private final IEvaluationContextContractFactory<Formcycle> impl;
 	private EFormcycleContractFactory(final IEmbedmentContractFactory embedmentFactory, final IExternalContextContractFactory<Formcycle> ex) {
-		this.impl = new GenericContractFactory<>(embedmentFactory, ex);
+		this.impl = new GenericContractFactory.Builder<Formcycle>().setEmbedment(embedmentFactory).setExternal(ex).build();
 	}
+
 	@Override
 	public IEmbedmentContractFactory getEmbedmentFactory() {
 		return impl.getEmbedmentFactory();

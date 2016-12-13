@@ -16,37 +16,48 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.Void;
 
 @ParametersAreNonnullByDefault
-public enum DummyLibraryContractFactory implements ILibraryContractFactory, ILibrary {
-	INSTANCE;
-	@Override
-	public ILibrary makeLibrary() {
-		return this;
+public final class DummyLibraryContractFactory {
+	private DummyLibraryContractFactory() {
 	}
 
-	@Override
-	public boolean isProvidingScope(final String scope) {
-		return false;
+	public static ILibraryContractFactory getInstance() {
+		return DummyImpl.INSTANCE;
 	}
 
-	@Nullable
-	@Override
-	public ILibraryScopeContractFactory<Void> getScopeFactory(final String scope) {
-		return null;
-	}
+	// Hiding the implementation of ILibrary so the the API only returns
+	// a factory implementation.
+	private static enum DummyImpl implements ILibraryContractFactory, ILibrary {
+		INSTANCE;
+		@Override
+		public ILibrary makeLibrary() {
+			return this;
+		}
 
-	@Override
-	public ALangObject getVariable(final String scope, final String name, final IEvaluationContext ec)
-			throws EvaluationException {
-		throw new VariableNotDefinedException(scope, name, ec);
-	}
+		@Override
+		public boolean isProvidingScope(final String scope) {
+			return false;
+		}
 
-	@SuppressWarnings("null")
-	@Override
-	public Collection<String> getProvidedScopes() {
-		return Collections.emptySet();
-	}
+		@Nullable
+		@Override
+		public ILibraryScopeContractFactory<Void> getScopeFactory(final String scope) {
+			return null;
+		}
 
-	@Override
-	public void reset() {
+		@Override
+		public ALangObject getVariable(final String scope, final String name, final IEvaluationContext ec)
+				throws EvaluationException {
+			throw new VariableNotDefinedException(scope, name, ec);
+		}
+
+		@SuppressWarnings("null")
+		@Override
+		public Collection<String> getProvidedScopes() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public void reset() {
+		}
 	}
 }

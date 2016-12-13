@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.IReset;
@@ -23,20 +23,15 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
  * @formatter:on
  * @author mad_gaksha
  */
+@ParametersAreNonnullByDefault
 public interface IEvaluationContext extends IReset {
-	@Nonnull
 	public ILibrary getLibrary();
-	@Nonnull
 	public INamespace getNamespace();
-	@Nonnull
 	public ILogger getLogger();
-	@Nonnull
 	public ITracer<Node> getTracer();
-	@Nonnull
 	public IEmbedment getEmbedment();
 
-	@Nullable
-	public IExternalContext getExternalContext();
+	@Nullable public IExternalContext getExternalContext();
 	public void setExternalContext(@Nullable IExternalContext externalContext);
 
 	/**
@@ -48,8 +43,7 @@ public interface IEvaluationContext extends IReset {
 	 * @return Whether two variable names are equivalent and refer to the same
 	 *         variable. Default could be {@link String#equals(Object)}
 	 */
-	public boolean variableNameEquals(@Nonnull String name1, @Nonnull String name2);
+	public boolean variableNameEquals(String name1, String name2);
 	public void createSymbolTable(int symbolTableSize);
-	@Nonnull
 	public IVariableReference[] getSymbolTable();
 }

@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
-import de.xima.fc.form.expression.impl.embedment.DummyEmbedment;
+import de.xima.fc.form.expression.impl.embedment.DummyEmbedmentContractFactory;
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 import de.xima.fc.form.expression.impl.formexpression.EvaluationContextImpl;
 import de.xima.fc.form.expression.impl.library.DummyLibraryContractFactory;
@@ -135,7 +135,7 @@ public class HtmlDocumentCommandTest {
 		INSTANCE;
 		@Override
 		public IEmbedmentContractFactory getEmbedmentFactory() {
-			return DummyEmbedment.INSTANCE;
+			return DummyEmbedmentContractFactory.getInstance();
 		}
 		@Override
 		public ITracer<Node> makeTracer() {
@@ -151,7 +151,7 @@ public class HtmlDocumentCommandTest {
 		}
 		@Override
 		public ILibraryContractFactory getLibraryFactory() {
-			return DummyLibraryContractFactory.INSTANCE;
+			return DummyLibraryContractFactory.getInstance();
 		}
 		@Override
 		public DummyHtmlExternalContextContractFactory getExternalFactory() {

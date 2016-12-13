@@ -18,10 +18,8 @@ import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.impl.ec.EFormcycleContractFactory;
-import de.xima.fc.form.expression.impl.ec.GenericContractFactory;
-import de.xima.fc.form.expression.impl.embedment.EEmbedmentFactory;
+import de.xima.fc.form.expression.impl.ec.EvaluationContextContractFactory;
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
-import de.xima.fc.form.expression.impl.externalcontext.WriterOnlyExternalContext;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -33,11 +31,13 @@ public final class TestUtil {
 	}
 
 	static enum ETestType {
-		PROGRAM, TEMPLATE;
+		PROGRAM,
+		TEMPLATE;
 	}
 
 	static enum EContextType {
-		GENERIC, FORMCYCLE;
+		GENERIC,
+		FORMCYCLE;
 	}
 
 	static interface ITestCase {
@@ -66,45 +66,65 @@ public final class TestUtil {
 	}
 
 	static class Cfg {
-		@Nonnull final String code;
-		@Nullable String errMsg = null;
-		@Nonnull ETestType type = ETestType.PROGRAM;
-		@Nonnull EContextType context = EContextType.GENERIC;
-		@Nullable Class<? extends Throwable> errClass;
-		@Nonnull ISeverityConfig config = SeverityConfig.getLooseConfig();
-		Cfg(@Nonnull final  String code) {
+		@Nonnull
+		final String code;
+		@Nullable
+		String errMsg = null;
+		@Nonnull
+		ETestType type = ETestType.PROGRAM;
+		@Nonnull
+		EContextType context = EContextType.GENERIC;
+		@Nullable
+		Class<? extends Throwable> errClass;
+		@Nonnull
+		ISeverityConfig config = SeverityConfig.getLooseConfig();
+
+		Cfg(@Nonnull final String code) {
 			this.code = code;
 		}
-		@Nonnull Cfg strict() {
+
+		@Nonnull
+		Cfg strict() {
 			config = SeverityConfig.getStrictConfig();
 			return this;
 		}
-		@Nonnull Cfg prog() {
+
+		@Nonnull
+		Cfg prog() {
 			type = ETestType.PROGRAM;
 			return this;
 		}
-		@Nonnull Cfg template() {
+
+		@Nonnull
+		Cfg template() {
 			type = ETestType.TEMPLATE;
 			return this;
 		}
-		@Nonnull Cfg err(@Nullable  final String errMsg) {
+
+		@Nonnull
+		Cfg err(@Nullable final String errMsg) {
 			this.errMsg = errMsg;
 			return this;
 		}
-		@Nonnull Cfg err(@Nullable final Class<? extends Throwable> err) {
+
+		@Nonnull
+		Cfg err(@Nullable final Class<? extends Throwable> err) {
 			this.errClass = err;
 			return this;
 		}
-		@Nonnull Cfg generic() {
+
+		@Nonnull
+		Cfg generic() {
 			context = EContextType.GENERIC;
 			return this;
 		}
-		@Nonnull Cfg fc() {
+
+		@Nonnull
+		Cfg fc() {
 			context = EContextType.FORMCYCLE;
 			return this;
 		}
 	}
-
 
 	public static void test(final Class<? extends ITestCase> clazz) throws IllegalArgumentException, AssertionError {
 		if (!clazz.isEnum())
@@ -123,9 +143,7 @@ public final class TestUtil {
 					break;
 				case GENERIC:
 					final IFormExpression<Writer> feGeneric = parse(test.getCode(), test.getTestType(),
-							new GenericContractFactory<>(EEmbedmentFactory.GENERAL,
-									WriterOnlyExternalContext.getFactory()),
-							test.getSeverityConfig());
+							EvaluationContextContractFactory.WRITER, test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
@@ -191,8 +209,8 @@ public final class TestUtil {
 		}
 	}
 
-	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<Writer> fe,
-			@Nonnull final ETestType type) throws EvaluationException {
+	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<Writer> fe, @Nonnull final ETestType type)
+			throws EvaluationException {
 		final ALangObject res;
 		final Date t1 = new Date();
 		try (final StringBuilderWriter writer = new StringBuilderWriter()) {
@@ -235,9 +253,9 @@ public final class TestUtil {
 	}
 
 	@Nonnull
-	private static <T> IFormExpression<T> parse(@Nonnull final String code,
-			@Nonnull final ETestType type, @Nonnull final IEvaluationContextContractFactory<T> provider,
-			@Nonnull final ISeverityConfig config) throws ParseException, TokenMgrError {
+	private static <T> IFormExpression<T> parse(@Nonnull final String code, @Nonnull final ETestType type,
+			@Nonnull final IEvaluationContextContractFactory<T> provider, @Nonnull final ISeverityConfig config)
+					throws ParseException, TokenMgrError {
 		final IFormExpression<T> res;
 		final Date t1 = new Date();
 		switch (type) {

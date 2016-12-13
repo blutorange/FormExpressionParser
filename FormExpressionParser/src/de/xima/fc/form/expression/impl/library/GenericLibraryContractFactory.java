@@ -18,18 +18,32 @@ import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.Void;
 
+/**
+ * <p>
+ * A library simply consisting of a {@link ILibraryScopeContractFactory} for
+ * each supported scope. Retrieving values is delegated to the corresponding
+ * library scope.
+ * </p>
+ * <p>
+ * As it is immutable, you do not need to create a new instance every time.
+ * </p>
+ *
+ * @author madgaksha
+ */
 @Immutable
 @ParametersAreNonnullByDefault
 public class GenericLibraryContractFactory implements ILibraryContractFactory {
 	private static final long serialVersionUID = 1L;
-
 	private final ImmutableMap<String, ILibraryScopeContractFactory<Void>> library;
 
 	@SafeVarargs
 	private GenericLibraryContractFactory(final ILibraryScopeContractFactory<Void>... libraryScopeList) {
 		final ImmutableMap.Builder<String, ILibraryScopeContractFactory<Void>> builder = new ImmutableMap.Builder<>();
-		for (final ILibraryScopeContractFactory<Void> f : libraryScopeList)
+		for (final ILibraryScopeContractFactory<Void> f : libraryScopeList) {
+			if (f == null)
+				throw new IllegalArgumentException();
 			builder.put(f.getScopeName(), f);
+		}
 		library = builder.build();
 	}
 
@@ -40,9 +54,8 @@ public class GenericLibraryContractFactory implements ILibraryContractFactory {
 			final ILibraryScope<Void> scope = lib.makeScope();
 			builder.put(scope.getScopeName(), scope).build();
 		}
-		return new LibraryImpl(builder.build());
+		return new LibImpl(builder.build());
 	}
-
 
 	@Override
 	public boolean isProvidingScope(final String scope) {
@@ -55,16 +68,22 @@ public class GenericLibraryContractFactory implements ILibraryContractFactory {
 		return library.get(scope);
 	}
 
+	/**
+	 * @param libraryScopeList
+	 * @return A library factory with the given library scopes.
+	 * @throws IllegalArgumentException When any of the given scopes is <code>null</code>.
+	 */
 	@SafeVarargs
-	public static ILibraryContractFactory createWith(final ILibraryScopeContractFactory<Void>... libraryScopeList) {
+	public static ILibraryContractFactory createWith(final ILibraryScopeContractFactory<Void>... libraryScopeList)
+			throws IllegalArgumentException {
 		return new GenericLibraryContractFactory(libraryScopeList);
 	}
 
 	@Immutable
-	private class LibraryImpl implements ILibrary {
+	private class LibImpl implements ILibrary {
 		private final ImmutableMap<String, ILibraryScope<Void>> map;
 
-		private LibraryImpl(final ImmutableMap<String, ILibraryScope<Void>> map) {
+		private LibImpl(final ImmutableMap<String, ILibraryScope<Void>> map) {
 			this.map = map;
 		}
 

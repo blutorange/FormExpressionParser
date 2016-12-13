@@ -1,12 +1,13 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.iface.IReset;
 
+@ParametersAreNonnullByDefault
 public interface IEmbedment extends IReset {
 	/**
 	 * Sets the name of the current embedment. For code templates, code is
@@ -26,7 +27,6 @@ public interface IEmbedment extends IReset {
 	 * @return List of scopes the current embedment defines. Must not return any
 	 *         <code>null</code> elements.
 	 */
-	@Nonnull
 	public String[] getScopeListForCurrentEmbedment();
 
 	/**
@@ -38,13 +38,12 @@ public interface IEmbedment extends IReset {
 
 	/**
 	 * Does not need to be fast, used only for testing or pre-processing.
-	 * 
+	 *
 	 * @return A list of embedments this embedment defines, ie. for which
 	 *         {@link #getScopeList(String)} does not return <code>null</code>.
 	 */
-	@Nonnull
 	public String[] getEmbedmentList();
-	
+
 	/**
 	 * Writes the output of an embedded code block with the current type to the
 	 * output document, file, or stream etc.
@@ -57,7 +56,7 @@ public interface IEmbedment extends IReset {
 	 *             When this embedment places some restrictions on the data and
 	 *             these are violated. For example an embedment requiring HTML content.
 	 */
-	public void outputCode(@Nonnull String data, @Nonnull IEvaluationContext ec)
+	public void outputCode(String data, IEvaluationContext ec)
 			throws EmbedmentOutputException, InvalidTemplateDataException;
 
 	/**
@@ -72,6 +71,6 @@ public interface IEmbedment extends IReset {
 	 *             When this embedment places some restrictions on the data and
 	 *             these are violated. For example an embedment requiring HTML content.
 	 */
-	public void outputText(@Nonnull String data, @Nonnull IEvaluationContext ec)
+	public void outputText(String data, IEvaluationContext ec)
 			throws EmbedmentOutputException, InvalidTemplateDataException;
 }

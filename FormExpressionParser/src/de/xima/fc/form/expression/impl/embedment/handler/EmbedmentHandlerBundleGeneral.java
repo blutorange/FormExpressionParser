@@ -1,18 +1,18 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
-	SILENT("[%%", false), //$NON-NLS-1$
-	VERBOSE("[%%=", true), //$NON-NLS-1$
+	SILENT(CmnCnst.CustomScope.GENERAL_NO_OUTPUT, false),
+	VERBOSE(CmnCnst.CustomScope.GENERAL_YES_OUTPUT, true),
 	;
-
-	@Nonnull private final String name;
+	private final String name;
 	private final boolean doOutput;
-	private EmbedmentHandlerBundleGeneral(@Nonnull final String name, final boolean doOutput) {
+	private EmbedmentHandlerBundleGeneral(final String name, final boolean doOutput) {
 		this.name = name;
 		this.doOutput = doOutput;
 	}

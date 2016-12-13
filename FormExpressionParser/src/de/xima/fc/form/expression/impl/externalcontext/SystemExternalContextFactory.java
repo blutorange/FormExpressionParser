@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import java.io.PrintStream;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -16,21 +16,22 @@ import de.xima.fc.form.expression.impl.writer.SystemWriter;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public class SystemExternalContextFactory extends AGenericExternalContextFactory<PrintStream> {
+@ParametersAreNonnullByDefault
+public final class SystemExternalContextFactory extends AGenericExternalContextFactory<PrintStream> {
 	private static final long serialVersionUID = 1L;
+
+	private SystemExternalContextFactory(){}
 
 	@Override
 	public AGenericExternalContext makeExternalContext(final PrintStream printStream) {
 		return new SystemExternalContext(printStream);
 	}
 
-	@Nonnull
 	public static IExternalContextContractFactory<PrintStream> getFactory() {
 		return InstanceHolder.INSTANCE;
 	}
 
 	private static class InstanceHolder {
-		@Nonnull
 		public final static IExternalContextContractFactory<PrintStream> INSTANCE = new SystemExternalContextFactory();
 	}
 

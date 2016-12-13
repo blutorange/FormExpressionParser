@@ -17,12 +17,13 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.ILibraryScope;
 import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
-import de.xima.fc.form.expression.impl.library.FormcycleScope;
+import de.xima.fc.form.expression.impl.library.LibraryScopeFormcycle;
 import de.xima.fc.form.expression.object.ALangObject;
 
 @ParametersAreNonnullByDefault
 public enum FormcycleExternalContextContractFactory implements IExternalContextContractFactory<Formcycle> {
-	INSTANCE(FormcycleScope.FORM_FIELD);
+	INSTANCE(LibraryScopeFormcycle.getAll());
+
 	private ImmutableMap<String, ILibraryScopeContractFactory<Formcycle>> map;
 
 	@SafeVarargs
@@ -53,7 +54,7 @@ public enum FormcycleExternalContextContractFactory implements IExternalContextC
 		return map.containsKey(scope);
 	}
 
-	public static class FormcycleExternalContext extends AHtmlExternalContext {
+	private static class FormcycleExternalContext extends AHtmlExternalContext {
 		private final Formcycle formcycle;
 		private final ImmutableMap<String, ILibraryScope<Formcycle>> map;
 
@@ -83,6 +84,7 @@ public enum FormcycleExternalContextContractFactory implements IExternalContextC
 			}
 		}
 
+		@SuppressWarnings({ "unused", "null" })
 		@Override
 		public ALangObject fetchScopedVariable(@Nonnull final String scope, @Nonnull final String name,
 				@Nonnull final IEvaluationContext ec) throws EvaluationException {

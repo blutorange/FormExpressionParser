@@ -1,7 +1,5 @@
 package de.xima.fc.form.expression.impl.library;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
@@ -19,15 +17,16 @@ import de.xima.fc.form.expression.util.Void;
 
 @Immutable
 @ParametersAreNonnullByDefault
-public class GenericLibraryScopeFactory implements ILibraryScope<Void>, ILibraryScopeContractFactory<Void> {
+public final class GenericLibraryScopeFactory implements ILibraryScope<Void>, ILibraryScopeContractFactory<Void> {
 	private final String name;
 	private final ImmutableMap<String, LibVar> map;
 
-	private GenericLibraryScopeFactory(final String name, final Map<String, LibVar> map) {
+	private GenericLibraryScopeFactory(final String name, final ImmutableMap<String, LibVar> map) {
 		this.name = name;
-		this.map = ImmutableMap.copyOf(map);
+		this.map = map;
 	}
 
+	@SuppressWarnings({ "unused", "null" })
 	@Override
 	public ALangObject fetch(final String variableName, final Void object, final IEvaluationContext ec)
 			throws VariableNotDefinedException {
@@ -38,6 +37,7 @@ public class GenericLibraryScopeFactory implements ILibraryScope<Void>, ILibrary
 		return res.value;
 	}
 
+	@SuppressWarnings({ "null" })
 	@Nullable
 	@Override
 	public IVariableType getVariableType(final String variableName) {
@@ -80,6 +80,12 @@ public class GenericLibraryScopeFactory implements ILibraryScope<Void>, ILibrary
 			this.scopeName = scopeName;
 		}
 
+		/**
+		 * Adds a variable with a given name.
+		 * @param variableName Name of the variable to add.
+		 * @param value Value of the variable, including its type.
+		 * @return this for chaining.
+		 */
 		public Builder addVariable(final String variableName, final LibVar value) {
 			getBuilder().put(variableName, value);
 			return this;

@@ -1,7 +1,4 @@
-require scope math;
-switch(3.14) {
-  case math::pi:
-    throw exception("pi");
-  default:
-    "Hooray";
+scope foo {
+  string a;
 }
+foo::a = 9;
