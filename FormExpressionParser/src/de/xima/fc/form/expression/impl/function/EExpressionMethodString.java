@@ -1,17 +1,21 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public enum EExpressionMethodString implements IMethod2Function<StringLangObject> {
 	/**
 	 * @param stringToJoin {@link StringLangObject} The string to be concatenated to this string.
@@ -19,9 +23,9 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 	 */
 	PLUS(EMethod.PLUS, Impl.CONCATENATE),
 	;
-	@Nonnull private final EMethod method;
-	@Nonnull private final IFunction<StringLangObject> function;
-	private EExpressionMethodString(@Nonnull final EMethod method, @Nonnull final IFunction<StringLangObject> function) {
+	private final EMethod method;
+	private final IExpressionFunction<StringLangObject> function;
+	private EExpressionMethodString(final EMethod method, final IExpressionFunction<StringLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -30,24 +34,31 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		return method;
 	}
 	@Override
-	public IFunction<StringLangObject> getFunction() {
+	public IExpressionFunction<StringLangObject> getFunction() {
 		return function;
 	}
 
-	private static enum Impl implements IFunction<StringLangObject> {
+	private static enum Impl implements IExpressionFunction<StringLangObject> {
 		CONCATENATE(false, "stringToJoin") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.concat(args[0].coerceString(ec));
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equalsType(rhs) ? lhs : null;
+			}
 		},
 		;
 
-		@Nonnull private final String[] argList;
+		private final String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -63,9 +74,10 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 			return toString();
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -74,12 +86,8 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.STRING;
-		}
-		@Override
-		public Node getNode() {
-			return null;
 		}
 	}
 }

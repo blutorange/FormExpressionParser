@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.tracer;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
@@ -49,7 +49,7 @@ public enum DummyTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public Collection<IEvaluationWarning> getWarnings() {
+	public List<IEvaluationWarning> buildWarnings() {
 		return NullUtil.checkNotNull(Collections.<IEvaluationWarning>emptyList());
 	}
 

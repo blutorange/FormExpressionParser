@@ -7,17 +7,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 public class VariableTypeBuilder implements IVariableTypeBuilder {
 	@Nullable
-	private ELangObjectType type;
+	private ILangObjectClass type;
 	@Nullable
 	private List<IVariableType> children;
 
@@ -31,7 +30,7 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 	}
 
 	@Override
-	public VariableTypeBuilder append(@Nonnull final ELangObjectType type) throws IllegalVariableTypeException {
+	public VariableTypeBuilder append(@Nonnull final ILangObjectClass type) throws IllegalVariableTypeException {
 		return append(forSimpleType(type));
 	}
 
@@ -45,7 +44,7 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 	@Nonnull
 	public IVariableType build() throws IllegalVariableTypeException {
 		final List<IVariableType> c = children;
-		final ELangObjectType t = type;
+		final ILangObjectClass t = type;
 		if (t == null)
 			throw new IllegalVariableTypeException(CmnCnst.Error.NULL_LANG_OBJECT_TYPE);
 		if (c == null || c.isEmpty())
@@ -54,32 +53,12 @@ public class VariableTypeBuilder implements IVariableTypeBuilder {
 	}
 
 	@Override
-	public IVariableTypeBuilder setBasicType(@Nonnull final ELangObjectType type) {
+	public IVariableTypeBuilder setBasicType(@Nonnull final ILangObjectClass type) {
 		this.type = type;
 		return this;
 	}
 
-	private static IVariableType forSimpleType(final ELangObjectType type) throws IllegalVariableTypeException {
-		switch (type) {
-		case OBJECT:
-			return SimpleVariableType.OBJECT;
-		case BOOLEAN:
-			return SimpleVariableType.BOOLEAN;
-		case EXCEPTION:
-			return SimpleVariableType.EXCEPTION;
-		case NULL:
-			return SimpleVariableType.NULL;
-		case NUMBER:
-			return SimpleVariableType.NUMBER;
-		case REGEX:
-			return SimpleVariableType.REGEX;
-		case STRING:
-			return SimpleVariableType.STRING;
-		case ARRAY:
-		case FUNCTION:
-		case HASH:
-		default:
-			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_SIMPLE_TYPE, type));
-		}
+	private static IVariableType forSimpleType(final ILangObjectClass type) throws IllegalVariableTypeException {
+		return type.getSimpleVariableType();
 	}
 }

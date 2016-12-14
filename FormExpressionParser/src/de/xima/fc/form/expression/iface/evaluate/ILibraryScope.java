@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.iface.evaluate;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.IReset;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -10,7 +11,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * an environment may provide a math scope containing functions such as sin or cos, and constants such as pi or e.
  * @author madgaksha
  */
-public interface ILibraryScope<T> {
+public interface ILibraryScope<T> extends IReset {
 	/**
 	 * @param variableName Name of the variable to fetch.
 	 * @param object A custom object.
@@ -21,8 +22,4 @@ public interface ILibraryScope<T> {
 	@Nonnull
 	public ALangObject fetch(@Nonnull String variableName, @Nonnull T object, @Nonnull final IEvaluationContext ec)
 			throws EvaluationException;
-
-	/** @return Name of the scope that can be used by programs to access variables in this scope. */
-	@Nonnull
-	public String getScopeName();
 }

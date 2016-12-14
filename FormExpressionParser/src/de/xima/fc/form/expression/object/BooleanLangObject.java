@@ -3,11 +3,12 @@ package de.xima.fc.form.expression.object;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -19,9 +20,9 @@ public class BooleanLangObject extends ALangObject {
 		super();
 		this.value = value;
 	}
-	
+
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.BOOLEAN;
 	}
 
@@ -55,7 +56,7 @@ public class BooleanLangObject extends ALangObject {
 	// Coercion
 	@Nonnull
 	@Override
-	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
+	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return value ? StringLangObject.getTrueInstance() : StringLangObject.getFalseInstance();
 	}
 	@Nonnull
@@ -87,32 +88,32 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public IFunction<BooleanLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().expressionMethodBoolean(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
 
 	@Override
 	public IFunction<BooleanLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorBoolean(object, accessedViaDot);
+		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
 	}
 
 	@Override
 	public IFunction<BooleanLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerBoolean(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodBoolean(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorBoolean(object, accessedViaDot), object, accessedViaDot, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object, accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerBoolean(object, accessedViaDot), object, accessedViaDot, value, ec);
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot, value, ec);
 	}
 
 	@Override

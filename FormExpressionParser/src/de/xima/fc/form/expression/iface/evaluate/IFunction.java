@@ -1,18 +1,14 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 
 /**
  * A function that can be called with any number of arguments. The thisContext
  * of a function must be set when the function object is created.
- *
  * @author madgaksha
  *
  */
@@ -25,11 +21,10 @@ public interface IFunction<T extends ALangObject> {
 	public String getDeclaredName();
 
 	/**
-	 * @return A list of the argument names as declared, including the optional varArgs.
-	 * Empty array when there are no arguments.
+	 * @return Name of the i-th declared argument.
 	 */
 	@Nonnull
-	public String[] getDeclaredArgumentList();
+	public String getDeclaredArgument(int i) throws ArrayIndexOutOfBoundsException;
 
 	/**
 	 * @return The number of arguments, including the optional varArgs.
@@ -51,20 +46,14 @@ public interface IFunction<T extends ALangObject> {
 	 * @throws EvaluationException
 	 */
 	@Nonnull
-	public ALangObject evaluate(@Nonnull IEvaluationContext ec, @Nonnull T thisContext, @Nonnull ALangObject... args) throws EvaluationException;
+	public ALangObject evaluate(@Nonnull IEvaluationContext ec, @Nonnull T thisContext, @Nonnull ALangObject... args)
+			throws EvaluationException;
 
 	/**
-	 * @return Such that {@link ELangObjectType#clazz} equals the type parameter T.
+	 * @return Such that {@link ILangObjectClass#getLangObjectClass()} equals the type parameter T.
 	 */
 	@Nonnull
-	public ELangObjectType getThisContextType();
-
-	/**
-	 * @return May be null for native code. The node with the user-defined code
-	 *         of the function.
-	 */
-	@Nullable
-	public Node getNode();
+	public ILangObjectClass getThisContextType();
 
 	/**
 	 * Indicates whether the last argument is a varArgs argument. If it is, {@link #getDeclaredArgumentCount()} must

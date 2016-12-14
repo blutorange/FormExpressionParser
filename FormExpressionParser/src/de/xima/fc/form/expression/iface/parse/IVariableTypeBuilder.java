@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.iface.parse;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 
 @ParametersAreNonnullByDefault
 public interface IVariableTypeBuilder {
@@ -14,7 +14,7 @@ public interface IVariableTypeBuilder {
 	 * @return this for chaining.
 	 * @throws IllegalVariableTypeException When the argument is not a simple type.
 	 */
-	IVariableTypeBuilder append(ELangObjectType type) throws IllegalStateException, IllegalVariableTypeException;
+	IVariableTypeBuilder append(ILangObjectClass type) throws IllegalVariableTypeException;
 	IVariableType build() throws IllegalVariableTypeException;
-	IVariableTypeBuilder setBasicType(ELangObjectType type);
+	IVariableTypeBuilder setBasicType(ILangObjectClass type);
 }

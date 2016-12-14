@@ -21,11 +21,11 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.impl.contextcommand.PositionedDocumentCommand;
+import de.xima.fc.form.expression.impl.warning.GenericWarning;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-
-public abstract class AHtmlExternalContext implements IExternalContext{
+public abstract class AHtmlExternalContext implements IExternalContext {
 	private StringBuilder builder;
 	private List<PositionedDocumentCommand> docCommandList;
 	private int priority = 0;
@@ -43,13 +43,15 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 	@Override
 	public final void finishWriting() throws EmbedmentOutputException, InvalidTemplateDataException {
 		@SuppressWarnings("null")
-		@Nonnull final String html = builder.toString();
+		@Nonnull
+		final String html = builder.toString();
 		if (docCommandList != null) {
 			// Parse HTML stream.
 			Token token;
 			try {
 				token = tokenize(html);
-			} catch (final TokenMgrError e) {
+			}
+			catch (final TokenMgrError e) {
 				throw new InvalidTemplateDataException(CmnCnst.Error.INVALID_HTML_TEMPLATE, e);
 			}
 			// Remove tags etc.
@@ -58,11 +60,13 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 			if (token != null) {
 				do {
 					output(token.image);
-				} while ((token = token.next) != null);
+				}
+				while ((token = token.next) != null);
 			}
 			docCommandList.clear();
 			docCommandList = null;
-		} else {
+		}
+		else {
 			output(html);
 		}
 		finishOutput();
@@ -77,8 +81,9 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 		if (docCommand.isPresent())
 			docCommandList.add(new PositionedDocumentCommand(docCommand.get(), builder.length(), ++priority));
 		else
-			ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_HTML_CONTEXT,
-					command.getClass().getCanonicalName(), command));
+			ec.getTracer().appendWarning(
+					new GenericWarning(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_HTML_CONTEXT,
+							command.getClass().getCanonicalName(), command), ec));
 	}
 
 	private Token tokenize(final String html) throws TokenMgrError {
@@ -96,7 +101,8 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 
 	@SuppressWarnings("all")
 	private void consumeStream(final HtmlParserTokenManager tm) {
-		while (tm.getNextToken().kind != HtmlParserConstants.EOF);
+		while (tm.getNextToken().kind != HtmlParserConstants.EOF)
+			;
 	}
 
 	/**
@@ -114,7 +120,7 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 				initial = removeEnclosing(pdc, initial, pdc.command.getData()[0]);
 				break;
 			case REMOVE_NEXT_TAG:
-				initial = removeNext(pdc, initial ,pdc.command.getData()[0]);
+				initial = removeNext(pdc, initial, pdc.command.getData()[0]);
 				break;
 			case REMOVE_PREVIOUS_TAG:
 				initial = removePrevious(pdc, initial, pdc.command.getData()[0]);
@@ -134,10 +140,13 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 	}
 
 	/**
-	 * Checks whether the token is attached. If not, seeks to the next token that is attached.
-	 * When there is no such token, seeks to a previous attached token. Where there is no
-	 * such token either, sets the token to <code>null</code>.
-	 * @param pdc Command with token to check.
+	 * Checks whether the token is attached. If not, seeks to the next token
+	 * that is attached. When there is no such token, seeks to a previous
+	 * attached token. Where there is no such token either, sets the token to
+	 * <code>null</code>.
+	 *
+	 * @param pdc
+	 *            Command with token to check.
 	 */
 	private static void checkAttachment(final PositionedDocumentCommand pdc) {
 		final Token originalToken = pdc.token;
@@ -162,24 +171,29 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 
 	/**
 	 * Creates a new <code>a</code> tag.
-	 * @param href The link May be <code>null</code>.
-	 * @param text The link text. May be <code>null</code>.
-	 * @param alt The alternative text. May be <code>null</code>.
+	 *
+	 * @param href
+	 *            The link May be <code>null</code>.
+	 * @param text
+	 *            The link text. May be <code>null</code>.
+	 * @param alt
+	 *            The alternative text. May be <code>null</code>.
 	 * @return The initial token of kind {@link HtmlParserConstants#tagBegin}.
 	 */
 	private static void insertA(final Token insertPosition, final String href, final String text, final String target) {
 		insertPosition.insertOpeningTag(CmnCnst.Html.A, CmnCnst.Html.HREF, href, CmnCnst.Html.TARGET, target)
-		.insertHtmlText(text)
-		.insertClosingTag(CmnCnst.Html.A);
+		.insertHtmlText(text).insertClosingTag(CmnCnst.Html.A);
 		insertPosition.rebuildPositions();
 	}
 
-	private static Token removePrevious(final PositionedDocumentCommand pdc, final Token initial, final String tagName) {
+	private static Token removePrevious(final PositionedDocumentCommand pdc, final Token initial,
+			final String tagName) {
 		final Token tmp = pdc.token;
 		return (tmp != null && !tmp.isDetached) ? removePrevious(initial, tmp, tagName) : initial;
 	}
 
-	private static Token removeEnclosing(final PositionedDocumentCommand pdc, final Token initial, final String tagName) {
+	private static Token removeEnclosing(final PositionedDocumentCommand pdc, final Token initial,
+			final String tagName) {
 		final Token tmp = pdc.token;
 		return (tmp != null && !tmp.isDetached) ? removeEnclosing(initial, tmp, tagName) : initial;
 	}
@@ -221,12 +235,16 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 
 	/**
 	 * Removes all token starting from beg, including the token end. This
-	 * assumes that end can be reached via next references from the token
-	 * beg. Otherwise, this throws a {@link NullPointerException}.
-	 * @param beg Start token.
-	 * @param end End token.
+	 * assumes that end can be reached via next references from the token beg.
+	 * Otherwise, this throws a {@link NullPointerException}.
+	 *
+	 * @param beg
+	 *            Start token.
+	 * @param end
+	 *            End token.
 	 * @return One token before beg, or one token after end when beg is the
-	 * initial token. When end is the final token as well, returns <code>null</code>.
+	 *         initial token. When end is the final token as well, returns
+	 *         <code>null</code>.
 	 */
 	private static Token removeTokens(final Token initial, @Nonnull final Token beg, @Nonnull final Token end) {
 		Token token = beg;
@@ -242,7 +260,8 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 			token.next = end.next;
 		}
 		// When all tokens need to be removed, we return null to indicate this.
-		else if (end.next == null) return null;
+		else if (end.next == null)
+			return null;
 		token = end.next;
 		if (token != null)
 			token.prev = beg.prev;
@@ -310,7 +329,6 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 		}
 	}
 
-
 	/**
 	 * Searches for the first opening tag with the given name such that the
 	 * current token is inside that tag. Consider the example below. When
@@ -346,13 +364,14 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 
 	private static boolean isOpeningTag(final Token token, final String tagName) {
 		final Token tmp = token.next;
-		return token.kind == HtmlParserConstants.tagBegin && tmp != null
-				&& tmp.kind == HtmlParserConstants.tagName && tmp.image.equals(tagName);
+		return token.kind == HtmlParserConstants.tagBegin && tmp != null && tmp.kind == HtmlParserConstants.tagName
+				&& tmp.image.equals(tagName);
 	}
 
 	private static boolean isClosingTag(final Token token, final String tagName) {
 		Token t;
-		// Almost always, the first check will return false, so we do not need to check all these conditions all the time.
+		// Almost always, the first check will return false, so we do not need
+		// to check all these conditions all the time.
 		return token.kind == HtmlParserConstants.tagEnd && (t = token.prev) != null
 				&& (t = t.kind == HtmlParserConstants.tagWs ? t.prev : t) != null
 				&& t.kind == HtmlParserConstants.tagName && tagName.equals(t.image) && (t = t.prev) != null
@@ -361,5 +380,6 @@ public abstract class AHtmlExternalContext implements IExternalContext{
 	}
 
 	protected abstract void output(@Nullable String html) throws EmbedmentOutputException;
+
 	protected abstract void finishOutput() throws EmbedmentOutputException;
 }

@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,12 +12,15 @@ public interface ITracer<T extends ITraceElement> extends IReset {
 	@Nullable
 	public T getCurrentlyProcessed();
 	public void appendWarning(@Nonnull IEvaluationWarning warning);
+	/**
+	 * @return A (copied) list of warnings. This list may be modified safely.
+	 */
 	@Nonnull
-	public Collection<IEvaluationWarning> getWarnings();
+	public List<IEvaluationWarning> buildWarnings();
 	public void enableWarnings();
 	public void disableWarnings();
 	public boolean isWarningsEnabled();
-	
+
 	/**
 	 * Descend one stack trace level, ie. when calling a function.
 	 * @param position Current position.
@@ -33,6 +36,5 @@ public interface ITracer<T extends ITraceElement> extends IReset {
 	 * This is called when exceptions occur etc., ie. it does not need to be fast.
 	 * @return The stack trace. May be empty, but not <code>null</code>.
 	 */
-	@Nonnull
-	public T[] getStackTrace();
+	@Nonnull public T[] getStackTrace();
 }

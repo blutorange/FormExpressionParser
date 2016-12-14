@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
@@ -12,6 +11,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 
 public class ASTFunctionArgumentNode extends ASourceResolvableNode implements IVariableTyped {
 	private static final long serialVersionUID = 1L;

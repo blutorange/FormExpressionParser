@@ -1,17 +1,19 @@
 package de.xima.fc.form.expression.iface.parse;
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 
+import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
-import de.xima.fc.form.expression.object.ALangObject;
 
+@ParametersAreNonnullByDefault
 public interface IFormExpression<T> extends Serializable {
 	/**
 	 * Evaluates (executes) this program and returns the result. You must supply the
@@ -21,13 +23,23 @@ public interface IFormExpression<T> extends Serializable {
 	 * @return The result.
 	 * @throws EvaluationException When any error occurred during the evaluation.
 	 */
-	@Nonnull
-	public ALangObject evaluate(@Nonnull final T object) throws EvaluationException;
+	public IEvaluationResult evaluate(final T object) throws EvaluationException;
+
+	/**
+	 * @param loggerLevel Some default is used when not set explicitly.
+	 * @return this for chaining.
+	 */
+
+	public IFormExpression<T> setLogLevel(ELogLevel loggerLevel);
+	/**
+	 * @param loggerName Some default is used when not set explicitly.
+	 * @return this for chaining.
+	 */
+	public IFormExpression<T> setLogLevel(String loggerName);
 
 	/**
 	 * @return A list of comment this program contains.
 	 */
-	@Nonnull
 	public ImmutableList<IComment> getComments();
 
 	/**
@@ -49,16 +61,14 @@ public interface IFormExpression<T> extends Serializable {
 	 * @return A list of warnings.
 	 * @throws EvaluationException
 	 */
-	@Nonnull
-	public ImmutableCollection<IEvaluationWarning> analyze(@Nonnull final T ex) throws EvaluationException;
+	public List<IEvaluationWarning> analyze(final T ex) throws EvaluationException;
 
 	/**
 	 * Specifications to which the external contexts provided to
 	 * {@link #equals(Object)} and {@link #analyze(IExternalContext)} must
 	 * adhere to.
 	 * @return The specifications.
-	 * @see IEvaluationContextContractFactory
+	 * @see IEvaluationContextContract
 	 */
-	@Nonnull
-	public IEvaluationContextContractFactory<T> getSpecs();
+	public IEvaluationContextContract<T> getSpecs();
 }

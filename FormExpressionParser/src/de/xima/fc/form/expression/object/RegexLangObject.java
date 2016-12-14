@@ -9,13 +9,14 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidRegexPatternException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -35,7 +36,7 @@ public class RegexLangObject extends ALangObject {
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.REGEX;
 	}
 
@@ -56,31 +57,31 @@ public class RegexLangObject extends ALangObject {
 
 	@Override
 	public IFunction<RegexLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().expressionMethodRegex(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
 	@Override
 	public IFunction<RegexLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorRegex(object, accessedViaDot);
+		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
 	}
 
 	@Override
 	public IFunction<RegexLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerRegex(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodRegex(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorRegex(object, accessedViaDot), object, accessedViaDot, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object, accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerRegex(object, accessedViaDot), object, accessedViaDot, value, ec);
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot, value, ec);
 	}
 
 	@Override

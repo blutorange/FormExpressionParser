@@ -1,21 +1,23 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
-public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
+@ParametersAreNonnullByDefault
+public enum EAttrAccessorRegex implements IAttrAccessorFunction<RegexLangObject> {
 	/**
 	 * @param string {@link StringLangObject} String to match. When not given, defaults to the empty string.
 	 * @return {@link BooleanLangObject}. Whether this regex matches the string.
@@ -23,24 +25,20 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 	matches(Impl.matches),
 	;
 
-	@Nonnull private final FunctionLangObject impl;
-	private final boolean evalImmediately;
-	@Nonnull private final String[] argList;
-	private final boolean hasVarArgs;
+	private final FunctionLangObject func;
+	private final Impl impl;
+	private final boolean deferEvaluation;
 
-	private EAttrAccessorRegex(@Nonnull final Impl impl) {
-		this.impl = FunctionLangObject.create(impl);
-		argList = impl.getDeclaredArgumentList();
-		hasVarArgs = impl.hasVarArgs();
-		evalImmediately = argList.length == 0 && !hasVarArgs;
+	private EAttrAccessorRegex(final Impl impl) {
+		this.func = FunctionLangObject.create(impl);
+		this.impl = impl;
+		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
-		if (!evalImmediately)
-			return impl;
-		return impl.functionValue().evaluate(ec, thisContext, args);
+		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -49,32 +47,27 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 		return toString();
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public String[] getDeclaredArgumentList() {
-		return argList;
+	public String getDeclaredArgument(final int i) {
+		return impl.argList[i];
 	}
 
 	@Override
 	public int getDeclaredArgumentCount() {
-		return argList.length;
+		return impl.argList.length;
 	}
 
 	@Override
-	public ELangObjectType getThisContextType() {
+	public ILangObjectClass getThisContextType() {
 		return ELangObjectType.REGEX;
 	}
 
 	@Override
-	public Node getNode() {
-		return null;
-	}
-
-	@Override
 	public boolean hasVarArgs() {
-		return hasVarArgs;
+		return impl.hasVarArgs;
 	}
-
-	private static enum Impl implements IFunction<RegexLangObject> {
+	private static enum Impl implements IAttrAccessorFunction<RegexLangObject> {
 		matches(false, "string") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
@@ -85,10 +78,11 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 		},
 		;
 
-		@Nonnull private String[] argList;
+		private String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -98,9 +92,10 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 			return hasVarArgs;
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -115,13 +110,8 @@ public enum EAttrAccessorRegex implements IFunction<RegexLangObject> {
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.REGEX;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 
 		@Override

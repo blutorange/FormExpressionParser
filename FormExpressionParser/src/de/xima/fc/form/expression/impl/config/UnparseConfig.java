@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 /**
- * A configuration affecting the output of {@link IFormExpression#unparse(UnparseConfig)}.
+ * A configuration affecting the output of {@link IFormExpression#unparseBody(UnparseConfig)}.
  * It offers several options to change how FormExpression code will be formatted.
  * @author mad_gaksha
  */

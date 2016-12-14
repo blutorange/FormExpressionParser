@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -17,6 +16,8 @@ import de.xima.fc.form.expression.exception.evaluation.NumberTooLongForIntExcept
 import de.xima.fc.form.expression.exception.evaluation.NumberTooLongForLongException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -58,7 +59,7 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.NUMBER;
 	}
 
@@ -139,7 +140,7 @@ public class NumberLangObject extends ALangObject {
 
 	// Coercion
 	@Override
-	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
+	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return StringLangObject.create(value);
 	}
 
@@ -187,38 +188,38 @@ public class NumberLangObject extends ALangObject {
 	@Override
 	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec)
 			throws EvaluationException {
-		return ec.getNamespace().expressionMethodNumber(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
 
 	@Override
 	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorNumber(object, accessedViaDot);
+		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
 	}
 
 	@Override
 	public IFunction<NumberLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerNumber(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodNumber(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorNumber(object, accessedViaDot), object,
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object,
 				accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value,
 			final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerNumber(object, accessedViaDot), object, accessedViaDot,
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot,
 				value, ec);
 	}
 
@@ -238,12 +239,12 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
-	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public INonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
 	@Override
-	public NonNullIterator<ALangObject> iterator() {
+	public INonNullIterator<ALangObject> iterator() {
 		return new Itr();
 	}
 
@@ -380,7 +381,7 @@ public class NumberLangObject extends ALangObject {
 		return InstanceHolder.E;
 	}
 
-	private class Itr implements NonNullIterator<ALangObject> {
+	private class Itr implements INonNullIterator<ALangObject> {
 		private double i = 0.0;
 		@Override
 		public boolean hasNext() {

@@ -1,17 +1,18 @@
 package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UnresolvedVariableSourceException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IArgumentResolvableNode;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
-import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.evaluate.IUnparsableFunction;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.impl.config.UnparseConfig;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -19,15 +20,13 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
+class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject> {
 	@Nonnull
 	private final EvaluateVisitor visitor;
 	@Nonnull
-	private final IArgumentResolvable node;
+	private final IArgumentResolvableNode node;
 	@Nonnull
 	private final String name;
-	@Nullable
-	private String[] argList;
 
 	public EvaluateVisitorNamedFunction(@Nonnull final EvaluateVisitor visitor,
 			@Nonnull final ASTFunctionClauseNode node, @Nonnull final IEvaluationContext ec)
@@ -35,8 +34,8 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 		this(visitor, node, node.getCanonicalName(), ec);
 	}
 
-	protected <T extends Node & IArgumentResolvable> EvaluateVisitorNamedFunction(
-			@Nonnull final EvaluateVisitor visitor, @Nonnull final T node, @Nonnull final String name,
+	protected EvaluateVisitorNamedFunction(
+			@Nonnull final EvaluateVisitor visitor, @Nonnull final IArgumentResolvableNode node, @Nonnull final String name,
 			@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
 		final Node b = node.getLastChildOrNull();
 		if (b == null)
@@ -49,18 +48,8 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	}
 
 	@Override
-	public Node getNode() {
-		return node.getBodyNode();
-	}
-
-	@Override
-	public String[] getDeclaredArgumentList() {
-		if (argList != null)
-			return argList;
-		final String[] list = new String[node.getArgumentCount()];
-		for (int i = node.getArgumentCount(); i-- > 0;)
-			list[i] = node.getArgResolvable(i).getVariableName();
-		return argList = list;
+	public String getDeclaredArgument(final int i) {
+		return node.getArgResolvable(i).getVariableName();
 	}
 
 	@Override
@@ -110,12 +99,17 @@ class EvaluateVisitorNamedFunction implements IFunction<NullLangObject> {
 	}
 
 	@Override
-	public ELangObjectType getThisContextType() {
+	public ILangObjectClass getThisContextType() {
 		return ELangObjectType.NULL;
 	}
 
 	@Override
 	public boolean hasVarArgs() {
 		return node.hasVarArgs();
+	}
+
+	@Override
+	public void unparseBody(final StringBuilder builder) {
+		builder.append(UnparseVisitor.unparse(node.getBodyNode(), UnparseConfig.getUnstyledWithoutCommentsConfig()));
 	}
 }

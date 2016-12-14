@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.highlight.AHighlighter;
 import de.xima.fc.form.expression.highlight.Color;
@@ -28,7 +29,7 @@ public class HtmlHighlighter extends AHighlighter {
 	private String cssClassPrefix;
 	private boolean basicStyling = true;
 	private StringBuilder currentLine;
-	private HtmlHighlighter(@Nonnull final IHighlightTheme theme) throws IllegalArgumentException {
+	private HtmlHighlighter(@Nonnull final IHighlightTheme theme) throws FormExpressionException {
 		super(theme);
 	}
 
@@ -186,7 +187,7 @@ public class HtmlHighlighter extends AHighlighter {
 				css.write("font-weight:100;");
 				break;
 			default:
-				throw new RuntimeException("missing case for enum: " + weight);
+				throw new FormExpressionException("missing case for enum: " + weight);
 			}
 			css.write("}");
 		}
@@ -218,7 +219,7 @@ public class HtmlHighlighter extends AHighlighter {
 				css.write("smaller");
 				break;
 			default:
-				throw new RuntimeException("missing case for enum: " + size);
+				throw new FormExpressionException("missing case for enum: " + size);
 			}
 			css.write(";}");
 		}
@@ -244,7 +245,7 @@ public class HtmlHighlighter extends AHighlighter {
 				css.write("text-decoration:underline;");
 				break;
 			default:
-				throw new RuntimeException("missing case for enum: " + feature);
+				throw new FormExpressionException("missing case for enum: " + feature);
 			}
 			css.write("}");
 		}

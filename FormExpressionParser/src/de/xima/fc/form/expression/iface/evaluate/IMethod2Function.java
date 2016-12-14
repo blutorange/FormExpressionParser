@@ -16,5 +16,5 @@ import de.xima.fc.form.expression.object.ALangObject;
  */
 public interface IMethod2Function<T extends ALangObject> {
 	@Nonnull public EMethod getMethod();
-	@Nonnull public IFunction<T> getFunction();
+	@Nonnull public IExpressionFunction<T> getFunction();
 }

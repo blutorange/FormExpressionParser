@@ -26,7 +26,7 @@ import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
@@ -53,13 +53,13 @@ implements IScopeDefinitionsBuilder {
 	@Nonnull
 	private final Map<String, Map<String, IHeaderNode>> manualMap;
 	@Nonnull
-	private final IEvaluationContextContractFactory<?> factory;
+	private final IEvaluationContextContract<?> factory;
 	@Nonnull
 	private final ISeverityConfig config;
 
 	@Nonnull
 	public static IScopeDefinitionsBuilder collect(@Nonnull final Node node,
-			@Nonnull final IEvaluationContextContractFactory<?> factory, @Nonnull final ISeverityConfig config)
+			@Nonnull final IEvaluationContextContract<?> factory, @Nonnull final ISeverityConfig config)
 					throws ParseException {
 		final ScopeCollectVisitor v = new ScopeCollectVisitor(config, factory);
 		node.jjtAccept(v, Optional.<Map<String, IHeaderNode>> absent());
@@ -69,7 +69,7 @@ implements IScopeDefinitionsBuilder {
 	}
 
 	private ScopeCollectVisitor(@Nonnull final ISeverityConfig config,
-			@Nonnull final IEvaluationContextContractFactory<?> factory) {
+			@Nonnull final IEvaluationContextContract<?> factory) {
 		globalMap = new HashMap<>();
 		requiredSet = new HashSet<>();
 		manualMap = new HashMap<>();

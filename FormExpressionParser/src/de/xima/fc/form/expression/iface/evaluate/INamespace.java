@@ -1,19 +1,12 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ArrayLangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
-import de.xima.fc.form.expression.object.ExceptionLangObject;
-import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.HashLangObject;
-import de.xima.fc.form.expression.object.NumberLangObject;
-import de.xima.fc.form.expression.object.RegexLangObject;
-import de.xima.fc.form.expression.object.StringLangObject;
 
 /**
  * <p>
@@ -29,34 +22,67 @@ import de.xima.fc.form.expression.object.StringLangObject;
  * An attribute assigner is the opposite of an attribute accessor assigns a value to some attribute
  * of an object, eg <code>myArray[0] = 1</code>.
  * </p>
+ * <b>Must be immutable.</b>
  * @author madgaksha
  *
  */
+@Immutable
+@ParametersAreNonnullByDefault
 public interface INamespace {
-	@Nullable public IFunction<StringLangObject> expressionMethodString(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<NumberLangObject> expressionMethodNumber(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<ArrayLangObject> expressionMethodArray(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<HashLangObject> expressionMethodHash(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<BooleanLangObject> expressionMethodBoolean(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<ExceptionLangObject> expressionMethodException(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<FunctionLangObject> expressionMethodFunction(@Nonnull EMethod method) throws EvaluationException;
-	@Nullable public IFunction<RegexLangObject> expressionMethodRegex(@Nonnull EMethod method) throws EvaluationException;
+	/**
+	 * @param method Method to get.
+	 * @param type Type for which to get the method.
+	 * @return The expression method for the given type. Must also look it up in any supertypes.
+	 * @throws EvaluationException
+	 */
+	@Nullable
+	public <T extends ALangObject> IFunction<T> expressionMethod(EMethod method, T type) throws EvaluationException;
 
-	@Nullable public IFunction<StringLangObject> attrAccessorString(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<NumberLangObject> attrAccessorNumber(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<ArrayLangObject> attrAccessorArray(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<HashLangObject> attrAccessorHash(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<BooleanLangObject> attrAccessorBoolean(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<ExceptionLangObject> attrAccessorException(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<FunctionLangObject> attrAccessorFunction(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<RegexLangObject> attrAccessorRegex(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	/**
+	 * @param method Accessor to get.
+	 * @param type Type for which to get the accessor.
+	 * @return The attribute accessor for the given type. Must also look it up in any supertypes.
+	 * @throws EvaluationException
+	 */
+	@Nullable
+	public <T extends ALangObject> IFunction<T> attrAccessor(ALangObject name, boolean accessedViaDot, T type)
+			throws EvaluationException;
 
-	@Nullable public IFunction<StringLangObject> attrAssignerString(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<NumberLangObject> attrAssignerNumber(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<ArrayLangObject> attrAssignerArray(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<HashLangObject> attrAssignerHash(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<BooleanLangObject> attrAssignerBoolean(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<ExceptionLangObject> attrAssignerException(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<FunctionLangObject> attrAssignerFunction(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
-	@Nullable public IFunction<RegexLangObject> attrAssignerRegex(@Nonnull ALangObject name, boolean accessedViaDot) throws EvaluationException;
+	/**
+	 * @param method Assigner to get.
+	 * @param type Type for which to get the assigner.
+	 * @return The attribute assigner for the given type. Must also look it up in any supertypes.
+	 * @throws EvaluationException
+	 */
+	@Nullable
+	public <T extends ALangObject> IFunction<T> attrAssigner(ALangObject name, boolean accessedViaDot, T type)
+			throws EvaluationException;
+
+	/**
+	 * @param method Method to get.
+	 * @param type Type for which to get the method.
+	 * @return The expression method for the given type. Must also look it up in any supertypes.
+	 * @throws EvaluationException
+	 */
+	@Nullable
+	public IFunction<?> expressionMethod(EMethod method, ILangObjectClass type) throws EvaluationException;
+
+	/**
+	 * @param method Accessor to get.
+	 * @param type Type for which to get the accessor.
+	 * @return The attribute accessor for the given type. Must also look it up in any supertypes.
+	 * @throws EvaluationException
+	 */
+	@Nullable
+	public IFunction<?> attrAccessor(ALangObject name, boolean accessedViaDot, ILangObjectClass type)
+			throws EvaluationException;
+	/**
+	 * @param method Assigner to get.
+	 * @param type Type for which to get the assigner.
+	 * @return The attribute assigner for the given type. Must also look it up in any supertypes.
+	 * @throws EvaluationException
+	 */
+	@Nullable
+	public IFunction<?> attrAssigner(ALangObject name, boolean accessedViaDot, ILangObjectClass type)
+			throws EvaluationException;
 }

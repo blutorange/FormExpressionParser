@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -16,6 +15,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.DummyVariableTypeBuilder;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
 import de.xima.fc.form.expression.node.ASTForLoopNode;

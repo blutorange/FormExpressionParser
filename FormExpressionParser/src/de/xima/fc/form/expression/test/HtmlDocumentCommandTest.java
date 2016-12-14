@@ -10,23 +10,23 @@ import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.evaluate.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.ILibraryContractFactory;
-import de.xima.fc.form.expression.iface.evaluate.ILogger;
-import de.xima.fc.form.expression.iface.evaluate.INamespaceContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
-import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.factory.IEmbedmentContractFactory;
+import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.factory.ILoggerContractFactory;
+import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
-import de.xima.fc.form.expression.impl.embedment.DummyEmbedmentContractFactory;
+import de.xima.fc.form.expression.impl.embedment.EEmbedmentContractFactory;
 import de.xima.fc.form.expression.impl.externalcontext.AHtmlExternalContext;
 import de.xima.fc.form.expression.impl.formexpression.EvaluationContextImpl;
-import de.xima.fc.form.expression.impl.library.DummyLibraryContractFactory;
-import de.xima.fc.form.expression.impl.logger.DummyLogger;
-import de.xima.fc.form.expression.impl.namespace.DummyNamespaceContractFactory;
+import de.xima.fc.form.expression.impl.library.ELibraryContractFactory;
+import de.xima.fc.form.expression.impl.logger.ELoggerContractFactory;
+import de.xima.fc.form.expression.impl.namespace.ENamespaceContractFactory;
 import de.xima.fc.form.expression.impl.tracer.DummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;
 
@@ -115,11 +115,14 @@ public class HtmlDocumentCommandTest {
 				throws EvaluationException {
 			throw new VariableNotDefinedException(scope, name, ec);
 		}
+		@Override
+		public void reset() {
+		}
 	}
 	private static enum DummyHtmlExternalContextContractFactory implements IExternalContextContractFactory<StringBuilder> {
 		INSTANCE;
 		@Override
-		public DummyHtmlExternalContext makeExternalContext(final StringBuilder sb) {
+		public DummyHtmlExternalContext make(final StringBuilder sb) {
 			return new DummyHtmlExternalContext(sb);
 		}
 		@Override
@@ -131,27 +134,27 @@ public class HtmlDocumentCommandTest {
 			return null;
 		}
 	}
-	private static enum DummyContractFactory implements IEvaluationContextContractFactory<StringBuilder> {
+	private static enum DummyContractFactory implements IEvaluationContextContract<StringBuilder> {
 		INSTANCE;
 		@Override
 		public IEmbedmentContractFactory getEmbedmentFactory() {
-			return DummyEmbedmentContractFactory.getInstance();
+			return EEmbedmentContractFactory.EMPTY;
 		}
 		@Override
 		public ITracer<Node> makeTracer() {
 			return DummyTracer.INSTANCE;
 		}
 		@Override
-		public ILogger makeLogger() {
-			return DummyLogger.INSTANCE;
+		public ILoggerContractFactory getLoggerFactory() {
+			return ELoggerContractFactory.DUMMY;
 		}
 		@Override
 		public INamespaceContractFactory getNamespaceFactory() {
-			return DummyNamespaceContractFactory.INSTANCE;
+			return ENamespaceContractFactory.EMPTY;
 		}
 		@Override
 		public ILibraryContractFactory getLibraryFactory() {
-			return DummyLibraryContractFactory.getInstance();
+			return ELibraryContractFactory.EMPTY;
 		}
 		@Override
 		public DummyHtmlExternalContextContractFactory getExternalFactory() {
@@ -161,8 +164,8 @@ public class HtmlDocumentCommandTest {
 
 	private static String process(final Object... stuffToWrite) throws Exception {
 		final StringBuilder sb = new StringBuilder();
-		final DummyHtmlExternalContext hec = DummyContractFactory.INSTANCE.getExternalFactory().makeExternalContext(sb);
-		final IEvaluationContext ec = new EvaluationContextImpl(DummyContractFactory.INSTANCE);
+		final DummyHtmlExternalContext hec = DummyContractFactory.INSTANCE.getExternalFactory().make(sb);
+		final IEvaluationContext ec = new EvaluationContextImpl(DummyContractFactory.INSTANCE, "", null);
 		hec.beginWriting();
 		try {
 			for (final Object stuff : stuffToWrite) {

@@ -19,6 +19,12 @@ public class NullUtil {
 		return o;
 	}
 
+	public static void checkItemsNotNull(final Object[] objects) {
+		for (final Object o : objects)
+			if (o == null)
+				throw new NullPointerException();
+	}
+
 	/**
 	 * Same as {@link String#format(String, Object...)}, but never returns <code>null</code>.
 	 * @param pattern Pattern for formatting.
@@ -42,7 +48,7 @@ public class NullUtil {
 	public static String or(@Nullable final String string, @Nonnull final String orString) {
 		return string != null ? string : orString;
 	}
-	
+
 	public static void main(final String[] args) {
 		final char c = '3';
 		System.out.println(toString(c));

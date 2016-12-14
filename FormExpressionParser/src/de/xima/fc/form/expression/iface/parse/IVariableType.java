@@ -1,23 +1,25 @@
 package de.xima.fc.form.expression.iface.parse;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 
 @Immutable
 @ParametersAreNonnullByDefault
-public interface IVariableType {
+public interface IVariableType extends Serializable {
 	public boolean equalsType(IVariableType other);
 
 	/**
 	 * @return The basic type, eg. <code>array</code> for
 	 *         <code>array&lt;string&gt;</code>.
 	 */
-	public ELangObjectType getBasicLangType();
+	public ILangObjectClass getBasicLangClass();
 
 	/**
 	 * @return The number of generics of this type. For example an
@@ -77,9 +79,9 @@ public interface IVariableType {
 	/**
 	 * A comparator for objects of {@link IVariableType}, supporting <code>null</code>.
 	 * <code>null</code> is sorted first. Sorts similar to string, with the
-	 * {@link #getBasicLangType()} corresponding to the {@link String}'s first character;
+	 * {@link #getBasicLangClass()} corresponding to the {@link String}'s first character;
 	 * and all the {@link #getGeneric(int)} types to the next characters.
-	 * The types themselves are compared via {@link ELangObjectType#order}.
+	 * The types themselves are compared via {@link ELangObjectType#id}.
 	 */
 	public static Comparator<IVariableType> COMPARATOR = new Comparator<IVariableType>() {
 		@Override
@@ -90,8 +92,8 @@ public interface IVariableType {
 				return -1;
 			if (o2 == null)
 				return 1;
-			final int l1 = o1.getBasicLangType().order;
-			final int l2 = o2.getBasicLangType().order;
+			final int l1 = o1.getBasicLangClass().getClassId();
+			final int l2 = o2.getBasicLangClass().getClassId();
 			if (l1 != l2)
 				return l1 - l2;
 			final int s = Math.min(o1.getGenericCount(), o2.getGenericCount());

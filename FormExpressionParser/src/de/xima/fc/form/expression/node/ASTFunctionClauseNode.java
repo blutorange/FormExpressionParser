@@ -3,23 +3,23 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.evaluate.IArgumentResolvableNode;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
-public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvable, IVariableTyped {
+public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvableNode, IVariableTyped {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull

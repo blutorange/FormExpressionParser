@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
@@ -22,7 +23,7 @@ public class VisualizeTreeGraphviz {
 		// Parse the expression.
 		final String expression = args[0];
 		if (expression == null)
-			throw new RuntimeException("First argument (code) must not be null."); //$NON-NLS-1$
+			throw new FormExpressionException("First argument (code) must not be null."); //$NON-NLS-1$
 		final Node rootNode;
 		try {
 			rootNode = FormExpressionFactory.forProgram().asNode(expression);

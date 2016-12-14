@@ -2,17 +2,18 @@ package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
-public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
+public enum EAttrAccessorArray implements IAttrAccessorFunction<ArrayLangObject> {
 	/**
 	 * @return {@link NumberLangObject} The length of this array.
 	 */
@@ -29,23 +30,20 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 	sort(Impl.sort)
 	;
 
-	@Nonnull private final FunctionLangObject impl;
-	@Nonnull private final String[] argList;
-	private final boolean evalImmediately;
-	private final boolean hasVarArgs;
-	
+	@Nonnull private final FunctionLangObject func;
+	@Nonnull private final Impl impl;
+	private final boolean deferEvaluation;
+
 	private EAttrAccessorArray(@Nonnull final Impl impl) {
-		this.impl = FunctionLangObject.create(impl);
-		argList = impl.getDeclaredArgumentList();
-		hasVarArgs = impl.hasVarArgs();
-		evalImmediately = argList.length == 0 && !hasVarArgs;
+		this.func = FunctionLangObject.create(impl);
+		this.impl = impl;
+		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 			throws EvaluationException {
-		if (!evalImmediately) return impl;
-		return impl.functionValue().evaluate(ec, thisContext, args);
+		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -54,32 +52,28 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		return toString();
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public String[] getDeclaredArgumentList() {
-		return argList;
+	public String getDeclaredArgument(final int i) {
+		return impl.argList[i];
 	}
 
 	@Override
 	public int getDeclaredArgumentCount() {
-		return argList.length;
+		return impl.argList.length;
 	}
 
 	@Override
-	public ELangObjectType getThisContextType() {
+	public ILangObjectClass getThisContextType() {
 		return ELangObjectType.ARRAY;
 	}
 
 	@Override
-	public Node getNode() {
-		return null;
-	}
-
-	@Override
 	public boolean hasVarArgs() {
-		return hasVarArgs;
+		return impl.hasVarArgs;
 	}
 
-	private static enum Impl implements IFunction<ArrayLangObject> {
+	private static enum Impl implements IAttrAccessorFunction<ArrayLangObject> {
 		/**
 		 * When you want to join two arrays <code>a</code> and <code>b</code>, use <code>a+b</code>.
 		 * @param objectToAdd {@link ALangObject}*. Object(s) to be added to the end of this array.
@@ -118,6 +112,7 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		private boolean hasVarArgs;
 
 		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -127,9 +122,10 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 			return hasVarArgs;
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -144,13 +140,8 @@ public enum EAttrAccessorArray implements IFunction<ArrayLangObject> {
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.ARRAY;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 
 		@Override

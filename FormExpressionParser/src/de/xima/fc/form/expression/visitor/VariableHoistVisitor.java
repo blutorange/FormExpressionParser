@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.impl.variable.HeaderNodeImpl;
@@ -32,12 +32,12 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @ParametersAreNonnullByDefault
 public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
-	private final IEvaluationContextContractFactory<?> contractFactory;
+	private final IEvaluationContextContract<?> contractFactory;
 	private final ISeverityConfig config;
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
 
 	public VariableHoistVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config) {
+			final IEvaluationContextContract<?> contractFactory, final ISeverityConfig config) {
 		this.scopeDefBuilder = scopeDefBuilder;
 		this.config = config;
 		this.contractFactory = contractFactory;
@@ -132,7 +132,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 	}
 
 	public static void hoist(final Node node, final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> contractFactory, final ISeverityConfig config)
+			final IEvaluationContextContract<?> contractFactory, final ISeverityConfig config)
 					throws ParseException {
 		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory, config);
 		v.bindScopeDefValues(scopeDefBuilder);

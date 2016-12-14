@@ -11,11 +11,12 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.ComparatorEntryByKey;
@@ -32,7 +33,7 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.HASH;
 	}
 
@@ -82,31 +83,32 @@ public class HashLangObject extends ALangObject {
 
 	@Override
 	public IFunction<HashLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().expressionMethodHash(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
+
 	@Override
 	public IFunction<HashLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorHash(object, accessedViaDot);
+		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
 	}
 
 	@Override
 	public IFunction<HashLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerHash(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodHash(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorHash(object, accessedViaDot), object, accessedViaDot, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object, accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerHash(object, accessedViaDot), object, accessedViaDot, value, ec);
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot, value, ec);
 	}
 
 	/**
@@ -174,12 +176,12 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
-	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public INonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
 	@Override
-	public NonNullIterator<ALangObject> iterator() {
+	public INonNullIterator<ALangObject> iterator() {
 		return new Itr(value.keySet().iterator());
 	}
 
@@ -233,7 +235,7 @@ public class HashLangObject extends ALangObject {
 		return value.size();
 	}
 
-	private class Itr implements NonNullIterator<ALangObject> {
+	private class Itr implements INonNullIterator<ALangObject> {
 		private final Iterator<ALangObject> it;
 		public Itr(final Iterator<ALangObject> it) {
 			this.it = it;

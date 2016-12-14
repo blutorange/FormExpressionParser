@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 
@@ -18,11 +18,11 @@ public enum DummyVariableTypeBuilder implements IVariableTypeBuilder {
 		throw new IllegalVariableTypeException();
 	}
 	@Override
-	public IVariableTypeBuilder setBasicType(@Nonnull final ELangObjectType type) {
+	public IVariableTypeBuilder setBasicType(@Nonnull final ILangObjectClass type) {
 		return this;
 	}
 	@Override
-	public IVariableTypeBuilder append(final ELangObjectType type) {
+	public IVariableTypeBuilder append(final ILangObjectClass type) {
 		return this;
 	}
 }

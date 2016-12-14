@@ -361,6 +361,7 @@ public final class CmnCnst {
 		@Nonnull public static final String INCOMPATIBLE_FUNCTION_RETURN_TYPE = "Type returned is not compatible with the declared return type.";
 		@Nonnull public static final String NULL_MAP_VALUE = "Map must not contain any null value.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_ASSIGNMENT_TYPE = "Variable {0} cannot be assigned to this type.";
+		@Nonnull public static final String INCOMPATIBLE_EXPRESSION_METHOD_TYPES = "Expression method {0} for type {1} does not accept the right hand side type {2}.";
 	}
 
 	public static final class ToString {

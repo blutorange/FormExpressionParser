@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -16,6 +15,8 @@ import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAssignerExcepti
 import de.xima.fc.form.expression.exception.evaluation.NoSuchMethodException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -147,7 +148,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author mad_gaksha
  *
  */
-public abstract class ALangObject implements NonNullIterable<ALangObject>, Comparable<ALangObject> {
+public abstract class ALangObject implements INonNullIterable<ALangObject>, Comparable<ALangObject> {
 	private final static Logger LOG = Logger.getLogger(ALangObject.class.getCanonicalName());
 	private static AtomicLong ID_COUNTER = new AtomicLong();
 
@@ -190,7 +191,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 * @param ec Context to be used.
 	 */
 	@Nonnull
-	public StringLangObject coerceString(@Nonnull final IEvaluationContext ec) throws CoercionException {
+	public StringLangObject coerceString(@Nonnull final IEvaluationContext ec) {
 		if (getType() == ELangObjectType.STRING)
 			return (StringLangObject) this;
 		return StringLangObject.create(toString());
@@ -226,16 +227,13 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 * @throws CoercionException When the object cannot be coerced.
 	 */
 	@Nonnull
-	public BooleanLangObject coerceBoolean(@Nonnull final IEvaluationContext ec) throws CoercionException {
-		switch (getType()) {
-		case BOOLEAN:
-			return (BooleanLangObject)this;
-		case NULL:
+	public final BooleanLangObject coerceBoolean(@Nonnull final IEvaluationContext ec) {
+//				final TODO how to do this? Loosen restrictions? Let each object do it themselves?
+		if (getType().getClassId() == ELangObjectType.BOOLEAN.getClassId())
+			return (BooleanLangObject) this;
+		if (getType().getClassId() == ELangObjectType.NULL.getClassId())
 			return BooleanLangObject.getFalseInstance();
-			//$CASES-OMITTED$
-		default:
-			return BooleanLangObject.getTrueInstance();
-		}
+		return BooleanLangObject.getTrueInstance();
 	}
 
 	@Nonnull
@@ -322,8 +320,8 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 *            Type to check against.
 	 * @return Whether this object is of the given type.
 	 */
-	public boolean is(@Nonnull final ELangObjectType type) {
-		return getType() == type;
+	public boolean is(@Nonnull final ILangObjectClass type) {
+		return getType().getClassId() == type.getClassId();
 	}
 
 	public long getId() {
@@ -381,7 +379,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 			@Nonnull final IEvaluationContext ec, @Nonnull final ALangObject... args) throws EvaluationException;
 
 	@Nonnull
-	public NonNullIterable<ALangObject> getIterable(@Nonnull final IEvaluationContext ec) throws IterationNotSupportedException {
+	public INonNullIterable<ALangObject> getIterable(@Nonnull final IEvaluationContext ec) throws IterationNotSupportedException {
 		throw new IterationNotSupportedException(this, ec);
 	}
 
@@ -389,7 +387,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	@Override
 	@Nonnull
 	@Deprecated
-	public NonNullIterator<ALangObject> iterator() throws UnsupportedOperationException {
+	public INonNullIterator<ALangObject> iterator() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException(CmnCnst.Error.DEPRECATED_ALANGOBJECT_ITERATOR);
 	}
 
@@ -409,7 +407,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 *
 	 * <p>This holds true. When the comparand is null <code>o.type</code> throws a
 	 * NullPointerException. When the two objects are of different type, they are ordered
-	 * according to {@link ELangObjectType#order} and cannot be equal. When the two objects are
+	 * according to {@link ELangObjectType#id} and cannot be equal. When the two objects are
 	 * of the same type, the abstract method {@link ALangObject#compareToSameType(ALangObject)}
 	 * is called. Subclasses are required to adhere to the above contract.
 	 * </p>
@@ -417,7 +415,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	 */
 	@Override
 	public final int compareTo(final ALangObject o) {
-		if (getType() != o.getType()) return getType().order - o.getType().order;
+		if (getType() != o.getType()) return getType().getClassId() - o.getType().getClassId();
 		return compareToSameType(o);
 	}
 
@@ -466,7 +464,7 @@ public abstract class ALangObject implements NonNullIterable<ALangObject>, Compa
 	}
 
 	@Nonnull
-	public abstract ELangObjectType getType();
+	public abstract ILangObjectClass getType();
 
 	public final boolean isArray() {
 		return getType() == ELangObjectType.ARRAY;

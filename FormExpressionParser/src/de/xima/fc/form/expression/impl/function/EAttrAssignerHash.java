@@ -1,33 +1,36 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
-public enum EAttrAssignerHash implements IFunction<HashLangObject> {
+@ParametersAreNonnullByDefault
+public enum EAttrAssignerHash implements IAttrAssignerFunction<HashLangObject> {
 	;
-	@Nonnull private final FunctionLangObject impl;
-	@Nonnull private final String[] argList;
+
+	private final FunctionLangObject func;
+	private final Impl impl;
 	private final boolean hasVarArgs;
 
-	private EAttrAssignerHash(@Nonnull final Impl impl) {
-		this.impl = FunctionLangObject.create(impl);
-		argList = impl.getDeclaredArgumentList();
+	private EAttrAssignerHash(final Impl impl) {
+		this.func = FunctionLangObject.create(impl);
+		this.impl = impl;
 		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
-		return impl.functionValue().evaluate(ec, thisContext, args);
+	public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext, final ALangObject... args)
+			throws EvaluationException {
+		return func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -36,14 +39,20 @@ public enum EAttrAssignerHash implements IFunction<HashLangObject> {
 		return toString();
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public String[] getDeclaredArgumentList() {
-		return argList;
+	public String getDeclaredArgument(final int i) {
+		return impl.argList[i];
 	}
 
 	@Override
 	public int getDeclaredArgumentCount() {
-		return argList.length;
+		return impl.argList.length;
+	}
+
+	@Override
+	public ILangObjectClass getThisContextType() {
+		return ELangObjectType.HASH;
 	}
 
 	@Override
@@ -51,23 +60,14 @@ public enum EAttrAssignerHash implements IFunction<HashLangObject> {
 		return hasVarArgs;
 	}
 
-	@Override
-	public ELangObjectType getThisContextType() {
-		return ELangObjectType.HASH;
-	}
-
-	@Override
-	public Node getNode() {
-		return null;
-	}
-
-	private static enum Impl implements IFunction<HashLangObject> {
+	private static enum Impl implements IAttrAssignerFunction<HashLangObject> {
 		;
 
-		@Nonnull private String[] argList;
+		private String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -77,9 +77,10 @@ public enum EAttrAssignerHash implements IFunction<HashLangObject> {
 			return hasVarArgs;
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -94,13 +95,8 @@ public enum EAttrAssignerHash implements IFunction<HashLangObject> {
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.HASH;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 
 		@Override

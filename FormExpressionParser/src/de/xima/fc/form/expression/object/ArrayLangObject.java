@@ -11,11 +11,14 @@ import java.util.NoSuchElementException;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.parse.IVariableProvider;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -28,13 +31,22 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.ARRAY;
 	}
-	
+
 	@Nonnull
 	public static ArrayLangObject create() {
 		return new ArrayLangObject(new ArrayList<ALangObject>());
+	}
+
+
+	@Nonnull
+	public static <T extends ALangObject> ArrayLangObject create(final IVariableProvider<T>[] value, final int startIndex) {
+		final List<ALangObject> list = new ArrayList<>(value.length-startIndex+1);
+		for (int i = startIndex; i < value.length; ++i)
+			list.add(value[i].make());
+		return new ArrayLangObject(list);
 	}
 
 	@Nonnull
@@ -52,9 +64,9 @@ public class ArrayLangObject extends ALangObject {
 		final List<ALangObject> list = new ArrayList<>(value.length-startIndex+1);
 		for (int i = startIndex; i < value.length; ++i)
 			list.add(value[i]);
-		return new ArrayLangObject(list);		
+		return new ArrayLangObject(list);
 	}
-	
+
 	@Nonnull
 	public static ALangObject create(final ALangObject value) {
 		if (value == null) return NullLangObject.getInstance();
@@ -103,34 +115,34 @@ public class ArrayLangObject extends ALangObject {
 
 	@Override
 	public IFunction<ArrayLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().expressionMethodArray(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
 	@Override
 	public IFunction<ArrayLangObject> attrAccessor(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorArray(name, accessedViaDot);
+		return ec.getNamespace().attrAccessor(name, accessedViaDot, this);
 	}
 	@Override
 	public IFunction<ArrayLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerArray(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodArray(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorArray(object, accessedViaDot), object,
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object,
 				accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot,
 			final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerArray(object, accessedViaDot), object, accessedViaDot,
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot,
 				value, ec);
 	}
 
@@ -189,12 +201,12 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public INonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
 	@Override
-	public NonNullIterator<ALangObject> iterator() {
+	public INonNullIterator<ALangObject> iterator() {
 		return new Itr();
 	}
 
@@ -275,7 +287,7 @@ public class ArrayLangObject extends ALangObject {
 		return false;
 	}
 
-	private class Itr implements NonNullIterator<ALangObject> {
+	private class Itr implements INonNullIterator<ALangObject> {
 		private int cursor;       // index of next element to return
 		private int lastRet = -1; // index of last element returned; -1 if no such
 		@Override
@@ -295,7 +307,7 @@ public class ArrayLangObject extends ALangObject {
 		@Override
 		public void remove() {
 			if (lastRet < 0)
-				throw new IllegalStateException();
+				throw new FormExpressionException();
 			try {
 				value.remove(lastRet);
 				cursor = lastRet;

@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.visitor;
 
-import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
-import static de.xima.fc.form.expression.enums.ELangObjectType.FUNCTION;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_UNMATCHING_SWITCH_TYPE_AS_ERROR;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.ARRAY;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.FUNCTION;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,8 +16,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleConditionTypeException;
@@ -25,6 +25,7 @@ import de.xima.fc.form.expression.exception.parse.IncompatibleForLoopHeaderTypeA
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableAssignmentTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVariableTypeForExpressionMethodException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingReturnException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
@@ -35,13 +36,14 @@ import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
-import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
 import de.xima.fc.form.expression.node.ASTArrayNode;
@@ -280,10 +282,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	private final IVariableType[] table;
 	private final ISeverityConfig config;
-	private final IEvaluationContextContractFactory<?> factory;
+	private final IEvaluationContextContract<?> factory;
 
-	private VariableTypeCheckVisitor(final IVariableType[] symbolTypeTable,
-			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config) {
+	private VariableTypeCheckVisitor(final IVariableType[] symbolTypeTable, final IEvaluationContextContract<?> factory,
+			final ISeverityConfig config) {
 		this.table = symbolTypeTable;
 		this.config = config;
 		this.factory = factory;
@@ -404,7 +406,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			throws SemanticsException {
 		if (infoActual.hasReturnType() && !typeDeclared.isAssignableFrom(infoActual.getReturnType()))
 			throw new IncompatibleFunctionReturnTypeException(typeDeclared, infoActual.getReturnType(), node);
-		if (typeDeclared.getBasicLangType() != ELangObjectType.NULL) {
+		if (typeDeclared.getBasicLangClass() != ELangObjectType.NULL) {
 			// non-void function
 			if (config.hasOption(TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR) && infoActual.hasImplicitType())
 				throw new MissingReturnException(typeDeclared, node);
@@ -415,8 +417,38 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTExpressionNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		// Empty expression node.
+		if (node.isLeaf())
+			return new NodeInfo(null, SimpleVariableType.NULL);
+
+		// Binary expression node.
+		// Get type of left most node.
+		final NodeInfo infoLhs = node.jjtGetChild(0).jjtAccept(this);
+		if (!infoLhs.hasImplicitType()) {
+			if (node.jjtGetNumChildren() > 1)
+				throw new UnreachableCodeException(node.jjtGetChild(1));
+			return infoLhs;
+		}
+		// Process expression methods from the left to the right.
+		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
+			// Get type from right hand side.
+			final Node rhs = node.jjtGetChild(i);
+			final NodeInfo infoRhs = rhs.jjtAccept(this);
+			if (!infoRhs.hasImplicitType()) {
+				if (i < node.jjtGetNumChildren() - 1)
+					throw new UnreachableCodeException(node.jjtGetChild(i + 1));
+				return infoRhs.unifyJumps(infoLhs);
+			}
+			// Check if there is such an expression method.
+			final IVariableType typeCombined = factory.getNamespaceFactory().getReturnOfExpressionMethod(
+					infoLhs.getImplicitType(), rhs.getSiblingMethod(), infoRhs.getImplicitType());
+			if (typeCombined == null)
+				throw new IncompatibleVariableTypeForExpressionMethodException(infoLhs.getImplicitType(),
+						rhs.getSiblingMethod(), infoRhs.getImplicitType(), rhs);
+			infoLhs.unifyJumps(infoRhs);
+			infoLhs.replaceImplicitType(typeCombined);
+		}
+		return infoLhs;
 	}
 
 	@Override
@@ -432,7 +464,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				if (method != EMethod.EQUAL) {
 					// TODO check if method call works and get result
 					// method.equalMethod(node)
-					throw new RuntimeException();
+					throw new FormExpressionException();
 				}
 				if (!infoVar.hasImplicitType()) {
 					if (i > 0)
@@ -448,7 +480,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				break;
 			case JJTPROPERTYEXPRESSIONNODE:
 				// TODO
-				if(true) throw new RuntimeException();
+				if (true)
+					throw new FormExpressionException();
 				break;
 			default:
 				throw new SemanticsException(
@@ -1051,7 +1084,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Nullable
 	public static IVariableType check(final Node node, final IVariableType[] symbolTypeTable,
-			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config,
+			final IEvaluationContextContract<?> factory, final ISeverityConfig config,
 			final IScopeDefinitions scopeDefs) throws SemanticsException {
 		final VariableTypeCheckVisitor v = new VariableTypeCheckVisitor(symbolTypeTable, factory, config);
 		// TODO check and process scope defs

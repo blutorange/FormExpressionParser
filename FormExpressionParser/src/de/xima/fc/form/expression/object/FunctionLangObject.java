@@ -1,25 +1,25 @@
 package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
-import de.xima.fc.form.expression.impl.config.UnparseConfig;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.evaluate.IUnparsableFunction;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
-import de.xima.fc.form.expression.visitor.UnparseVisitor;
 
+@ParametersAreNonnullByDefault
 public class FunctionLangObject extends ALangObject {
-	@Nonnull
 	private final IFunction<ALangObject> value;
 
 	private static class InstanceHolder {
-		@Nonnull
 		public final static FunctionLangObject NO_OP = new FunctionLangObject(new IFunction<ALangObject>() {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext,
@@ -28,8 +28,8 @@ public class FunctionLangObject extends ALangObject {
 			}
 
 			@Override
-			public String[] getDeclaredArgumentList() {
-				return CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
+			public String getDeclaredArgument(final int i) {
+				throw new ArrayIndexOutOfBoundsException();
 			}
 
 			@Override
@@ -38,17 +38,12 @@ public class FunctionLangObject extends ALangObject {
 			}
 
 			@Override
-			public Node getNode() {
-				return null;
-			}
-
-			@Override
 			public String getDeclaredName() {
 				return CmnCnst.NonnullConstant.STRING_EMPTY;
 			}
 
 			@Override
-			public ELangObjectType getThisContextType() {
+			public ILangObjectClass getThisContextType() {
 				return ELangObjectType.NULL;
 			}
 
@@ -59,17 +54,16 @@ public class FunctionLangObject extends ALangObject {
 		});
 	}
 
-	private FunctionLangObject(@Nonnull final IFunction<ALangObject> value) {
+	private FunctionLangObject(final IFunction<ALangObject> value) {
 		super();
 		this.value = value;
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.FUNCTION;
 	}
-	
-	@Nonnull
+
 	public IFunction<ALangObject> functionValue() {
 		return value;
 	}
@@ -88,20 +82,17 @@ public class FunctionLangObject extends ALangObject {
 	public void toExpression(final StringBuilder builder) {
 		builder.append(Syntax.LAMBDA_ARROW).append(Syntax.PAREN_OPEN);
 		// Add arguments.
-		for (final String arg : value.getDeclaredArgumentList())
-			builder.append(arg).append(Syntax.COMMA);
+		for (int i = 0; i < value.getDeclaredArgumentCount(); ++i)
+			builder.append(value.getDeclaredArgument(i)).append(Syntax.COMMA);
 		// Remove final comma
 		if (builder.length() > 3)
 			builder.setLength(builder.length() - 1);
 		builder.append(Syntax.PAREN_CLOSE).append(Syntax.BRACE_OPEN);
 		// Convert body.
-		final Node n = value.getNode();
-		if (n == null)
+		if (value instanceof IUnparsableFunction)
+			((IUnparsableFunction<?>)value).unparseBody(builder);
+		else
 			builder.append(Syntax.NATIVE_CODE);
-		else {
-			final String unparse = UnparseVisitor.unparse(n, UnparseConfig.getUnstyledWithoutCommentsConfig());
-			builder.append(unparse);
-		}
 		builder.append(Syntax.BRACE_CLOSE).append(Syntax.SEMI_COLON);
 	}
 
@@ -111,41 +102,44 @@ public class FunctionLangObject extends ALangObject {
 				.append(value.getDeclaredName()).append(')'));
 	}
 
+	@Nullable
 	@Override
 	public IFunction<FunctionLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec)
 			throws EvaluationException {
-		return ec.getNamespace().expressionMethodFunction(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
 
+	@Nullable
 	@Override
 	public IFunction<FunctionLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorFunction(object, accessedViaDot);
+		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
 	}
 
+	@Nullable
 	@Override
 	public IFunction<FunctionLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerFunction(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodFunction(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot,
 			final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorFunction(object, accessedViaDot), object,
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object,
 				accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value,
 			final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerFunction(object, accessedViaDot), object,
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object,
 				accessedViaDot, value, ec);
 	}
 
@@ -161,7 +155,7 @@ public class FunctionLangObject extends ALangObject {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public boolean equals(@Nullable final Object o) {
 		if (o == this)
 			return true;
 		if (!(o instanceof FunctionLangObject))
@@ -187,17 +181,12 @@ public class FunctionLangObject extends ALangObject {
 		return this;
 	}
 
-	@Nonnull
 	public static FunctionLangObject getNoOpInstance() {
 		return InstanceHolder.NO_OP;
 	}
 
-	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before
-									// calling IFunction#evaluate
-	@Nonnull
+	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling the function.
 	public static FunctionLangObject create(final IFunction<? extends ALangObject> value) {
-		if (value == null)
-			return getNoOpInstance();
 		return new FunctionLangObject((IFunction<ALangObject>) value);
 	}
 }

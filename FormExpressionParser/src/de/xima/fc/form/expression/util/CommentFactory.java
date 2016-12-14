@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.util;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.ECommentType;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.iface.parse.IComment;
@@ -19,7 +20,7 @@ public final class CommentFactory {
 		case FormExpressionParserConstants.TypeSingleLineComment:
 			break;
 		default:
-			throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
+			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
 		}
 		final Token t = NullUtil.checkNotNull(token);
 		final ECommentType type = t.image.charAt(1) == '/' ? ECommentType.SINGLE_LINE : ECommentType.MULTI_LINE;

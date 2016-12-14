@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
@@ -12,6 +11,8 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class ASTVariableTypeNode extends ANode {
@@ -19,13 +20,13 @@ public class ASTVariableTypeNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	
 	@Nonnull
-	private ELangObjectType variableType = ELangObjectType.OBJECT;
+	private ILangObjectClass variableType = ELangObjectType.OBJECT;
 
 	public ASTVariableTypeNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 	
-	public ASTVariableTypeNode(@Nonnull final Node prototype, @Nonnull final ELangObjectType variableType) {
+	public ASTVariableTypeNode(@Nonnull final Node prototype, @Nonnull final ILangObjectClass variableType) {
 		super(prototype, FormExpressionParserTreeConstants.JJTVARIABLETYPENODE);
 		this.variableType = variableType;
 	}
@@ -60,14 +61,14 @@ public class ASTVariableTypeNode extends ANode {
 		sb.append(variableType).append(',');
 	}
 	
-	public void init(final EMethod method, @Nonnull final ELangObjectType variableType) throws ParseException {
+	public void init(final EMethod method, @Nonnull final ILangObjectClass variableType) throws ParseException {
 		assertNonNull(variableType, CmnCnst.Error.NULL_VARIABLE_TYPE);
 		super.init(method);
 		this.variableType  = variableType;
 	}
 
 	@Nonnull
-	public ELangObjectType getVariableType() {
+	public ILangObjectClass getVariableType() {
 		return variableType;
 	}
 

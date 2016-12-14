@@ -4,12 +4,12 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.VariableNotDefinedException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
-import de.xima.fc.form.expression.impl.ec.GenericContractFactory;
+import de.xima.fc.form.expression.impl.ec.EvaluationContextContract;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * An external context providing scoped variables, to be used with the
- * {@link GenericContractFactory}. As the
+ * {@link EvaluationContextContract}. As the
  * {@link #fetchScopedVariable(String, String, IEvaluationContext)} is final,
  * subclasses cannot provided variables either.
  *

@@ -3,7 +3,8 @@ package de.xima.fc.form.expression.impl.variable;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.exception.FormExpressionException;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
@@ -19,22 +20,22 @@ public enum SimpleVariableType implements IVariableType {
 	;
 
 	@Nonnull
-	private final ELangObjectType type;
+	private final ILangObjectClass clazz;
 
-	private SimpleVariableType(@Nonnull final ELangObjectType type) {
+	private SimpleVariableType(@Nonnull final ILangObjectClass type) {
 		if (!type.allowsGenericsCount(0))
-			throw new RuntimeException();
-		this.type = type;
+			throw new FormExpressionException();
+		this.clazz = type;
 	}
 
 	@Override
-	public ELangObjectType getBasicLangType() {
-		return type;
+	public ILangObjectClass getBasicLangClass() {
+		return clazz;
 	}
 
 	@Override
 	public boolean equalsType(final IVariableType other) {
-		if (type != other.getBasicLangType())
+		if (clazz != other.getBasicLangClass())
 			return false;
 		if (other.getGenericCount() != 0)
 			return false;
@@ -51,15 +52,15 @@ public enum SimpleVariableType implements IVariableType {
 
 	@Override
 	public String toString() {
-		return type.toString();
+		return clazz.toString();
 	}
 
 	@Override
 	public IVariableType union(final IVariableType otherType) {
-		if (type == otherType.getBasicLangType() || otherType.getBasicLangType() == ELangObjectType.NULL
-				|| type == ELangObjectType.OBJECT)
+		if (clazz == otherType.getBasicLangClass() || otherType.getBasicLangClass() == ELangObjectType.NULL
+				|| clazz == ELangObjectType.OBJECT)
 			return this;
-		if (type == ELangObjectType.NULL || otherType.getBasicLangType() == ELangObjectType.OBJECT)
+		if (clazz == ELangObjectType.NULL || otherType.getBasicLangClass() == ELangObjectType.OBJECT)
 			return otherType;
 		return SimpleVariableType.OBJECT;
 	}
@@ -73,19 +74,19 @@ public enum SimpleVariableType implements IVariableType {
 		//   .      o      x     x     o   x
 		//   .      o      x     x     x   o
 		//   .      o      x     x     x   x
-		if (type == otherType.getBasicLangType() || otherType.getBasicLangType() == ELangObjectType.NULL
-				|| type == ELangObjectType.OBJECT)
+		if (clazz == otherType.getBasicLangClass() || otherType.getBasicLangClass() == ELangObjectType.NULL
+				|| clazz == ELangObjectType.OBJECT)
 			return true;
 		return false;
 	}
 
 	@Override
 	public boolean isIterable() {
-		return getBasicLangType().isIterable();
+		return getBasicLangClass().isIterable();
 	}
 
 	@Override
 	public IVariableType getIterableItemType() {
-		return type.getIterableItemType(CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_ARRAY);
+		return clazz.getIterableItemType(CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_ARRAY);
 	}
 }

@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.object;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -11,16 +12,19 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public class StringLangObject extends ALangObject {
+public class StringLangObject extends ALangObject implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Nonnull private final String value;
 
 	private static class InstanceHolder {
@@ -44,7 +48,7 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.STRING;
 	}
 
@@ -60,31 +64,31 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public IFunction<StringLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().expressionMethodString(method);
+		return ec.getNamespace().expressionMethod(method, this);
 	}
 	@Override
 	public IFunction<StringLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessorString(object, accessedViaDot);
+		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
 	}
 
 	@Override
 	public IFunction<StringLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssignerString(name, accessedViaDot);
+		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
 	}
 
 	@Override
 	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethodString(method), method, ec, args);
+		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
 	}
 
 	@Override
 	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessorString(object, accessedViaDot), object, accessedViaDot, ec);
+		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object, accessedViaDot, ec);
 	}
 
 	@Override
 	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssignerString(object, accessedViaDot), object, accessedViaDot, value, ec);
+		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot, value, ec);
 	}
 
 	@Override
@@ -137,7 +141,7 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public StringLangObject coerceString(final IEvaluationContext ec) throws CoercionException {
+	public StringLangObject coerceString(final IEvaluationContext ec) {
 		return this;
 	}
 
@@ -147,12 +151,12 @@ public class StringLangObject extends ALangObject {
 	}
 
 	@Override
-	public NonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
+	public INonNullIterable<ALangObject> getIterable(final IEvaluationContext ec) {
 		return this;
 	}
 
 	@Override
-	public NonNullIterator<ALangObject> iterator() {
+	public INonNullIterator<ALangObject> iterator() {
 		return new Itr();
 	}
 
@@ -259,7 +263,7 @@ public class StringLangObject extends ALangObject {
 		return value.length();
 	}
 
-	private class Itr implements NonNullIterator<ALangObject> {
+	private class Itr implements INonNullIterator<ALangObject> {
 		private int i = 0;
 		@Override
 		public boolean hasNext() {

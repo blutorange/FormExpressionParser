@@ -10,15 +10,16 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.impl.config.SeverityConfig;
-import de.xima.fc.form.expression.impl.ec.EFormcycleContractFactory;
-import de.xima.fc.form.expression.impl.ec.EvaluationContextContractFactory;
+import de.xima.fc.form.expression.impl.ec.EEvaluationContextContractFormcycle;
+import de.xima.fc.form.expression.impl.ec.EEvaluationContextContractWriter;
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
@@ -126,9 +127,9 @@ public final class TestUtil {
 		}
 	}
 
-	public static void test(final Class<? extends ITestCase> clazz) throws IllegalArgumentException, AssertionError {
+	public static void test(final Class<? extends ITestCase> clazz) throws FormExpressionException, AssertionError {
 		if (!clazz.isEnum())
-			throw new IllegalAccessError(String.format("%s is not an enum.", clazz));
+			throw new FormExpressionException(String.format("%s is not an enum.", clazz));
 		for (final ITestCase test : clazz.getEnumConstants()) {
 			System.out.println(String.format("Running test %s::%s.", clazz.getSimpleName(), test));
 			Throwable exception = null;
@@ -137,13 +138,13 @@ public final class TestUtil {
 				switch (test.getContextType()) {
 				case FORMCYCLE:
 					final IFormExpression<Formcycle> feForm = parse(test.getCode(), test.getTestType(),
-							EFormcycleContractFactory.GENERAL, test.getSeverityConfig());
+							EEvaluationContextContractFormcycle.INSTANCE, test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateFormcycle(feForm, test.getTestType());
 					break;
 				case GENERIC:
 					final IFormExpression<Writer> feGeneric = parse(test.getCode(), test.getTestType(),
-							EvaluationContextContractFactory.WRITER, test.getSeverityConfig());
+							EEvaluationContextContractWriter.INSTANCE, test.getSeverityConfig());
 					if (test.isPerformEvaluation())
 						res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
@@ -216,14 +217,14 @@ public final class TestUtil {
 		try (final StringBuilderWriter writer = new StringBuilderWriter()) {
 			switch (type) {
 			case PROGRAM:
-				res = fe.evaluate(writer);
+				res = fe.evaluate(writer).getObject();
 				break;
 			case TEMPLATE:
 				fe.evaluate(writer);
 				res = StringLangObject.create(writer.toString());
 				break;
 			default:
-				throw new RuntimeException("Unkown enum: " + type);
+				throw new FormExpressionException("Unkown enum: " + type);
 			}
 		}
 		final Date t2 = new Date();
@@ -237,7 +238,7 @@ public final class TestUtil {
 		final Date t1 = new Date();
 		switch (type) {
 		case PROGRAM:
-			res = fe.evaluate(new Formcycle());
+			res = fe.evaluate(new Formcycle()).getObject();
 			break;
 		case TEMPLATE:
 			final Writer sbw = new StringBuilderWriter();
@@ -245,7 +246,7 @@ public final class TestUtil {
 			res = StringLangObject.create(sbw.toString());
 			break;
 		default:
-			throw new RuntimeException("Unkown enum: " + type);
+			throw new FormExpressionException("Unkown enum: " + type);
 		}
 		final Date t2 = new Date();
 		System.out.println(String.format("Evaluation took %s ms.", t2.getTime() - t1.getTime()));
@@ -254,7 +255,7 @@ public final class TestUtil {
 
 	@Nonnull
 	private static <T> IFormExpression<T> parse(@Nonnull final String code, @Nonnull final ETestType type,
-			@Nonnull final IEvaluationContextContractFactory<T> provider, @Nonnull final ISeverityConfig config)
+			@Nonnull final IEvaluationContextContract<T> provider, @Nonnull final ISeverityConfig config)
 					throws ParseException, TokenMgrError {
 		final IFormExpression<T> res;
 		final Date t1 = new Date();

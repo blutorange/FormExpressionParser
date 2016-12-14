@@ -24,9 +24,9 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.config.IUnparseConfig;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
-import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
@@ -38,7 +38,6 @@ import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
-import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCollectVisitor;
 
 public final class FormExpressionFactory {
@@ -102,7 +101,7 @@ public final class FormExpressionFactory {
 		@Override
 		@Nonnull
 		public <T> IFormExpression<T> parse(@Nonnull final String code,
-				@Nonnull final IEvaluationContextContractFactory<T> factory, final ISeverityConfig config)
+				@Nonnull final IEvaluationContextContract<T> factory, final ISeverityConfig config)
 						throws ParseException, TokenMgrError, SemanticsException {
 			Preconditions.checkNotNull(code);
 			Preconditions.checkNotNull(factory);
@@ -183,7 +182,7 @@ public final class FormExpressionFactory {
 
 		@Override
 		public <T> IFormExpression<T> parse(final String code,
-				final IEvaluationContextContractFactory<T> factory, final ISeverityConfig config)
+				final IEvaluationContextContract<T> factory, final ISeverityConfig config)
 						throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			Preconditions.checkNotNull(factory);
@@ -305,7 +304,7 @@ public final class FormExpressionFactory {
 	@Nonnull
 	private static <T> IFormExpression<T> postProcess(final @Nonnull Node node,
 			@Nonnull final FormExpressionParser parser,
-			@Nonnull final IEvaluationContextContractFactory<T> contractFactory,
+			@Nonnull final IEvaluationContextContract<T> contractFactory,
 			@Nonnull final ISeverityConfig severityConfig) throws ParseException {
 		JumpCheckVisitor.check(node);
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, contractFactory, severityConfig);
@@ -315,7 +314,7 @@ public final class FormExpressionFactory {
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
 		checkScopeDefsConstancy(scopeDefs);
 		final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);
-		VariableTypeCheckVisitor.check(node, symbolTypeTable, contractFactory, severityConfig, scopeDefs);
+		//VariableTypeCheckVisitor.check(node, symbolTypeTable, contractFactory, severityConfig, scopeDefs);
 		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, contractFactory, symbolTableSize);
 	}
 

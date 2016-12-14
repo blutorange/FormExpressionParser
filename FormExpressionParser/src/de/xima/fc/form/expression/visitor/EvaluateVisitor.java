@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EJump;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
@@ -34,6 +33,7 @@ import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -82,7 +82,7 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
-import de.xima.fc.form.expression.object.NonNullIterator;
+import de.xima.fc.form.expression.object.INonNullIterator;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
@@ -546,7 +546,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		}
 		else {
 			// Iterating for loop
-			final NonNullIterator<ALangObject> it = jjtAccept(node, node.getEnhancedIteratorNode(), ec).getIterable(ec).iterator();
+			final INonNullIterator<ALangObject> it = jjtAccept(node, node.getEnhancedIteratorNode(), ec).getIterable(ec).iterator();
 			forloop: while (it.hasNext()) {
 				setSimpleVariable(node, it.next(), ec);
 				res = jjtAccept(node, node.getBodyNode(), ec);

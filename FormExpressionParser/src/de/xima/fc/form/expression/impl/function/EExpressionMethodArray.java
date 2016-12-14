@@ -1,25 +1,29 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> {
 	PLUS(EMethod.PLUS, Impl.UNION),
 	DASH(EMethod.DASH, Impl.DIFFERENCE),
 	;
-	@Nonnull private final EMethod method;
-	@Nonnull private final IFunction<ArrayLangObject> function;
+	private final EMethod method;
+	private final IExpressionFunction<ArrayLangObject> function;
 
-	private EExpressionMethodArray(@Nonnull final EMethod method, @Nonnull final IFunction<ArrayLangObject> function) {
+	private EExpressionMethodArray(final EMethod method, final IExpressionFunction<ArrayLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -30,11 +34,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 	}
 
 	@Override
-	public IFunction<ArrayLangObject> getFunction() {
+	public IExpressionFunction<ArrayLangObject> getFunction() {
 		return function;
 	}
 
-	private static enum Impl implements IFunction<ArrayLangObject> {
+	private static enum Impl implements IExpressionFunction<ArrayLangObject> {
 		/**
 		 * @param elementsToAdd {@link ALangObject}. Element(s) to be added to this array. When an array, all of the array's elements are added at the end of this array. Otherwise, the object itself is added to the end of this array.
 		 * @return <code>this</code>, with the elements specified by the argument added.
@@ -46,6 +50,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 				if (args[0].getType() == ELangObjectType.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
 				else thisContext.add(args[0]);
 				return thisContext;
+			}
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return rhs.equalsType(rhs) ? rhs : null;
 			}
 		},
 		/**
@@ -60,13 +69,19 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 				else thisContext.remove(args[0]);
 				return thisContext;
 			}
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return rhs.equalsType(rhs) ? rhs : null;
+			}
 		},
 		;
 
-		@Nonnull private final String[] argList;
+		private final String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -82,9 +97,10 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			return toString();
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -93,13 +109,8 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.ARRAY;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 	}
 }

@@ -37,6 +37,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.collect.ImmutableList;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.config.IUnparseConfig;
@@ -745,7 +746,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new RuntimeException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION,
+				throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION,
 						node.jjtGetChild(i).getSiblingMethod()));
 			}
 		}

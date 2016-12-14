@@ -19,9 +19,9 @@ import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
-import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -32,13 +32,13 @@ import de.xima.fc.form.expression.util.CmnCnst;
 @ParametersAreNonnullByDefault
 public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
-	private final IEvaluationContextContractFactory<?> factory;
+	private final IEvaluationContextContract<?> factory;
 	private final Stack<String> defaultScopeStack = new Stack<>();
 	private final ISeverityConfig config;
 	private int symbolTableSize = 0;
 
 	private VariableResolveVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config) {
+			final IEvaluationContextContract<?> factory, final ISeverityConfig config) {
 		this.scopeDefBuilder = scopeDefBuilder;
 		this.factory = factory;
 		this.config = config;
@@ -193,7 +193,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 	}
 
 	public static int resolve(final Node node, final IScopeDefinitionsBuilder scopeDefBuilder,
-			final IEvaluationContextContractFactory<?> factory, final ISeverityConfig config)
+			final IEvaluationContextContract<?> factory, final ISeverityConfig config)
 					throws ParseException {
 		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, factory, config);
 		v.resolveScopeDefs(scopeDefBuilder);

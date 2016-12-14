@@ -1,8 +1,9 @@
 package de.xima.fc.form.expression.impl.formexpression;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -11,31 +12,36 @@ import de.xima.fc.form.expression.iface.evaluate.ILibrary;
 import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.impl.variable.GenericVariableReference;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public final class EvaluationContextImpl implements IEvaluationContext {
 
-	@Nonnull private final INamespace namespace;
-	@Nonnull private final ILogger logger;
-	@Nonnull private final ITracer<Node> tracer;
-	@Nonnull private final ILibrary library;
-	@Nonnull private final IEmbedment embedment;
-	@Nullable private IExternalContext externalContext;
-	@Nonnull private IVariableReference[] symbolTable;
+	private final INamespace namespace;
+	private final ILogger logger;
+	private final ITracer<Node> tracer;
+	private final ILibrary library;
+	private final IEmbedment embedment;
+	@Nullable
+	private IExternalContext externalContext;
+	private IVariableReference[] symbolTable;
 
 	/**
 	 * Creates a new evaluation context.
-	 * @param ecFactory Factory for creating an evaluation context.
+	 *
+	 * @param ecFactory
+	 *            Factory for creating an evaluation context.
 	 */
-	public EvaluationContextImpl(final IEvaluationContextContractFactory<?> ecFactory) {
-		this.namespace = ecFactory.getNamespaceFactory().makeNamespace();
-		this.library = ecFactory.getLibraryFactory().makeLibrary();
+	public EvaluationContextImpl(final IEvaluationContextContract<?> ecFactory, final String logName,
+			@Nullable final ELogLevel logLevel) {
+		this.namespace = ecFactory.getNamespaceFactory().make();
+		this.library = ecFactory.getLibraryFactory().make();
 		this.tracer = ecFactory.makeTracer();
-		this.logger = ecFactory.makeLogger();
-		this.embedment = ecFactory.getEmbedmentFactory().makeEmbedment();
+		this.logger = ecFactory.getLoggerFactory().make(logName, logLevel);
+		this.embedment = ecFactory.getEmbedmentFactory().make();
 		this.symbolTable = CmnCnst.NonnullConstant.EMPTY_SYMBOL_TABLE;
 	}
 
@@ -74,15 +80,18 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 		library.reset();
 		embedment.reset();
 		tracer.reset();
+		if (externalContext != null)
+			externalContext.reset();
 		symbolTable = CmnCnst.NonnullConstant.EMPTY_SYMBOL_TABLE;
 		externalContext = null;
 	}
 
 	@Override
-	public void setExternalContext(final IExternalContext externalContext) {
+	public void setExternalContext(@Nullable final IExternalContext externalContext) {
 		this.externalContext = externalContext;
 	}
 
+	@Nullable
 	@Override
 	public IExternalContext getExternalContext() {
 		return externalContext;

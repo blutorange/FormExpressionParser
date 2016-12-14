@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.test;
 
-import static de.xima.fc.form.expression.enums.ELangObjectType.ARRAY;
-import static de.xima.fc.form.expression.enums.ELangObjectType.FUNCTION;
-import static de.xima.fc.form.expression.enums.ELangObjectType.HASH;
-import static de.xima.fc.form.expression.enums.ELangObjectType.NULL;
-import static de.xima.fc.form.expression.enums.ELangObjectType.OBJECT;
-import static de.xima.fc.form.expression.enums.ELangObjectType.STRING;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.ARRAY;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.FUNCTION;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.HASH;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.NULL;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.OBJECT;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectType.STRING;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -17,9 +17,10 @@ import javax.annotation.Nonnull;
 
 import org.junit.Test;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
 
@@ -28,13 +29,13 @@ public class VariableTypeTest {
 		@Nonnull
 		public final IVariableType var;
 		@Nonnull
-		public final ELangObjectType obj;
+		public final ILangObjectClass obj;
 
-		public Tuple(@Nonnull final ELangObjectType obj) {
+		public Tuple(@Nonnull final ILangObjectClass obj) {
 			this.obj = obj;
 			this.var = new VariableTypeBuilder().setBasicType(obj).build();
 		}
-		public Tuple(@Nonnull final IVariableType var, @Nonnull final ELangObjectType obj) {
+		public Tuple(@Nonnull final IVariableType var, @Nonnull final ILangObjectClass obj) {
 			this.var = var;
 			this.obj = obj;
 		}
@@ -156,7 +157,7 @@ public class VariableTypeTest {
 			assertFalse(t.var.equalsType(funcType));
 			assertTrue(t.var.getGenericCount() == 0);
 			assertTrue(t.var.union(t.var).equalsType(t.var));
-			assertTrue(t.var.getBasicLangType() == t.obj);
+			assertTrue(t.var.getBasicLangClass() == t.obj);
 			if (t.obj != NULL) {
 				assertTrue(t.var.union(arrayType).equalsType(SimpleVariableType.OBJECT));
 				assertTrue(t.var.union(hashType).equalsType(SimpleVariableType.OBJECT));
@@ -182,7 +183,7 @@ public class VariableTypeTest {
 	@Nonnull
 	private List<Tuple> getSimpleTypes() {
 		final List<Tuple> list = new ArrayList<>();
-		for (final ELangObjectType obj : ELangObjectType.values())
+		for (final ILangObjectClass obj : ELangObjectType.values())
 			if (obj.allowsGenericsCount(0))
 				list.add(new Tuple(obj));
 		return list;

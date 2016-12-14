@@ -2,15 +2,15 @@ package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAssignerException;
-import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -33,21 +33,35 @@ import de.xima.fc.form.expression.util.NullUtil;
  * <br>
  *
  * The argument array is guaranteed to contain exactly three entries, the
- * {@link ALangObject}
- * <code>property<code>, the {@link BooleanLangObject} <code>accessedViaDot</dot>,
- * and the <code>value</code> {@link ALangObject} to be assigned.
+ * {@link ALangObject} <code>property<code>, the {@link BooleanLangObject}
+ * <code>accessedViaDot</dot>, and the <code>value</code> {@link ALangObject}
+ * to be assigned.
  *
  * @author madgaksha
  *
  * @param <T>
  */
-public abstract class GenericAttrAssigner<T extends ALangObject> implements IFunction<T> {
+public abstract class GenericAttrAssigner<T extends ALangObject> implements IAttrAssignerFunction<T> {
+	private static final long serialVersionUID = 1L;
+
+	@Nonnull
+	private final String name;
+
+	@Nonnull
+	private final String[] argList;
+
+	@Nonnull
+	private final ILangObjectClass type;
+
+	private final boolean hasVarArgs;
+
 	/**
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<StringLangObject> STRING = new GenericAttrAssigner<StringLangObject>(ELangObjectType.STRING,
+	public final static IAttrAssignerFunction<StringLangObject> STRING = new GenericAttrAssigner<StringLangObject>(ELangObjectType.STRING,
 			"genericAttrAssignerString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
@@ -69,8 +83,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 *             When the index is too large or too small to be represented as
 	 *             an <code>int</code>.
 	 */
-	public final static IFunction<ArrayLangObject> ARRAY = new GenericAttrAssigner<ArrayLangObject>(ELangObjectType.ARRAY,
+	public final static IAttrAssignerFunction<ArrayLangObject> ARRAY = new GenericAttrAssigner<ArrayLangObject>(ELangObjectType.ARRAY,
 			"genericAttrAssignerArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
@@ -89,8 +104,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<BooleanLangObject> BOOLEAN = new GenericAttrAssigner<BooleanLangObject>(ELangObjectType.BOOLEAN,
+	public final static IAttrAssignerFunction<BooleanLangObject> BOOLEAN = new GenericAttrAssigner<BooleanLangObject>(ELangObjectType.BOOLEAN,
 			"genericAttrAssignerBoolean", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -103,8 +119,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAssigner<ExceptionLangObject>(
+	public final static IAttrAssignerFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAssigner<ExceptionLangObject>(
 			ELangObjectType.EXCEPTION, "genericAttrAssignerException", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -117,8 +134,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAssigner<RegexLangObject>(ELangObjectType.REGEX,
+	public final static IAttrAssignerFunction<RegexLangObject> REGEX = new GenericAttrAssigner<RegexLangObject>(ELangObjectType.REGEX,
 			"genericAttrAssignerRegex", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -131,8 +149,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<FunctionLangObject> FUNCTION = new GenericAttrAssigner<FunctionLangObject>(
+	public final static IAttrAssignerFunction<FunctionLangObject> FUNCTION = new GenericAttrAssigner<FunctionLangObject>(
 			ELangObjectType.FUNCTION, "genericAttrAssignerFunction", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -145,8 +164,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IFunction<NumberLangObject> NUMBER = new GenericAttrAssigner<NumberLangObject>(ELangObjectType.NUMBER,
+	public final static IAttrAssignerFunction<NumberLangObject> NUMBER = new GenericAttrAssigner<NumberLangObject>(ELangObjectType.NUMBER,
 			"genericAttrAssignerFunction", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -164,8 +184,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	 *                 the key is mapped to {@link NullLangObject}. Use
 	 *                 {@link EAttrAccessorHash#contains} to check.
 	 */
-	public final static IFunction<HashLangObject> HASH = new GenericAttrAssigner<HashLangObject>(ELangObjectType.HASH,
+	public final static IAttrAssignerFunction<HashLangObject> HASH = new GenericAttrAssigner<HashLangObject>(ELangObjectType.HASH,
 			"genericAttrAssignerHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -174,16 +195,9 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 		}
 	};
 
-	@Nonnull
-	private final String name;
-	@Nonnull
-	private final String[] argList;
-	private final boolean hasVarArgs;
-	@Nonnull
-	private final ELangObjectType type;
-
-	private GenericAttrAssigner(@Nonnull final ELangObjectType type, @Nonnull final String name,
+	private GenericAttrAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
 			final boolean hasVarArgs, @Nonnull final String... argList) {
+		NullUtil.checkItemsNotNull(argList);
 		this.type = type;
 		this.name = name;
 		this.argList = argList;
@@ -200,9 +214,10 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 		return hasVarArgs;
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public String[] getDeclaredArgumentList() {
-		return argList;
+	public String getDeclaredArgument(final int i) {
+		return argList[i];
 	}
 
 	@Override
@@ -211,12 +226,7 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IFun
 	}
 
 	@Override
-	public Node getNode() {
-		return null;
-	}
-
-	@Override
-	public ELangObjectType getThisContextType() {
+	public ILangObjectClass getThisContextType() {
 		return type;
 	}
 

@@ -1,4 +1,29 @@
-scope foo {
-  string a;
+global scope {
+  number a;
+  number b;
 }
-foo::a = 9;
+a=2;
+b=c;
+a+b;
+
+
+hash.key   // attribute "key"
+hash[key]  // any lang object, we only know its type, eg. BooleanLangObject
+
+AttrAccessor    // array.length, array.sort  // a certain well defined name
+GenericAccessor // hash.someKey, array[9923] // a possibly endless set of names
+
+(1) Is dot-accessed? Property defined by its (string) name.
+ (1a) Check if there is an attribute accessor defined.
+ (1b) If not, check if there is a generic attribute accessor.
+ (1c) If not, give up.
+(2) Otherwise, it is bracket-style accessed. Property is defined by its variable type.
+    This means that it cannot change the variable type returned depending on the value
+    during run-time. The return type must be the same for all values of a certain type
+    of property.    
+ (2a) Check if there is a bracket attribute accessor.
+ (2b) If not, give up.
+ 
+This also means that in general hash.key and hash["key"] do not mean the same.
+However, one can define attribute accessors in such a way that this does yield
+the same result.

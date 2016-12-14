@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
@@ -72,7 +73,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 	public Node getTypeNode() {
 		if (typedNode != null)
 			return typedNode;
-		throw new IllegalStateException(CmnCnst.Error.GET_TYPE_NODE_CALLED_BUT_NO_TYPE_NODE_PRESENT);
+		throw new FormExpressionException(CmnCnst.Error.GET_TYPE_NODE_CALLED_BUT_NO_TYPE_NODE_PRESENT);
 	}
 
 	@Override

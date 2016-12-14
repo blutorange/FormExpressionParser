@@ -1,34 +1,35 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 
-public enum EAttrAssignerException implements IFunction<ExceptionLangObject> {
+@ParametersAreNonnullByDefault
+public enum EAttrAssignerException implements IAttrAssignerFunction<ExceptionLangObject> {
 	;
 
-	@Nonnull private final FunctionLangObject impl;
-	@Nonnull private final String[] argList;
+	private final FunctionLangObject func;
+	private final Impl impl;
 	private final boolean hasVarArgs;
 
-	private EAttrAssignerException(@Nonnull final Impl impl) {
-		this.impl = FunctionLangObject.create(impl);
-		argList = impl.getDeclaredArgumentList();
+	private EAttrAssignerException(final Impl impl) {
+		this.func = FunctionLangObject.create(impl);
+		this.impl = impl;
 		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
-		return impl.functionValue().evaluate(ec, thisContext, args);
+	public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
+			throws EvaluationException {
+		return func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -37,24 +38,20 @@ public enum EAttrAssignerException implements IFunction<ExceptionLangObject> {
 		return toString();
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public String[] getDeclaredArgumentList() {
-		return argList;
+	public String getDeclaredArgument(final int i) {
+		return impl.argList[i];
 	}
 
 	@Override
 	public int getDeclaredArgumentCount() {
-		return argList.length;
+		return impl.argList.length;
 	}
 
 	@Override
-	public ELangObjectType getThisContextType() {
+	public ILangObjectClass getThisContextType() {
 		return ELangObjectType.EXCEPTION;
-	}
-
-	@Override
-	public Node getNode() {
-		return null;
 	}
 
 	@Override
@@ -62,13 +59,13 @@ public enum EAttrAssignerException implements IFunction<ExceptionLangObject> {
 		return hasVarArgs;
 	}
 
-	private static enum Impl implements IFunction<ExceptionLangObject> {
+	private static enum Impl implements IAttrAssignerFunction<ExceptionLangObject> {
 		;
 
-		@Nonnull private String[] argList;
+		private String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -78,9 +75,10 @@ public enum EAttrAssignerException implements IFunction<ExceptionLangObject> {
 			return hasVarArgs;
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -95,13 +93,8 @@ public enum EAttrAssignerException implements IFunction<ExceptionLangObject> {
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.EXCEPTION;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 
 		@Override

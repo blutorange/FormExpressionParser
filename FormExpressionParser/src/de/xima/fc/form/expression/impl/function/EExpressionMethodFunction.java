@@ -1,24 +1,28 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangObject> {
 	;
-	@Nonnull private final EMethod method;
-	@Nonnull private final IFunction<FunctionLangObject> function;
+	private final EMethod method;
+	private final IExpressionFunction<FunctionLangObject> function;
 
-	private EExpressionMethodFunction(@Nonnull final EMethod method, @Nonnull final IFunction<FunctionLangObject> function) {
+	private EExpressionMethodFunction(final EMethod method, final IExpressionFunction<FunctionLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -29,12 +33,12 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 	}
 
 	@Override
-	public IFunction<FunctionLangObject> getFunction() {
+	public IExpressionFunction<FunctionLangObject> getFunction() {
 		return function;
 	}
 
 	@SuppressWarnings("unused")
-	private static enum Impl implements IFunction<FunctionLangObject> {
+	private static enum Impl implements IExpressionFunction<FunctionLangObject> {
 		// A dummy because there are not methods yet.
 		@Deprecated
 		DUMMY(false, "comparand"){ //$NON-NLS-1$
@@ -43,13 +47,20 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 					throws EvaluationException {
 				throw new UncatchableEvaluationException(ec);
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return null;
+			}
 		},
 		;
 
-		@Nonnull private final String[] argList;
+		private final String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -65,9 +76,10 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 			return toString();
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -76,13 +88,8 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.FUNCTION;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 	}
 }

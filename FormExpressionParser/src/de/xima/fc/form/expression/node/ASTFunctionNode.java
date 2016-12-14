@@ -2,22 +2,22 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.iface.evaluate.IArgumentResolvableNode;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVariableTyped {
+public class ASTFunctionNode extends ANode implements IArgumentResolvableNode, IVariableTyped {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull
@@ -29,7 +29,7 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVari
 	public ASTFunctionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
-	
+
 	public void init(final EMethod method, final boolean hasVarArgs, final boolean hasType) throws ParseException {
 		assertChildrenAtLeast(hasType ? 2 : 1);
 		if (hasVarArgs && jjtGetNumChildren() == (hasType ? 2 : 1))
@@ -38,7 +38,7 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVari
 		this.hasVarArgs = hasVarArgs;
 		this.hasType = hasType;
 	}
-	
+
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (hasType && i == 0)
@@ -65,12 +65,12 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVari
 	public <E extends Throwable> void jjtAccept(final IFormExpressionVoidVoidVisitor<E> visitor) throws E {
 		visitor.visit(this);
 	}
-	
+
 	@Override
 	public final int getArgumentCount() {
 		return jjtGetNumChildren() - (hasType ? 2 : 1);
 	}
-	
+
 	public Node getArgumentNode(final int i) {
 		return jjtGetChild(i + (hasType ? 1 : 0));
 	}
@@ -85,17 +85,17 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvable, IVari
 	public Node getBodyNode() {
 		return jjtGetChild(jjtGetNumChildren()-1);
 	}
-	
+
 	@Override
 	public ISourceResolvable getThisResolvable() {
 		return thisResolvable;
 	}
-	
+
 	@Override
 	public boolean hasVarArgs() {
 		return hasVarArgs;
 	}
-	
+
 	@Override
 	public boolean hasType() {
 		return hasType;

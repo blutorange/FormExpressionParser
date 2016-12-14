@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -18,17 +19,17 @@ import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Boolean, RuntimeException> {
+public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Boolean, FormExpressionException> {
 	@Nonnull private final ISourceResolvable[] resolvableTable;
 	@Nonnull private final Node[] nodeTable;
 	@Nonnull private final boolean[] booleanTable;
-	
+
 	private UnusedVariableCheckVisitor(final int symbolTableSize) {
 		resolvableTable = new ISourceResolvable[symbolTableSize];
 		nodeTable = new Node[symbolTableSize];
 		booleanTable = new boolean[symbolTableSize];
 	}
-	
+
 	private void addToNodeTable(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node) {
 		final int source = resolvable.getSource();
 		if (source >= 0 && source < resolvableTable.length && nodeTable[source] == null) {
@@ -39,7 +40,7 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 
 	private void addToBooleanTable(final int source) {
 		if (source >= 0 && source < booleanTable.length)
-			booleanTable[source] = true;		
+			booleanTable[source] = true;
 	}
 
 	private void addWarnings(@Nonnull final IEvaluationContext ec) {
@@ -58,7 +59,7 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 		visitChildren(node, assignment);
 		addToNodeTable(node, node);
 	}
-	
+
 	@Override
 	public void visit(final ASTVariableNode node, final Boolean assignment) {
 		final int source = node.getSource();
@@ -69,14 +70,14 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 				addToBooleanTable(source);
 		}
 	}
-	
+
 	@Override
 	public void visit(final ASTFunctionClauseNode node, final Boolean assignment) {
 		for (int i = node.getArgumentCount(); i-->0;)
 			addToNodeTable(node.getArgResolvable(i), node.jjtGetChild(i));
 		node.getBodyNode().jjtAccept(this, assignment);
 	}
-	
+
 	@Override
 	public void visit(final ASTFunctionNode node, final Boolean assignment) {
 		for (int i = node.getArgumentCount(); i-->0;)

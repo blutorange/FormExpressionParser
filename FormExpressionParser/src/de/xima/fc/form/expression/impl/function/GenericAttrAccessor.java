@@ -2,14 +2,14 @@ package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -42,7 +42,8 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  * @param <T>
  */
-public abstract class GenericAttrAccessor<T extends ALangObject> implements IFunction<T> {
+public abstract class GenericAttrAccessor<T extends ALangObject> implements IAttrAccessorFunction<T> {
+	private static final long serialVersionUID = 1L;
 	/**
 	 * @param index
 	 *            {@link NumberLangObject} The index of the character to get
@@ -56,8 +57,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             When the index is too large or too small to be represented as
 	 *             an <code>int</code>.
 	 */
-	public final static IFunction<StringLangObject> STRING = new GenericAttrAccessor<StringLangObject>(ELangObjectType.STRING,
-			"genericAttrAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IAttrAccessorFunction<StringLangObject> STRING = new GenericAttrAccessor<StringLangObject>(
+			ELangObjectType.STRING, "genericAttrAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
@@ -84,8 +87,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *             When the index is too large or too small to be represented as
 	 *             an <code>int</code>.
 	 */
-	public final static IFunction<ArrayLangObject> ARRAY = new GenericAttrAccessor<ArrayLangObject>(ELangObjectType.ARRAY,
-			"genericAttrAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IAttrAccessorFunction<ArrayLangObject> ARRAY = new GenericAttrAccessor<ArrayLangObject>(
+			ELangObjectType.ARRAY, "genericAttrAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
@@ -103,8 +108,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<BooleanLangObject> BOOLEAN = new GenericAttrAccessor<BooleanLangObject>(ELangObjectType.BOOLEAN,
-			"genericAttrAccessorBoolean", false) { //$NON-NLS-1$
+	public final static IAttrAccessorFunction<BooleanLangObject> BOOLEAN = new GenericAttrAccessor<BooleanLangObject>(
+			ELangObjectType.BOOLEAN, "genericAttrAccessorBoolean", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -117,8 +124,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAccessor<ExceptionLangObject>(
+	public final static IAttrAccessorFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAccessor<ExceptionLangObject>(
 			ELangObjectType.EXCEPTION, "genericAttrAccessorException", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -131,8 +140,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<RegexLangObject> REGEX = new GenericAttrAccessor<RegexLangObject>(ELangObjectType.REGEX,
-			"genericAttrAccessorRegex", false) { //$NON-NLS-1$
+	public final static IAttrAccessorFunction<RegexLangObject> REGEX = new GenericAttrAccessor<RegexLangObject>(
+			ELangObjectType.REGEX, "genericAttrAccessorRegex", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -145,8 +156,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<FunctionLangObject> FUNCTION = new GenericAttrAccessor<FunctionLangObject>(
+	public final static IAttrAccessorFunction<FunctionLangObject> FUNCTION = new GenericAttrAccessor<FunctionLangObject>(
 			ELangObjectType.FUNCTION, "genericAttrAccessorFunction", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -159,8 +172,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IFunction<NumberLangObject> NUMBER = new GenericAttrAccessor<NumberLangObject>(ELangObjectType.NUMBER,
-			"genericAttrAccessorNumber", false) { //$NON-NLS-1$
+	public final static IAttrAccessorFunction<NumberLangObject> NUMBER = new GenericAttrAccessor<NumberLangObject>(
+			ELangObjectType.NUMBER, "genericAttrAccessorNumber", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -178,8 +193,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	 *                 the key is mapped to {@link NullLangObject}. Use
 	 *                 {@link EAttrAccessorHash#contains} to check.
 	 */
-	public final static IFunction<HashLangObject> HASH = new GenericAttrAccessor<HashLangObject>(ELangObjectType.HASH,
-			"genericAttrAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IAttrAccessorFunction<HashLangObject> HASH = new GenericAttrAccessor<HashLangObject>(
+			ELangObjectType.HASH, "genericAttrAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
@@ -193,10 +210,11 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	private final String[] argList;
 	private final boolean hasVarArgs;
 	@Nonnull
-	private final ELangObjectType type;
+	private final ILangObjectClass type;
 
-	private GenericAttrAccessor(@Nonnull final ELangObjectType type, @Nonnull final String name,
+	private GenericAttrAccessor(@Nonnull final ILangObjectClass type, @Nonnull final String name,
 			final boolean hasVarArgs, @Nonnull final String... argList) {
+		NullUtil.checkItemsNotNull(argList);
 		this.type = type;
 		this.name = name;
 		this.argList = argList;
@@ -213,9 +231,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 		return hasVarArgs;
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public String[] getDeclaredArgumentList() {
-		return argList;
+	public String getDeclaredArgument(final int i) {
+		return argList[i];
 	}
 
 	@Override
@@ -224,12 +243,7 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IFun
 	}
 
 	@Override
-	public Node getNode() {
-		return null;
-	}
-
-	@Override
-	public ELangObjectType getThisContextType() {
+	public ILangObjectClass getThisContextType() {
 		return type;
 	}
 

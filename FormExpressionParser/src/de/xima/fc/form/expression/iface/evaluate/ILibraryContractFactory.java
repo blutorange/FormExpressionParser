@@ -1,21 +1,19 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import java.io.Serializable;
-
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.iface.parse.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.factory.IContractFactory;
+import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.util.Void;
 
+/**
+ * <b>Must be immutable.</b>
+ * @author madgaksha
+ *
+ */
 @ParametersAreNonnullByDefault
-public interface ILibraryContractFactory extends Serializable {
-	/**
-	 * @return Creates a library adhering to the specifications as
-	 * indicates by the contract factory.
-	 */
-	public ILibrary makeLibrary();
-
+public interface ILibraryContractFactory extends IContractFactory<ILibrary> {
 	/**
 	 * Provides information on whether all {@link ILibrary} created by this
 	 * factory provide values for a certain scope.

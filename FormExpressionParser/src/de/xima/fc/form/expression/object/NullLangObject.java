@@ -5,13 +5,14 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectAccessException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectAssignException;
 import de.xima.fc.form.expression.exception.evaluation.NullObjectMethodException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
@@ -29,7 +30,7 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
-	public ELangObjectType getType() {
+	public ILangObjectClass getType() {
 		return ELangObjectType.NULL;
 	}
 	

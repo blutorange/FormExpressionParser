@@ -1,22 +1,26 @@
 package de.xima.fc.form.expression.impl.formexpression;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 
+import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.SimulateVisitor;
 import de.xima.fc.form.expression.visitor.UnusedVariableCheckVisitor;
@@ -27,49 +31,54 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 
 	private final int symbolTableSize;
 	private final IScopeDefinitions scopeDefs;
-	private final IEvaluationContextContractFactory<T> ecFactory;
+	private final IEvaluationContextContract<T> ecFactory;
 	private final Node node;
 	private final ImmutableList<IComment> comments;
+	private ELogLevel logLevel;
+	private String logName;
 
 	FormExpressionImpl(final Node node, final ImmutableList<IComment> comments,
-			final IScopeDefinitions scopeDefs, final IEvaluationContextContractFactory<T> specs,
+			final IScopeDefinitions scopeDefs, final IEvaluationContextContract<T> specs,
 			final int heapSize) {
 		this.node = node;
 		this.comments = comments;
 		this.ecFactory = specs;
 		this.scopeDefs = scopeDefs;
 		this.symbolTableSize = heapSize;
+		this.logLevel = ELogLevel.WARN;
+		this.logName = NullUtil.stringFormat("Logger.%08X", hashCode());
 	}
 
 	@Override
 	@Nonnull
-	public ALangObject evaluate(@Nonnull final T object) throws EvaluationException {
+	public IEvaluationResult evaluate(@Nonnull final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
 		final IEvaluationContext ec = makeEc(object);
 		ec.createSymbolTable(symbolTableSize);
 		final ALangObject result = EvaluateVisitor.evaluateCode(node, scopeDefs, ec);
 		ec.reset();
-		return result;
+		return new ResImpl(result, ec.getTracer().buildWarnings());
 	}
+
 	@Override
 	public ImmutableList<IComment> getComments() {
 		return comments;
 	}
 
 	@Override
-	public IEvaluationContextContractFactory<T> getSpecs() {
+	public IEvaluationContextContract<T> getSpecs() {
 		return ecFactory;
 	}
 
 	@Override
-	public ImmutableCollection<IEvaluationWarning> analyze(final T object) throws EvaluationException {
+	public List<IEvaluationWarning> analyze(final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
 		final IEvaluationContext ec = makeEc(object);
-		final ImmutableCollection<IEvaluationWarning> result;
+		final List<IEvaluationWarning> result;
 		try {
 			SimulateVisitor.simulate(node, scopeDefs, ec);
 			UnusedVariableCheckVisitor.check(node, scopeDefs, symbolTableSize, ec);
-			result = ImmutableList.copyOf(ec.getTracer().getWarnings());
+			result = ec.getTracer().buildWarnings();
 		}
 		finally {
 			ec.reset();
@@ -78,8 +87,41 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	}
 
 	private IEvaluationContext makeEc(final T object) {
-		final IEvaluationContext ec = new EvaluationContextImpl(ecFactory);
-		ec.setExternalContext(ecFactory.getExternalFactory().makeExternalContext(object));
+		final IEvaluationContext ec = new EvaluationContextImpl(ecFactory, logName, logLevel);
+		ec.setExternalContext(ecFactory.getExternalFactory().make(object));
 		return ec;
+	}
+
+	private class ResImpl implements IEvaluationResult {
+		private final ALangObject object;
+		private final List<IEvaluationWarning> warnings;
+		public ResImpl(final ALangObject object, final List<IEvaluationWarning> warnings){
+			this.object = object;
+			this.warnings = warnings;
+		}
+		@Override
+		public ALangObject getObject() {
+			return object;
+		}
+		@Override
+		public List<IEvaluationWarning> getWarnings() {
+			return warnings;
+		}
+	}
+
+	@SuppressWarnings("null")
+	@Override
+	public IFormExpression<T> setLogLevel(final ELogLevel logLevel) {
+		if (logLevel != null)
+			this.logLevel = logLevel;
+		return this;
+	}
+
+	@SuppressWarnings("null")
+	@Override
+	public IFormExpression<T> setLogLevel(final String logName) {
+		if (logName != null)
+			this.logName = logName;
+		return this;
 	}
 }

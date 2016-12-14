@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
-import de.xima.fc.form.expression.impl.embedment.EEmbedmentFactory;
+import de.xima.fc.form.expression.impl.embedment.EEmbedmentContractFactory;
 
 public class IEmbedmentTest extends IFaceTest<IEmbedment> {
 
@@ -64,7 +64,7 @@ public class IEmbedmentTest extends IFaceTest<IEmbedment> {
 
 	@Parameterized.Parameters
 	public static Collection<Object[]> instancesToTest() {
-		return getInstancesToTest(IEmbedment.class, EEmbedmentFactory.FORMCYCLE.makeEmbedment(),
-				EEmbedmentFactory.GENERAL.makeEmbedment());
+		return getInstancesToTest(IEmbedment.class, EEmbedmentContractFactory.FORMCYCLE.make(),
+				EEmbedmentContractFactory.GENERAL.make());
 	}
 }

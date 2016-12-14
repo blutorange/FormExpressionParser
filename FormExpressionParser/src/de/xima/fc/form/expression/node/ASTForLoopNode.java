@@ -3,7 +3,6 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
@@ -14,6 +13,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.ILabelled;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, IVariableTyped {

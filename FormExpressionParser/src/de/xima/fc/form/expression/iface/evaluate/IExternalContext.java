@@ -5,14 +5,15 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.IReset;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.object.ALangObject;
 
-public interface IExternalContext {
+public interface IExternalContext extends IReset {
 	/**
 	 * Called once before evaluation begins.
-	 * 
+	 *
 	 * @throws EmbedmentOutputException
 	 *             When there is an I/O error.
 	 */
@@ -21,7 +22,7 @@ public interface IExternalContext {
 	/**
 	 * Called during evaluation. Writes the given data. Data needs to be written
 	 * when evaluating template files.
-	 * 
+	 *
 	 * @param data
 	 *            The data to be written.
 	 * @throws EmbedmentOutputException
@@ -33,7 +34,7 @@ public interface IExternalContext {
 
 	/**
 	 * Called once after evaluation is finished.
-	 * 
+	 *
 	 * @throws EmbedmentOutputException
 	 *             When an I/O error occurs.
 	 * @throw InvalidTemplateDataException When the data is syntactically or
@@ -46,7 +47,7 @@ public interface IExternalContext {
 	 * command {@link DocumentCommand#removeParagraph}. When the external
 	 * context supports it, it takes that command and removes the current
 	 * paragraph (eg. the current &lt;p&gt; tag) from the output.
-	 * 
+	 *
 	 * @param command
 	 *            The command to process.
 	 */
@@ -75,11 +76,11 @@ public interface IExternalContext {
 	 * @param ec
 	 *            Current evaluation context.
 	 * @return The value of the variable. It must adhere to the contract
-	 *  given by {@link IEvaluationContextContractFactory} and may opt
-	 *  to return a default value for some instances. 
+	 *  given by {@link IEvaluationContextContract} and may opt
+	 *  to return a default value for some instances.
 	 * @throws EvaluationException Only when a scope and variable is
-	 * requested not defined by the {@link IEvaluationContextContractFactory}.
-	 * @see IEvaluationContextContractFactory
+	 * requested not defined by the {@link IEvaluationContextContract}.
+	 * @see IEvaluationContextContract
 	 */
 	@Nonnull
 	public ALangObject fetchScopedVariable(@Nonnull String scope, @Nonnull String name, @Nonnull IEvaluationContext ec)

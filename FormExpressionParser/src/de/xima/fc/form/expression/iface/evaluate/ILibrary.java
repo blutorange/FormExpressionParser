@@ -6,7 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.IReset;
-import de.xima.fc.form.expression.impl.library.LibraryScopeSystem;
+import de.xima.fc.form.expression.impl.library.ELibraryScopeContractFactoryVoid;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * access to values and functions addressed by scope name
  * and variable name.
  * </p><p>
- * For example, the {@link LibraryScopeSystem} provides several mathematical
+ * For example, the {@link ELibraryScopeContractFactoryVoid} provides several mathematical
  * constants and functions under the scope name <code>math</code>,
  * the scope <code>fields</code> provides access to form fields.
  * To access the value of pi, a program needs to require the scope

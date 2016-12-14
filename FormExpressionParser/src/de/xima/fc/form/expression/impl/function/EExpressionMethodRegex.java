@@ -1,24 +1,28 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> {
 	;
-	@Nonnull private final EMethod method;
-	@Nonnull private final IFunction<RegexLangObject> function;
+	private final EMethod method;
+	private final IExpressionFunction<RegexLangObject> function;
 
-	private EExpressionMethodRegex(@Nonnull final EMethod method, @Nonnull final IFunction<RegexLangObject> function) {
+	private EExpressionMethodRegex(final EMethod method, final IExpressionFunction<RegexLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -29,12 +33,12 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 	}
 
 	@Override
-	public IFunction<RegexLangObject> getFunction() {
+	public IExpressionFunction<RegexLangObject> getFunction() {
 		return function;
 	}
 
 	@SuppressWarnings("unused")
-	private static enum Impl implements IFunction<RegexLangObject> {
+	private static enum Impl implements IExpressionFunction<RegexLangObject> {
 		// Dummy because there are not methods yet.
 		@Deprecated
 		DUMMY(false, "comparand"){ //$NON-NLS-1$
@@ -43,13 +47,20 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 					throws EvaluationException {
 				throw new UncatchableEvaluationException(ec);
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return null;
+			}
 		},
 		;
 
-		@Nonnull private final String[] argList;
+		private final String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -65,9 +76,10 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 			return toString();
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -76,13 +88,8 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.REGEX;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 	}
 }

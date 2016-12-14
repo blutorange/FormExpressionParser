@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
- * A configuration affecting the output of {@link IFormExpression#unparse(SeverityConfig)}.
+ * A configuration affecting the output of {@link IFormExpression#unparseBody(SeverityConfig)}.
  * It offers several options to change how FormExpression code will be formatted.
  * @author mad_gaksha
  */

@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.node.ASTArrayNode;
@@ -48,7 +49,7 @@ import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoidVisitor<Boolean, RuntimeException> {
+public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoidVisitor<Boolean, FormExpressionException> {
 	/**
 	 * @param node Node to be checked.
 	 * @return Whether the node is compile-time constant.

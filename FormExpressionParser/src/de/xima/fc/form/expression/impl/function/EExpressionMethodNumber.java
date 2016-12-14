@@ -1,17 +1,21 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject> {
 	/**
 	 * @return {@link NumberLangObject} This number.
@@ -54,9 +58,9 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	 */
 	PERCENT(EMethod.PERCENT, Impl.MODULO),
 	;
-	@Nonnull private final EMethod method;
-	@Nonnull private final IFunction<NumberLangObject> function;
-	private EExpressionMethodNumber(@Nonnull final EMethod method, @Nonnull final IFunction<NumberLangObject> function) {
+	private final EMethod method;
+	private final IExpressionFunction<NumberLangObject> function;
+	private EExpressionMethodNumber(final EMethod method, final IExpressionFunction<NumberLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -66,16 +70,22 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 	}
 
 	@Override
-	public IFunction<NumberLangObject> getFunction() {
+	public IExpressionFunction<NumberLangObject> getFunction() {
 		return function;
 	}
 
-	private static enum Impl implements IFunction<NumberLangObject> {
+	private static enum Impl implements IExpressionFunction<NumberLangObject> {
 		IDENTITY(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext;
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs;
 			}
 		},
 		ADD(false, "summand") { //$NON-NLS-1$
@@ -84,12 +94,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
+			}
 		},
 		SUBTRACT(false, "subtrahend") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(args[0].coerceNumber(ec));
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
 			}
 		},
 		INCREMENT(false) {
@@ -98,12 +120,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(NumberLangObject.getOneInstance());
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs;
+			}
 		},
 		DECREMENT(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(NumberLangObject.getOneInstance());
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs;
 			}
 		},
 		NEGATE(false) {
@@ -112,12 +146,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					throws EvaluationException {
 				return thisContext.negate();
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs;
+			}
 		},
 		MULTIPLY(false, "multiplicand") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.multiply(args[0].coerceNumber(ec));
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
 			}
 		},
 		DIVIDE(false, "dividend") { //$NON-NLS-1$
@@ -126,6 +172,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.divide(args[0].coerceNumber(ec));
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
+			}
 		},
 		MODULO(false,"operand"){ //$NON-NLS-1$
 			@Override
@@ -133,13 +185,20 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.modulo(args[0].coerceNumber(ec));
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
+			}
 		},
 		;
 
-		@Nonnull private final String[] argList;
+		private final String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -155,9 +214,10 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			return toString();
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -166,13 +226,8 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.NUMBER;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 	}
 }

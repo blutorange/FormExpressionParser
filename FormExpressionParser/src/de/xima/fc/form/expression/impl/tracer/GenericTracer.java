@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.impl.tracer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -104,7 +103,7 @@ public class GenericTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public Collection<IEvaluationWarning> getWarnings() {
-		return warnList != null ? warnList : NullUtil.checkNotNull(Collections.<IEvaluationWarning> emptyList());
+	public List<IEvaluationWarning> buildWarnings() {
+		return warnList != null ? new ArrayList<>(warnList) : NullUtil.checkNotNull(Collections.<IEvaluationWarning>emptyList());
 	}
 }

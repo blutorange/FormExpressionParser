@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.iface.config;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
-import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
+import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
 import de.xima.fc.form.expression.impl.config.UnparseConfig;
 
 /**

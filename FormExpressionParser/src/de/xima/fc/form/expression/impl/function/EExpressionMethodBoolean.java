@@ -1,27 +1,31 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.ELangObjectType;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
+import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
+import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObject> {
 	DOUBLE_BAR(EMethod.DOUBLE_BAR, Impl.OR),
 	DOUBLE_AMPERSAND(EMethod.DOUBLE_AMPERSAND, Impl.AND),
 	CIRCUMFLEX(EMethod.CIRCUMFLEX, Impl.XOR),
 	EXCLAMATION(EMethod.EXCLAMATION, Impl.NOT),
 	;
-	@Nonnull private final EMethod method;
-	@Nonnull private final IFunction<BooleanLangObject> function;
+	private final EMethod method;
+	private final IExpressionFunction<BooleanLangObject> function;
 
-	private EExpressionMethodBoolean(@Nonnull final EMethod method, @Nonnull final IFunction<BooleanLangObject> function) {
+	private EExpressionMethodBoolean(final EMethod method, final IExpressionFunction<BooleanLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -32,11 +36,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 	}
 
 	@Override
-	public IFunction<BooleanLangObject> getFunction() {
+	public IExpressionFunction<BooleanLangObject> getFunction() {
 		return function;
 	}
 
-	private static enum Impl implements IFunction<BooleanLangObject> {
+	private static enum Impl implements IExpressionFunction<BooleanLangObject> {
 		/**
 		 * @param orOperand {@link BooleanLangObject}. Argument for the OR.
 		 * @return {@link BooleanLangObject}. The result of the logical OR disjunction between this boolean and the argument.
@@ -46,6 +50,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext.or(args[0].coerceBoolean(ec));
+			}
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
 			}
 		},
 		/**
@@ -58,6 +67,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 					throws EvaluationException {
 				return thisContext.and(args[0].coerceBoolean(ec));
 			}
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
+			}
 		},
 		/**
 		 * @param xorOperand {@link BooleanLangObject}. Argument for the XOR.
@@ -69,6 +83,12 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 					throws EvaluationException {
 				return thisContext.xor(args[0].coerceBoolean(ec));
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
+			}
 		},
 		/**
 		 * @return {@link BooleanLangObject}. The logical negation of this boolean.
@@ -79,13 +99,20 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 					throws EvaluationException {
 				return thisContext.not();
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
+				return lhs.equals(rhs) ? lhs : null;
+			}
 		},
 		;
 
-		@Nonnull private final String[] argList;
+		private final String[] argList;
 		private boolean hasVarArgs;
 
-		private Impl(final boolean hasVarArgs, @Nonnull final String... argList) {
+		private Impl(final boolean hasVarArgs, final String... argList) {
+			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -101,9 +128,10 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			return toString();
 		}
 
+		@SuppressWarnings("null")
 		@Override
-		public String[] getDeclaredArgumentList() {
-			return argList;
+		public String getDeclaredArgument(final int i) {
+			return argList[i];
 		}
 
 		@Override
@@ -112,13 +140,8 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 		}
 
 		@Override
-		public ELangObjectType getThisContextType() {
+		public ILangObjectClass getThisContextType() {
 			return ELangObjectType.BOOLEAN;
-		}
-
-		@Override
-		public Node getNode() {
-			return null;
 		}
 	}
 }

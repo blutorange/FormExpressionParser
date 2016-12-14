@@ -11,9 +11,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
-import de.xima.fc.form.expression.iface.evaluate.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
+import de.xima.fc.form.expression.iface.factory.IEmbedmentContractFactory;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 /**
@@ -30,14 +30,14 @@ import de.xima.fc.form.expression.util.CmnCnst;
 public class GenericEmbedmentFactory implements IEmbedmentContractFactory {
 	private static final long serialVersionUID = 1L;
 
-	public final ImmutableMap<String, IEmbedmentHandler> map;
+	private final ImmutableMap<String, IEmbedmentHandler> map;
 
 	private GenericEmbedmentFactory(final ImmutableMap<String, IEmbedmentHandler> map) {
 		this.map = map;
 	}
 
 	@Override
-	public IEmbedment makeEmbedment() {
+	public IEmbedment make() {
 		return new EmbedmentImpl(map);
 	}
 
@@ -56,10 +56,7 @@ public class GenericEmbedmentFactory implements IEmbedmentContractFactory {
 		@Nullable
 		private String handlerEmbedment;
 
-		@SuppressWarnings({ "unused", "null" })
-		private EmbedmentImpl(final ImmutableMap<String, IEmbedmentHandler> map) throws IllegalArgumentException {
-			if (map == null)
-				throw new IllegalArgumentException(CmnCnst.Error.NULL_MAP);
+		private EmbedmentImpl(final ImmutableMap<String, IEmbedmentHandler> map) {
 			this.map = map;
 		}
 

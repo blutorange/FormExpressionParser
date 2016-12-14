@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -19,22 +20,24 @@ import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
-import de.xima.fc.form.expression.iface.parse.IFormExpressionFactory;
 import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.impl.config.UnparseConfig;
-import de.xima.fc.form.expression.impl.ec.EFormcycleContractFactory;
+import de.xima.fc.form.expression.impl.ec.EEvaluationContextContractFormcycle;
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
-import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
+ * - check all serializable / immutable classes
+ * - replace logger with tracer ?
  * - unparse: los nicer
  * - variable typing: allow var for "object" everywhere (for loop header etc, hash<var,var> etc.)
  * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
@@ -46,7 +49,7 @@ public class Demo {
 	@Nonnull
 	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
 	@Nonnull
-	private static final IEvaluationContextContractFactory<Formcycle> CONTRACT_FACTORY = EFormcycleContractFactory.GENERAL;
+	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
 	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
@@ -55,7 +58,7 @@ public class Demo {
 	public static void main(final String args[]) {
 		final String code = readArgs(args);
 		if (code == null)
-			throw new RuntimeException("Code must not be null."); //$NON-NLS-1$
+			throw new FormExpressionException("Code must not be null."); //$NON-NLS-1$
 
 		showInputCode(code);
 
@@ -66,14 +69,14 @@ public class Demo {
 		IFormExpression<Formcycle> expression = parseCode(code);
 
 		if (expression == null)
-			throw new RuntimeException("Parsed expression must not be null."); //$NON-NLS-1$
+			throw new FormExpressionException("Parsed expression must not be null."); //$NON-NLS-1$
 
 		expression = showSerialization(expression);
 
 		final Node node = showParseTree(code);
 
 		if (node == null)
-			throw new RuntimeException("Node must not be null."); //$NON-NLS-1$
+			throw new FormExpressionException("Node must not be null."); //$NON-NLS-1$
 
 		showFormatted(code);
 
@@ -92,7 +95,7 @@ public class Demo {
 		final long t2 = System.nanoTime();
 		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms");
 		if (dex == null)
-			throw new RuntimeException("Deseialized expression is null.");
+			throw new FormExpressionException("Deseialized expression is null.");
 		return dex;
 	}
 
@@ -238,7 +241,7 @@ public class Demo {
 
 	private static void showEvaluatedResult(@Nonnull final IFormExpression<Formcycle> ex) {
 		System.out.println("===Evaluation===");
-		final ALangObject result;
+		final IEvaluationResult result;
 		try {
 			// Do it once so we don't measure setup times.
 			ex.evaluate(new Formcycle());
@@ -267,7 +270,16 @@ public class Demo {
 		}
 
 		System.out.println("===Evaluated result==="); //$NON-NLS-1$
-		System.out.println("toString: " + result.toString()); //$NON-NLS-1$
-		System.out.println("inspect: " + result.inspect()); //$NON-NLS-1$
+		System.out.println("toString: " + result.getObject().toString()); //$NON-NLS-1$
+		System.out.println("inspect: " + result.getObject().inspect()); //$NON-NLS-1$
+
+		System.out.println();
+		System.out.println();
+
+		System.out.println("===Evaluation warnings==="); //$NON-NLS-1$
+		final List<IEvaluationWarning> warnings = result.getWarnings();
+		Collections.sort(warnings, IEvaluationWarning.COMPARATOR);
+		for (final IEvaluationWarning warning : result.getWarnings())
+			System.out.println(warning);
 	}
 }

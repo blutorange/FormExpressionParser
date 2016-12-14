@@ -6,6 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -19,12 +20,12 @@ public class DocumentCommand extends AExternalContextCommand {
 	 *            Command type.
 	 * @param data
 	 *            Data for the command.
-	 * @throws IllegalArgumentException
+	 * @throws FormExpressionException
 	 *             When type is <code>null</code>, or the number of String
 	 *             arguments does not match {@link EDocumentCommandType#argc}.
 	 */
 	private DocumentCommand(final EDocumentCommandType type, @Nullable final String... data)
-			throws IllegalArgumentException {
+			throws FormExpressionException {
 		final String[] dataArray = data != null ? data : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 		assertArguments(type, dataArray);
 		this.type = type;
@@ -33,9 +34,9 @@ public class DocumentCommand extends AExternalContextCommand {
 
 	private final static void assertArguments(@Nullable final EDocumentCommandType type, final String[] data) {
 		if (type == null)
-			throw new IllegalArgumentException(CmnCnst.Error.NULL_TYPE);
+			throw new FormExpressionException(CmnCnst.Error.NULL_TYPE);
 		if (data.length != type.argc)
-			throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENTS_FOR_DOCUMENT_COMMAND, type,
+			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENTS_FOR_DOCUMENT_COMMAND, type,
 					new Integer(type.argc), new Integer(data.length), StringUtils.join(data, ',')));
 	}
 
