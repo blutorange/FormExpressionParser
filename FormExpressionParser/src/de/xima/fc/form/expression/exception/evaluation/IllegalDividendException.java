@@ -3,11 +3,9 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.object.ALangObject;
 
 /**
@@ -21,20 +19,9 @@ public class IllegalDividendException extends IllegalArgumentValueException {
 	private static final long serialVersionUID = 1L;
 
 	public IllegalDividendException(@Nonnull final ALangObject divisor, @Nonnull final ALangObject dividend, final int index, @Nonnull final IEvaluationContext ec) {
-		super(getSlashFunction(divisor, ec), EMethod.SLASH.methodName, divisor, dividend, index, ec);
+		super(divisor.expressionMethod(EMethod.SLASH, ec), EMethod.SLASH.methodName, divisor, dividend, index, ec);
 		this.dividend = dividend;
 		this.divisor = divisor;
-	}
-	@Nullable
-	private static IFunction<? extends ALangObject> getSlashFunction(@Nonnull final ALangObject divisor, @Nonnull final IEvaluationContext ec) {
-		IFunction<? extends ALangObject> slashFunction;
-		try {
-			slashFunction = divisor.expressionMethod(EMethod.SLASH, ec);
-		}
-		catch (final EvaluationException e) {
-			slashFunction = null;
-		}
-		return slashFunction;
 	}
 	public final @Nonnull ALangObject divisor;
 	public final @Nonnull ALangObject dividend;

@@ -1,22 +1,33 @@
 package de.xima.fc.form.expression.exception.parse;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class IncompatibleVariableTypeException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 
-	public IncompatibleVariableTypeException(@Nonnull final String message, @Nonnull final IVariableType shouldType,
-			@Nonnull final IVariableType isType, @Nonnull final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_VARIABLE_TYPES, isType, shouldType, message), node);
+	public IncompatibleVariableTypeException(final String message, @Nullable final IVariableType shouldType,
+			final IVariableType isType, final Node node) {
+		super(message(message, shouldType, isType), node);
 		this.shouldType = shouldType;
 		this.isType = isType;
 	}
 
-	@Nonnull
-	public final IVariableType shouldType, isType;
+	private static String message(final String message, @Nullable final IVariableType shouldType,
+			final IVariableType isType) {
+		if (shouldType != null)
+			return NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_VARIABLE_TYPES_KNOWN_SHOULD, isType, shouldType,
+					message);
+		return NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_VARIABLE_TYPES_UNKNOWN_SHOULD, isType, message);
+	}
+
+	public final IVariableType isType;
+	@Nullable
+	public final IVariableType shouldType;
 }

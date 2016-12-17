@@ -3,38 +3,35 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAccessorBoolean implements IAttrAccessorFunction<BooleanLangObject> {
-	/**
-	 * @return {@link NumberLangObject}. <code>0</code>, when this is false, <code>1</code> when this is true.
-	 */
-	toNumber(Impl.to_number),
+public enum EDotAssignerRegex implements IDotAssignerFunction<RegexLangObject> {
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
-	private final boolean deferEvaluation;
+	private final boolean hasVarArgs;
 
-	private EAttrAccessorBoolean(final Impl impl) {
+	private EDotAssignerRegex(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
-		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
+		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
-		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
+	public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext, final ALangObject... args)
+			throws EvaluationException {
+		return func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -56,22 +53,20 @@ public enum EAttrAccessorBoolean implements IAttrAccessorFunction<BooleanLangObj
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.BOOLEAN;
+		return ELangObjectType.REGEX;
 	}
 
 	@Override
 	public boolean hasVarArgs() {
-		return impl.hasVarArgs;
+		return hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAccessorFunction<BooleanLangObject> {
-		to_number(false) {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return thisContext.coerceNumber(ec);
-			}
-		}
+	@Override
+	public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+		return impl.isDotAssignerDefined(thisContext, value);
+	}
+
+	private static enum Impl implements IDotAssignerFunction<RegexLangObject> {
 		;
 
 		private String[] argList;
@@ -107,11 +102,19 @@ public enum EAttrAccessorBoolean implements IAttrAccessorFunction<BooleanLangObj
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.BOOLEAN;
+			return ELangObjectType.REGEX;
 		}
 
 		@Override
-		public abstract ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
-				final ALangObject... args) throws EvaluationException;
+		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new UncatchableEvaluationException(ec,
+					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
+		}
+
+		@Override
+		public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+			return false;
+		}
 	}
 }

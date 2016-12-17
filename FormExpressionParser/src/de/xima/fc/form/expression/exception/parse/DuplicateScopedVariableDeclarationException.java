@@ -20,7 +20,7 @@ public class DuplicateScopedVariableDeclarationException extends SemanticsExcept
 	public DuplicateScopedVariableDeclarationException(@Nullable final String scopeName, final String variableName,
 			final Node node) {
 		super(NullUtil.messageFormat(CmnCnst.Error.DUPLICATE_SCOPED_VARIABLE, variableName,
-				scopeName == null ? CmnCnst.Syntax.GLOBAL : scopeName), node.getStartLine(), node.getStartColumn());
+				scopeName == null ? CmnCnst.Syntax.GLOBAL : scopeName), node);
 		this.scopeName = scopeName;
 	}
 

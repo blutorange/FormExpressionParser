@@ -7,23 +7,23 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorArray;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorBoolean;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorException;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorFunction;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorHash;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorNumber;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorObject;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorRegex;
-import de.xima.fc.form.expression.impl.function.EAttrAccessorString;
 import de.xima.fc.form.expression.impl.function.EAttrAssignerArray;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerBoolean;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerException;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerFunction;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerHash;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerNumber;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerRegex;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerString;
+import de.xima.fc.form.expression.impl.function.EDotAccessorArray;
+import de.xima.fc.form.expression.impl.function.EDotAccessorBoolean;
+import de.xima.fc.form.expression.impl.function.EDotAccessorException;
+import de.xima.fc.form.expression.impl.function.EDotAccessorFunction;
+import de.xima.fc.form.expression.impl.function.EDotAccessorHash;
+import de.xima.fc.form.expression.impl.function.EDotAccessorNumber;
+import de.xima.fc.form.expression.impl.function.EDotAccessorObject;
+import de.xima.fc.form.expression.impl.function.EDotAccessorRegex;
+import de.xima.fc.form.expression.impl.function.EDotAccessorString;
+import de.xima.fc.form.expression.impl.function.EDotAssignerBoolean;
+import de.xima.fc.form.expression.impl.function.EDotAssignerException;
+import de.xima.fc.form.expression.impl.function.EDotAssignerFunction;
+import de.xima.fc.form.expression.impl.function.EDotAssignerHash;
+import de.xima.fc.form.expression.impl.function.EDotAssignerNumber;
+import de.xima.fc.form.expression.impl.function.EDotAssignerRegex;
+import de.xima.fc.form.expression.impl.function.EDotAssignerString;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodException;
@@ -32,12 +32,15 @@ import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodRegex;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
-import de.xima.fc.form.expression.impl.function.GenericAttrAccessor;
-import de.xima.fc.form.expression.impl.function.GenericAttrAssigner;
+import de.xima.fc.form.expression.impl.function.GenericBracketAccessor;
+import de.xima.fc.form.expression.impl.function.GenericBracketAssigner;
+import de.xima.fc.form.expression.impl.function.GenericDotAccessor;
+import de.xima.fc.form.expression.impl.function.GenericDotAssigner;
 
 @ParametersAreNonnullByDefault
 public enum ENamespaceContractFactory implements INamespaceContractFactory {
-	EMPTY(new GenericNamespaceContractFactory.Builder().build()),
+	EMPTY(new GenericNamespaceContractFactory.Builder()
+			.build()),
 	GENERIC(
 			new GenericNamespaceContractFactory.Builder()
 			.addExpressionMethod(EExpressionMethodBoolean.values())
@@ -49,43 +52,60 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 			.addExpressionMethod(EExpressionMethodFunction.values())
 			.addExpressionMethod(EExpressionMethodRegex.values())
 
-			.addAttrAccessor(EAttrAccessorObject.values())
+			.addDotAccessor(EDotAccessorObject.values())
+			.addDotAccessor(EDotAccessorBoolean.values())
+			.addDotAccessor(EDotAccessorNumber.values())
+			.addDotAccessor(EDotAccessorString.values())
+			.addDotAccessor(EDotAccessorArray.values())
+			.addDotAccessor(EDotAccessorHash.values())
+			.addDotAccessor(EDotAccessorException.values())
+			.addDotAccessor(EDotAccessorFunction.values())
+			.addDotAccessor(EDotAccessorRegex.values())
 
-			.addAttrAccessor(EAttrAccessorBoolean.values())
-			.addAttrAccessor(EAttrAccessorNumber.values())
-			.addAttrAccessor(EAttrAccessorString.values())
-			.addAttrAccessor(EAttrAccessorArray.values())
-			.addAttrAccessor(EAttrAccessorHash.values())
-			.addAttrAccessor(EAttrAccessorException.values())
-			.addAttrAccessor(EAttrAccessorFunction.values())
-			.addAttrAccessor(EAttrAccessorRegex.values())
+			.addDotAssigner(EDotAssignerBoolean.values())
+			.addDotAssigner(EDotAssignerNumber.values())
+			.addDotAssigner(EDotAssignerString.values())
+			.addDotAssigner(EAttrAssignerArray.values())
+			.addDotAssigner(EDotAssignerHash.values())
+			.addDotAssigner(EDotAssignerException.values())
+			.addDotAssigner(EDotAssignerFunction.values())
+			.addDotAssigner(EDotAssignerRegex.values())
 
-			.addAttrAssigner(EAttrAssignerBoolean.values())
-			.addAttrAssigner(EAttrAssignerNumber.values())
-			.addAttrAssigner(EAttrAssignerString.values())
-			.addAttrAssigner(EAttrAssignerArray.values())
-			.addAttrAssigner(EAttrAssignerHash.values())
-			.addAttrAssigner(EAttrAssignerException.values())
-			.addAttrAssigner(EAttrAssignerFunction.values())
-			.addAttrAssigner(EAttrAssignerRegex.values())
+			.addGenericBracketAccessor(GenericBracketAccessor.ARRAY)
+			.addGenericBracketAccessor(GenericBracketAccessor.BOOLEAN)
+			.addGenericBracketAccessor(GenericBracketAccessor.EXCEPTION)
+			.addGenericBracketAccessor(GenericBracketAccessor.FUNCTION)
+			.addGenericBracketAccessor(GenericBracketAccessor.HASH)
+			.addGenericBracketAccessor(GenericBracketAccessor.NUMBER)
+			.addGenericBracketAccessor(GenericBracketAccessor.STRING)
+			.addGenericBracketAccessor(GenericBracketAccessor.REGEX)
 
-			.addGenericAttrAccessor(GenericAttrAccessor.ARRAY)
-			.addGenericAttrAccessor(GenericAttrAccessor.BOOLEAN)
-			.addGenericAttrAccessor(GenericAttrAccessor.EXCEPTION)
-			.addGenericAttrAccessor(GenericAttrAccessor.FUNCTION)
-			.addGenericAttrAccessor(GenericAttrAccessor.HASH)
-			.addGenericAttrAccessor(GenericAttrAccessor.NUMBER)
-			.addGenericAttrAccessor(GenericAttrAccessor.STRING)
-			.addGenericAttrAccessor(GenericAttrAccessor.REGEX)
+			.addGenericDotAccessor(GenericDotAccessor.ARRAY)
+			.addGenericDotAccessor(GenericDotAccessor.BOOLEAN)
+			.addGenericDotAccessor(GenericDotAccessor.EXCEPTION)
+			.addGenericDotAccessor(GenericDotAccessor.FUNCTION)
+			.addGenericDotAccessor(GenericDotAccessor.HASH)
+			.addGenericDotAccessor(GenericDotAccessor.NUMBER)
+			.addGenericDotAccessor(GenericDotAccessor.STRING)
+			.addGenericDotAccessor(GenericDotAccessor.REGEX)
 
-			.addGenericAttrAssigner(GenericAttrAssigner.ARRAY)
-			.addGenericAttrAssigner(GenericAttrAssigner.BOOLEAN)
-			.addGenericAttrAssigner(GenericAttrAssigner.EXCEPTION)
-			.addGenericAttrAssigner(GenericAttrAssigner.FUNCTION)
-			.addGenericAttrAssigner(GenericAttrAssigner.HASH)
-			.addGenericAttrAssigner(GenericAttrAssigner.NUMBER)
-			.addGenericAttrAssigner(GenericAttrAssigner.STRING)
-			.addGenericAttrAssigner(GenericAttrAssigner.REGEX)
+			.addGenericBracketAssigner(GenericBracketAssigner.ARRAY)
+			.addGenericBracketAssigner(GenericBracketAssigner.BOOLEAN)
+			.addGenericBracketAssigner(GenericBracketAssigner.EXCEPTION)
+			.addGenericBracketAssigner(GenericBracketAssigner.FUNCTION)
+			.addGenericBracketAssigner(GenericBracketAssigner.HASH)
+			.addGenericBracketAssigner(GenericBracketAssigner.NUMBER)
+			.addGenericBracketAssigner(GenericBracketAssigner.STRING)
+			.addGenericBracketAssigner(GenericBracketAssigner.REGEX)
+
+			.addGenericDotAssigner(GenericDotAssigner.ARRAY)
+			.addGenericDotAssigner(GenericDotAssigner.BOOLEAN)
+			.addGenericDotAssigner(GenericDotAssigner.EXCEPTION)
+			.addGenericDotAssigner(GenericDotAssigner.FUNCTION)
+			.addGenericDotAssigner(GenericDotAssigner.HASH)
+			.addGenericDotAssigner(GenericDotAssigner.NUMBER)
+			.addGenericDotAssigner(GenericDotAssigner.STRING)
+			.addGenericDotAssigner(GenericDotAssigner.REGEX)
 
 			.build()),
 	;
@@ -99,16 +119,25 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 	}
 	@Nullable
 	@Override
-	public IVariableType getReturnOfExpressionMethod(final IVariableType lhs, final EMethod method, final IVariableType rhs) {
-		return impl.getReturnOfExpressionMethod(lhs, method, rhs);
+	public IVariableType getExpressionMethodReturnType(final IVariableType lhs, final EMethod method, final IVariableType rhs) {
+		return impl.getExpressionMethodReturnType(lhs, method, rhs);
 	}
 	@Override
-	public boolean isBracketAttributeAssignerDefined(final IVariableType lhs, final IVariableType property, final IVariableType rhs) {
-		return impl.isBracketAttributeAssignerDefined(lhs, property, rhs);
+	public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property, final IVariableType value) {
+		return impl.isBracketAssignerDefined(thisContext, property, value);
+	}
+	@Nullable
+	@Override
+	public IVariableType getBracketAccessorReturnType(final IVariableType thisContext, final IVariableType property) {
+		return impl.getBracketAccessorReturnType(thisContext, property);
 	}
 	@Override
-	public boolean isDotAttributeAssignerDefined(final IVariableType lhs, final IVariableType property, final IVariableType rhs) {
-		return impl.isDotAttributeAssignerDefined(lhs, property, rhs);
+	public boolean isDotAssignerDefined(final IVariableType thisContext, final String property, final IVariableType value) {
+		return impl.isDotAssignerDefined(thisContext, property, value);
 	}
-
+	@Nullable
+	@Override
+	public IVariableType getDotAccessorReturnType(final IVariableType thisContext, final String property) {
+		return impl.getDotAccessorReturnType(thisContext, property);
+	}
 }

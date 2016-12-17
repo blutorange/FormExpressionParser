@@ -7,8 +7,7 @@ import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.iface.evaluate.ILibraryScope;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.provider.ImmutableSimpleVariableTypeVariableProvider;
-import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.impl.variable.provider.NumberVariableProvider.StaticNumberVariableProvider;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.Void;
 
@@ -17,10 +16,9 @@ public enum ELibraryScopeContractFactoryVoid implements ILibraryScopeContractFac
 	EMPTY(new LibraryScopeContractFactoryVoid.Builder(CmnCnst.NonnullConstant.STRING_EMPTY).build()),
 	MATH(
 			new LibraryScopeContractFactoryVoid.Builder(CmnCnst.CustomScope.MATH)
-			.addVariable("pi", new ImmutableSimpleVariableTypeVariableProvider<>(NumberLangObject.getPiInstance()))
-			.addVariable("e", new ImmutableSimpleVariableTypeVariableProvider<>(NumberLangObject.getEInstance()))
-			.build()
-	);
+					.addVariable(CmnCnst.Name.PI, new StaticNumberVariableProvider(Math.PI))
+					.addVariable(CmnCnst.Name.E, new StaticNumberVariableProvider(Math.E))
+					.build());
 
 	private final ILibraryScopeContractFactory<Void> impl;
 

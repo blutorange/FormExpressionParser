@@ -5,6 +5,9 @@ import java.io.Serializable;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.google.common.collect.ImmutableCollection;
+
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -15,7 +18,11 @@ public interface ILangObjectClass extends Serializable {
 	public Integer getClassId();
 
 	@Nullable
-	public ILangObjectClass getSuperType();
+	public ILangObjectClass getSuperClass();
+
+	@Nullable
+	public IVariableType getSuperType(IVariableType type);
+
 
 	/** @return The class for objects of this type. */
 	public Class<? extends ALangObject> getLangObjectClass();
@@ -35,7 +42,7 @@ public interface ILangObjectClass extends Serializable {
 	 *
 	 * @return Whether this type is compound.
 	 */
-	public boolean allowsGenericsCount(int i);
+	public boolean allowsGenericsCountAndFlags(int count, ImmutableCollection<EVariableTypeFlag> flags);
 
 	/**
 	 * @param generics
@@ -52,7 +59,7 @@ public interface ILangObjectClass extends Serializable {
 
 	/**
 	 * @return A simple type for no generics.
-	 * @throws IllegalVariableTypeException When this type requires generic, ie. when {@link #allowsGenericsCount(int)} returns <code>false</code> for <code>0</code>.
+	 * @throws IllegalVariableTypeException When this type requires generic, ie. when {@link #allowsGenericsCountAndFlags(int)} returns <code>false</code> for <code>0</code>.
 	 */
 	public IVariableType getSimpleVariableType() throws IllegalVariableTypeException;
 
@@ -61,4 +68,6 @@ public interface ILangObjectClass extends Serializable {
 	 * @return Whether objects of this type are mutable or immutable.
 	 */
 	public boolean isImmutable();
+
+	public boolean equalsClass(ILangObjectClass clazz);
 }

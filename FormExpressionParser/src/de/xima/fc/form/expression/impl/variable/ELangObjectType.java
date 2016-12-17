@@ -3,6 +3,9 @@ package de.xima.fc.form.expression.impl.variable;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.google.common.collect.ImmutableCollection;
+
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -28,10 +31,10 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @ParametersAreNonnullByDefault
 public enum ELangObjectType implements ILangObjectClass {
-	OBJECT(0, false, ALangObject.class, null, CmnCnst.Syntax.OBJECT, false) {
+	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.OBJECT, false) {
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -43,11 +46,23 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			return SimpleVariableType.OBJECT;
 		}
-	},
-	NULL(1, true, NullLangObject.class, null, CmnCnst.Syntax.VAR, false) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return null;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return null;
+		}
+	},
+	NULL(1, true, NullLangObject.class, CmnCnst.Syntax.VAR, false) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -59,11 +74,23 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			return SimpleVariableType.NULL;
 		}
-	},
-	BOOLEAN(2, true, BooleanLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.BOOLEAN, false) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	BOOLEAN(2, true, BooleanLangObject.class, CmnCnst.Syntax.BOOLEAN, false) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -76,24 +103,22 @@ public enum ELangObjectType implements ILangObjectClass {
 			return SimpleVariableType.BOOLEAN;
 		}
 
-		//		@Nullable
-		//		@Override
-		//		public IFunction<BooleanLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot,
-		//				final IEvaluationContext ec) throws EvaluationException {
-		//			return ec.getNamespace().attrAccessorBoolean(object, accessedViaDot);
-		//		}
-		//
-		//		@Nullable
-		//		@Override
-		//		public IFunction<BooleanLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot,
-		//				final IEvaluationContext ec) throws EvaluationException {
-		//			return ec.getNamespace().attrAssignerBoolean(name, accessedViaDot);
-		//		}
-	},
-	NUMBER(3, true, NumberLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.NUMBER, true) {
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	NUMBER(3, true, NumberLangObject.class, CmnCnst.Syntax.NUMBER, true) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -106,11 +131,23 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			return SimpleVariableType.NUMBER;
 		}
-	},
-	STRING(4, true, StringLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.STRING, true) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	STRING(4, true, StringLangObject.class, CmnCnst.Syntax.STRING, true) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -123,11 +160,23 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			return SimpleVariableType.STRING;
 		}
-	},
-	REGEX(5, true, RegexLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.REGEX, false) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	REGEX(5, true, RegexLangObject.class, CmnCnst.Syntax.REGEX, false) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -139,11 +188,28 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			return SimpleVariableType.REGEX;
 		}
-	},
-	FUNCTION(6, true, FunctionLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.METHOD, false) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i > 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	FUNCTION(6, true, FunctionLangObject.class, CmnCnst.Syntax.METHOD, false) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			for (final EVariableTypeFlag flag : flags) {
+				if (flag != EVariableTypeFlag.VARARG)
+					return false;
+				return i >= 2;
+			}
+			return i >= 1;
 		}
 
 		@Override
@@ -155,11 +221,24 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_SIMPLE_TYPE, this));
 		}
-	},
-	EXCEPTION(7, true, ExceptionLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.ERROR, false) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 0;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+
+	},
+	EXCEPTION(7, true, ExceptionLangObject.class, CmnCnst.Syntax.ERROR, false) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 0 && flags.isEmpty();
 		}
 
 		@Override
@@ -171,11 +250,23 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			return SimpleVariableType.EXCEPTION;
 		}
-	},
-	ARRAY(8, false, ArrayLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.ARRAY, true) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 1;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	ARRAY(8, false, ArrayLangObject.class, CmnCnst.Syntax.ARRAY, true) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 1 && flags.isEmpty();
 		}
 
 		@Override
@@ -188,11 +279,23 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_SIMPLE_TYPE, this));
 		}
-	},
-	HASH(9, false, HashLangObject.class, ELangObjectType.OBJECT, CmnCnst.Syntax.HASH, true) {
+
+		@Nullable
 		@Override
-		public boolean allowsGenericsCount(final int i) {
-			return i == 2;
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
+	},
+	HASH(9, false, HashLangObject.class, CmnCnst.Syntax.HASH, true) {
+		@Override
+		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
+			return i == 2 && flags.isEmpty();
 		}
 
 		@Override
@@ -205,6 +308,18 @@ public enum ELangObjectType implements ILangObjectClass {
 		public IVariableType getSimpleVariableType() throws IllegalVariableTypeException {
 			throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_SIMPLE_TYPE, this));
 		}
+
+		@Nullable
+		@Override
+		public IVariableType getSuperType(final IVariableType type) {
+			return SimpleVariableType.OBJECT;
+		}
+
+		@Nullable
+		@Override
+		public ILangObjectClass getSuperClass() {
+			return ELangObjectType.OBJECT;
+		}
 	};
 
 	private final boolean isImmutable;
@@ -212,13 +327,10 @@ public enum ELangObjectType implements ILangObjectClass {
 	private final boolean isIterable;
 	private final Class<? extends ALangObject> clazz;
 	private final String syntacticalTypeName;
-	@Nullable
-	private final ILangObjectClass superType;
 
 	private ELangObjectType(final Integer id, final boolean isImmutable, final Class<? extends ALangObject> clazz,
-			@Nullable final ILangObjectClass superType, final String syntacticalTypeName, final boolean isIterable) {
+			final String syntacticalTypeName, final boolean isIterable) {
 		this.id = id;
-		this.superType = superType;
 		this.clazz = clazz;
 		this.syntacticalTypeName = syntacticalTypeName;
 		this.isIterable = isIterable;
@@ -228,12 +340,6 @@ public enum ELangObjectType implements ILangObjectClass {
 	@Override
 	public final Integer getClassId() {
 		return id;
-	}
-
-	@Nullable
-	@Override
-	public final ILangObjectClass getSuperType() {
-		return superType;
 	}
 
 	@Override
@@ -252,9 +358,6 @@ public enum ELangObjectType implements ILangObjectClass {
 	}
 
 	@Override
-	public abstract boolean allowsGenericsCount(int i);
-
-	@Override
 	public abstract IVariableType getIterableItemType(IVariableType[] generics)
 			throws IllegalVariableTypeException, ArrayIndexOutOfBoundsException;
 
@@ -263,12 +366,8 @@ public enum ELangObjectType implements ILangObjectClass {
 		return isImmutable;
 	}
 
-	//	@Nullable
-	//	public abstract IFunction<BooleanLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot,
-	//			final IEvaluationContext ec) throws EvaluationException;
-	//
-	//	@Nullable
-	//	public abstract IFunction<BooleanLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot,
-	//			final IEvaluationContext ec) throws EvaluationException;
-
+	@Override
+	public final boolean equalsClass(final ILangObjectClass clazz) {
+		return id == clazz.getClassId();
+	}
 }

@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.object;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +11,9 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
 
-import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
-import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableProvider;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
@@ -111,39 +109,6 @@ public class ArrayLangObject extends ALangObject {
 		final List<ALangObject> clone = new ArrayList<>(value.size());
 		for (final ALangObject o : value) clone.add(o.deepClone());
 		return new ArrayLangObject(clone);
-	}
-
-	@Override
-	public IFunction<ArrayLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().expressionMethod(method, this);
-	}
-	@Override
-	public IFunction<ArrayLangObject> attrAccessor(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessor(name, accessedViaDot, this);
-	}
-	@Override
-	public IFunction<ArrayLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
-	}
-
-	@Override
-	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
-			final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
-	}
-
-	@Override
-	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot,
-			final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object,
-				accessedViaDot, ec);
-	}
-
-	@Override
-	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot,
-			final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot,
-				value, ec);
 	}
 
 	@Override
@@ -274,6 +239,10 @@ public class ArrayLangObject extends ALangObject {
 	/** Sorts the array according to the natural ordering of {@link ALangObject */
 	public void sort() {
 		Collections.sort(value);
+	}
+
+	public void sort(final Comparator<ALangObject> comparator) {
+		Collections.sort(value, comparator);
 	}
 
 	@SuppressWarnings("null")

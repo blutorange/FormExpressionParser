@@ -36,6 +36,8 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
+ * - add support for variable types with flags, eg. method[vararg]<string, string>
+ *   or perhaps make that method<string, string...>
  * - check all serializable / immutable classes
  * - replace logger with tracer ?
  * - unparse: los nicer
@@ -106,8 +108,8 @@ public class Demo {
 					expression.analyze(new Formcycle()));
 			Collections.sort(warningList, IEvaluationWarning.COMPARATOR);
 			for (final IEvaluationWarning warning : warningList) {
-				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getLine(),
-						warning.getColumn(), warning.getMessage()));
+				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getStartLine(),
+						warning.getStartColumn(), warning.getMessage()));
 				System.out.println();
 			}
 		}

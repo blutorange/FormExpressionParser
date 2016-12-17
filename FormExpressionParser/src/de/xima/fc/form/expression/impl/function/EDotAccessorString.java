@@ -2,13 +2,17 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Locale;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.GenericVariableType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
@@ -17,7 +21,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAccessorString implements IAttrAccessorFunction<StringLangObject> {
+public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject> {
 	/**
 	 * Uses the the English-like {@link Locale#ROOT}.
 	 * @return {@link StringLangObject} The upper-case version of the string.
@@ -56,7 +60,7 @@ public enum EAttrAccessorString implements IAttrAccessorFunction<StringLangObjec
 	private final Impl impl;
 	private final boolean deferEvaluation;
 
-	private EAttrAccessorString(final Impl impl) {
+	private EDotAccessorString(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
 		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
@@ -95,12 +99,25 @@ public enum EAttrAccessorString implements IAttrAccessorFunction<StringLangObjec
 		return impl.hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAccessorFunction<StringLangObject> {
+	@Nullable
+	@Override
+	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+		return impl.getDotAccessorReturnType(thisContext);
+	}
+
+	private static enum Impl implements IDotAccessorFunction<StringLangObject> {
 		toLocaleUpperCase(false, "locale") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.toUpperCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				// string.toLocaleUpperCase(locale) => string
+				return GenericVariableType.forSimpleFunction(SimpleVariableType.STRING, SimpleVariableType.STRING);
 			}
 		},
 		toLocaleLowerCase(false, "locale") { //$NON-NLS-1$
@@ -109,12 +126,24 @@ public enum EAttrAccessorString implements IAttrAccessorFunction<StringLangObjec
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.toLowerCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(SimpleVariableType.STRING, SimpleVariableType.STRING);
+			}
 		},
 		toUpperCase(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.toUpperCase(Locale.ROOT);
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
 			}
 		},
 		toLowerCase(false) {
@@ -123,12 +152,24 @@ public enum EAttrAccessorString implements IAttrAccessorFunction<StringLangObjec
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.toLowerCase(Locale.ROOT);
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
+			}
 		},
 		length(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return NumberLangObject.create(thisContext.stringValue().length());
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
 			}
 		},
 		;

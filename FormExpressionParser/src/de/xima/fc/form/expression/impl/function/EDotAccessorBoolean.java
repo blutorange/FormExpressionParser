@@ -1,36 +1,43 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
+import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAssignerNumber implements IAttrAssignerFunction<NumberLangObject> {
+public enum EDotAccessorBoolean implements IDotAccessorFunction<BooleanLangObject> {
+	/**
+	 * @return {@link NumberLangObject}. <code>0</code>, when this is false, <code>1</code> when this is true.
+	 */
+	toNumber(Impl.numericValue),
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
-	private final boolean hasVarArgs;
+	private final boolean deferEvaluation;
 
-	private EAttrAssignerNumber(final Impl impl) {
+	private EDotAccessorBoolean(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
-		hasVarArgs = impl.hasVarArgs();
+		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-			throws EvaluationException {
-		return func.functionValue().evaluate(ec, thisContext, args);
+	public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
+			final ALangObject... args) throws EvaluationException {
+		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -52,14 +59,34 @@ public enum EAttrAssignerNumber implements IAttrAssignerFunction<NumberLangObjec
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.NUMBER;
+		return ELangObjectType.BOOLEAN;
 	}
 
 	@Override
 	public boolean hasVarArgs() {
-		return hasVarArgs;
+		return impl.hasVarArgs;
 	}
-	private static enum Impl implements IAttrAssignerFunction<NumberLangObject> {
+
+	@Nullable
+	@Override
+	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+		return impl.getDotAccessorReturnType(thisContext);
+	}
+
+	private static enum Impl implements IDotAccessorFunction<BooleanLangObject> {
+		numericValue(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return thisContext.coerceNumber(ec);
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+		}
 		;
 
 		private String[] argList;
@@ -95,15 +122,11 @@ public enum EAttrAssignerNumber implements IAttrAssignerFunction<NumberLangObjec
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.NUMBER;
+			return ELangObjectType.BOOLEAN;
 		}
-
 
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new UncatchableEvaluationException(ec,
-					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
-		}
+		public abstract ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
+				final ALangObject... args) throws EvaluationException;
 	}
 }

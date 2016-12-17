@@ -49,7 +49,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 			@Nullable
 			@Override
 			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equalsType(rhs) ? lhs : null;
+				return lhs.isAssignableFrom(rhs) ? lhs : null;
 			}
 		},
 		;

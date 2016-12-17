@@ -1,50 +1,41 @@
 package de.xima.fc.form.expression.impl.function;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAccessorNumber implements IAttrAccessorFunction<NumberLangObject> {
+public enum EDotAccessorException implements IDotAccessorFunction<ExceptionLangObject> {
 	/**
-	 * @return {@link NumberLangObject}. The sine of this number.
+	 * @return {@link StringLangObject}. The message for this exception. The empty string when this exception does not contain a message.
 	 */
-	sin(Impl.sin),
-	/**
-	 * @return {@link BooleanLangObject} True iff this number is <code>NaN</code>.
-	 */
-	nan(Impl.nan),
-	/**
-	 * @return {@link BooleanLangObject} True iff this number is <code>Infinity</code> or <code>-Infinity</code>.
-	 */
-	infinite(Impl.infinite),
-	/**
-	 * @return {@link BooleanLangObject} True iff this number is neither <code>NaN</code> nor <code>Infinity</code> or <code>-Infinity</code>.
-	 */
-	finite(Impl.finite),
+	message(Impl.message),
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
 	private final boolean deferEvaluation;
 
-	private EAttrAccessorNumber(final Impl impl) {
+	private EDotAccessorException(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
 		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+	public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
 		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
 	}
@@ -68,7 +59,7 @@ public enum EAttrAccessorNumber implements IAttrAccessorFunction<NumberLangObjec
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.NUMBER;
+		return ELangObjectType.EXCEPTION;
 	}
 
 	@Override
@@ -76,35 +67,26 @@ public enum EAttrAccessorNumber implements IAttrAccessorFunction<NumberLangObjec
 		return impl.hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAccessorFunction<NumberLangObject> {
-		sin(false) {
+	@Nullable
+	@Override
+	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+		return impl.getDotAccessorReturnType(thisContext);
+	}
+
+	private static enum Impl implements IDotAccessorFunction<ExceptionLangObject> {
+		message(false) {
 			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
-					final ALangObject... args) throws EvaluationException {
-				return thisContext.sin();
-			}
-		},
-		nan(false) {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
+			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.isNaN());
+				return StringLangObject.create(thisContext.exceptionValue().getMessage());
 			}
-		},
-		infinite(false) {
+
+			@Nullable
 			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.isInfinite());
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
 			}
-		},
-		finite(false) {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return BooleanLangObject.create(thisContext.isFinite());
-			}
-		},
+		}
 		;
 
 		private String[] argList;
@@ -140,11 +122,11 @@ public enum EAttrAccessorNumber implements IAttrAccessorFunction<NumberLangObjec
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.NUMBER;
+			return ELangObjectType.EXCEPTION;
 		}
 
 		@Override
-		public abstract ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
+		public abstract ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException;
 	}
 }

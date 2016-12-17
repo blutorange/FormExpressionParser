@@ -4,13 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.NullObjectAccessException;
-import de.xima.fc.form.expression.exception.evaluation.NullObjectAssignException;
-import de.xima.fc.form.expression.exception.evaluation.NullObjectMethodException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -33,7 +27,7 @@ public class NullLangObject extends ALangObject {
 	public ILangObjectClass getType() {
 		return ELangObjectType.NULL;
 	}
-	
+
 	/** @deprecated Use {@link #getInstance()} */
 	@Deprecated
 	public static ALangObject create() {
@@ -59,35 +53,6 @@ public class NullLangObject extends ALangObject {
 	@Nonnull
 	public static NullLangObject getInstance() {
 		return InstanceHolder.INSTANCE;
-	}
-
-	@Override
-	public IFunction<NumberLangObject> expressionMethod(@Nonnull final EMethod method,
-			@Nonnull final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectMethodException(method, ec);
-	}
-	@Override
-	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAccessException(object, accessedViaDot, ec);
-	}
-	@Override
-	public IFunction<NumberLangObject> attrAssigner(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAssignException(object, accessedViaDot, ec);
-	}
-
-	@Override
-	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		throw new NullObjectMethodException(method, ec);
-	}
-
-	@Override
-	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAssignException(object, accessedViaDot, ec);
-	}
-
-	@Override
-	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot, final IEvaluationContext ec) throws EvaluationException {
-		throw new NullObjectAccessException(object, accessedViaDot, ec);
 	}
 
 	@Override

@@ -5,12 +5,13 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathException;
-import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAssignerException;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IGenericBracketAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -24,24 +25,21 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
- * A set of generic attribute assigners for object. Each object has got a
- * predefined set of named attributes. When none of those match, these generic
- * functions will be called. For example, they can be used to assign to an entry
- * of a {@link HashLangObject} or an {@link ArrayLangObject}.
- *
- * <br>
- * <br>
- *
- * The argument array is guaranteed to contain exactly three entries, the
- * {@link ALangObject} <code>property<code>, the {@link BooleanLangObject}
- * <code>accessedViaDot</dot>, and the <code>value</code> {@link ALangObject}
- * to be assigned.
+ * <p>
+ * A set of generic attribute assigners for object. This is used
+ * for assigning properties via bracket notation, eg.
+ * <code>array[0] = 5</code>.
+ * </p><p>
+ * The argument array is guaranteed to contain exactly two entries, the
+ * {@link ALangObject} <code>property<code> and the<code>value</code>
+ * {@link ALangObject} to be assigned.
+ * </p>
  *
  * @author madgaksha
  *
- * @param <T>
+ * @param <T> Type of the language object for the bracket accessor.
  */
-public abstract class GenericAttrAssigner<T extends ALangObject> implements IAttrAssignerFunction<T> {
+public abstract class GenericBracketAssigner<T extends ALangObject> implements IGenericBracketAssignerFunction<T> {
 	private static final long serialVersionUID = 1L;
 
 	@Nonnull
@@ -59,14 +57,20 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IAttrAssignerFunction<StringLangObject> STRING = new GenericAttrAssigner<StringLangObject>(ELangObjectType.STRING,
-			"genericAttrAssignerString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IGenericBracketAssignerFunction<StringLangObject> STRING = new GenericBracketAssigner<StringLangObject>(ELangObjectType.STRING,
+			"genericBracketAssignerString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
 			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
 					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			return false;
 		}
 	};
 
@@ -83,20 +87,28 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 	 *             When the index is too large or too small to be represented as
 	 *             an <code>int</code>.
 	 */
-	public final static IAttrAssignerFunction<ArrayLangObject> ARRAY = new GenericAttrAssigner<ArrayLangObject>(ELangObjectType.ARRAY,
-			"genericAttrAssignerArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IGenericBracketAssignerFunction<ArrayLangObject> ARRAY = new GenericBracketAssigner<ArrayLangObject>(ELangObjectType.ARRAY,
+			"genericBracketAssignerArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
-			if (((BooleanLangObject) args[1]).booleanValue())
-				throw new NoSuchAttrAccessorException(NullUtil.toString(args[0]), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue(ec);
 			final int len = thisContext.length();
 			if (index >= len || index < -len)
 				throw new ArrayIndexOutOfBoundsException(thisContext, index, ec);
-			thisContext.set(index < 0 ? index + len : index, args[2]);
+			thisContext.set(index < 0 ? index + len : index, args[1]);
 			return thisContext;
+		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			// Accessor must be a numeric index, eg. array[0] but not array[true]
+			if (!SimpleVariableType.NUMBER.isAssignableFrom(property))
+				return false;
+			// Object to be assigned must be of the correct type, eg. a number for array<object>
+			return thisContext.getGeneric(0).isAssignableFrom(value);
 		}
 	};
 
@@ -104,8 +116,8 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IAttrAssignerFunction<BooleanLangObject> BOOLEAN = new GenericAttrAssigner<BooleanLangObject>(ELangObjectType.BOOLEAN,
-			"genericAttrAssignerBoolean", false) { //$NON-NLS-1$
+	public final static IGenericBracketAssignerFunction<BooleanLangObject> BOOLEAN = new GenericBracketAssigner<BooleanLangObject>(ELangObjectType.BOOLEAN,
+			"genericBracketAssignerBoolean", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
@@ -113,14 +125,20 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
 					args[1].coerceBoolean(ec).booleanValue(), ec);
 		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			return false;
+		}
 	};
 
 	/**
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IAttrAssignerFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAssigner<ExceptionLangObject>(
-			ELangObjectType.EXCEPTION, "genericAttrAssignerException", false) { //$NON-NLS-1$
+	public final static IGenericBracketAssignerFunction<ExceptionLangObject> EXCEPTION = new GenericBracketAssigner<ExceptionLangObject>(
+			ELangObjectType.EXCEPTION, "genericBracketAssignerException", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
@@ -128,14 +146,20 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
 					args[1].coerceBoolean(ec).booleanValue(), ec);
 		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			return false;
+		}
 	};
 
 	/**
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IAttrAssignerFunction<RegexLangObject> REGEX = new GenericAttrAssigner<RegexLangObject>(ELangObjectType.REGEX,
-			"genericAttrAssignerRegex", false) { //$NON-NLS-1$
+	public final static IGenericBracketAssignerFunction<RegexLangObject> REGEX = new GenericBracketAssigner<RegexLangObject>(ELangObjectType.REGEX,
+			"genericBracketAssignerRegex", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
@@ -143,20 +167,11 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
 					args[1].coerceBoolean(ec).booleanValue(), ec);
 		}
-	};
 
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IAttrAssignerFunction<FunctionLangObject> FUNCTION = new GenericAttrAssigner<FunctionLangObject>(
-			ELangObjectType.FUNCTION, "genericAttrAssignerFunction", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			return false;
 		}
 	};
 
@@ -164,14 +179,41 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAssignerException.
 	 *             No generic attribute assigners.
 	 */
-	public final static IAttrAssignerFunction<NumberLangObject> NUMBER = new GenericAttrAssigner<NumberLangObject>(ELangObjectType.NUMBER,
-			"genericAttrAssignerFunction", false) { //$NON-NLS-1$
+	public final static IGenericBracketAssignerFunction<FunctionLangObject> FUNCTION = new GenericBracketAssigner<FunctionLangObject>(
+			ELangObjectType.FUNCTION, "genericBracketAssignerFunction", false) { //$NON-NLS-1$
+		private static final long serialVersionUID = 1L;
+		@Override
+		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
+					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			return false;
+		}
+	};
+
+	/**
+	 * @throws NoSuchAttrAssignerException.
+	 *             No generic attribute assigners.
+	 */
+	public final static IGenericBracketAssignerFunction<NumberLangObject> NUMBER = new GenericBracketAssigner<NumberLangObject>(ELangObjectType.NUMBER,
+			"genericBracketAssignerFunction", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
 			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
 					args[1].coerceBoolean(ec).booleanValue(), ec);
+		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			return false;
 		}
 	};
 
@@ -182,20 +224,32 @@ public abstract class GenericAttrAssigner<T extends ALangObject> implements IAtt
 	 * @return {@link ALangObject} The object that is mapped to the given key.
 	 * @NullLangObject When the map does not contain any value for the key, or
 	 *                 the key is mapped to {@link NullLangObject}. Use
-	 *                 {@link EAttrAccessorHash#contains} to check.
+	 *                 {@link EDotAccessorHash#contains} to check.
 	 */
-	public final static IAttrAssignerFunction<HashLangObject> HASH = new GenericAttrAssigner<HashLangObject>(ELangObjectType.HASH,
-			"genericAttrAssignerHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IGenericBracketAssignerFunction<HashLangObject> HASH = new GenericBracketAssigner<HashLangObject>(ELangObjectType.HASH,
+			"genericBracketAssignerHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			thisContext.put(args[0], args[2]);
+			thisContext.put(args[0], args[1]);
 			return thisContext;
+		}
+
+		@Override
+		public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
+				final IVariableType value) {
+			// Property must be compatible with the first generics argument,
+			// eg. number for hash<object, string>
+			if (!thisContext.getGeneric(0).isAssignableFrom(property))
+				return false;
+			// Value to be assigned must be compatible with the second
+			// generics argument, eg. number for hash<string, object>
+			return thisContext.getGeneric(1).isAssignableFrom(value);
 		}
 	};
 
-	private GenericAttrAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
+	private GenericBracketAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
 			final boolean hasVarArgs, @Nonnull final String... argList) {
 		NullUtil.checkItemsNotNull(argList);
 		this.type = type;

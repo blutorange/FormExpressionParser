@@ -4,31 +4,32 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
+import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.HashLangObject;
+import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAssignerHash implements IAttrAssignerFunction<HashLangObject> {
+public enum EDotAssignerString implements IDotAssignerFunction<StringLangObject> {
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
 	private final boolean hasVarArgs;
 
-	private EAttrAssignerHash(final Impl impl) {
+	private EDotAssignerString(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
 		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext, final ALangObject... args)
+	public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 			throws EvaluationException {
 		return func.functionValue().evaluate(ec, thisContext, args);
 	}
@@ -52,7 +53,7 @@ public enum EAttrAssignerHash implements IAttrAssignerFunction<HashLangObject> {
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.HASH;
+		return ELangObjectType.STRING;
 	}
 
 	@Override
@@ -60,7 +61,12 @@ public enum EAttrAssignerHash implements IAttrAssignerFunction<HashLangObject> {
 		return hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAssignerFunction<HashLangObject> {
+	@Override
+	public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+		return impl.isDotAssignerDefined(thisContext, value);
+	}
+
+	private static enum Impl implements IDotAssignerFunction<StringLangObject> {
 		;
 
 		private String[] argList;
@@ -76,6 +82,7 @@ public enum EAttrAssignerHash implements IAttrAssignerFunction<HashLangObject> {
 		public boolean hasVarArgs() {
 			return hasVarArgs;
 		}
+
 
 		@SuppressWarnings("null")
 		@Override
@@ -96,15 +103,18 @@ public enum EAttrAssignerHash implements IAttrAssignerFunction<HashLangObject> {
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.HASH;
+			return ELangObjectType.STRING;
 		}
 
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext,
+		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			throw new UncatchableEvaluationException(ec,
-					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
+			throw new UncatchableEvaluationException(ec, "Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
 		}
 
+		@Override
+		public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+			return false;
+		}
 	}
 }

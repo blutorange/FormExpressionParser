@@ -7,6 +7,9 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
+import com.google.common.collect.ImmutableCollection;
+
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 
@@ -53,7 +56,7 @@ public interface IVariableType extends Serializable {
 
 	/**
 	 * <p>
-	 * Determines if the class or interface represented by this type is either
+	 * Determines if the class represented by this type is either
 	 * the same as, or is a super type, the class or interface represented by
 	 * the specified type parameter. It returns true if so; otherwise it returns
 	 * false.
@@ -62,6 +65,7 @@ public interface IVariableType extends Serializable {
 	 * Specifically, this method tests whether the type represented by the
 	 * specified type parameter can be converted to this type.
 	 * </p>
+	 * @param type Type to check.
 	 */
 	public boolean isAssignableFrom(IVariableType type);
 
@@ -105,4 +109,20 @@ public interface IVariableType extends Serializable {
 			return o1.getGenericCount() - o2.getGenericCount();
 		}
 	};
+
+	/**
+	 * Whether this type is an of the given class.
+	 * Return <code>false</code> when it is a super or subtype.
+	 * @param baseClass Class to check.
+	 * @return Whether this is of the given class.
+	 */
+	public boolean isA(ILangObjectClass baseClass);
+
+	/**
+	 * @param flag Flag to check for.
+	 * @return Whether the flag is set for this variable type.
+	 */
+	public boolean hasFlag(EVariableTypeFlag flag);
+
+	public ImmutableCollection<EVariableTypeFlag> getFlags();
 }

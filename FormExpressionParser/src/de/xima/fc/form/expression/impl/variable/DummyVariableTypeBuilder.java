@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -23,6 +24,10 @@ public enum DummyVariableTypeBuilder implements IVariableTypeBuilder {
 	}
 	@Override
 	public IVariableTypeBuilder append(final ILangObjectClass type) {
+		return this;
+	}
+	@Override
+	public IVariableTypeBuilder setFlag(final EVariableTypeFlag flag) {
 		return this;
 	}
 }

@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.variable;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -14,14 +14,14 @@ import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @Immutable
+@ParametersAreNonnullByDefault
 public class HeaderNodeImpl implements IHeaderNode {
 	private static final long serialVersionUID = 1L;
 
-	@Nonnull
 	private final Node node;
-	@Nonnull
 	private final String variableName;
 	@Nullable
 	private final Node typedNode;
@@ -29,7 +29,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 	private final boolean hasNode;
 	private int source = EVariableSource.ID_UNRESOLVED;
 
-	public HeaderNodeImpl(@Nonnull final ASTVariableDeclarationClauseNode node) {
+	public HeaderNodeImpl(final ASTVariableDeclarationClauseNode node) {
 		this.node = node.hasAssignment() ? node.getAssignmentNode() : new ASTNullNode(node);
 		this.typedNode = node.hasType() ? node.getTypeNode() : null;
 		this.isFunction = false;
@@ -37,7 +37,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 		this.hasNode = true;
 	}
 
-	public HeaderNodeImpl(@Nonnull final ASTFunctionClauseNode node) {
+	public HeaderNodeImpl(final ASTFunctionClauseNode node) {
 		this.node = node;
 		this.typedNode = node;
 		this.isFunction = true;
@@ -51,7 +51,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 	 * @param variableName
 	 *            Variable name.
 	 */
-	public HeaderNodeImpl(@Nonnull final String variableName, @Nonnull final Node prototype) {
+	public HeaderNodeImpl(final String variableName, final Node prototype) {
 		this.isFunction = false;
 		this.variableName = variableName;
 		this.node = new ASTNullNode(prototype);
@@ -110,7 +110,6 @@ public class HeaderNodeImpl implements IHeaderNode {
 
 	@Override
 	public String toString() {
-		return String.format("HeaderNodeImpl(%s,source=%d)", variableName, source);
+		return NullUtil.messageFormat("HeaderNodeImpl({0},source={1})", variableName, source);
 	}
-
 }

@@ -25,14 +25,11 @@ import de.xima.fc.form.expression.object.ALangObject;
 public abstract class AVariableProvider<T extends ALangObject> implements IVariableProvider<T> {
 	private static final long serialVersionUID = 1L;
 
-	public final IVariableType type;
+	private final IVariableType type;
 
 	protected AVariableProvider(final IVariableType type) {
 		this.type = type;
 	}
-
-	@Override
-	public abstract T make();
 
 	@Override
 	public final IVariableType getType() {

@@ -3,10 +3,12 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAssignerFunction;
+import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
@@ -14,7 +16,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAssignerArray implements IAttrAssignerFunction<ArrayLangObject> {
+public enum EAttrAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 	/**
 	 * @param newLength The new length of the array. Padded with {@link NullLangObject} as necessary.
 	 */
@@ -59,13 +61,17 @@ public enum EAttrAssignerArray implements IAttrAssignerFunction<ArrayLangObject>
 		return ELangObjectType.ARRAY;
 	}
 
-
 	@Override
 	public boolean hasVarArgs() {
 		return hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAssignerFunction<ArrayLangObject> {
+	@Override
+	public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+		return impl.isDotAssignerDefined(thisContext, value);
+	}
+
+	private static enum Impl implements IDotAssignerFunction<ArrayLangObject> {
 		length(false, "newLength") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
@@ -73,6 +79,12 @@ public enum EAttrAssignerArray implements IAttrAssignerFunction<ArrayLangObject>
 				final int len = args[2].coerceNumber(ec).intValue(ec);
 				thisContext.setLength(len);
 				return thisContext;
+			}
+
+			@Override
+			public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+				// newLength must be a number.
+				return SimpleVariableType.NUMBER.isAssignableFrom(value);
 			}
 		}
 		;

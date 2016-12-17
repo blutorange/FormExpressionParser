@@ -86,17 +86,19 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 	}
 
 	@Override
-	public void visit(final ASTAssignmentExpressionNode node, Boolean assignment) {
+	public void visit(final ASTAssignmentExpressionNode node, final Boolean assignment) {
+		Boolean a = assignment;
 		for (int i = node.getAssignableNodeCount(); i-- > 0;) {
 			// For ASTVariableNodes, we add it to the list of unused variables.
 			// For ASTPropertyExpressionNodes, we need to mark every
 			// occurring variable as being used.
 			final Node n = node.getAssignableNode(i);
 			final Node first = n.getFirstChildOrNull();
-			assignment = assignment || n.jjtGetNodeId() == FormExpressionParserTreeConstants.JJTVARIABLENODE;
+			a = a || n.jjtGetNodeId() == FormExpressionParserTreeConstants.JJTVARIABLENODE;
 			if (first != null)
 				first.jjtAccept(this, assignment);
 		}
+		node.getAssignValueNode().jjtAccept(this, assignment);
 	}
 
 	private void defineScopeDefs(final IScopeDefinitions scopeDefs) {

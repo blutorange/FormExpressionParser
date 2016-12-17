@@ -196,13 +196,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			switch (n.getSiblingMethod()) {
 			case DOT:
 				thisContext = res;
-				final StringLangObject attrDot = jjtAccept(parentNode, n, ec).coerceString(ec);
-				res = res.evaluateAttrAccessor(attrDot, true, ec);
+				final String attrDot = jjtAccept(parentNode, n, ec).coerceString(ec).stringValue();
+				res = res.evaluateDotAccessor(attrDot, ec);
 				break;
 			case BRACKET:
 				thisContext = res;
 				final ALangObject attrBracket = jjtAccept(parentNode, n, ec);
-				res = res.evaluateAttrAccessor(attrBracket, false, ec);
+				res = res.evaluateBracketAccessor(attrBracket, ec);
 				break;
 			case PARENTHESIS:
 				// Get a function object.
@@ -221,7 +221,6 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
 
 				ec.getTracer().descend(parentNode);
-				//TODO make void function return null, no matter what
 				try {
 					if (func.getThisContextType() == ELangObjectType.NULL)
 						thisContext = NullLangObject.getInstance();
@@ -285,19 +284,19 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
 			case DOT:
-				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
+				final String attrDot = jjtAccept(prop, last, ec).coerceString(ec).stringValue();
 				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c
 				// etc.
 				// First we need to evaluate the last attribute accessor (a.b),
 				// then the expression method (+).
 				if (method != EMethod.EQUAL)
-					assignee = res.evaluateAttrAccessor(attrDot, true, ec)
+					assignee = res.evaluateDotAccessor(attrDot, ec)
 					.evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
 				// Now we can call the attribute assigner and assign the
 				// value.
 				if (assignee == null)
 					assignee = NullLangObject.getInstance();
-				res.executeAttrAssigner(attrDot, true, assignee, ec);
+				res.executeDotAssigner(attrDot, assignee, ec);
 				break;
 			case BRACKET:
 				final ALangObject attrBracket = jjtAccept(prop, last, ec);
@@ -306,11 +305,11 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				// First we need to evaluate the last attribute accessor (a[b]),
 				// then the expression method (+).
 				if (method != EMethod.EQUAL)
-					assignee = res.evaluateAttrAccessor(attrBracket, false, ec)
+					assignee = res.evaluateBracketAccessor(attrBracket, ec)
 					.evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
 				if (assignee == null)
 					assignee = NullLangObject.getInstance();
-				res.executeAttrAssigner(attrBracket, false, assignee, ec);
+				res.executeBracketAssigner(attrBracket, assignee, ec);
 				break;
 				// $CASES-OMITTED$
 			default:
@@ -351,15 +350,15 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
 			switch (last.getSiblingMethod()) {
 			case DOT:
-				final StringLangObject attrDot = jjtAccept(prop, last, ec).coerceString(ec);
+				final String attrDot = jjtAccept(prop, last, ec).coerceString(ec).stringValue();
 				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c
 				// etc.
 				// First we need to evaluate the last attribute accessor (a.b),
 				// then the expression method (+).
-				res = tmp.evaluateAttrAccessor(attrDot, true, ec);
+				res = tmp.evaluateDotAccessor(attrDot, ec);
 				// Now we can call the attribute assigner and assign the
 				// value.
-				res.executeAttrAssigner(attrDot, true, res.evaluateExpressionMethod(method.equalMethod(ec), ec), ec);
+				res.executeDotAssigner(attrDot, res.evaluateExpressionMethod(method.equalMethod(ec), ec), ec);
 				break;
 			case BRACKET:
 				final ALangObject attrBracket = jjtAccept(prop, last, ec);
@@ -367,8 +366,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				// a[b]=a[b]+c etc.
 				// First we need to evaluate the last attribute accessor (a[b]),
 				// then the expression method (+).
-				res = tmp.evaluateAttrAccessor(attrBracket, false, ec);
-				tmp.executeAttrAssigner(attrBracket, false, res.evaluateExpressionMethod(method.equalMethod(ec), ec),
+				res = tmp.evaluateBracketAccessor(attrBracket, ec);
+				tmp.executeBracketAssigner(attrBracket, res.evaluateExpressionMethod(method.equalMethod(ec), ec),
 						ec);
 				break;
 				// $CASES-OMITTED$

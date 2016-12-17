@@ -2,43 +2,35 @@ package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.RegexLangObject;
-import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAccessorRegex implements IAttrAccessorFunction<RegexLangObject> {
-	/**
-	 * @param string {@link StringLangObject} String to match. When not given, defaults to the empty string.
-	 * @return {@link BooleanLangObject}. Whether this regex matches the string.
-	 */
-	matches(Impl.matches),
+public enum EDotAssignerFunction implements IDotAssignerFunction<FunctionLangObject> {
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
-	private final boolean deferEvaluation;
+	private final boolean hasVarArgs;
 
-	private EAttrAccessorRegex(final Impl impl) {
+	private EDotAssignerFunction(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
-		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
+		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
-		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
+	public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
+			throws EvaluationException {
+		return func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -60,22 +52,20 @@ public enum EAttrAccessorRegex implements IAttrAccessorFunction<RegexLangObject>
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.REGEX;
+		return ELangObjectType.FUNCTION;
 	}
 
 	@Override
 	public boolean hasVarArgs() {
-		return impl.hasVarArgs;
+		return hasVarArgs;
 	}
-	private static enum Impl implements IAttrAccessorFunction<RegexLangObject> {
-		matches(false, "string") { //$NON-NLS-1$
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
-					final ALangObject... args) throws EvaluationException {
-				final String input = args.length == 0 ? StringUtils.EMPTY : args[0].coerceString(ec).stringValue();
-				return BooleanLangObject.create(thisContext.patternValue().matcher(input).matches());
-			}
-		},
+
+	@Override
+	public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+		return impl.isDotAssignerDefined(thisContext, value);
+	}
+
+	private static enum Impl implements IDotAssignerFunction<FunctionLangObject> {
 		;
 
 		private String[] argList;
@@ -111,11 +101,19 @@ public enum EAttrAccessorRegex implements IAttrAccessorFunction<RegexLangObject>
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.REGEX;
+			return ELangObjectType.FUNCTION;
 		}
 
 		@Override
-		public abstract ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
-				final ALangObject... args) throws EvaluationException;
+		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new UncatchableEvaluationException(ec,
+					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
+		}
+
+		@Override
+		public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+			return false;
+		}
 	}
 }

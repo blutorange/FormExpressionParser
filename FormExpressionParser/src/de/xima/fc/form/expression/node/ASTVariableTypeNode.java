@@ -1,8 +1,15 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
@@ -15,18 +22,19 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public class ASTVariableTypeNode extends ANode {
-	
-	private static final long serialVersionUID = 1L;
-	
-	@Nonnull
-	private ILangObjectClass variableType = ELangObjectType.OBJECT;
 
-	public ASTVariableTypeNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	private static final long serialVersionUID = 1L;
+
+	private ILangObjectClass variableType = ELangObjectType.OBJECT;
+	private EVariableTypeFlag[] flags = CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_FLAG_ARRAY;
+
+	public ASTVariableTypeNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
-	
-	public ASTVariableTypeNode(@Nonnull final Node prototype, @Nonnull final ILangObjectClass variableType) {
+
+	public ASTVariableTypeNode(final Node prototype, final ILangObjectClass variableType) {
 		super(prototype, FormExpressionParserTreeConstants.JJTVARIABLETYPENODE);
 		this.variableType = variableType;
 	}
@@ -51,23 +59,37 @@ public class ASTVariableTypeNode extends ANode {
 		visitor.visit(this);
 	}
 
+	@Nullable
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return new ASTVariableTypeNode(jjtGetChild(i), ELangObjectType.OBJECT);
 	}
-	
+
 	@Override
 	public void additionalToStringFields(final StringBuilder sb) {
 		sb.append(variableType).append(',');
+		for (final EVariableTypeFlag flag : flags)
+			sb.append(flag).append(',');
 	}
-	
-	public void init(final EMethod method, @Nonnull final ILangObjectClass variableType) throws ParseException {
+
+	public void init(final EMethod method, final ILangObjectClass variableType, @Nullable final EVariableTypeFlag... flags) throws ParseException {
 		assertNonNull(variableType, CmnCnst.Error.NULL_VARIABLE_TYPE);
 		super.init(method);
 		this.variableType  = variableType;
+		if (flags != null) {
+			int count = 0;
+			for (final Object o : flags)
+				if (o != null)
+					++count;
+			final EVariableTypeFlag[] f = new EVariableTypeFlag[count];
+			int i = 0;
+			for (final EVariableTypeFlag flag : flags)
+				if (flag != null && i < f.length)
+					f[i++] = flag;
+			this.flags = f;
+		}
 	}
 
-	@Nonnull
 	public ILangObjectClass getVariableType() {
 		return variableType;
 	}
@@ -75,13 +97,28 @@ public class ASTVariableTypeNode extends ANode {
 	public boolean hasGenerics() {
 		return jjtGetNumChildren()>0;
 	}
-	
+
 	public int getGenericsCount() {
 		return jjtGetNumChildren();
 	}
-	
-	@Nonnull
+
 	public Node getGenericsNode(final int i) {
 		return jjtGetChild(i);
+	}
+
+	public ImmutableCollection<EVariableTypeFlag> getFlags() {
+		if (flags.length == 0)
+			return ImmutableSet.of();
+		@SuppressWarnings("null") // We already check for nullness when adding flags.
+		@Nonnull
+		final EVariableTypeFlag first = flags[0];
+		return Sets.immutableEnumSet(first, flags);
+	}
+
+	public boolean hasFlag(final EVariableTypeFlag flag) {
+		for (int i = flags.length; i --> 0;)
+			if (flag == flags[i])
+				return true;
+		return false;
 	}
 }

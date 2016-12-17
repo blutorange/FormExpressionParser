@@ -1,15 +1,18 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathException;
 import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
+import de.xima.fc.form.expression.iface.evaluate.IGenericBracketAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -23,26 +26,20 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
- * A set of generic attribute accessors for elements. Each object has got a
- * predefined set of named attributes, eg. <code>length</code> for
- * {@link ArrayLangObject}s or <code>message</code> for
- * {@link ExceptionLangObject}s. When none of those match, these generic
- * functions will be called. For example, they can be used to access an entry of
- * a {@link HashLangObject}, or the character at a certain index of a
- * {@link StringLangObject}.
- *
- * <br>
- * <br>
- *
- * The argument array is guaranteed to contain exactly two entries, the
- * {@link ALangObject} <code>property<code> and the {@link BooleanLangObject}
- * <code>accessedViaDot</dot>.
+ * <p>
+ * A set of generic attribute accessors for elements. This is used
+ * for accessing properties via bracket notation, eg. <code>array[0]</code>
+ * </p><p>
+ * The argument array is guaranteed to contain exactly one entry, the
+ * {@link ALangObject} <code>property<code>.
+ * </p>
  *
  * @author madgaksha
  *
- * @param <T>
+ * @param <T> Type of the language object for the bracket accessor.
  */
-public abstract class GenericAttrAccessor<T extends ALangObject> implements IAttrAccessorFunction<T> {
+@ParametersAreNonnullByDefault
+public abstract class GenericBracketAccessor<T extends ALangObject> implements IGenericBracketAccessorFunction<T> {
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @param index
@@ -55,22 +52,27 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 	 *                 <code>index &lt; -string.length</code>.
 	 * @throws MathException
 	 *             When the index is too large or too small to be represented as
-	 *             an <code>int</code>.
+	 *             a 4 byte signed int.
 	 */
-	public final static IAttrAccessorFunction<StringLangObject> STRING = new GenericAttrAccessor<StringLangObject>(
-			ELangObjectType.STRING, "genericAttrAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IGenericBracketAccessorFunction<StringLangObject> STRING = new GenericBracketAccessor<StringLangObject>(
+			ELangObjectType.STRING, "genericBracketAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
-			if (((BooleanLangObject) args[1]).booleanValue())
-				throw new NoSuchAttrAccessorException(NullUtil.toString(args[0]), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue(ec);
 			final int len = thisContext.length();
 			if (index >= len || index < -len)
 				return NullLangObject.getInstance();
 			return StringLangObject.create(thisContext.stringValue().charAt(index < 0 ? index + len : index));
+		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			return SimpleVariableType.NUMBER.isAssignableFrom(property) ? SimpleVariableType.STRING : null;
 		}
 	};
 
@@ -85,10 +87,10 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 	 *                 <code>index &lt; -string.length</code>.
 	 * @throws MathException
 	 *             When the index is too large or too small to be represented as
-	 *             an <code>int</code>.
+	 *             a 4 byte signed int.
 	 */
-	public final static IAttrAccessorFunction<ArrayLangObject> ARRAY = new GenericAttrAccessor<ArrayLangObject>(
-			ELangObjectType.ARRAY, "genericAttrAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IGenericBracketAccessorFunction<ArrayLangObject> ARRAY = new GenericBracketAccessor<ArrayLangObject>(
+			ELangObjectType.ARRAY, "genericBracketAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -102,21 +104,38 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 				throw new ArrayIndexOutOfBoundsException(thisContext, index, ec);
 			return thisContext.get(index < 0 ? index + len : index);
 		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			// Property must be a numeric index, eg. array[0], but not array[true].
+			if (!SimpleVariableType.NUMBER.isAssignableFrom(property))
+				return null;
+			// Return type is the first generics argument, eg number for array<number>
+			return thisContext.getGeneric(0);
+		}
 	};
 
 	/**
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IAttrAccessorFunction<BooleanLangObject> BOOLEAN = new GenericAttrAccessor<BooleanLangObject>(
-			ELangObjectType.BOOLEAN, "genericAttrAccessorBoolean", false) { //$NON-NLS-1$
+	public final static IGenericBracketAccessorFunction<BooleanLangObject> BOOLEAN = new GenericBracketAccessor<BooleanLangObject>(
+			ELangObjectType.BOOLEAN, "genericBracketAccessorBoolean", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
+		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			return null;
 		}
 	};
 
@@ -124,15 +143,21 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IAttrAccessorFunction<ExceptionLangObject> EXCEPTION = new GenericAttrAccessor<ExceptionLangObject>(
-			ELangObjectType.EXCEPTION, "genericAttrAccessorException", false) { //$NON-NLS-1$
+	public final static IGenericBracketAccessorFunction<ExceptionLangObject> EXCEPTION = new GenericBracketAccessor<ExceptionLangObject>(
+			ELangObjectType.EXCEPTION, "genericBracketAccessorException", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
+		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			return null;
 		}
 	};
 
@@ -140,15 +165,21 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IAttrAccessorFunction<RegexLangObject> REGEX = new GenericAttrAccessor<RegexLangObject>(
-			ELangObjectType.REGEX, "genericAttrAccessorRegex", false) { //$NON-NLS-1$
+	public final static IGenericBracketAccessorFunction<RegexLangObject> REGEX = new GenericBracketAccessor<RegexLangObject>(
+			ELangObjectType.REGEX, "genericBracketAccessorRegex", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
+		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			return null;
 		}
 	};
 
@@ -156,15 +187,21 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IAttrAccessorFunction<FunctionLangObject> FUNCTION = new GenericAttrAccessor<FunctionLangObject>(
-			ELangObjectType.FUNCTION, "genericAttrAccessorFunction", false) { //$NON-NLS-1$
+	public final static IGenericBracketAccessorFunction<FunctionLangObject> FUNCTION = new GenericBracketAccessor<FunctionLangObject>(
+			ELangObjectType.FUNCTION, "genericBracketAccessorFunction", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
+		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			return null;
 		}
 	};
 
@@ -172,29 +209,36 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 	 * @throws NoSuchAttrAccessorException
 	 *             No generic attribute accessors.
 	 */
-	public final static IAttrAccessorFunction<NumberLangObject> NUMBER = new GenericAttrAccessor<NumberLangObject>(
-			ELangObjectType.NUMBER, "genericAttrAccessorNumber", false) { //$NON-NLS-1$
+	public final static IGenericBracketAccessorFunction<NumberLangObject> NUMBER = new GenericBracketAccessor<NumberLangObject>(
+			ELangObjectType.NUMBER, "genericBracketAccessorNumber", false) { //$NON-NLS-1$
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
 				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
+			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
+		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			return null;
 		}
 	};
 
 	/**
 	 * @param key
-	 *            {@link ALangObject} The key. When not specified,
-	 *            {@link NullLangObject} is assumed.
+	 *            {@link ALangObject} The key. Must be of the variable type as
+	 *            specified by the first generics argument.
 	 * @return {@link ALangObject} The object that is mapped to the given key.
+	 *         Its type is the second generics argument.
 	 * @NullLangObject When the map does not contain any value for the key, or
 	 *                 the key is mapped to {@link NullLangObject}. Use
-	 *                 {@link EAttrAccessorHash#contains} to check.
+	 *                 {@link EDotAccessorHash#contains} to check.
 	 */
-	public final static IAttrAccessorFunction<HashLangObject> HASH = new GenericAttrAccessor<HashLangObject>(
-			ELangObjectType.HASH, "genericAttrAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+	public final static IGenericBracketAccessorFunction<HashLangObject> HASH = new GenericBracketAccessor<HashLangObject>(
+			ELangObjectType.HASH, "genericBracketAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -202,18 +246,26 @@ public abstract class GenericAttrAccessor<T extends ALangObject> implements IAtt
 				final ALangObject... args) throws EvaluationException {
 			return thisContext.get(args[0]);
 		}
+
+		@Nullable
+		@Override
+		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
+				final IVariableType property) {
+			// Property type must be compatible with the first generics argument,
+			// eg. number for hash<object, string>
+			if (!thisContext.getGeneric(0).isAssignableFrom(property))
+				return null;
+			return thisContext.getGeneric(1);
+		}
 	};
 
-	@Nonnull
 	private final String name;
-	@Nonnull
 	private final String[] argList;
 	private final boolean hasVarArgs;
-	@Nonnull
 	private final ILangObjectClass type;
 
-	private GenericAttrAccessor(@Nonnull final ILangObjectClass type, @Nonnull final String name,
-			final boolean hasVarArgs, @Nonnull final String... argList) {
+	private GenericBracketAccessor(final ILangObjectClass type, final String name, final boolean hasVarArgs,
+			final String... argList) {
 		NullUtil.checkItemsNotNull(argList);
 		this.type = type;
 		this.name = name;

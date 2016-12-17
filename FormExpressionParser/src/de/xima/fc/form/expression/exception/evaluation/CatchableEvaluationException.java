@@ -15,6 +15,9 @@ public class CatchableEvaluationException extends EvaluationException {
 	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec) {
 		super(ec);
 	}
+	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, final Throwable cause) {
+		super(ec, cause);
+	}
 	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
 		super(ec, msg);
 	}

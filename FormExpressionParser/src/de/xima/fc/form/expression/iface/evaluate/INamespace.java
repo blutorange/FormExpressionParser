@@ -5,84 +5,70 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.object.ALangObject;
 
 /**
  * <p>
- * A namespace that contains all available functions and attribute accessors for each type of
- * language object. For example, an array has got functions such as <code>length</code> or
- * <code>sort</code>, and the attribute accessor that return the i-th element <code>myArray[i]</code>.
+ * A namespace that contains all available methods, attribute accessors and assigners
+ * for each type of language object.
  * </p><p>
- * Note that attribute accessors may be written in two ways: for a language object of type hash
- * <code>myHash.myValue</code> and <code>myHash["myValue"]</code> are equivalent. Whether an attribute
- * is accessed via the dotNotation or not is indicated by the boolean argument <code>accessedViaDot</code>
- * all attribute accessors and assigners get passed.
+ * For example, an array provides methods such as <code>[1,2] + [3,4]</code>; dot attribute
+ * accessors such as <code>length</code> or <code>sort</code>; and bracket attribute accessor
+ * such as <code>array[i]</code>. It also provides dot attribute assigners such as
+ * <code>array.length = 5</code> and bracket attribute assigners such as <code>array[0] = 5/<code>.
  * </p><p>
- * An attribute assigner is the opposite of an attribute accessor assigns a value to some attribute
- * of an object, eg <code>myArray[0] = 1</code>.
- * </p>
  * <b>Must be immutable.</b>
  * @author madgaksha
- *
  */
 @Immutable
 @ParametersAreNonnullByDefault
 public interface INamespace {
 	/**
+	 * Expression method for the given object type. For example
+	 * the thisContext for <code>"foo" * 3</code> is <code>string</code>.
 	 * @param method Method to get.
-	 * @param type Type for which to get the method.
-	 * @return The expression method for the given type. Must also look it up in any supertypes.
-	 * @throws EvaluationException
+	 * @param thisContext Type for which to get the method.
+	 * @return The expression method for the given type, or <code>null</code>
+	 * when there is no such method. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public <T extends ALangObject> IFunction<T> expressionMethod(EMethod method, T type) throws EvaluationException;
+	public IFunction<?> expressionMethod(ILangObjectClass thisContext, EMethod method);
 
 	/**
-	 * @param method Accessor to get.
-	 * @param type Type for which to get the accessor.
-	 * @return The attribute accessor for the given type. Must also look it up in any supertypes.
-	 * @throws EvaluationException
+	 * For example <code>hash["key"]</code>.
+	 * @param thisContext Type for which to get the accessor.
+	 * @param property Property to access.
+	 * @return The attribute accessor for the given type, or <code>null</code>
+	 * when there is no such accessor. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public <T extends ALangObject> IFunction<T> attrAccessor(ALangObject name, boolean accessedViaDot, T type)
-			throws EvaluationException;
+	public IFunction<?> bracketAccessor(ILangObjectClass thisContext);
 
 	/**
-	 * @param method Assigner to get.
+	 * For example <code>array.length</code>.
+	 * @param thisContext Type for which to get the accessor.
+	 * @param property Property to access.
+	 * @return The attribute accessor for the given type, or <code>null</code>
+	 * when there is no such accessor. Must also look it up in any supertypes.
+	 */
+	@Nullable
+	public IFunction<?> dotAccessor(ILangObjectClass thisContext, String property);
+
+	/**
+	 * @param method Bracket assigner to get, eg. <code>array[0] = 8</code>.
 	 * @param type Type for which to get the assigner.
-	 * @return The attribute assigner for the given type. Must also look it up in any supertypes.
-	 * @throws EvaluationException
+	 * @return The attribute assigner for the given type, or <code>null</code>
+	 * when there is no such assigner. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public <T extends ALangObject> IFunction<T> attrAssigner(ALangObject name, boolean accessedViaDot, T type)
-			throws EvaluationException;
+	public IFunction<?> bracketAssigner(ILangObjectClass thisContext);
 
 	/**
-	 * @param method Method to get.
-	 * @param type Type for which to get the method.
-	 * @return The expression method for the given type. Must also look it up in any supertypes.
-	 * @throws EvaluationException
+	 * For example <code>array.length = 8</code>.
+	 * @param thisContext Type for which to get the assigner.
+	 * @param property Dot assigner to get.
+	 * @return The attribute assigner for the given type, or <code>null</code>
+	 * when there is no such assigner. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public IFunction<?> expressionMethod(EMethod method, ILangObjectClass type) throws EvaluationException;
-
-	/**
-	 * @param method Accessor to get.
-	 * @param type Type for which to get the accessor.
-	 * @return The attribute accessor for the given type. Must also look it up in any supertypes.
-	 * @throws EvaluationException
-	 */
-	@Nullable
-	public IFunction<?> attrAccessor(ALangObject name, boolean accessedViaDot, ILangObjectClass type)
-			throws EvaluationException;
-	/**
-	 * @param method Assigner to get.
-	 * @param type Type for which to get the assigner.
-	 * @return The attribute assigner for the given type. Must also look it up in any supertypes.
-	 * @throws EvaluationException
-	 */
-	@Nullable
-	public IFunction<?> attrAssigner(ALangObject name, boolean accessedViaDot, ILangObjectClass type)
-			throws EvaluationException;
+	public IFunction<?> dotAssigner(ILangObjectClass thisContext, String property);
 }

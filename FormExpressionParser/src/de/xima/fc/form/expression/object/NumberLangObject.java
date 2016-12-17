@@ -6,16 +6,15 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
-import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathDivisionByZeroException;
 import de.xima.fc.form.expression.exception.evaluation.MathException;
 import de.xima.fc.form.expression.exception.evaluation.NumberTooLongForIntException;
 import de.xima.fc.form.expression.exception.evaluation.NumberTooLongForLongException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -33,6 +32,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  * @author madgaksha
  */
+@ParametersAreNonnullByDefault
 public class NumberLangObject extends ALangObject {
 	private final double value;
 
@@ -46,11 +46,11 @@ public class NumberLangObject extends ALangObject {
 
 
 	private static class InstanceHolder {
-		@Nonnull public final static NumberLangObject ZERO = NumberLangObject.create(0);
-		@Nonnull public final static NumberLangObject ONE = NumberLangObject.create(1);
-		@Nonnull public static final NumberLangObject FOURTY_TWO = NumberLangObject.create(42);
-		@Nonnull public static final NumberLangObject PI = NumberLangObject.create(Math.PI);
-		@Nonnull public static final NumberLangObject E = NumberLangObject.create(Math.E);
+		public final static NumberLangObject ZERO = NumberLangObject.create(0);
+		public final static NumberLangObject ONE = NumberLangObject.create(1);
+		public static final NumberLangObject FOURTY_TWO = NumberLangObject.create(42);
+		public static final NumberLangObject PI = NumberLangObject.create(Math.PI);
+		public static final NumberLangObject E = NumberLangObject.create(Math.E);
 	}
 
 	private NumberLangObject(final double value) {
@@ -67,70 +67,45 @@ public class NumberLangObject extends ALangObject {
 		return value;
 	}
 
-	public long longValue(@Nonnull final IEvaluationContext ec) throws MathException {
+	public long longValue(final IEvaluationContext ec) throws MathException {
 		if (Double.isNaN(value) || value > 9007199254740993f || value < -9007199254740993f)
 			throw new NumberTooLongForLongException(value, ec);
 		return (long) value;
 	}
 
-	public int intValue(@Nonnull final IEvaluationContext ec) throws MathException {
+	public int intValue(final IEvaluationContext ec) throws MathException {
 		if (Double.isNaN(value) || value > Integer.MAX_VALUE || value < Integer.MIN_VALUE)
 			throw new NumberTooLongForIntException(value, ec);
 		return (int) value;
 	}
 
-	@Nonnull
 	public static NumberLangObject create(final int value) {
 		return new NumberLangObject(value);
 	}
 
-	@Nonnull
 	public static NumberLangObject create(final long value) {
 		return new NumberLangObject(value);
 	}
 
-	@Nonnull
 	public static NumberLangObject create(final float value) {
 		return new NumberLangObject(value);
 	}
 
-	@Nonnull
 	public static NumberLangObject create(final double value) {
 		return new NumberLangObject(value);
 	}
 
-	@Nonnull
-	public static ALangObject create(final Integer value) {
-		if (value == null)
-			return NullLangObject.getInstance();
-		return create(value.intValue());
+	public static NumberLangObject create(final Number value) {
+		return new NumberLangObject(value.doubleValue());
 	}
 
-	@Nonnull
-	public static ALangObject create(final Long value) {
-		if (value == null)
-			return NullLangObject.getInstance();
-		return create(value.longValue());
-	}
-
-	@Nonnull
-	public static NumberLangObject create(final Float value) {
-		if (value == null)
-			return NumberLangObject.getZeroInstance();
-		return create(value.floatValue());
-	}
-
-	@Nonnull
-	public static NumberLangObject create(final Double value) {
-		if (value == null)
-			return NumberLangObject.create(0);
-		return create(value.doubleValue());
-	}
-
-	@Nonnull
+	/**
+	 * @param value String representing the number, must be parseable
+	 * according to {@link Double#parseDouble(String)}.
+	 * @return A number lang object for this value. <code>0</code> when
+	 * the value is not parsable as a number.
+	 */
 	public static NumberLangObject create(final String value) {
-		if (value == null)
-			return NumberLangObject.getZeroInstance();
 		try {
 			return new NumberLangObject(Double.parseDouble(value));
 		} catch (final NumberFormatException e) {
@@ -172,7 +147,7 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public boolean equals(@Nullable final Object o) {
 		if (this == o)
 			return true;
 		if (!(o instanceof NumberLangObject))
@@ -183,44 +158,6 @@ public class NumberLangObject extends ALangObject {
 	@Override
 	protected int compareToSameType(final ALangObject o) {
 		return Double.compare(value, ((NumberLangObject)o).value);
-	}
-
-	@Override
-	public IFunction<NumberLangObject> expressionMethod(final EMethod method, final IEvaluationContext ec)
-			throws EvaluationException {
-		return ec.getNamespace().expressionMethod(method, this);
-	}
-
-	@Override
-	public IFunction<NumberLangObject> attrAccessor(final ALangObject object, final boolean accessedViaDot,
-			final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAccessor(object, accessedViaDot, this);
-	}
-
-	@Override
-	public IFunction<NumberLangObject> attrAssigner(final ALangObject name, final boolean accessedViaDot,
-			final IEvaluationContext ec) throws EvaluationException {
-		return ec.getNamespace().attrAssigner(name, accessedViaDot, this);
-	}
-
-	@Override
-	public ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
-			final ALangObject... args) throws EvaluationException {
-		return evaluateExpressionMethod(this, ec.getNamespace().expressionMethod(method, this), method, ec, args);
-	}
-
-	@Override
-	public ALangObject evaluateAttrAccessor(final ALangObject object, final boolean accessedViaDot,
-			final IEvaluationContext ec) throws EvaluationException {
-		return evaluateAttrAccessor(this, ec.getNamespace().attrAccessor(object, accessedViaDot, this), object,
-				accessedViaDot, ec);
-	}
-
-	@Override
-	public void executeAttrAssigner(final ALangObject object, final boolean accessedViaDot, final ALangObject value,
-			final IEvaluationContext ec) throws EvaluationException {
-		executeAttrAssigner(this, ec.getNamespace().attrAssigner(object, accessedViaDot, this), object, accessedViaDot,
-				value, ec);
 	}
 
 	@Override
@@ -235,7 +172,7 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	public static String toExpression(final double value) {
-		return NUMBER_FORMAT.get().format(value);
+		return NullUtil.checkNotNull(NUMBER_FORMAT.get().format(value));
 	}
 
 	@Override
@@ -258,7 +195,6 @@ public class NumberLangObject extends ALangObject {
 	 *            Number to add.
 	 * @return A new number, the sum of this number and the operand.
 	 */
-	@Nonnull
 	public NumberLangObject add(final NumberLangObject operand) {
 		return NumberLangObject.create(value + operand.value);
 	}
@@ -268,7 +204,6 @@ public class NumberLangObject extends ALangObject {
 	 *            Number to subtract.
 	 * @return A new number, the difference of this number and the operand.
 	 */
-	@Nonnull
 	public NumberLangObject subtract(final NumberLangObject operand) {
 		return NumberLangObject.create(value - operand.value);
 	}
@@ -278,7 +213,6 @@ public class NumberLangObject extends ALangObject {
 	 *            Number to multiply by.
 	 * @return A new number, the product of this number and the operand.
 	 */
-	@Nonnull
 	public NumberLangObject multiply(final NumberLangObject operand) {
 		return NumberLangObject.create(value * operand.value);
 	}
@@ -290,7 +224,6 @@ public class NumberLangObject extends ALangObject {
 	 * @throws MathDivisionByZeroException
 	 *             When the operand is 0.
 	 */
-	@Nonnull
 	public NumberLangObject divide(final NumberLangObject operand) {
 		return NumberLangObject.create(value / operand.value);
 	}
@@ -307,17 +240,18 @@ public class NumberLangObject extends ALangObject {
 		return value <= 0.0d ? -value <= Double.MAX_VALUE : value <= Double.MAX_VALUE;
 	}
 
-	@Nonnull
 	public NumberLangObject abs() {
 		return NumberLangObject.create(value < 0.0d ? -value : value);
 	}
 
-	@Nonnull
 	public NumberLangObject signum() {
 		return NumberLangObject.create(value > 0d ? 1 : value < 0d ? -1 : 0);
 	}
 
-	@Nonnull
+	public int signumInt() {
+		return value > 0d ? 1 : value < 0d ? -1 : 0;
+	}
+
 	public NumberLangObject negate() {
 		return NumberLangObject.create(-value);
 	}
@@ -326,13 +260,11 @@ public class NumberLangObject extends ALangObject {
 	 * @param other
 	 * @return A number in the range [0...other).
 	 */
-	@Nonnull
 	public NumberLangObject modulo(final NumberLangObject other) {
 		final double res = Math.IEEEremainder(value, other.value);
 		return NumberLangObject.create(res < 0d ? res + other.value : res);
 	}
 
-	@Nonnull
 	public NumberLangObject remainder(final NumberLangObject other) {
 		return NumberLangObject.create(value % other.value);
 	}
@@ -341,42 +273,34 @@ public class NumberLangObject extends ALangObject {
 		return NumberLangObject.create(Math.pow(value, operand.value));
 	}
 
-	@Nonnull
 	public NumberLangObject log() throws MathException {
 		return NumberLangObject.create(Math.log(value));
 	}
 
-	@Nonnull
 	public NumberLangObject sin() throws MathException {
 		return NumberLangObject.create(Math.sin(value));
 	}
 
-	@Nonnull
 	public NumberLangObject cos() throws MathException {
 		return NumberLangObject.create(Math.cos(value));
 	}
 
-	@Nonnull
 	public static NumberLangObject getZeroInstance() {
 		return InstanceHolder.ZERO;
 	}
 
-	@Nonnull
 	public static NumberLangObject getOneInstance() {
 		return InstanceHolder.ONE;
 	}
 
-	@Nonnull
 	public static NumberLangObject getFourtyTwoInstance() {
 		return InstanceHolder.FOURTY_TWO;
 	}
 
-	@Nonnull
 	public static NumberLangObject getPiInstance() {
 		return InstanceHolder.PI;
 	}
 
-	@Nonnull
 	public static NumberLangObject getEInstance() {
 		return InstanceHolder.E;
 	}

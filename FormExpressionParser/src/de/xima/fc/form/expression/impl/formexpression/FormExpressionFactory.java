@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
+import de.xima.fc.form.expression.enums.ESeverityOption;
 import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -38,6 +39,7 @@ import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
 import de.xima.fc.form.expression.visitor.VariableHoistVisitor;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
+import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCollectVisitor;
 
 public final class FormExpressionFactory {
@@ -296,7 +298,7 @@ public final class FormExpressionFactory {
 	 * </ul>
 	 * @param node
 	 * @param parser
-	 * @param contractFactory
+	 * @param factory
 	 * @param strictMode
 	 * @return
 	 * @throws ParseException
@@ -304,18 +306,20 @@ public final class FormExpressionFactory {
 	@Nonnull
 	private static <T> IFormExpression<T> postProcess(final @Nonnull Node node,
 			@Nonnull final FormExpressionParser parser,
-			@Nonnull final IEvaluationContextContract<T> contractFactory,
+			@Nonnull final IEvaluationContextContract<T> factory,
 			@Nonnull final ISeverityConfig severityConfig) throws ParseException {
 		JumpCheckVisitor.check(node);
-		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, contractFactory, severityConfig);
-		VariableHoistVisitor.hoist(node, scopeDefBuilder, contractFactory, severityConfig);
-		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, contractFactory,
+		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, factory, severityConfig);
+		VariableHoistVisitor.hoist(node, scopeDefBuilder, factory, severityConfig);
+		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, factory,
 				severityConfig);
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
 		checkScopeDefsConstancy(scopeDefs);
-		final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);
-		//VariableTypeCheckVisitor.check(node, symbolTypeTable, contractFactory, severityConfig, scopeDefs);
-		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, contractFactory, symbolTableSize);
+		if (severityConfig.hasOption(ESeverityOption.TREAT_UNMATCHING_VARIABLE_TYPES_AS_ERROR)) {
+			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs, factory);
+			VariableTypeCheckVisitor.check(node, symbolTypeTable, factory, severityConfig, scopeDefs);
+		}
+		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, factory, symbolTableSize);
 	}
 
 	private static void checkScopeDefsConstancy(final IScopeDefinitions scopeDef)

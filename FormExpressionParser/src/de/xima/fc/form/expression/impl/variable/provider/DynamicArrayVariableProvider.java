@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.parse.IVariableProvider;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -17,7 +16,7 @@ extends AVariableProvider<ArrayLangObject> {
 	private static final long serialVersionUID = 1L;
 	private final IVariableType innerType;
 	protected DynamicArrayVariableProvider(final IVariableType innerType) {
-		super(new GenericVariableType(ELangObjectType.ARRAY, innerType));
+		super(GenericVariableType.forArray(innerType));
 		this.innerType = innerType;
 	}
 	private static <V extends ALangObject> IVariableType getInnerType(final IVariableProvider<V>[] items) {
@@ -28,7 +27,7 @@ extends AVariableProvider<ArrayLangObject> {
 			innerType = innerType.union(i.getType());
 			innerType = i.getType();
 		}
-		return new GenericVariableType(ELangObjectType.ARRAY, innerType);
+		return GenericVariableType.forArray(innerType);
 	}
 	@Override
 	public final ArrayLangObject make() {

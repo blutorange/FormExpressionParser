@@ -4,10 +4,12 @@ import java.util.Collection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
+import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
@@ -16,6 +18,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.DummyVariableTypeBuilder;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
 import de.xima.fc.form.expression.node.ASTForLoopNode;
@@ -36,14 +39,19 @@ public final class VariableTypeCollectVisitor
 extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
 
 	private final IVariableType[] table;
+	private final IEvaluationContextContract<?> factory;
 
-	public VariableTypeCollectVisitor(final int symbolTableSize) {
+	public VariableTypeCollectVisitor(final int symbolTableSize, final IEvaluationContextContract<?> factory) {
 		table = new IVariableType[symbolTableSize];
+		this.factory = factory;
 	}
 
 	@Override
 	public void visit(final ASTVariableTypeNode node, final IVariableTypeBuilder builder) throws SemanticsException {
 		builder.setBasicType(node.getVariableType());
+		for (final EVariableTypeFlag flag : node.getFlags())
+			if (flag != null)
+				builder.setFlag(flag);
 		for (int i = 0; i < node.getGenericsCount(); ++i) {
 			final VariableTypeBuilder newBuilder = new VariableTypeBuilder();
 			node.getGenericsNode(i).jjtAccept(this, newBuilder);
@@ -90,8 +98,10 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		builder.append(getType(node));
 		for (int i = node.getArgumentCount(); i-->0;) {
 			IVariableType type = visitTypedNode(node.getArgResolvable(i));
-			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
-				type = wrapVarArgs(node, i);
+			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
+				builder.setFlag(EVariableTypeFlag.VARARG);
+				type = varArgParam(node, i);
+			}
 			builder.append(type);
 		}
 		node.getBodyNode().jjtAccept(this, builder);
@@ -102,18 +112,20 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		// TODO set type for *this* variable
 		for (int i = node.getArgumentCount(); i-->0;) {
 			visitTypedNode(node.getArgResolvable(i));
-			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
-				wrapVarArgs(node, i);
+			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
+				builder.setFlag(EVariableTypeFlag.VARARG);
+				varArgParam(node, i);
+			}
 		}
 		node.getBodyNode().jjtAccept(this, builder);
 	}
 
-	private <T extends IArgumentResolvable & Node> IVariableType wrapVarArgs(final T node, final int i) throws SemanticsException, IllegalVariableTypeException {
-		final VariableTypeBuilder b = new VariableTypeBuilder();
-		b.setBasicType(ELangObjectType.ARRAY);
-		final IVariableType type = table[node.getArgResolvable(i).getSource()];
-		b.append(type != null ? type : SimpleVariableType.OBJECT);
-		return resolveTypedNode(node.getArgResolvable(i), node, b.build());
+	private <T extends IArgumentResolvable & Node> IVariableType varArgParam(final T node, final int i) throws SemanticsException, IllegalVariableTypeException {
+		IVariableType type = table[node.getArgResolvable(i).getSource()];
+		type = type != null ? type : SimpleVariableType.OBJECT;
+		final IVariableType wrapped = GenericVariableType.forArray(type);
+		resolveTypedNode(node.getArgResolvable(i), node, wrapped);
+		return type;
 	}
 
 	private <T extends IVariableTyped & Node> IVariableType getType(final T typedNode) throws SemanticsException {
@@ -180,9 +192,9 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	}
 
 	public static IVariableType[] collect(final Node node, final int symbolTableSize,
-			final IScopeDefinitions scopeDefs)
+			final IScopeDefinitions scopeDefs, 	final IEvaluationContextContract<?> factory)
 					throws SemanticsException {
-		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize);
+		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize, factory);
 		v.visitScopeDefs(scopeDefs);
 		node.jjtAccept(v, DummyVariableTypeBuilder.INSTANCE);
 		return v.getTable();

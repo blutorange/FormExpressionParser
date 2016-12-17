@@ -9,8 +9,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 public class NullObjectAccessException extends NoSuchAttrAccessorException {
 	private static final long serialVersionUID = 1L;
 
-	public NullObjectAccessException(@Nonnull final ALangObject object, final boolean accessedViaDot,
-			@Nonnull final IEvaluationContext ec) {
-		super(object.inspect(), NullLangObject.getInstance(), accessedViaDot, ec);
+	public NullObjectAccessException(@Nonnull final ALangObject object,@Nonnull final IEvaluationContext ec) {
+		super(object.inspect(), NullLangObject.getInstance(), ec);
 	}
 }

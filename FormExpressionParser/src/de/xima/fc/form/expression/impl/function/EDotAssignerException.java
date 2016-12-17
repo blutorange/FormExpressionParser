@@ -3,38 +3,34 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ExceptionLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
-import de.xima.fc.form.expression.object.StringLangObject;
-import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAccessorException implements IAttrAccessorFunction<ExceptionLangObject> {
-	/**
-	 * @return {@link StringLangObject}. The message for this exception. The empty string when this exception does not contain a message.
-	 */
-	message(Impl.message),
+public enum EDotAssignerException implements IDotAssignerFunction<ExceptionLangObject> {
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
-	private final boolean deferEvaluation;
+	private final boolean hasVarArgs;
 
-	private EAttrAccessorException(final Impl impl) {
+	private EDotAssignerException(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
-		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
+		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
-			final ALangObject... args) throws EvaluationException {
-		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
+	public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
+			throws EvaluationException {
+		return func.functionValue().evaluate(ec, thisContext, args);
 	}
 
 	@SuppressWarnings("null")
@@ -61,24 +57,21 @@ public enum EAttrAccessorException implements IAttrAccessorFunction<ExceptionLan
 
 	@Override
 	public boolean hasVarArgs() {
-		return impl.hasVarArgs;
+		return hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAccessorFunction<ExceptionLangObject> {
-		message(false) {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return StringLangObject.create(thisContext.exceptionValue().getMessage());
-			}
-		}
+	@Override
+	public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+		return impl.isDotAssignerDefined(thisContext, value);
+	}
+
+	private static enum Impl implements IDotAssignerFunction<ExceptionLangObject> {
 		;
 
 		private String[] argList;
 		private boolean hasVarArgs;
 
 		private Impl(final boolean hasVarArgs, final String... argList) {
-			NullUtil.checkItemsNotNull(argList);
 			this.argList = argList;
 			this.hasVarArgs = hasVarArgs;
 		}
@@ -111,7 +104,15 @@ public enum EAttrAccessorException implements IAttrAccessorFunction<ExceptionLan
 		}
 
 		@Override
-		public abstract ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
-				final ALangObject... args) throws EvaluationException;
+		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
+				final ALangObject... args) throws EvaluationException {
+			throw new UncatchableEvaluationException(ec,
+					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
+		}
+
+		@Override
+		public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
+			return false;
+		}
 	}
 }

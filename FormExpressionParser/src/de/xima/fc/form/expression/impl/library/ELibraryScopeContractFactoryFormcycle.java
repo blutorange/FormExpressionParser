@@ -13,7 +13,6 @@ import de.xima.fc.form.expression.iface.evaluate.ILibraryScope;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.warning.MissingFormFieldWarning;
@@ -43,8 +42,7 @@ public enum ELibraryScopeContractFactoryFormcycle implements ILibraryScopeContra
 		}
 	},
 	FC_SYSTEM(FetchImpl.FORM_FIELD) {
-		private final IVariableType type = new GenericVariableType(ELangObjectType.ARRAY,
-				new GenericVariableType(ELangObjectType.HASH, SimpleVariableType.STRING, SimpleVariableType.STRING));
+		private final IVariableType type = GenericVariableType.forArray(GenericVariableType.forHash(SimpleVariableType.STRING, SimpleVariableType.STRING));
 
 		@Override
 		public boolean isProviding(final String variableName) {

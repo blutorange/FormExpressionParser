@@ -1,14 +1,19 @@
 package de.xima.fc.form.expression.impl.variable;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
+
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 @Immutable
+@ParametersAreNonnullByDefault
 public enum SimpleVariableType implements IVariableType {
 	OBJECT(ELangObjectType.OBJECT),
 	NULL(ELangObjectType.NULL),
@@ -19,11 +24,11 @@ public enum SimpleVariableType implements IVariableType {
 	EXCEPTION(ELangObjectType.EXCEPTION),
 	;
 
-	@Nonnull
+	private static final long serialVersionUID = 1L;
 	private final ILangObjectClass clazz;
 
-	private SimpleVariableType(@Nonnull final ILangObjectClass type) {
-		if (!type.allowsGenericsCount(0))
+	private SimpleVariableType(final ILangObjectClass type) {
+		if (!type.allowsGenericsCountAndFlags(0, ImmutableSet.<EVariableTypeFlag>of()))
 			throw new FormExpressionException();
 		this.clazz = type;
 	}
@@ -34,12 +39,8 @@ public enum SimpleVariableType implements IVariableType {
 	}
 
 	@Override
-	public boolean equalsType(final IVariableType other) {
-		if (clazz != other.getBasicLangClass())
-			return false;
-		if (other.getGenericCount() != 0)
-			return false;
-		return true;
+	public boolean equalsType(final IVariableType that) {
+		return GenericVariableType.equalsType(this, that);
 	}
 	@Override
 	public int getGenericCount() {
@@ -50,34 +51,20 @@ public enum SimpleVariableType implements IVariableType {
 		throw new ArrayIndexOutOfBoundsException(i);
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String toString() {
 		return clazz.toString();
 	}
 
 	@Override
-	public IVariableType union(final IVariableType otherType) {
-		if (clazz == otherType.getBasicLangClass() || otherType.getBasicLangClass() == ELangObjectType.NULL
-				|| clazz == ELangObjectType.OBJECT)
-			return this;
-		if (clazz == ELangObjectType.NULL || otherType.getBasicLangClass() == ELangObjectType.OBJECT)
-			return otherType;
-		return SimpleVariableType.OBJECT;
+	public IVariableType union(final IVariableType that) {
+		return GenericVariableType.union(this, that);
 	}
 
 	@Override
-	public boolean isAssignableFrom(final IVariableType otherType) {
-		// this    null object string     ...
-		// null     o      x     x     x  ...
-		// object   o      o     o     o  ...
-		// string   o      x     o     x   x
-		//   .      o      x     x     o   x
-		//   .      o      x     x     x   o
-		//   .      o      x     x     x   x
-		if (clazz == otherType.getBasicLangClass() || otherType.getBasicLangClass() == ELangObjectType.NULL
-				|| clazz == ELangObjectType.OBJECT)
-			return true;
-		return false;
+	public boolean isAssignableFrom(final IVariableType that) {
+		return GenericVariableType.isAssignableFrom(this, that);
 	}
 
 	@Override
@@ -88,5 +75,20 @@ public enum SimpleVariableType implements IVariableType {
 	@Override
 	public IVariableType getIterableItemType() {
 		return clazz.getIterableItemType(CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_ARRAY);
+	}
+
+	@Override
+	public boolean isA(final ILangObjectClass baseClass) {
+		return clazz.equalsClass(baseClass);
+	}
+
+	@Override
+	public boolean hasFlag(final EVariableTypeFlag flag) {
+		return false;
+	}
+
+	@Override
+	public ImmutableCollection<EVariableTypeFlag> getFlags() {
+		return ImmutableSet.<EVariableTypeFlag>of();
 	}
 }

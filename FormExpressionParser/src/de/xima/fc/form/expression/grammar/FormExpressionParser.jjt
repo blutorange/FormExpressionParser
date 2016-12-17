@@ -51,15 +51,16 @@ package de.xima.fc.form.expression.grammar;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import de.xima.fc.form.expression.enums.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.impl.formexpression.CommentFactory;
+import de.xima.fc.form.expression.util.CommentFactory;
 import de.xima.fc.form.expression.node.*;
 
 public class FormExpressionParser
@@ -113,6 +114,7 @@ TOKEN :
 | < TypeAngleClose : ">" > { --typeLevel; if (typeLevel == 0) SwitchTo(FormExpressionParserConstants.CODE); }
 | < TypeComma : "," >
 | < TypeHash : "hash" >
+| < TypeTripleDot : "..." >
 | < TypeVoid : "void" >
 | < TypeError : "error" >
 | < TypeRegex : "regex" >
@@ -750,6 +752,7 @@ void VoidVariableType(EMethod method) #VariableTypeNode :
 void SpecificVariableType(EMethod method) #VariableTypeNode :
 {
   ELangObjectType type;
+  EVariableTypeFlag flag = null;
 }
 {
   (
@@ -792,14 +795,14 @@ void SpecificVariableType(EMethod method) #VariableTypeNode :
   |
     (
       ( < Method >  | < TypeMethod > )
-      GenericsMethod(null)
+      flag = GenericsMethod(null)
       {
         type = ELangObjectType.FUNCTION;
       }
     )
   )
   {
-    jjtThis.init(method, type);
+    jjtThis.init(method, type, flag);
   }
 }
 
@@ -838,29 +841,44 @@ void GenericsArray(EMethod method) #void:
   )
 }
 
-void GenericsMethod(EMethod method) #void:
+EVariableTypeFlag GenericsMethod(EMethod method) #void:
 {
+  EVariableTypeFlag flag = null;
 }
 {
   (
-    < AngleOpen >
-  | < TypeAngleOpen >
-  )
-  (
-    SpecificVariableType(method)
-  | VoidVariableType(method)
-  )
-  (
     (
-      < Comma >
-    | < TypeComma >
+      < AngleOpen >
+    | < TypeAngleOpen >
     )
-    SpecificVariableType(method)
-  )*
-  (
-    < AngleClose >
-  | < TypeAngleClose >
+    (
+      SpecificVariableType(method)
+    | VoidVariableType(method)
+    )
+    (
+      (
+        < Comma >
+      | < TypeComma >
+      )
+      SpecificVariableType(method)
+    )*
+    [
+      (
+        < TripleDot >
+      | < TypeTripleDot >
+      )
+      {
+        flag = EVariableTypeFlag.VARARG;
+      }
+    ]
+    (
+      < AngleClose >
+    | < TypeAngleClose >
+    )
   )
+  {
+    return flag;
+  }
 }
 
 void GenericsFunction(EMethod method) #void :

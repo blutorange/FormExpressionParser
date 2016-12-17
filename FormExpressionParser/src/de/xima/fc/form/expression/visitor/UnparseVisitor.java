@@ -37,6 +37,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.collect.ImmutableList;
 
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
@@ -101,7 +102,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	private final Writer writer;
 	private final IUnparseConfig config;
 	private final ImmutableList<IComment> comments;
-	@Nullable private final IComment commentToken;
+	@Nullable private IComment commentToken;
 	private int commentPos;
 
 	private boolean insideManualDefs;
@@ -192,6 +193,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// Get the next comment
 		++commentPos;
 		ct = commentPos < comments.size() ? comments.get(commentPos) : null;
+		this.commentToken = ct;
 	}
 
 	private void writeRemainingComments() throws IOException {
@@ -208,8 +210,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// comment. We check check for >= beginColumn to be safe, but
 		// the = case cannot happen as a comment token cannot be at the same
 		// position as a non-comment node.
-		final IComment ct = this.commentToken;
-		while (ct != null
+		IComment ct;
+		while ((ct = this.commentToken) != null
 				&& (node.getStartLine() > ct.getLine() || node.getStartLine() == ct.getLine()
 				&& node.getStartColumn() >= ct.getColumn())) {
 			writeComment(prefix, isBlock);
@@ -882,13 +884,12 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			expression(node.getTypeNode(), prefix);
 		writer.write(config.getRequiredSpace());
 		writer.write(node.getVariableName());
-		writer.write(config.getOptionalSpace());
-		writer.write(Syntax.EQUAL);
-		writer.write(config.getOptionalSpace());
-		if (node.hasAssignment())
+		if (node.hasAssignment()) {
+			writer.write(config.getOptionalSpace());
+			writer.write(Syntax.EQUAL);
+			writer.write(config.getOptionalSpace());
 			expression(node.getAssignmentNode(), prefix);
-		else
-			writer.write(Syntax.NULL);
+		}
 	}
 
 	@Override
@@ -945,6 +946,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 					writer.write(config.getOptionalSpace());
 				}
 			}
+			if (node.hasFlag(EVariableTypeFlag.VARARG))
+				writer.write(CmnCnst.Syntax.TRIPLE_DOT);
 			writer.write(Syntax.ANGLE_CLOSE);
 		}
 	}

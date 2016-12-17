@@ -24,11 +24,4 @@ public class NoSuchAttrAccessorException extends NoSuchFunctionException {
 			@Nonnull final IEvaluationContext ec) {
 		super(CmnCnst.Name.ATTRIBUTE_ACCESSOR, name, thisContext, ec);
 	}
-
-	public NoSuchAttrAccessorException(@Nonnull final String name, @Nonnull final ALangObject thisContext,
-			final boolean accessedViaDot, @Nonnull final IEvaluationContext ec) {
-		super(accessedViaDot ? CmnCnst.Name.DOT_ATTRIBUTE_ACCESSOR : CmnCnst.Name.BRACKET_ATTRIBUTE_ACCESSOR, name,
-				thisContext, ec);
-	}
-
 }

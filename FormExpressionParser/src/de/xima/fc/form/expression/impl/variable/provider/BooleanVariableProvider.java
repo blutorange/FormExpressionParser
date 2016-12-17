@@ -14,10 +14,10 @@ public abstract class BooleanVariableProvider extends AVariableProvider<BooleanL
 	}
 	@Override
 	public abstract BooleanLangObject make();
-	public static IVariableProvider<BooleanLangObject> getTrueProvider() {
+	public static IVariableProvider<BooleanLangObject> forTrue() {
 		return InstanceHolder.TRUE;
 	}
-	public static IVariableProvider<BooleanLangObject> getFalseProvider() {
+	public static IVariableProvider<BooleanLangObject> forFalse() {
 		return InstanceHolder.FALSE;
 	}
 	private static class InstanceHolder {

@@ -33,6 +33,12 @@ public class EvaluationException extends Exception {
 		externalContext = ec.getExternalContext();
 	}
 
+	public EvaluationException(@Nonnull final IEvaluationContext ec, final Throwable cause) {
+		super(msgWithContext(cause.getMessage(), ec));
+		this.ec = ec;
+		externalContext = ec.getExternalContext();
+	}
+
 	public EvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
 		super(msgWithContext(msg, ec));
 		this.ec = ec;
@@ -84,18 +90,18 @@ public class EvaluationException extends Exception {
 			}
 		}
 		sb.append(System.lineSeparator());
-		
+
 		if (ec != null)
 			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_KNOWN_EC, ec, ec.getClass().getCanonicalName()));
-		else 
+		else
 			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_UNKNOWN_EC));
-		
+
 		sb.append(System.lineSeparator());
-		
+
 		final IExternalContext ex = ec != null ? ec.getExternalContext() : null;
 		if (ex != null)
 			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_KNOWN_EX, ex, ex.getClass().getCanonicalName()));
-		else 
+		else
 			sb.append(NullUtil.messageFormat(CmnCnst.Error.EVALUATION_EXCEPTION_UNKNOWN_EX));
 
 		return sb.toString();

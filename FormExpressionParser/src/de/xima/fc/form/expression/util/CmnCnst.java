@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -42,6 +43,7 @@ public final class CmnCnst {
 		@Nonnull public static final String[] EMPTY_STRING_ARRAY = new String[0];
 		@Nonnull public static final GenericSourceResolvable[] EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY = new GenericSourceResolvable[0];
 		@Nonnull public static final IVariableType[] EMPTY_VARIABLE_TYPE_ARRAY = new IVariableType[0];
+		@Nonnull public static final EVariableTypeFlag[] EMPTY_VARIABLE_TYPE_FLAG_ARRAY = new EVariableTypeFlag[0];
 	}
 
 	public final static class CustomScope {
@@ -91,6 +93,8 @@ public final class CmnCnst {
 		@Nonnull public static final String HASH = "hash";
 		@Nonnull public static final String VALUE = "value";
 		@Nonnull public static final String EMPTY_LABEL = "without label";
+		@Nonnull public static final String PI = "pi";
+		@Nonnull public static final String E = "e";
 	}
 
 	public final static class ExpressionMethod {
@@ -330,7 +334,8 @@ public final class CmnCnst {
 		@Nonnull public static final String SCOPED_FUNCTION_OUTSIDE_HEADER = "Occurence of function {0}::{1} at top level. Scoped function must be defined in a scope block in strict mode.";
 		@Nonnull public static final String UNDEFINED_EMBEDMENT = "Embedment {0} is not defined.";
 		@Nonnull public static final String VAR_ARGS_WITHOUT_ARGUMENTS = "Function cannot have varArgs without any arguments. " + INTERNAL_ERROR;
-		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires {0} parameters, but {1} were given.";
+		@Nonnull public static final String ILLEGAL_ARGUMENT_COUNT = "Function requires {0} parameter(s), but {1} were given.";
+		@Nonnull public static final String ILLEGAL_VARARG_ARGUMENT_COUNT = "Varargs function requires {0} or more parameters, but {1} were given.";
 		@Nonnull public static final String NULL_VARIABLE_TYPE = "Variable type must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String ILLEGAL_VARIABLE_TYPE_AT_EVALUATION = "Variable type declaration {0} cannot occur in the main program. " + INTERNAL_ERROR;
 		@Nonnull public static final String NOT_A_SIMPLE_TYPE = "Lang object type {0} is not a simple type. " + INTERNAL_ERROR;
@@ -341,7 +346,8 @@ public final class CmnCnst {
 		@Nonnull public static final String GET_TYPE_NODE_CALLED_BUT_NO_TYPE_NODE_PRESENT = "No type node present, use hasType() to check. " + INTERNAL_ERROR;
 		@Nonnull public static final String INCOMPATIBLE_SIMPLE_TYPES = "Incompatible simple types.";
 		@Nonnull public static final String INCOMPATIBLE_GENERIC_TYPES = "Incompatible generic types.";
-		@Nonnull public static final String INCOMPATIBLE_VARIABLE_TYPES = "Found variable type {0}, but expected {1}: {2}";
+		@Nonnull public static final String INCOMPATIBLE_VARIABLE_TYPES_KNOWN_SHOULD = "Found incompatible variable type {0} but expected {1}: {2}";
+		@Nonnull public static final String INCOMPATIBLE_VARIABLE_TYPES_UNKNOWN_SHOULD = "Found incompatible variable type {0}: {1}";
 		@Nonnull public static final String CONDITION_MUST_BE_BOOLEAN = "Condition must evaluate to boolean type.";
 		@Nonnull public static final String UNREACHABLE_CODE = "Unreachable code, previous code never completes normally.";
 		@Nonnull public static final String ILLEGAL_NODE_DURING_TYPECHECKING = "Illegal node during variable type checking: {0}. " + INTERNAL_ERROR;
@@ -362,6 +368,11 @@ public final class CmnCnst {
 		@Nonnull public static final String NULL_MAP_VALUE = "Map must not contain any null value.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_ASSIGNMENT_TYPE = "Variable {0} cannot be assigned to this type.";
 		@Nonnull public static final String INCOMPATIBLE_EXPRESSION_METHOD_TYPES = "Expression method {0} for type {1} does not accept the right hand side type {2}.";
+		@Nonnull public static final String INCONSISTENT_CLASS_HIERARCHY = "Inconsistent class hierarchy: {0} < {1}";
+		@Nonnull public static final String NO_SUCH_BRACKET_ACCESSOR = "No such bracket accessor of type {0} for this variable type.";
+		@Nonnull public static final String NO_SUCH_DOT_ACCESSOR = "No such dot accessor {0} for this variable type.";
+		@Nonnull public static final String NOT_A_FUNCTION = "A function type is required.";
+		@Nonnull public static final String INCOMPATIBLE_FUNCTION_PARAMETER_TYPE = "Function parameter type not compatible.";
 	}
 
 	public static final class ToString {

@@ -17,6 +17,9 @@ import javax.annotation.Nonnull;
 
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableSet;
+
+import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -69,9 +72,16 @@ public class VariableTypeTest {
 			assertTrue(funcType.union(funcSingle).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(funcType.union(arrayType).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(funcType.union(hashType).equalsType(SimpleVariableType.OBJECT));
-			assertTrue(funcObject.isAssignableFrom(funcType));
-			if (t.obj != OBJECT)
+			if (t.obj != OBJECT) {
 				assertFalse(funcType.isAssignableFrom(funcObject));
+				if (t.obj != NULL)
+					assertFalse(funcObject.isAssignableFrom(funcType));
+				else
+					assertTrue(funcObject.isAssignableFrom(funcType));
+			}
+			else {
+				assertTrue(funcObject.isAssignableFrom(funcType));
+			}
 		}
 	}
 
@@ -94,6 +104,7 @@ public class VariableTypeTest {
 		for (final Tuple t : getSimpleTypes()) {
 			final IVariableType hashType = new VariableTypeBuilder().setBasicType(HASH).append(t.var).append(t.var).build();
 			final IVariableType hashObject = new VariableTypeBuilder().setBasicType(HASH).append(OBJECT).append(OBJECT).build();
+			final IVariableType hashTypeString = new VariableTypeBuilder().setBasicType(HASH).append(t.var).append(STRING).build();
 			final IVariableType hashNull = new VariableTypeBuilder().setBasicType(HASH).append(NULL).append(NULL).build();
 			basicTests(new Tuple(hashType, HASH));
 			if (t.obj != NULL) {
@@ -102,12 +113,21 @@ public class VariableTypeTest {
 			}
 			assertFalse(hashType.equalsType(arrayType));
 			assertFalse(hashType.equalsType(funcType));
+			if (t.obj != STRING && t.obj != NULL)
+				assertTrue(arrayType.union(hashTypeString).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(hashType.union(hashNull).equalsType(hashType));
 			assertTrue(hashType.union(arrayType).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(hashType.union(funcType).equalsType(SimpleVariableType.OBJECT));
-			assertTrue(hashObject.isAssignableFrom(hashType));
-			if (t.obj != OBJECT)
+			if (t.obj != OBJECT) {
 				assertFalse(hashType.isAssignableFrom(hashObject));
+				if (t.obj != NULL)
+					assertFalse(hashObject.isAssignableFrom(hashType));
+				else
+					assertTrue(hashObject.isAssignableFrom(hashType));
+			}
+			else {
+				assertTrue(hashObject.isAssignableFrom(hashType));
+			}
 		}
 	}
 
@@ -128,6 +148,7 @@ public class VariableTypeTest {
 			final IVariableType arrayObject = new VariableTypeBuilder().setBasicType(ARRAY).append(OBJECT).build();
 			final IVariableType arrayType = new VariableTypeBuilder().setBasicType(ARRAY).append(t.var).build();
 			final IVariableType arrayNull = new VariableTypeBuilder().setBasicType(ARRAY).append(NULL).build();
+			final IVariableType arrayString = new VariableTypeBuilder().setBasicType(ARRAY).append(STRING).build();
 			basicTests(new Tuple(arrayType, ARRAY));
 			if (t.obj != NULL) {
 				assertFalse(funcType.equalsType(arrayNull));
@@ -135,12 +156,21 @@ public class VariableTypeTest {
 			}
 			assertFalse(arrayType.equalsType(hashType));
 			assertFalse(arrayType.equalsType(funcType));
+			if (t.obj != STRING && t.obj != NULL)
+				assertTrue(arrayType.union(arrayString).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(arrayType.union(arrayNull).equalsType(arrayType));
 			assertTrue(arrayType.union(hashType).equalsType(SimpleVariableType.OBJECT));
 			assertTrue(arrayType.union(funcType).equalsType(SimpleVariableType.OBJECT));
-			assertTrue(arrayObject.isAssignableFrom(arrayType));
-			if (t.obj != OBJECT)
+			if (t.obj != OBJECT) {
 				assertFalse(arrayType.isAssignableFrom(arrayObject));
+				if (t.obj != NULL)
+					assertFalse(arrayObject.isAssignableFrom(arrayType));
+				else
+					assertTrue(arrayObject.isAssignableFrom(arrayType));
+			}
+			else {
+				assertTrue(arrayObject.isAssignableFrom(arrayType));
+			}
 		}
 	}
 
@@ -184,7 +214,7 @@ public class VariableTypeTest {
 	private List<Tuple> getSimpleTypes() {
 		final List<Tuple> list = new ArrayList<>();
 		for (final ILangObjectClass obj : ELangObjectType.values())
-			if (obj.allowsGenericsCount(0))
+			if (obj.allowsGenericsCountAndFlags(0, ImmutableSet.<EVariableTypeFlag>of()))
 				list.add(new Tuple(obj));
 		return list;
 	}

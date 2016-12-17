@@ -54,7 +54,12 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Nullable
 			@Override
 			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return rhs.equalsType(rhs) ? rhs : null;
+				// Right hand side must be an array as well.
+				if (lhs.getBasicLangClass().getClassId() != rhs.getBasicLangClass().getClassId())
+					return null;
+				// Return type is the union between the two array types.
+				// array<string> + array<number> = array<object>
+				return lhs.union(rhs);
 			}
 		},
 		/**
@@ -72,7 +77,12 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Nullable
 			@Override
 			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return rhs.equalsType(rhs) ? rhs : null;
+				// Right hand side must be an array as well.
+				if (lhs.getBasicLangClass().getClassId() != rhs.getBasicLangClass().getClassId())
+					return null;
+				// Return type is the union between the two array types.
+				// array<string> - array<number> = array<object>
+				return lhs.union(rhs);
 			}
 		},
 		;

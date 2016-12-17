@@ -2,14 +2,17 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Arrays;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
+import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.iface.evaluate.IAttrAccessorFunction;
+import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
@@ -18,7 +21,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EAttrAccessorFunction implements IAttrAccessorFunction<FunctionLangObject> {
+public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObject> {
 	/**
 	 * @return {@link StringLangObject}. The declared name of this function. The
 	 *         empty string when an anonymous function.
@@ -45,7 +48,7 @@ public enum EAttrAccessorFunction implements IAttrAccessorFunction<FunctionLangO
 	private final Impl impl;
 	private final boolean deferEvaluation;
 
-	private EAttrAccessorFunction(final Impl impl) {
+	private EDotAccessorFunction(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
 		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
@@ -84,12 +87,24 @@ public enum EAttrAccessorFunction implements IAttrAccessorFunction<FunctionLangO
 		return impl.hasVarArgs;
 	}
 
-	private static enum Impl implements IAttrAccessorFunction<FunctionLangObject> {
+	@Nullable
+	@Override
+	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+		return impl.getDotAccessorReturnType(thisContext);
+	}
+
+	private static enum Impl implements IDotAccessorFunction<FunctionLangObject> {
 		name(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				return StringLangObject.create(thisContext.functionValue().getDeclaredName());
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
 			}
 		},
 		apply(false, "thisContext", "argsArray") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -104,6 +119,13 @@ public enum EAttrAccessorFunction implements IAttrAccessorFunction<FunctionLangO
 					return thisContext.functionValue().evaluate(ec, thiz, args[1].coerceArray(ec).toArray());
 				return thisContext.functionValue().evaluate(ec, thiz);
 			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				//TODO real return type, may have to remove this. METHODS MUST BE BOUND!
+				return null;
+			}
 		},
 		call(true, "thisContext", "args") { //$NON-NLS-1$ //$NON-NLS-2$
 			@SuppressWarnings("null")
@@ -117,6 +139,13 @@ public enum EAttrAccessorFunction implements IAttrAccessorFunction<FunctionLangO
 				if (args.length > 1)
 					return thisContext.functionValue().evaluate(ec, thiz, Arrays.copyOfRange(args, 1, args.length));
 				return thisContext.functionValue().evaluate(ec, thiz);
+			}
+
+			@Nullable
+			@Override
+			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+				//TODO real return type, may have to remove this. METHODS MUST BE BOUND!
+				return null;
 			}
 		};
 

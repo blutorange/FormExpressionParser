@@ -9,23 +9,28 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 @ParametersAreNonnullByDefault
 public class GenericWarning implements IEvaluationWarning {
 	private final String message;
-	private final int line, column;
+	private final int startLine, startColumn;
+	private final int endLine, endColumn;
 
 	public GenericWarning(final String message, final Node node) {
 		this.message = message;
-		column = node.getStartColumn();
-		line = node.getStartLine();
+		startColumn = node.getStartColumn();
+		startLine = node.getStartLine();
+		endColumn = node.getEndColumn();
+		endLine = node.getEndLine();
 	}
 
 	public GenericWarning(final String message, final IEvaluationContext ec) {
 		this.message = message;
 		final Node node = ec.getTracer().getCurrentlyProcessed();
 		if (node != null) {
-			column = node.getStartColumn();
-			line = node.getStartLine();
+			startColumn = node.getStartColumn();
+			startLine = node.getStartLine();
+			endColumn = node.getEndColumn();
+			endLine = node.getEndLine();
 		}
 		else {
-			column = line = 0;
+			startColumn = startLine = endColumn = endLine = 0;
 		}
 	}
 
@@ -35,12 +40,22 @@ public class GenericWarning implements IEvaluationWarning {
 	}
 
 	@Override
-	public final int getLine() {
-		return line;
+	public final int getStartLine() {
+		return startLine;
 	}
 
 	@Override
-	public final int getColumn() {
-		return column;
+	public final int getStartColumn() {
+		return startColumn;
+	}
+
+	@Override
+	public int getEndLine() {
+		return endLine;
+	}
+
+	@Override
+	public int getEndColumn() {
+		return endColumn;
 	}
 }
