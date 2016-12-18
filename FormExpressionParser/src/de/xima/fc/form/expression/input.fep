@@ -1,8 +1,9 @@
 global scope {
-  array<number> arr = [0,1,2,3];
-  method<number, number, number> comparator = ->number(number x, number y){y - x;};
-  method<array<number>, number, number...> push;
+  number a;
+  number b;
+  number c;
+  number d;
 }
-//arr.get(false);
-push = arr.push;
-//arr.sortBy(comparator);
+a = 5;
+logerror(++a);
+a;

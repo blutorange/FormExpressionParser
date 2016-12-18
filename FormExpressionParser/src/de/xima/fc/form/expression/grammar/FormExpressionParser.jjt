@@ -114,6 +114,7 @@ TOKEN :
 | < TypeAngleClose : ">" > { --typeLevel; if (typeLevel == 0) SwitchTo(FormExpressionParserConstants.CODE); }
 | < TypeComma : "," >
 | < TypeHash : "hash" >
+| < TypeVar : "var" >
 | < TypeTripleDot : "..." >
 | < TypeVoid : "void" >
 | < TypeError : "error" >
@@ -697,7 +698,7 @@ void FunctionArgument(EMethod method) #FunctionArgumentNode :
 }
 {
   (
-      [ SpecificVariableType(null) ] t = < Identifier >
+      [ VariableType(null) ] t = < Identifier >
   )
   {
     jjtThis.init(method, t.image);
@@ -731,7 +732,7 @@ void UnspecificVariableType(EMethod method) #VariableTypeNode :
 }
 {
   (
-    < Var >
+    < Var > | < TypeVar >
   )
   {
     jjtThis.init(method, ELangObjectType.OBJECT);
@@ -814,12 +815,12 @@ void GenericsHash(EMethod method) #void:
     < AngleOpen >
   | < TypeAngleOpen >
   )
-  SpecificVariableType(method)
+  VariableType(method)
   (
     < Comma >
   | < TypeComma >
   )
-  SpecificVariableType(method)
+  VariableType(method)
   (
     < AngleClose >
   | < TypeAngleClose >
@@ -834,7 +835,7 @@ void GenericsArray(EMethod method) #void:
     < AngleOpen >
   | < TypeAngleOpen >
   )
-  SpecificVariableType(method)
+  VariableType(method)
   (
     < AngleClose >
   | < TypeAngleClose >
@@ -852,7 +853,7 @@ EVariableTypeFlag GenericsMethod(EMethod method) #void:
     | < TypeAngleOpen >
     )
     (
-      SpecificVariableType(method)
+      VariableType(method)
     | VoidVariableType(method)
     )
     (
@@ -860,7 +861,7 @@ EVariableTypeFlag GenericsMethod(EMethod method) #void:
         < Comma >
       | < TypeComma >
       )
-      SpecificVariableType(method)
+      VariableType(method)
     )*
     [
       (
@@ -886,7 +887,7 @@ void GenericsFunction(EMethod method) #void :
 }
 {
   (
-    SpecificVariableType(method)
+    VariableType(method)
   | VoidVariableType(method)
   )
 }
@@ -1138,9 +1139,9 @@ void ForLoop(EMethod method) #ForLoopNode :
   (
     < For > [ < AngleOpen > label = < Identifier > < AngleClose > ] < ParenOpen >
     (
-      LOOKAHEAD([ SpecificVariableType(null) ] < Identifier > < In >)
+      LOOKAHEAD([ VariableType(null) ] < Identifier > < In >)
       (
-        [ SpecificVariableType(null) { hasType = true; } ]
+        [ VariableType(null) { hasType = true; } ]
         iteratingLoopVariable = < Identifier >
         < In >
         Expression(null)

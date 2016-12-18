@@ -396,7 +396,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			final NodeInfo infoArg = node.getArgumentNode(i).jjtAccept(this);
 			final IVariableType typeArg = infoArg.hasImplicitType() ? infoArg.getImplicitType()
 					: SimpleVariableType.OBJECT;
-			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
+			if (node.hasVarArgs() && i == node.getArgumentCount() - 1)
 				builder.setFlag(EVariableTypeFlag.VARARG);
 			builder.append(typeArg);
 		}
@@ -790,9 +790,10 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					throw new IllegalJumpClauseException(EJump.BREAK, infoCase.getAnyLabel(), node.getCaseNode(i));
 				if (infoCase.hasReturnType())
 					throw new IllegalJumpClauseException(EJump.RETURN, null, node.getCaseNode(i));
-				if (!infoCase.hasImplicitType()) { // FIXME we can still reacher
-					// other cases, dont
-					// throw!!!
+				if (!infoCase.hasImplicitType()) {
+					// FIXME we can still reach
+					// other cases, dont throw!!!
+					// We check each case one after another, when it throws, that's it???
 					if (i < node.getCaseCount() - 1)
 						throw new UnreachableCodeException(node.getCaseNode(i));
 				}
@@ -943,7 +944,6 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				throw new UnreachableCodeException(node.getPropertyNode(0));
 			return infoRes;
 		}
-		//IVariableType typeThis = infoRes.getImplicitType();
 		for (int i = 0; i < node.getPropertyNodeCount(); ++i) {
 			switch (node.getPropertyType(i)) {
 			case DOT: {
@@ -977,6 +977,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					throw new NotAFunctionException(infoRes.getImplicitType(), node);
 				// TODO Check this context for the function
 				// Check argument count and argument types.
+				// Alternatively: bind functions to a certain this context?
 				final int declaredArgCount = typeFunction.getGenericCount() - 1;
 				final int actualArgCount = node.getParenthesisArgNodeCount(i);
 				final int indexOneAfterEnd;
@@ -1032,8 +1033,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTIdentifierNameNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
+		return new NodeInfo(null, SimpleVariableType.STRING);
 	}
 
 	/**

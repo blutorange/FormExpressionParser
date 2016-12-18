@@ -29,7 +29,7 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.ARRAY;
 	}
 

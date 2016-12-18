@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
@@ -20,28 +21,25 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject> {
-	@Nonnull
 	private final EvaluateVisitor visitor;
-	@Nonnull
 	private final IArgumentResolvableNode node;
-	@Nonnull
 	private final String name;
 
-	public EvaluateVisitorNamedFunction(@Nonnull final EvaluateVisitor visitor,
-			@Nonnull final ASTFunctionClauseNode node, @Nonnull final IEvaluationContext ec)
-					throws UncatchableEvaluationException {
+	public EvaluateVisitorNamedFunction(final EvaluateVisitor visitor, final ASTFunctionClauseNode node,
+			final IEvaluationContext ec) throws UncatchableEvaluationException {
 		this(visitor, node, node.getCanonicalName(), ec);
 	}
 
-	protected EvaluateVisitorNamedFunction(
-			@Nonnull final EvaluateVisitor visitor, @Nonnull final IArgumentResolvableNode node, @Nonnull final String name,
-			@Nonnull final IEvaluationContext ec) throws UncatchableEvaluationException {
+	protected EvaluateVisitorNamedFunction(final EvaluateVisitor visitor, final IArgumentResolvableNode node,
+			final String name, final IEvaluationContext ec) throws UncatchableEvaluationException {
 		final Node b = node.getLastChildOrNull();
 		if (b == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		if (node.jjtGetNumChildren() == 0)
-			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_AT_LEAST, 1, 0));
+			throw new UncatchableEvaluationException(ec,
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_AT_LEAST, 1, 0));
 		this.visitor = visitor;
 		this.name = name;
 		this.node = node;
@@ -65,9 +63,8 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 	@Override
 	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final NullLangObject thisContext,
 			@Nonnull final ALangObject... args) throws EvaluationException {
-		// Set special variables 'this'
-		// TODO remove the arguments variable, not needed and wont work with var
-		// types
+		// TODO Set special variables 'this'
+		// As we are global function, set it to null?
 		set(ec, node.getThisResolvable(), thisContext);
 		final int normalArgCount;
 		if (node.hasVarArgs()) {
@@ -91,13 +88,6 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 		return node.getBodyNode().jjtAccept(visitor);
 	}
 
-	private void set(@Nonnull final IEvaluationContext ec, @Nonnull final ISourceResolvable res,
-			@Nonnull final ALangObject val) throws UnresolvedVariableSourceException {
-		if (res.getSource() < 0)
-			throw new UnresolvedVariableSourceException(null, res.getVariableName(), ec);
-		ec.getSymbolTable()[res.getSource()].setCurrentObject(val);
-	}
-
 	@Override
 	public ILangObjectClass getThisContextType() {
 		return ELangObjectType.NULL;
@@ -111,5 +101,12 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 	@Override
 	public void unparseBody(final StringBuilder builder) {
 		builder.append(UnparseVisitor.unparse(node.getBodyNode(), UnparseConfig.getUnstyledWithoutCommentsConfig()));
+	}
+
+	private void set(final IEvaluationContext ec, final ISourceResolvable res, final ALangObject val)
+			throws UnresolvedVariableSourceException {
+		if (res.getSource() < 0)
+			throw new UnresolvedVariableSourceException(null, res.getVariableName(), ec);
+		ec.getSymbolTable()[res.getSource()].setCurrentObject(val);
 	}
 }

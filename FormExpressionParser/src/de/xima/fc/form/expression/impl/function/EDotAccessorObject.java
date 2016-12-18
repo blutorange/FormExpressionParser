@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -18,9 +17,13 @@ import de.xima.fc.form.expression.util.NullUtil;
 @ParametersAreNonnullByDefault
 public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 	/**
-	 * @return {@link NumberLangObject}. <code>0</code>, when this is false, <code>1</code> when this is true.
+	 * @return <code>number</code>. <code>0</code>, when this is false, <code>1</code> when this is true.
 	 */
 	toString(Impl.toString),
+	/**
+	 * @return <code>number</code> The id of this object. This may change between consecutive executions of the same program.
+	 */
+	id(Impl.id)
 	;
 
 	private final FunctionLangObject func;
@@ -66,10 +69,14 @@ public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<ALangObject> {
@@ -80,10 +87,31 @@ public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 				return thisContext.coerceString(ec);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.STRING;
+			}
+		},
+		id(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return NumberLangObject.create(thisContext.getId());
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		}
 		;

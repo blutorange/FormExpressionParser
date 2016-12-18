@@ -1,23 +1,32 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
+/**
+ * Expression methods for <code>hash&lt;K,V&gt;</code>.
+ * @author madgaksha
+ */
 @ParametersAreNonnullByDefault
 public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
+	/**
+	 * Merges the values from the right hash into the left hash.
+	 * @param hashToMerge <code>hash&lt;K,V&gt;</code> Hash with values to merge.
+	 * @return this <code>hash&lt;K,V&gt;</code> The merged hashed for chaining.
+	 */
+	PLUS(EMethod.PLUS, Impl.UNION),
 	;
 	private final EMethod method;
 	private final IExpressionFunction<HashLangObject> function;
@@ -37,21 +46,33 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 		return function;
 	}
 
-	@SuppressWarnings("unused")
 	private static enum Impl implements IExpressionFunction<HashLangObject> {
-		// A dummy because there are no methods yet.
-		@Deprecated
-		DUMMY(false, "comparand"){ //$NON-NLS-1$
+		UNION(false, "hashToMerge"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final HashLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				throw new UncatchableEvaluationException(ec);
+				thisContext.putAll(args[0].coerceHash(ec));
+				return thisContext;
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forHash(thisContext.getGeneric(0), thisContext.getGeneric(1));
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return GenericVariableType.forHash(thisContext.getGeneric(0), thisContext.getGeneric(1));
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.HASH;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.HASH;
 			}
 		},
 		;

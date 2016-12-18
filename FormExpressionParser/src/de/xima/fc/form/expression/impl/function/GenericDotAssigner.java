@@ -3,8 +3,6 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.MathException;
-import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAssignerException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IGenericDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
@@ -12,14 +10,8 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.ArrayLangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
-import de.xima.fc.form.expression.object.ExceptionLangObject;
-import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
-import de.xima.fc.form.expression.object.NumberLangObject;
-import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -54,153 +46,6 @@ public abstract class GenericDotAssigner<T extends ALangObject> implements IGene
 	private final boolean hasVarArgs;
 
 	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<StringLangObject> STRING = new GenericDotAssigner<StringLangObject>(ELangObjectType.STRING,
-			"genericDotAssignerString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
-				final ALangObject... args) throws EvaluationException, MathException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<ArrayLangObject> ARRAY = new GenericDotAssigner<ArrayLangObject>(ELangObjectType.ARRAY,
-			"genericBracketAssignerArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
-				final ALangObject... args) throws EvaluationException, MathException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<BooleanLangObject> BOOLEAN = new GenericDotAssigner<BooleanLangObject>(ELangObjectType.BOOLEAN,
-			"genericBracketAssignerBoolean", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<ExceptionLangObject> EXCEPTION = new GenericDotAssigner<ExceptionLangObject>(
-			ELangObjectType.EXCEPTION, "genericBracketAssignerException", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<RegexLangObject> REGEX = new GenericDotAssigner<RegexLangObject>(ELangObjectType.REGEX,
-			"genericBracketAssignerRegex", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<FunctionLangObject> FUNCTION = new GenericDotAssigner<FunctionLangObject>(
-			ELangObjectType.FUNCTION, "genericBracketAssignerFunction", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAssignerException.
-	 *             No generic attribute assigners.
-	 */
-	public final static IGenericDotAssignerFunction<NumberLangObject> NUMBER = new GenericDotAssigner<NumberLangObject>(ELangObjectType.NUMBER,
-			"genericBracketAssignerFunction", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAssignerException(args[0].inspect(), thisContext,
-					args[1].coerceBoolean(ec).booleanValue(), ec);
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			return false;
-		}
-	};
-
-	/**
 	 * @param key
 	 *            {@link ALangObject} The key. When not specified,
 	 *            {@link NullLangObject} is assumed.
@@ -220,15 +65,23 @@ public abstract class GenericDotAssigner<T extends ALangObject> implements IGene
 		}
 
 		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
-				final IVariableType value) {
-			// Property must be compatible with the first generics argument,
-			// ie. a hash<string, ?>
-			if (!thisContext.getGeneric(0).isAssignableFrom(SimpleVariableType.STRING))
-				return false;
-			// Value to be assigned must be compatible with the second
-			// generics argument, eg. number for hash<string, object>
-			return thisContext.getGeneric(1).isAssignableFrom(value);
+		public IVariableType getValueType(final IVariableType thisContext, final String property) {
+			return thisContext.getGeneric(1);
+		}
+
+		@Override
+		public boolean isHandlingProperty(final IVariableType thisContext, final String property) {
+			return thisContext.getGeneric(0).isAssignableFrom(SimpleVariableType.STRING);
+		}
+
+		@Override
+		public boolean isHandlingProperty(final String property) {
+			return true;
+		}
+
+		@Override
+		public ILangObjectClass getValueClass() {
+			return ELangObjectType.OBJECT;
 		}
 	};
 

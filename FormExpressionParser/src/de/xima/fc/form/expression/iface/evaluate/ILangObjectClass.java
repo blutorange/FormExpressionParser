@@ -70,4 +70,6 @@ public interface ILangObjectClass extends Serializable {
 	public boolean isImmutable();
 
 	public boolean equalsClass(ILangObjectClass clazz);
+
+	public boolean isSuperClassOf(ILangObjectClass that);
 }

@@ -1,12 +1,10 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.MathException;
-import de.xima.fc.form.expression.exception.evaluation.NoSuchAttrAccessorException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IGenericBracketAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
@@ -15,13 +13,9 @@ import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
-import de.xima.fc.form.expression.object.ExceptionLangObject;
-import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
-import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -68,11 +62,24 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 			return StringLangObject.create(thisContext.stringValue().charAt(index < 0 ? index + len : index));
 		}
 
-		@Nullable
 		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			return SimpleVariableType.NUMBER.isAssignableFrom(property) ? SimpleVariableType.STRING : null;
+		public IVariableType getPropertyType(final IVariableType thisContext) {
+			return SimpleVariableType.NUMBER;
+		}
+
+		@Override
+		public IVariableType getReturnType(final IVariableType thisContext) {
+			return SimpleVariableType.STRING;
+		}
+
+		@Override
+		public ILangObjectClass getPropertyClass() {
+			return ELangObjectType.NUMBER;
+		}
+
+		@Override
+		public ILangObjectClass getReturnClass() {
+			return ELangObjectType.STRING;
 		}
 	};
 
@@ -96,8 +103,6 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 		@Override
 		public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 				final ALangObject... args) throws EvaluationException, MathException {
-			if (((BooleanLangObject) args[1]).booleanValue())
-				throw new NoSuchAttrAccessorException(NullUtil.toString(args[0]), true, ec);
 			final int index = args[0].coerceNumber(ec).intValue(ec);
 			final int len = thisContext.length();
 			if (index >= len || index < -len)
@@ -105,125 +110,24 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 			return thisContext.get(index < 0 ? index + len : index);
 		}
 
-		@Nullable
 		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			// Property must be a numeric index, eg. array[0], but not array[true].
-			if (!SimpleVariableType.NUMBER.isAssignableFrom(property))
-				return null;
-			// Return type is the first generics argument, eg number for array<number>
+		public IVariableType getPropertyType(final IVariableType thisContext) {
+			return SimpleVariableType.NUMBER;
+		}
+
+		@Override
+		public IVariableType getReturnType(final IVariableType thisContext) {
 			return thisContext.getGeneric(0);
 		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAccessorException
-	 *             No generic attribute accessors.
-	 */
-	public final static IGenericBracketAccessorFunction<BooleanLangObject> BOOLEAN = new GenericBracketAccessor<BooleanLangObject>(
-			ELangObjectType.BOOLEAN, "genericBracketAccessorBoolean", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
 
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
+		public ILangObjectClass getPropertyClass() {
+			return ELangObjectType.NUMBER;
 		}
 
-		@Nullable
 		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			return null;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAccessorException
-	 *             No generic attribute accessors.
-	 */
-	public final static IGenericBracketAccessorFunction<ExceptionLangObject> EXCEPTION = new GenericBracketAccessor<ExceptionLangObject>(
-			ELangObjectType.EXCEPTION, "genericBracketAccessorException", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
-		}
-
-		@Nullable
-		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			return null;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAccessorException
-	 *             No generic attribute accessors.
-	 */
-	public final static IGenericBracketAccessorFunction<RegexLangObject> REGEX = new GenericBracketAccessor<RegexLangObject>(
-			ELangObjectType.REGEX, "genericBracketAccessorRegex", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
-		}
-
-		@Nullable
-		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			return null;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAccessorException
-	 *             No generic attribute accessors.
-	 */
-	public final static IGenericBracketAccessorFunction<FunctionLangObject> FUNCTION = new GenericBracketAccessor<FunctionLangObject>(
-			ELangObjectType.FUNCTION, "genericBracketAccessorFunction", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
-		}
-
-		@Nullable
-		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			return null;
-		}
-	};
-
-	/**
-	 * @throws NoSuchAttrAccessorException
-	 *             No generic attribute accessors.
-	 */
-	public final static IGenericBracketAccessorFunction<NumberLangObject> NUMBER = new GenericBracketAccessor<NumberLangObject>(
-			ELangObjectType.NUMBER, "genericBracketAccessorNumber", false) { //$NON-NLS-1$
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final NumberLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new NoSuchAttrAccessorException(args[0].inspect(), thisContext, ec);
-		}
-
-		@Nullable
-		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			return null;
+		public ILangObjectClass getReturnClass() {
+			return ELangObjectType.OBJECT;
 		}
 	};
 
@@ -247,15 +151,24 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 			return thisContext.get(args[0]);
 		}
 
-		@Nullable
 		@Override
-		public IVariableType getBracketAccessorReturnType(final IVariableType thisContext,
-				final IVariableType property) {
-			// Property type must be compatible with the first generics argument,
-			// eg. number for hash<object, string>
-			if (!thisContext.getGeneric(0).isAssignableFrom(property))
-				return null;
+		public IVariableType getPropertyType(final IVariableType thisContext) {
+			return thisContext.getGeneric(0);
+		}
+
+		@Override
+		public IVariableType getReturnType(final IVariableType thisContext) {
 			return thisContext.getGeneric(1);
+		}
+
+		@Override
+		public ILangObjectClass getPropertyClass() {
+			return ELangObjectType.OBJECT;
+		}
+
+		@Override
+		public ILangObjectClass getReturnClass() {
+			return ELangObjectType.OBJECT;
 		}
 	};
 

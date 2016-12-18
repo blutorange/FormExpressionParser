@@ -1,57 +1,69 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.FunctionLangObject;
+import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangObject> {
+public enum EExpressionMethodObject implements IMethod2Function<StringLangObject> {
+	/**
+	 * @param stringToJoin {@link StringLangObject} The string to be concatenated to this string.
+	 * @return {@link StringLangObject} The concatenation between this string and the argument.
+	 */
+	PLUS(EMethod.PLUS, Impl.CONCATENATE),
 	;
 	private final EMethod method;
-	private final IExpressionFunction<FunctionLangObject> function;
-
-	private EExpressionMethodFunction(final EMethod method, final IExpressionFunction<FunctionLangObject> function) {
+	private final IExpressionFunction<StringLangObject> function;
+	private EExpressionMethodObject(final EMethod method, final IExpressionFunction<StringLangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
-
 	@Override
 	public EMethod getMethod() {
 		return method;
 	}
-
 	@Override
-	public IExpressionFunction<FunctionLangObject> getFunction() {
+	public IExpressionFunction<StringLangObject> getFunction() {
 		return function;
 	}
 
-	@SuppressWarnings("unused")
-	private static enum Impl implements IExpressionFunction<FunctionLangObject> {
-		// A dummy because there are not methods yet.
-		@Deprecated
-		DUMMY(false, "comparand"){ //$NON-NLS-1$
+	private static enum Impl implements IExpressionFunction<StringLangObject> {
+		CONCATENATE(false, "stringToJoin") { //$NON-NLS-1$
 			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				throw new UncatchableEvaluationException(ec);
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return thisContext.concat(args[0].coerceString(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.STRING;
 			}
 		},
 		;
@@ -89,7 +101,7 @@ public enum EExpressionMethodFunction implements IMethod2Function<FunctionLangOb
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.FUNCTION;
+			return ELangObjectType.STRING;
 		}
 	}
 }

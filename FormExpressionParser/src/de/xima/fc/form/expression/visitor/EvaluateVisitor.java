@@ -187,9 +187,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			@Nonnull final IEvaluationContext ec) throws EvaluationException {
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
-		@Nonnull
 		ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0), ec);
-		@Nonnull
 		ALangObject thisContext = NullLangObject.getInstance();
 		for (int i = 1; i < indexOneAfterEnd; ++i) {
 			final Node n = parentNode.jjtGetChild(i);
@@ -217,7 +215,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 					throw new IllegalNumberOfFunctionParametersException(func, args.length, ec);
 
 				// Check thisContext of the function.
-				if (func.getThisContextType() != ELangObjectType.NULL && func.getThisContextType() != thisContext.getType())
+				if (func.getThisContextType() != ELangObjectType.NULL && func.getThisContextType() != thisContext.getObjectClass())
 					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
 
 				ec.getTracer().descend(parentNode);

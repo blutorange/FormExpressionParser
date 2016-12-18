@@ -196,25 +196,25 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 *            Context to be used.
 	 */
 	public StringLangObject coerceString(final IEvaluationContext ec) {
-		if (getType() == ELangObjectType.STRING)
+		if (getObjectClass() == ELangObjectType.STRING)
 			return (StringLangObject) this;
 		return StringLangObject.create(toString());
 	}
 
 	public ArrayLangObject coerceArray(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == ELangObjectType.ARRAY)
+		if (getObjectClass() == ELangObjectType.ARRAY)
 			return (ArrayLangObject) this;
 		throw new CoercionException(this, ELangObjectType.ARRAY, ec);
 	}
 
 	public HashLangObject coerceHash(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == ELangObjectType.HASH)
+		if (getObjectClass() == ELangObjectType.HASH)
 			return (HashLangObject) this;
 		throw new CoercionException(this, ELangObjectType.HASH, ec);
 	}
 
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == ELangObjectType.NUMBER)
+		if (getObjectClass() == ELangObjectType.NUMBER)
 			return (NumberLangObject) this;
 		throw new CoercionException(this, ELangObjectType.NUMBER, ec);
 	}
@@ -231,27 +231,27 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 *             When the object cannot be coerced.
 	 */
 	public final BooleanLangObject coerceBoolean(final IEvaluationContext ec) {
-		if (getType().getClassId() == ELangObjectType.BOOLEAN.getClassId())
+		if (getObjectClass().getClassId() == ELangObjectType.BOOLEAN.getClassId())
 			return (BooleanLangObject) this;
-		if (getType().getClassId() == ELangObjectType.NULL.getClassId())
+		if (getObjectClass().getClassId() == ELangObjectType.NULL.getClassId())
 			return BooleanLangObject.getFalseInstance();
 		return BooleanLangObject.getTrueInstance();
 	}
 
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == ELangObjectType.EXCEPTION)
+		if (getObjectClass() == ELangObjectType.EXCEPTION)
 			return (ExceptionLangObject) this;
 		throw new CoercionException(this, ELangObjectType.EXCEPTION, ec);
 	}
 
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == ELangObjectType.FUNCTION)
+		if (getObjectClass() == ELangObjectType.FUNCTION)
 			return (FunctionLangObject) this;
 		throw new CoercionException(this, ELangObjectType.FUNCTION, ec);
 	}
 
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
-		if (getType() == ELangObjectType.REGEX)
+		if (getObjectClass() == ELangObjectType.REGEX)
 			return (RegexLangObject) this;
 		throw new CoercionException(this, ELangObjectType.REGEX, ec);
 	}
@@ -279,7 +279,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// wrong type, or the Type enum contains the wrong class.
 		if (clazz != type.getLangObjectClass())
 			throw new EvaluationException(ec, CmnCnst.Error.COERCION_TYPE_NOT_MATCHING);
-		if (type == getType())
+		if (type == getObjectClass())
 			return (T) this;
 		switch (type) {
 		case OBJECT:
@@ -324,9 +324,10 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 * @return Whether this object is of the given type.
 	 */
 	public boolean is(final ILangObjectClass type) {
-		return getType().getClassId() == type.getClassId();
+		return getObjectClass().getClassId() == type.getClassId();
 	}
 
+	/** @return The id of this object. */
 	public long getId() {
 		return id;
 	}
@@ -375,7 +376,8 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) expressionMethod(method, ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) expressionMethod(method,
+				args.length > 0 ? args[0] : NullLangObject.getInstance(), ec);
 		if (func == null)
 			throw new NoSuchMethodException(method, this, ec);
 		return ALangObject.create(func.evaluate(ec, this, args));
@@ -401,7 +403,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAccessor(ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAccessor(property, ec);
 		if (func == null)
 			throw new NoSuchAttrAccessorException(NullUtil.toString(property), this, ec);
 		return func.evaluate(ec, this, property);
@@ -414,48 +416,51 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) dotAssigner(property, ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) dotAssigner(property, value, ec);
 		if (func == null)
 			throw new NoSuchAttrAssignerException(property, this, ec);
 		func.evaluate(ec, this, StringLangObject.create(property), value);
 	}
 
-	public final void executeBracketAssigner(final ALangObject property, final ALangObject value, final IEvaluationContext ec)
-			throws EvaluationException {
+	public final void executeBracketAssigner(final ALangObject property, final ALangObject value,
+			final IEvaluationContext ec) throws EvaluationException {
 		// The namespace returns a function such that the generics argument is
 		// that of the current run-time class or some super class.
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAssigner(ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAssigner(property, value, ec);
 		if (func == null)
 			throw new NoSuchAttrAssignerException(NullUtil.toString(property), this, ec);
 		func.evaluate(ec, this, property, value);
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) {
-		return ec.getNamespace().expressionMethod(getType(), method);
+	public final IFunction<? extends ALangObject> expressionMethod(final EMethod method, final ALangObject rhs, final IEvaluationContext ec) {
+		return ec.getNamespace().expressionMethod(getObjectClass(), method, rhs.getObjectClass());
 	}
 
 	@Nullable
 	public final IFunction<? extends ALangObject> dotAccessor(final String property, final IEvaluationContext ec) {
-		return ec.getNamespace().dotAccessor(getType(), property);
+		return ec.getNamespace().dotAccessor(getObjectClass(), property);
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> dotAssigner(final String property, final IEvaluationContext ec) {
-		return ec.getNamespace().dotAssigner(getType(), property);
+	public final IFunction<? extends ALangObject> dotAssigner(final String property, final ALangObject value,
+			final IEvaluationContext ec) {
+		return ec.getNamespace().dotAssigner(getObjectClass(), property, value.getObjectClass());
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> bracketAccessor(final IEvaluationContext ec) {
-		return ec.getNamespace().bracketAccessor(getType());
+	public final IFunction<? extends ALangObject> bracketAccessor(final ALangObject property,
+			final IEvaluationContext ec) {
+		return ec.getNamespace().bracketAccessor(getObjectClass(), property.getObjectClass());
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> bracketAssigner(final IEvaluationContext ec) {
-		return ec.getNamespace().bracketAssigner(getType());
+	public final IFunction<? extends ALangObject> bracketAssigner(final ALangObject property, final ALangObject value,
+			final IEvaluationContext ec) {
+		return ec.getNamespace().bracketAssigner(getObjectClass(), property.getObjectClass(), value.getObjectClass());
 	}
 
 	public INonNullIterable<ALangObject> getIterable(final IEvaluationContext ec)
@@ -501,8 +506,8 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	public final int compareTo(@Nullable final ALangObject o) {
 		if (o == null)
 			return -1;
-		if (getType() != o.getType())
-			return getType().getClassId() - o.getType().getClassId();
+		if (getObjectClass() != o.getObjectClass())
+			return getObjectClass().getClassId() - o.getObjectClass().getClassId();
 		return compareToSameType(o);
 	}
 
@@ -549,41 +554,41 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		return value;
 	}
 
-	public abstract ILangObjectClass getType();
+	public abstract ILangObjectClass getObjectClass();
 
 	public final boolean isArray() {
-		return getType() == ELangObjectType.ARRAY;
+		return getObjectClass() == ELangObjectType.ARRAY;
 	}
 
 	public final boolean isNumber() {
-		return getType() == ELangObjectType.NUMBER;
+		return getObjectClass() == ELangObjectType.NUMBER;
 	}
 
 	public final boolean isString() {
-		return getType() == ELangObjectType.STRING;
+		return getObjectClass() == ELangObjectType.STRING;
 	}
 
 	public final boolean isHash() {
-		return getType() == ELangObjectType.HASH;
+		return getObjectClass() == ELangObjectType.HASH;
 	}
 
 	public final boolean isBoolean() {
-		return getType() == ELangObjectType.BOOLEAN;
+		return getObjectClass() == ELangObjectType.BOOLEAN;
 	}
 
 	public final boolean isFunction() {
-		return getType() == ELangObjectType.FUNCTION;
+		return getObjectClass() == ELangObjectType.FUNCTION;
 	}
 
 	public final boolean isException() {
-		return getType() == ELangObjectType.EXCEPTION;
+		return getObjectClass() == ELangObjectType.EXCEPTION;
 	}
 
 	public final boolean isRegex() {
-		return getType() == ELangObjectType.REGEX;
+		return getObjectClass() == ELangObjectType.REGEX;
 	}
 
 	public final boolean isNull() {
-		return getType() == ELangObjectType.NULL;
+		return getObjectClass() == ELangObjectType.NULL;
 	}
 }

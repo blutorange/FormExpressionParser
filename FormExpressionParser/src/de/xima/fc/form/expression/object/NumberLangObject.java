@@ -59,7 +59,7 @@ public class NumberLangObject extends ALangObject {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.NUMBER;
 	}
 

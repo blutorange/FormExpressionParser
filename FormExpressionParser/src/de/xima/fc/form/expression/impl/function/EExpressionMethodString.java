@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -11,6 +10,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -46,10 +46,24 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 				return thisContext.concat(args[0].coerceString(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.isAssignableFrom(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.STRING;
 			}
 		},
 		;

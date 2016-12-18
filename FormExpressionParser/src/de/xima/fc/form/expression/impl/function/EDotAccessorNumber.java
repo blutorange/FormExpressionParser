@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -79,10 +78,14 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<NumberLangObject> {
@@ -93,10 +96,14 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 				return thisContext.sin();
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		nan(false) {
@@ -106,10 +113,14 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 				return BooleanLangObject.create(thisContext.isNaN());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		infinite(false) {
@@ -119,10 +130,14 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 				return BooleanLangObject.create(thisContext.isInfinite());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.BOOLEAN;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		finite(false) {
@@ -132,10 +147,14 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 				return BooleanLangObject.create(thisContext.isFinite());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.BOOLEAN;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		;

@@ -409,8 +409,8 @@ public abstract class ANode implements Node {
 				break;
 			default:
 				final String msg = NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_LVALUE,
-						children[i].getClass().getSimpleName(), assignType, new Integer(getStartLine()),
-						new Integer(getStartColumn()));
+						children[i].getClass().getSimpleName(), assignType, children[i].getStartLine(),
+						children[i].getStartColumn());
 				throw new ParseException(msg);
 			}
 		}

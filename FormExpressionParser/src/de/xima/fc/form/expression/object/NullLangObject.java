@@ -24,7 +24,7 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.NULL;
 	}
 

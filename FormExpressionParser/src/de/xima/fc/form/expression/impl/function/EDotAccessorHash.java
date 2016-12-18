@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -88,10 +87,14 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<HashLangObject> {
@@ -102,12 +105,14 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 				return thisContext.get(args.length == 0 ? NullLangObject.getInstance() : args[0]);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-				// hash<string, boolean>.get(string) => boolean
-				// function<boolean, string>
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return GenericVariableType.forSimpleFunction(thisContext.getGeneric(1), thisContext.getGeneric(0));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		contains(false, "key") { //$NON-NLS-1$
@@ -118,12 +123,16 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 						.create(thisContext.contains(args.length == 0 ? NullLangObject.getInstance() : args[0]));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				// hash<string, number> => boolean
 				// function<boolean, string>
 				return GenericVariableType.forSimpleFunction(SimpleVariableType.BOOLEAN, thisContext.getGeneric(0));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		length(false) {
@@ -133,10 +142,14 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 				return NumberLangObject.create(thisContext.length());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		}
 		;

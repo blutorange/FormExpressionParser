@@ -33,7 +33,7 @@ public class RegexLangObject extends ALangObject {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.REGEX;
 	}
 

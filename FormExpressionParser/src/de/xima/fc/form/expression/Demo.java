@@ -36,12 +36,9 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
- * - add support for variable types with flags, eg. method[vararg]<string, string>
- *   or perhaps make that method<string, string...>
  * - check all serializable / immutable classes
  * - replace logger with tracer ?
  * - unparse: los nicer
- * - variable typing: allow var for "object" everywhere (for loop header etc, hash<var,var> etc.)
  * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
  * - update formatting js
  * - update highlighter with new token types (global, scope, require etc)

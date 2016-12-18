@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -11,6 +10,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -47,19 +47,27 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				if (args[0].getType() == ELangObjectType.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
+				if (args[0].getObjectClass() == ELangObjectType.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
 				else thisContext.add(args[0]);
 				return thisContext;
 			}
-			@Nullable
+
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				// Right hand side must be an array as well.
-				if (lhs.getBasicLangClass().getClassId() != rhs.getBasicLangClass().getClassId())
-					return null;
-				// Return type is the union between the two array types.
-				// array<string> + array<number> = array<object>
-				return lhs.union(rhs);
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forArray(thisContext.getGeneric(0));
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return GenericVariableType.forArray(thisContext.getGeneric(0));
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.ARRAY;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.ARRAY;
 			}
 		},
 		/**
@@ -70,19 +78,26 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				if (args[0].getType() == ELangObjectType.ARRAY) thisContext.removeAll(args[0].coerceArray(ec));
+				if (args[0].getObjectClass() == ELangObjectType.ARRAY) thisContext.removeAll(args[0].coerceArray(ec));
 				else thisContext.remove(args[0]);
 				return thisContext;
 			}
-			@Nullable
+
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				// Right hand side must be an array as well.
-				if (lhs.getBasicLangClass().getClassId() != rhs.getBasicLangClass().getClassId())
-					return null;
-				// Return type is the union between the two array types.
-				// array<string> - array<number> = array<object>
-				return lhs.union(rhs);
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forArray(thisContext.getGeneric(0));
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return GenericVariableType.forArray(thisContext.getGeneric(0));
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.ARRAY;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.ARRAY;
 			}
 		},
 		;

@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Arrays;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -87,10 +86,14 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<FunctionLangObject> {
@@ -101,10 +104,14 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 				return StringLangObject.create(thisContext.functionValue().getDeclaredName());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.STRING;
 			}
 		},
 		apply(false, "thisContext", "argsArray") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -112,7 +119,7 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				final ALangObject thiz = args.length > 0 ? args[0] : NullLangObject.getInstance();
-				if (thisContext.functionValue().getThisContextType() != thiz.getType())
+				if (thisContext.functionValue().getThisContextType() != thiz.getObjectClass())
 					throw new IllegalThisContextException(thiz, thisContext.functionValue().getThisContextType(),
 							thisContext.functionValue(), ec);
 				if (args.length > 1)
@@ -120,11 +127,16 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 				return thisContext.functionValue().evaluate(ec, thiz);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				//TODO real return type, may have to remove this. METHODS MUST BE BOUND!
-				return null;
+				throw new RuntimeException("TODO - not yet implemented");
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				//TODO real return type, may have to remove this. METHODS MUST BE BOUND!
+				throw new RuntimeException("TODO - not yet implemented");
 			}
 		},
 		call(true, "thisContext", "args") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -133,7 +145,7 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
 				final ALangObject thiz = args.length > 0 ? args[0] : NullLangObject.getInstance();
-				if (thisContext.functionValue().getThisContextType() != thiz.getType())
+				if (thisContext.functionValue().getThisContextType() != thiz.getObjectClass())
 					throw new IllegalThisContextException(thiz, thisContext.functionValue().getThisContextType(),
 							thisContext.functionValue(), ec);
 				if (args.length > 1)
@@ -141,11 +153,16 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 				return thisContext.functionValue().evaluate(ec, thiz);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				//TODO real return type, may have to remove this. METHODS MUST BE BOUND!
-				return null;
+				throw new RuntimeException("TODO - not yet implemented");
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				//TODO real return type, may have to remove this. METHODS MUST BE BOUND!
+				throw new RuntimeException("TODO - not yet implemented");
 			}
 		};
 

@@ -1,6 +1,8 @@
 package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -10,6 +12,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class BooleanLangObject extends ALangObject {
 	private final boolean value;
 
@@ -19,33 +22,32 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.BOOLEAN;
 	}
 
 	private static class InstanceHolder {
-		@Nonnull private static BooleanLangObject TRUE = new BooleanLangObject(true);
-		@Nonnull private static BooleanLangObject FALSE = new BooleanLangObject(false);
+		private static BooleanLangObject TRUE = new BooleanLangObject(true);
+		private static BooleanLangObject FALSE = new BooleanLangObject(false);
 	}
 
 	public boolean booleanValue() {
 		return value;
 	}
 
-	@Nonnull
+
 	public BooleanLangObject or(final BooleanLangObject other) {
 		return BooleanLangObject.create(value||other.value);
 	}
-	@Nonnull
+
 	public BooleanLangObject and(final BooleanLangObject other) {
 		return BooleanLangObject.create(value&&other.value);
 	}
-	@Nonnull
+
 	public BooleanLangObject xor(final BooleanLangObject other) {
 		return BooleanLangObject.create(value^other.value);
 	}
 
-	@Nonnull
 	public BooleanLangObject not() {
 		return BooleanLangObject.create(!value);
 	}
@@ -89,7 +91,7 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public boolean equals(@Nullable final Object o) {
 		if (this == o) return true;
 		if (!(o instanceof BooleanLangObject)) return false;
 		return value == ((BooleanLangObject)o).value;
@@ -123,24 +125,19 @@ public class BooleanLangObject extends ALangObject {
 		builder.append(toExpression(value));
 	}
 
-	@Nonnull
 	public static String toExpression(final boolean value) {
 		return value ? Syntax.TRUE : Syntax.FALSE;
 	}
 
-	@Nonnull
 	public static BooleanLangObject create(final boolean b) {
-		return b ? getTrueInstance() : getFalseInstance();
+		return b ? InstanceHolder.TRUE : InstanceHolder.FALSE;
 	}
 
-	@Nonnull
 	public static BooleanLangObject getTrueInstance() {
 		return InstanceHolder.TRUE;
 	}
 
-	@Nonnull
 	public static BooleanLangObject getFalseInstance() {
 		return InstanceHolder.FALSE;
 	}
-
 }

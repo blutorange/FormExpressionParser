@@ -1,23 +1,24 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> {
+	EQUAL_TILDE(EMethod.EQUAL_TILDE, Impl.MATCHES)
 	;
 	private final EMethod method;
 	private final IExpressionFunction<RegexLangObject> function;
@@ -37,21 +38,33 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 		return function;
 	}
 
-	@SuppressWarnings("unused")
 	private static enum Impl implements IExpressionFunction<RegexLangObject> {
-		// Dummy because there are not methods yet.
-		@Deprecated
-		DUMMY(false, "comparand"){ //$NON-NLS-1$
+		MATCHES(false, "string"){ //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				throw new UncatchableEvaluationException(ec);
+				return BooleanLangObject
+						.create(thisContext.patternValue().matcher(args[0].coerceString(ec).stringValue()).matches());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		;

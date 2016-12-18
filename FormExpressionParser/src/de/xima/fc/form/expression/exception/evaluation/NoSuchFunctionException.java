@@ -20,7 +20,7 @@ public class NoSuchFunctionException extends CatchableEvaluationException {
 
 	public NoSuchFunctionException(@Nonnull final String type, @Nonnull final String name, @Nonnull final ALangObject thisContext, @Nonnull final IEvaluationContext ec) {
 		super(ec, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_FUNCTION_2,
-				type, name, thisContext.inspect(), thisContext.getType()));
+				type, name, thisContext.inspect(), thisContext.getObjectClass()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}

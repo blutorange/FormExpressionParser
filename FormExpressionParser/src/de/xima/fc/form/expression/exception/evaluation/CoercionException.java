@@ -20,7 +20,7 @@ public class CoercionException extends CatchableEvaluationException {
 
 	public CoercionException(@Nonnull final ALangObject from, @Nonnull final ILangObjectClass to,
 			@Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.messageFormat(CmnCnst.Error.COERCION, from.toString(), from.getType(), to));
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.COERCION, from.toString(), from.getObjectClass(), to));
 		this.from = from;
 		this.to = to;
 	}

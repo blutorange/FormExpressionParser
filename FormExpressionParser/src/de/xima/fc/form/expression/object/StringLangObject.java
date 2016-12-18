@@ -45,7 +45,7 @@ public class StringLangObject extends ALangObject implements Serializable {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.STRING;
 	}
 

@@ -31,7 +31,7 @@ public interface INamespace {
 	 * when there is no such method. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public IFunction<?> expressionMethod(ILangObjectClass thisContext, EMethod method);
+	public IFunction<?> expressionMethod(ILangObjectClass thisContext, EMethod method, ILangObjectClass rhs);
 
 	/**
 	 * For example <code>hash["key"]</code>.
@@ -41,7 +41,7 @@ public interface INamespace {
 	 * when there is no such accessor. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public IFunction<?> bracketAccessor(ILangObjectClass thisContext);
+	public IFunction<?> bracketAccessor(ILangObjectClass thisContext, ILangObjectClass property);
 
 	/**
 	 * For example <code>array.length</code>.
@@ -60,7 +60,7 @@ public interface INamespace {
 	 * when there is no such assigner. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public IFunction<?> bracketAssigner(ILangObjectClass thisContext);
+	public IFunction<?> bracketAssigner(ILangObjectClass thisContext, ILangObjectClass property, ILangObjectClass value);
 
 	/**
 	 * For example <code>array.length = 8</code>.
@@ -70,5 +70,5 @@ public interface INamespace {
 	 * when there is no such assigner. Must also look it up in any supertypes.
 	 */
 	@Nullable
-	public IFunction<?> dotAssigner(ILangObjectClass thisContext, String property);
+	public IFunction<?> dotAssigner(ILangObjectClass thisContext, String property, ILangObjectClass value);
 }

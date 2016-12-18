@@ -7,7 +7,6 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.function.EAttrAssignerArray;
 import de.xima.fc.form.expression.impl.function.EDotAccessorArray;
 import de.xima.fc.form.expression.impl.function.EDotAccessorBoolean;
 import de.xima.fc.form.expression.impl.function.EDotAccessorException;
@@ -17,17 +16,9 @@ import de.xima.fc.form.expression.impl.function.EDotAccessorNumber;
 import de.xima.fc.form.expression.impl.function.EDotAccessorObject;
 import de.xima.fc.form.expression.impl.function.EDotAccessorRegex;
 import de.xima.fc.form.expression.impl.function.EDotAccessorString;
-import de.xima.fc.form.expression.impl.function.EDotAssignerBoolean;
-import de.xima.fc.form.expression.impl.function.EDotAssignerException;
-import de.xima.fc.form.expression.impl.function.EDotAssignerFunction;
-import de.xima.fc.form.expression.impl.function.EDotAssignerHash;
-import de.xima.fc.form.expression.impl.function.EDotAssignerNumber;
-import de.xima.fc.form.expression.impl.function.EDotAssignerRegex;
-import de.xima.fc.form.expression.impl.function.EDotAssignerString;
+import de.xima.fc.form.expression.impl.function.EDotAssignerArray;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodException;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodFunction;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodRegex;
@@ -48,8 +39,6 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 			.addExpressionMethod(EExpressionMethodString.values())
 			.addExpressionMethod(EExpressionMethodArray.values())
 			.addExpressionMethod(EExpressionMethodHash.values())
-			.addExpressionMethod(EExpressionMethodException.values())
-			.addExpressionMethod(EExpressionMethodFunction.values())
 			.addExpressionMethod(EExpressionMethodRegex.values())
 
 			.addDotAccessor(EDotAccessorObject.values())
@@ -62,50 +51,16 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 			.addDotAccessor(EDotAccessorFunction.values())
 			.addDotAccessor(EDotAccessorRegex.values())
 
-			.addDotAssigner(EDotAssignerBoolean.values())
-			.addDotAssigner(EDotAssignerNumber.values())
-			.addDotAssigner(EDotAssignerString.values())
-			.addDotAssigner(EAttrAssignerArray.values())
-			.addDotAssigner(EDotAssignerHash.values())
-			.addDotAssigner(EDotAssignerException.values())
-			.addDotAssigner(EDotAssignerFunction.values())
-			.addDotAssigner(EDotAssignerRegex.values())
+			.addDotAssigner(EDotAssignerArray.values())
 
 			.addGenericBracketAccessor(GenericBracketAccessor.ARRAY)
-			.addGenericBracketAccessor(GenericBracketAccessor.BOOLEAN)
-			.addGenericBracketAccessor(GenericBracketAccessor.EXCEPTION)
-			.addGenericBracketAccessor(GenericBracketAccessor.FUNCTION)
 			.addGenericBracketAccessor(GenericBracketAccessor.HASH)
-			.addGenericBracketAccessor(GenericBracketAccessor.NUMBER)
 			.addGenericBracketAccessor(GenericBracketAccessor.STRING)
-			.addGenericBracketAccessor(GenericBracketAccessor.REGEX)
-
-			.addGenericDotAccessor(GenericDotAccessor.ARRAY)
-			.addGenericDotAccessor(GenericDotAccessor.BOOLEAN)
-			.addGenericDotAccessor(GenericDotAccessor.EXCEPTION)
-			.addGenericDotAccessor(GenericDotAccessor.FUNCTION)
 			.addGenericDotAccessor(GenericDotAccessor.HASH)
-			.addGenericDotAccessor(GenericDotAccessor.NUMBER)
-			.addGenericDotAccessor(GenericDotAccessor.STRING)
-			.addGenericDotAccessor(GenericDotAccessor.REGEX)
 
 			.addGenericBracketAssigner(GenericBracketAssigner.ARRAY)
-			.addGenericBracketAssigner(GenericBracketAssigner.BOOLEAN)
-			.addGenericBracketAssigner(GenericBracketAssigner.EXCEPTION)
-			.addGenericBracketAssigner(GenericBracketAssigner.FUNCTION)
 			.addGenericBracketAssigner(GenericBracketAssigner.HASH)
-			.addGenericBracketAssigner(GenericBracketAssigner.NUMBER)
-			.addGenericBracketAssigner(GenericBracketAssigner.STRING)
-			.addGenericBracketAssigner(GenericBracketAssigner.REGEX)
-
-			.addGenericDotAssigner(GenericDotAssigner.ARRAY)
-			.addGenericDotAssigner(GenericDotAssigner.BOOLEAN)
-			.addGenericDotAssigner(GenericDotAssigner.EXCEPTION)
-			.addGenericDotAssigner(GenericDotAssigner.FUNCTION)
 			.addGenericDotAssigner(GenericDotAssigner.HASH)
-			.addGenericDotAssigner(GenericDotAssigner.NUMBER)
-			.addGenericDotAssigner(GenericDotAssigner.STRING)
-			.addGenericDotAssigner(GenericDotAssigner.REGEX)
 
 			.build()),
 	;

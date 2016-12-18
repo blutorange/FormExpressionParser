@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -11,6 +10,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -81,11 +81,21 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					throws EvaluationException {
 				return thisContext;
 			}
-
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		ADD(false, "summand") { //$NON-NLS-1$
@@ -95,10 +105,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.add(args[0].coerceNumber(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		SUBTRACT(false, "subtrahend") { //$NON-NLS-1$
@@ -108,10 +132,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.subtract(args[0].coerceNumber(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return thisContext;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		INCREMENT(false) {
@@ -120,11 +158,21 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.add(NumberLangObject.getOneInstance());
 			}
-
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		DECREMENT(false) {
@@ -133,11 +181,21 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					final ALangObject... args) throws EvaluationException {
 				return thisContext.subtract(NumberLangObject.getOneInstance());
 			}
-
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		NEGATE(false) {
@@ -146,11 +204,21 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 					throws EvaluationException {
 				return thisContext.negate();
 			}
-
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		MULTIPLY(false, "multiplicand") { //$NON-NLS-1$
@@ -160,10 +228,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.multiply(args[0].coerceNumber(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		DIVIDE(false, "dividend") { //$NON-NLS-1$
@@ -173,10 +255,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.divide(args[0].coerceNumber(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		MODULO(false,"operand"){ //$NON-NLS-1$
@@ -186,10 +282,24 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return thisContext.modulo(args[0].coerceNumber(ec));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		;

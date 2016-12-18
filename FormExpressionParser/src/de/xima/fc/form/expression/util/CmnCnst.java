@@ -357,6 +357,11 @@ public final class CmnCnst {
 		@Nonnull public static final String JUMP_WITHOUT_MATCHING_LABEL_OR_FUNCTION = "Jump clause used without label or enclosing function.";
 		@Nonnull public static final String TRACER_KNOWN_POSITION = "at {0} (line {1}, column {2})";
 		@Nonnull public static final String TRACER_UNKNOWN_POSITION = "at unknown";
+		@Nonnull public static final String EVALUATION_EXCEPTION_NAMESPACE = "Namespace is {0} ({1}).";
+		@Nonnull public static final String EVALUATION_EXCEPTION_LIBRARY = "Library is {0} ({1}).";
+		@Nonnull public static final String EVALUATION_EXCEPTION_TRACER = "Tracer is {0} ({1}).";
+		@Nonnull public static final String EVALUATION_EXCEPTION_LOGGER = "Logger is {0} ({1}).";
+		@Nonnull public static final String EVALUATION_EXCEPTION_EMBEDMENT = "Embedment is {0} ({1}).";
 		@Nonnull public static final String EVALUATION_EXCEPTION_KNOWN_EC = "Evaluation context is {0} ({1}).";
 		@Nonnull public static final String EVALUATION_EXCEPTION_UNKNOWN_EC = "Evaluation context is unknown.";
 		@Nonnull public static final String EVALUATION_EXCEPTION_KNOWN_EX = "External context is {0} ({1}).";
@@ -393,6 +398,7 @@ public final class CmnCnst {
 		@Nonnull public static final String INSPECT_NULL_LANG_OBJECT = "NullLangObject";
 		@Nonnull public static final String DOCUMENT_COMMAND = "%s(%s)";
 		@Nonnull public static final String POSITIONED_DOCUMENT_COMMAND = "%s@%s(%s)";
+		@Nonnull public static final String E_METHOD = "%s(%s)";
 	}
 
 	public static final class Html {

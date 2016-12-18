@@ -110,10 +110,14 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<ArrayLangObject> {
@@ -129,10 +133,14 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return thisContext.get(index);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), SimpleVariableType.NUMBER);
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		push(true, "objectsToAdd") { //$NON-NLS-1$
@@ -144,12 +152,16 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return thisContext;
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				// array<number>.push(number, number) => array<number>
 				// function<array<number>, number, array<number>)
 				return GenericVariableType.forVarArgFunction(thisContext, thisContext.getGeneric(0), thisContext.getGeneric(0));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		length(false) {
@@ -159,10 +171,14 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return NumberLangObject.create(thisContext.length());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		sort(false) {
@@ -173,10 +189,14 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return thisContext;
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return thisContext;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.ARRAY;
 			}
 		},
 		sortBy(false, "comparator") {
@@ -196,13 +216,17 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return thisContext;
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				// array<string>.sort(comparator) => array<string>
 				// function<array<string>, function<number, string, string>>
 				return GenericVariableType.forSimpleFunction(thisContext, GenericVariableType
 						.forSimpleFunction(SimpleVariableType.NUMBER, thisContext.getGeneric(0), thisContext.getGeneric(0)));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},;
 

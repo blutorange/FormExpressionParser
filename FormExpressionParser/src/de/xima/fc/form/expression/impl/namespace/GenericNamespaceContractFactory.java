@@ -1,8 +1,11 @@
 package de.xima.fc.form.expression.impl.namespace;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -54,10 +57,10 @@ import de.xima.fc.form.expression.util.NullUtil;
  * </pre>
  * </p>
  * <p>
- * Note that this make extensive use of casting. Correctness of this relies on
+ * Note that this class make extensive use of casting. Correctness of this relies on
  * whether the information supplied by {@link ILangObjectClass#getClassId()}
- * {@link ILangObjectClass#getSuperType()}, and {@link ALangObject#getType()} is
- * correct. The class corresponding to the type.getSuperType() must actually be
+ * {@link ILangObjectClass#getSuperType()}, and {@link ALangObject#getObjectClass()} is
+ * consistent. The class corresponding to the type.getSuperType() must actually be
  * a superclass of the class corresponding to the type.
  * </p>
  *
@@ -68,33 +71,42 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class GenericNamespaceContractFactory implements INamespaceContractFactory, INamespace {
 	private static final long serialVersionUID = 1L;
 
-	private final EnumMap<EMethod, IExpressionFunction<?>>[] expressionMethodMap;
+	private final EnumMap<EMethod, IExpressionFunction<?>[]>[] expressionMethodMap;
 
 	private final Map<String, IDotAccessorFunction<?>>[] dotAccessorMap;
-	private final Map<String, IDotAssignerFunction<?>>[] dotAssignerMap;
+	private final Map<String, IDotAssignerFunction<?>[]>[] dotAssignerMap;
 
-	private final IGenericDotAccessorFunction<?>[] genericDotAccessorMap;
-	private final IGenericDotAssignerFunction<?>[] genericDotAssignerMap;
+	private final IGenericDotAccessorFunction<?>[][] genericDotAccessorMap;
+	private final IGenericDotAssignerFunction<?>[][] genericDotAssignerMap;
 
-	private final IGenericBracketAccessorFunction<?>[] genericBracketAccessorMap;
-	private final IGenericBracketAssignerFunction<?>[] genericBracketAssignerMap;
+	/**
+	 * For each class, there may be several overloaded accessors / assigners.
+	 * genericBracketAccessorMap[classId][index]
+	 */
+	private final IGenericBracketAccessorFunction<?>[][] genericBracketAccessorMap;
+
+	/**
+	 * For each class, there may be several overloaded accessors / assigners.
+	 * genericBracketAssignerMap[classId][index]
+	 */
+	private final IGenericBracketAssignerFunction<?>[][] genericBracketAssignerMap;
 
 	@SuppressWarnings("unchecked")
 	private GenericNamespaceContractFactory(
-			final Map<Integer, EnumMap<EMethod, IExpressionFunction<?>>> expressionMethodMap,
+			final Map<Integer, EnumMap<EMethod, List<IExpressionFunction<?>>>> expressionMethodMap,
 			final Map<Integer, Map<String, IDotAccessorFunction<?>>> dotAccessorMap,
-			final Map<Integer, Map<String, IDotAssignerFunction<?>>> dotAssignerMap,
-			final Map<Integer, IGenericDotAccessorFunction<?>> genericDotAccessorMap,
-			final Map<Integer, IGenericDotAssignerFunction<?>> genericDotAssignerMap,
-			final Map<Integer, IGenericBracketAccessorFunction<?>> genericBracketAccessorMap,
-			final Map<Integer, IGenericBracketAssignerFunction<?>> genericBracketAssignerMap) {
+			final Map<Integer, Map<String, List<IDotAssignerFunction<?>>>> dotAssignerMap,
+			final Map<Integer, List<IGenericDotAccessorFunction<?>>> genericDotAccessorMap,
+			final Map<Integer, List<IGenericDotAssignerFunction<?>>> genericDotAssignerMap,
+			final Map<Integer, List<IGenericBracketAccessorFunction<?>>> genericBracketAccessorMap,
+			final Map<Integer, List<IGenericBracketAssignerFunction<?>>> genericBracketAssignerMap) {
+		this.expressionMethodMap = toArrayExpressionMethod(expressionMethodMap, new IExpressionFunction<?>[0]);
 		this.dotAccessorMap = toArray(dotAccessorMap, new Map[0]);
-		this.dotAssignerMap = toArray(dotAssignerMap, new Map[0]);
-		this.genericDotAccessorMap = toArray(genericDotAccessorMap, new IGenericDotAccessorFunction[0]);
-		this.genericDotAssignerMap = toArray(genericDotAssignerMap, new IGenericDotAssignerFunction[0]);
-		this.genericBracketAccessorMap = toArray(genericBracketAccessorMap, new IGenericBracketAccessorFunction[0]);
-		this.genericBracketAssignerMap = toArray(genericBracketAssignerMap, new IGenericBracketAssignerFunction[0]);
-		this.expressionMethodMap = toArray(expressionMethodMap, new EnumMap[0]);
+		this.dotAssignerMap = toArrayDotAssigner(dotAssignerMap, new IDotAssignerFunction<?>[0]);
+		this.genericDotAccessorMap = toArrayGeneric(genericDotAccessorMap, new IGenericDotAccessorFunction<?>[0]);
+		this.genericDotAssignerMap = toArrayGeneric(genericDotAssignerMap, new IGenericDotAssignerFunction<?>[0]);
+		this.genericBracketAccessorMap = toArrayGeneric(genericBracketAccessorMap, new IGenericBracketAccessorFunction<?>[0]);
+		this.genericBracketAssignerMap = toArrayGeneric(genericBracketAssignerMap, new IGenericBracketAssignerFunction<?>[0]);
 	}
 
 	private static <T> T[] toArray(final Map<Integer, T> map, final T[] array) {
@@ -102,69 +114,146 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		for (final Integer i : map.keySet())
 			if (i > max)
 				max = i;
-		final T[] arr = Arrays.copyOf(array, max + 1);
-		if (arr == null)
-			throw new FormExpressionException();
+		final T[] arr = NullUtil.checkNotNull(Arrays.copyOf(array, max + 1));
 		for (final Entry<Integer, T> entry : map.entrySet())
 			arr[entry.getKey()] = entry.getValue();
 		return arr;
 	}
 
-	@Nullable
-	@Override
-	public IExpressionFunction<?> expressionMethod(final ILangObjectClass thisContext, final EMethod method) {
-		final int classId = thisContext.getClassId();
-		if (classId < expressionMethodMap.length)
-			return expressionMethodMap[classId].get(method);
-		final ILangObjectClass superType = thisContext.getSuperClass();
-		return superType != null ? expressionMethod(superType, method) : null;
+	private static <T> Map<String, T[]>[] toArrayDotAssigner(final Map<Integer, Map<String, List<T>>> map, final T[] emptyArray) {
+		Integer max = 0;
+		for (final Integer i : map.keySet())
+			if (i > max)
+				max = i;
+		@SuppressWarnings("unchecked")
+		final Map<String, T[]>[] outer = new Map[max + 1];
+		for (final Entry<Integer, Map<String, List<T>>> entry : map.entrySet()) {
+			final Map<String, T[]> inner = new HashMap<>();
+			for (final Entry<String, List<T>> entry2 : entry.getValue().entrySet())
+				inner.put(entry2.getKey(), entry2.getValue().toArray(emptyArray));
+			outer[entry.getKey()] = inner;
+		}
+		return outer;
+	}
+
+	private static <T> EnumMap<EMethod, T[]>[] toArrayExpressionMethod(
+			final Map<Integer, EnumMap<EMethod, List<T>>> map, final T[] emptyArray) {
+		Integer max = 0;
+		for (final Integer i : map.keySet())
+			if (i > max)
+				max = i;
+		@SuppressWarnings("unchecked")
+		final EnumMap<EMethod, T[]>[] outer = new EnumMap[max + 1];
+		for (final Entry<Integer, EnumMap<EMethod, List<T>>> entry : map.entrySet()) {
+			final EnumMap<EMethod, T[]> inner = new EnumMap<>(EMethod.class);
+			for (final Entry<EMethod, List<T>> entry2 : entry.getValue().entrySet())
+				inner.put(entry2.getKey(), entry2.getValue().toArray(emptyArray));
+			outer[entry.getKey()] = inner;
+		}
+		return outer;
+	}
+
+	private static <T> T[][] toArrayGeneric(final Map<Integer, List<T>> map, final T[] emptyArray) {
+		Integer max = 0;
+		for (final Integer i : map.keySet())
+			if (i > max)
+				max = i;
+		@SuppressWarnings("unchecked")
+		final T[][] outer = NullUtil.checkNotNull((T[][])Array.newInstance(emptyArray.getClass(), max+1));
+		for (final Entry<Integer, List<T>> entry : map.entrySet())
+			outer[entry.getKey().intValue()] = entry.getValue().toArray(emptyArray);
+		return outer;
 	}
 
 	@Nullable
 	@Override
-	public IGenericBracketAccessorFunction<?> bracketAccessor(final ILangObjectClass thisContext) {
-		return bracket(thisContext, genericBracketAccessorMap);
+	public IExpressionFunction<?> expressionMethod(final ILangObjectClass thisContext, final EMethod method,
+			final ILangObjectClass rhs) {
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < expressionMethodMap.length && expressionMethodMap[classId] != null) {
+				final IExpressionFunction<?>[] methodList = expressionMethodMap[classId].get(method);
+				if (methodList != null)
+					for (final IExpressionFunction<?> m : methodList)
+						if (m.getRhsClass().isSuperClassOf(rhs))
+							return m;
+			}
+		}
+		return null;
+	}
+
+	@Nullable
+	@Override
+	public IGenericBracketAccessorFunction<?> bracketAccessor(final ILangObjectClass thisContext, final ILangObjectClass property) {
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < genericBracketAccessorMap.length && genericBracketAccessorMap[classId] != null)
+				for (final IGenericBracketAccessorFunction<?> accessor : genericBracketAccessorMap[classId])
+					if (accessor.getPropertyClass().isSuperClassOf(property))
+						return accessor;
+		}
+		return null;
 	}
 
 	@Override
 	@Nullable
-	public IGenericBracketAssignerFunction<?> bracketAssigner(final ILangObjectClass thisContext) {
-		return bracket(thisContext, genericBracketAssignerMap);
-	}
-
-	@Nullable
-	private static <T extends IFunction<?>> T bracket(final ILangObjectClass thisContext, final T[] map) {
-		final int classId = thisContext.getClassId();
-		final T func = classId < map.length ? map[classId] : null;
-		if (func != null)
-			return func;
-		final ILangObjectClass superType = thisContext.getSuperClass();
-		return superType != null ? bracket(superType, map) : null;
+	public IGenericBracketAssignerFunction<?> bracketAssigner(final ILangObjectClass thisContext, final ILangObjectClass property, final ILangObjectClass value) {
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < genericBracketAssignerMap.length && genericBracketAssignerMap[classId] != null)
+				for (final IGenericBracketAssignerFunction<?> assigner : genericBracketAssignerMap[classId])
+					if (assigner.getPropertyClass().isSuperClassOf(property) && assigner.getValueClass().isSuperClassOf(value))
+						return assigner;
+		}
+		return null;
 	}
 
 	@Nullable
 	@Override
 	public IFunction<?> dotAccessor(final ILangObjectClass thisContext, final String property) {
-		return dot(thisContext, property, dotAccessorMap, genericDotAccessorMap);
+		// Named accessor
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < dotAccessorMap.length && dotAccessorMap[classId] != null) {
+				final IDotAccessorFunction<?> accessor = dotAccessorMap[classId].get(property);
+				if (accessor != null)
+					return accessor;
+			}
+		}
+		// Generic accessor
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < genericDotAccessorMap.length && genericDotAccessorMap[classId] != null)
+				for (final IGenericDotAccessorFunction<?> accessor : genericDotAccessorMap[classId])
+					if (accessor.isHandlingProperty(property))
+						return accessor;
+		}
+		return null;
 	}
 
 	@Override
 	@Nullable
-	public IFunction<?> dotAssigner(final ILangObjectClass thisContext, final String property) {
-		return dot(thisContext, property, dotAssignerMap, genericDotAssignerMap);
-	}
-
-	@Nullable
-	private static <T extends IFunction<?>, S extends IFunction<?>> IFunction<?> dot(final ILangObjectClass thisContext,
-			final String property, final Map<String, T>[] map, final S[] genericMap) {
-		final int classId = thisContext.getClassId();
-		final T func = classId < map.length && map[classId] != null ? map[classId].get(property) : null;
-		if (func != null)
-			return func;
-		if (classId < genericMap.length && genericMap[classId] != null)
-			return genericMap[classId];
-		final ILangObjectClass superType = thisContext.getSuperClass();
-		return superType != null ? dot(superType, property, map, genericMap) : null;
+	public IFunction<?> dotAssigner(final ILangObjectClass thisContext, final String property, final ILangObjectClass value) {
+		// Named assigner
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < dotAssignerMap.length && dotAssignerMap[classId] != null) {
+				final IDotAssignerFunction<?>[] assignerList = dotAssignerMap[classId].get(property);
+				if (assignerList != null)
+					for (final IDotAssignerFunction<?> assigner : assignerList)
+						if (assigner.getValueClass().isSuperClassOf(value))
+							return assigner;
+			}
+		}
+		// Generic assigner
+		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
+			final int classId = clazz.getClassId();
+			if (classId < genericDotAssignerMap.length && genericDotAssignerMap[classId] != null)
+				for (final IGenericDotAssignerFunction<?> assigner : genericDotAssignerMap[classId])
+					if (assigner.isHandlingProperty(property))
+						return assigner;
+		}
+		return null;
 	}
 
 	@Override
@@ -174,42 +263,62 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 
 	@Nullable
 	@Override
-	public IVariableType getExpressionMethodReturnType(final IVariableType lhs, final EMethod method,
+	public IVariableType getExpressionMethodReturnType(final IVariableType thisContext, final EMethod method,
 			final IVariableType rhs) {
-		final IExpressionFunction<?> f = expressionMethod(lhs.getBasicLangClass(), method);
-		return f != null ? f.getReturnTypeFor(genericsType(lhs, f.getThisContextType()), rhs) : null;
+		final IExpressionFunction<?> func = expressionMethod(thisContext.getBasicLangClass(), method, rhs.getBasicLangClass());
+		if (func == null)
+			return null;
+		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		if (!func.getRhsType(convertedThisContext).isAssignableFrom(rhs))
+			return null;
+		return func.getReturnType(convertedThisContext);
 	}
 
 	@Override
 	public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property,
 			final IVariableType value) {
-		final IGenericBracketAssignerFunction<?> func = bracketAssigner(thisContext.getBasicLangClass());
-		return func != null
-				? func.isBracketAssignerDefined(genericsType(thisContext, func.getThisContextType()), property, value)
-				: false;
+		final IGenericBracketAssignerFunction<?> func = bracketAssigner(thisContext.getBasicLangClass(),
+				property.getBasicLangClass(), value.getBasicLangClass());
+		if (func == null)
+			return false;
+		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		if (!func.getPropertyType(convertedThisContext).isAssignableFrom(property)
+				|| !func.getValueType(convertedThisContext).isAssignableFrom(value))
+			return false;
+		return true;
 	}
 
 	@Nullable
 	@Override
 	public IVariableType getBracketAccessorReturnType(final IVariableType thisContext, final IVariableType property) {
-		final IGenericBracketAccessorFunction<?> func = bracketAccessor(thisContext.getBasicLangClass());
-		return func != null
-				? func.getBracketAccessorReturnType(genericsType(thisContext, func.getThisContextType()), property)
-				: null;
+		final IGenericBracketAccessorFunction<?> func = bracketAccessor(thisContext.getBasicLangClass(),
+				property.getBasicLangClass());
+		if (func == null)
+			return null;
+		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		if (!func.getPropertyType(convertedThisContext).isAssignableFrom(property))
+			return null;
+		return func.getReturnType(convertedThisContext);
 	}
 
 	@Override
 	public boolean isDotAssignerDefined(final IVariableType thisContext, final String property,
 			final IVariableType value) {
-		final IFunction<?> func = dotAssigner(thisContext.getBasicLangClass(), property);
+		final IFunction<?> func = dotAssigner(thisContext.getBasicLangClass(), property, value.getBasicLangClass());
 		if (func == null)
 			return false;
-		// Casting is better than repeating almost the same code from
-		// dotAssigner(...).
-		if (func instanceof IDotAssignerFunction<?>)
-			return ((IDotAssignerFunction<?>) func).isDotAssignerDefined(thisContext, value);
-		return ((IGenericDotAssignerFunction<?>) func)
-				.isDotAssignerDefined(genericsType(thisContext, func.getThisContextType()), property, value);
+		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		// Casting is better than repeating the search for a fitting function.
+		if (func instanceof IDotAssignerFunction<?>) {
+			final IDotAssignerFunction<?> f = ((IDotAssignerFunction<?>) func);
+			if (!f.getValueType(convertedThisContext).isAssignableFrom(value))
+				return false;
+			return true;
+		}
+		final IGenericDotAssignerFunction<?> f = ((IGenericDotAssignerFunction<?>) func);
+		if (!f.isHandlingProperty(convertedThisContext, property) || !f.getValueType(convertedThisContext, property).isAssignableFrom(value))
+			return false;
+		return true;
 	}
 
 	@Nullable
@@ -218,44 +327,53 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		final IFunction<?> func = dotAccessor(thisContext.getBasicLangClass(), property);
 		if (func == null)
 			return null;
-		// Casting is better than repeating almost the same code from
-		// dotAssigner(...).
+		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		// Casting is better than repeating the search for a fitting function.
 		if (func instanceof IDotAccessorFunction<?>)
-			return ((IDotAccessorFunction<?>) func).getDotAccessorReturnType(thisContext);
-		return ((IGenericDotAccessorFunction<?>) func)
-				.getDotAccessorReturnType(genericsType(thisContext, func.getThisContextType()), property);
+			return ((IDotAccessorFunction<?>) func).getReturnType(convertedThisContext);
+		final IGenericDotAccessorFunction<?> f = ((IGenericDotAccessorFunction<?>) func);
+		if (!f.isHandlingProperty(convertedThisContext, property))
+			return null;
+		return f.getReturnType(convertedThisContext, property);
 	}
 
-	private IVariableType genericsType(IVariableType declared, final ILangObjectClass actual) {
-		while (declared.getBasicLangClass().getClassId() != actual.getClassId()) {
-			final IVariableType d = declared.getBasicLangClass().getSuperType(declared);
+	/**
+	 * For example, let the subType be <code>IntegerArray</code> and the super class
+	 * be <code>Array</code>. Then this method returns <code>Array&lt;Integer&gt;</code>.
+	 * @param subType Some subType, or the same as the super type.
+	 * @param superClass Some super (or the same) class of the sub type.
+	 * @return The specific variable type of the sub type in terms of the super class.
+	 */
+	private IVariableType upconvertSpecificType(IVariableType subType, final ILangObjectClass superClass) {
+		while (subType.getBasicLangClass().getClassId() != superClass.getClassId()) {
+			final IVariableType d = subType.getBasicLangClass().getSuperType(subType);
 			if (d == null)
 				throw new FormExpressionException(
-						NullUtil.messageFormat(CmnCnst.Error.INCONSISTENT_CLASS_HIERARCHY, declared, actual));
-			declared = d;
+						NullUtil.messageFormat(CmnCnst.Error.INCONSISTENT_CLASS_HIERARCHY, subType, superClass));
+			subType = d;
 		}
-		return declared;
+		return subType;
 	}
 
 	@NotThreadSafe
 	public static class Builder {
 		@Nullable
-		private Map<Integer, EnumMap<EMethod, IExpressionFunction<?>>> expressionMethodMap;
+		private Map<Integer, EnumMap<EMethod, List<IExpressionFunction<?>>>> expressionMethodMap;
 
 		@Nullable
 		private Map<Integer, Map<String, IDotAccessorFunction<?>>> dotAccessorMap;
 		@Nullable
-		private Map<Integer, Map<String, IDotAssignerFunction<?>>> dotAssignerMap;
+		private Map<Integer, Map<String, List<IDotAssignerFunction<?>>>> dotAssignerMap;
 
 		@Nullable
-		private Map<Integer, IGenericDotAccessorFunction<?>> genericDotAccessorMap;
+		private Map<Integer, List<IGenericDotAccessorFunction<?>>> genericDotAccessorMap;
 		@Nullable
-		private Map<Integer, IGenericDotAssignerFunction<?>> genericDotAssignerMap;
+		private Map<Integer, List<IGenericDotAssignerFunction<?>>> genericDotAssignerMap;
 
 		@Nullable
-		private Map<Integer, IGenericBracketAccessorFunction<?>> genericBracketAccessorMap;
+		private Map<Integer, List<IGenericBracketAccessorFunction<?>>> genericBracketAccessorMap;
 		@Nullable
-		private Map<Integer, IGenericBracketAssignerFunction<?>> genericBracketAssignerMap;
+		private Map<Integer, List<IGenericBracketAssignerFunction<?>>> genericBracketAssignerMap;
 
 		@Nullable
 		private Map<Integer, ILangObjectClass> classPathMap;
@@ -282,11 +400,14 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 				if (classId < 0)
 					throw new FormExpressionException(String.format("Class id %d for %s is negative.", classId,
 							f.getFunction().getThisContextType()));
-				EnumMap<EMethod, IExpressionFunction<?>> map = getExpressionMethodMap().get(classId);
+				EnumMap<EMethod, List<IExpressionFunction<?>>> map = getExpressionMethodMap().get(classId);
 				if (map == null)
 					getExpressionMethodMap().put(classId, map = new EnumMap<>(EMethod.class));
+				List<IExpressionFunction<?>> list = map.get(f.getMethod());
+				if (list == null)
+					map.put(f.getMethod(), list = new ArrayList<>());
 				getClassPathMap().put(classId, f.getFunction().getThisContextType());
-				map.put(f.getMethod(), f.getFunction());
+				list.add(f.getFunction());
 			}
 			return this;
 		}
@@ -303,7 +424,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		public final <T extends ALangObject> Builder addDotAccessor(final IDotAccessorFunction<T>... functions)
 				throws FormExpressionException {
 			for (final IDotAccessorFunction<?> f : functions)
-				putFunction(f, getDotAccessorMap());
+				putFunctionSingle(NullUtil.checkNotNull(f), getDotAccessorMap());
 			return this;
 		}
 
@@ -319,7 +440,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		public final <T extends ALangObject> Builder addDotAssigner(final IDotAssignerFunction<T>... functions)
 				throws FormExpressionException {
 			for (final IDotAssignerFunction<?> f : functions)
-				putFunction(f, getDotAssignerMap());
+				putFunctionArray(NullUtil.checkNotNull(f), getDotAssignerMap());
 			return this;
 		}
 
@@ -335,7 +456,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		public final <T extends ALangObject> Builder addGenericDotAccessor(
 				final IGenericDotAccessorFunction<T>... functions) throws FormExpressionException {
 			for (final IGenericDotAccessorFunction<?> f : functions)
-				putFunctionGeneric(f, getGenericDotAccessorMap());
+				putFunctionGeneric(NullUtil.checkNotNull(f), getGenericDotAccessorMap());
 			return this;
 		}
 
@@ -351,7 +472,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		public final <T extends ALangObject> Builder addGenericDotAssigner(
 				final IGenericDotAssignerFunction<T>... functions) throws FormExpressionException {
 			for (final IGenericDotAssignerFunction<?> f : functions)
-				putFunctionGeneric(f, getGenericDotAssignerMap());
+				putFunctionGeneric(NullUtil.checkNotNull(f), getGenericDotAssignerMap());
 			return this;
 		}
 
@@ -367,7 +488,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		public final <T extends ALangObject> Builder addGenericBracketAccessor(
 				final IGenericBracketAccessorFunction<T>... functions) throws FormExpressionException {
 			for (final IGenericBracketAccessorFunction<?> f : functions)
-				putFunctionGeneric(f, getGenericBracketAccessorMap());
+				putFunctionGeneric(NullUtil.checkNotNull(f), getGenericBracketAccessorMap());
 			return this;
 		}
 
@@ -383,24 +504,39 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		public final <T extends ALangObject> Builder addGenericBracketAssigner(
 				final IGenericBracketAssignerFunction<T>... functions) throws FormExpressionException {
 			for (final IGenericBracketAssignerFunction<?> f : functions)
-				putFunctionGeneric(f, getGenericBracketAssignerMap());
+				putFunctionGeneric(NullUtil.checkNotNull(f), getGenericBracketAssignerMap());
 			return this;
 		}
 
-		private <T extends IFunction<?>> void putFunctionGeneric(@Nullable final T f, final Map<Integer, T> map) {
-			if (f == null)
-				throw new FormExpressionException();
+		private <T extends IFunction<?>> void putFunctionGeneric(final T f, final Map<Integer, List<T>> map) {
 			final Integer classId = f.getThisContextType().getClassId();
 			if (classId < 0)
 				throw new FormExpressionException(
 						String.format("Class id %d for %s is negative.", classId, f.getThisContextType()));
 			getClassPathMap().put(classId, f.getThisContextType());
-			map.put(classId, f);
+			@Nullable List<T> list = map.get(classId);
+			if (list == null)
+				map.put(classId, list = new ArrayList<>());
+			list.add(f);
 		}
 
-		private <T extends IFunction<?>> void putFunction(@Nullable final T f, final Map<Integer, Map<String, T>> map) {
-			if (f == null)
-				throw new FormExpressionException();
+		private <T extends IFunction<?>> void putFunctionArray(final T f, final Map<Integer, Map<String, List<T>>> map) {
+			final Integer classId = f.getThisContextType().getClassId();
+			if (classId < 0)
+				throw new FormExpressionException(
+						String.format("Class id %d for %s is negative.", classId, f.getThisContextType()));
+			Map<String, List<T>> m = map.get(classId);
+			if (m == null)
+				map.put(classId, m = new HashMap<>());
+			final String property = f.getDeclaredName();
+			@Nullable List<T> list = m.get(property);
+			if (list == null)
+				m.put(property, list = new ArrayList<>());
+			getClassPathMap().put(classId, f.getThisContextType());
+			list.add(f);
+		}
+
+		private <T extends IFunction<?>> void putFunctionSingle(final T f, final Map<Integer, Map<String, T>> map) {
 			final Integer classId = f.getThisContextType().getClassId();
 			if (classId < 0)
 				throw new FormExpressionException(
@@ -412,7 +548,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 			m.put(f.getDeclaredName(), f);
 		}
 
-		private Map<Integer, EnumMap<EMethod, IExpressionFunction<?>>> getExpressionMethodMap() {
+		private Map<Integer, EnumMap<EMethod, List<IExpressionFunction<?>>>> getExpressionMethodMap() {
 			if (expressionMethodMap != null)
 				return expressionMethodMap;
 			return expressionMethodMap = new HashMap<>();
@@ -424,31 +560,31 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 			return dotAccessorMap = new HashMap<>();
 		}
 
-		private Map<Integer, Map<String, IDotAssignerFunction<?>>> getDotAssignerMap() {
+		private Map<Integer, Map<String, List<IDotAssignerFunction<?>>>> getDotAssignerMap() {
 			if (dotAssignerMap != null)
 				return dotAssignerMap;
 			return dotAssignerMap = new HashMap<>();
 		}
 
-		private Map<Integer, IGenericDotAccessorFunction<?>> getGenericDotAccessorMap() {
+		private Map<Integer, List<IGenericDotAccessorFunction<?>>> getGenericDotAccessorMap() {
 			if (genericDotAccessorMap != null)
 				return genericDotAccessorMap;
 			return genericDotAccessorMap = new HashMap<>();
 		}
 
-		private Map<Integer, IGenericDotAssignerFunction<?>> getGenericDotAssignerMap() {
+		private Map<Integer, List<IGenericDotAssignerFunction<?>>> getGenericDotAssignerMap() {
 			if (genericDotAssignerMap != null)
 				return genericDotAssignerMap;
 			return genericDotAssignerMap = new HashMap<>();
 		}
 
-		private Map<Integer, IGenericBracketAccessorFunction<?>> getGenericBracketAccessorMap() {
+		private Map<Integer, List<IGenericBracketAccessorFunction<?>>> getGenericBracketAccessorMap() {
 			if (genericBracketAccessorMap != null)
 				return genericBracketAccessorMap;
 			return genericBracketAccessorMap = new HashMap<>();
 		}
 
-		private Map<Integer, IGenericBracketAssignerFunction<?>> getGenericBracketAssignerMap() {
+		private Map<Integer, List<IGenericBracketAssignerFunction<?>>> getGenericBracketAssignerMap() {
 			if (genericBracketAssignerMap != null)
 				return genericBracketAssignerMap;
 			return genericBracketAssignerMap = new HashMap<>();

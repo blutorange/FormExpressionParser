@@ -2,7 +2,6 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Locale;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -99,10 +98,14 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<StringLangObject> {
@@ -113,11 +116,15 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return thisContext.toUpperCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				// string.toLocaleUpperCase(locale) => string
 				return GenericVariableType.forSimpleFunction(SimpleVariableType.STRING, SimpleVariableType.STRING);
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		toLocaleLowerCase(false, "locale") { //$NON-NLS-1$
@@ -127,10 +134,14 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return thisContext.toLowerCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return GenericVariableType.forSimpleFunction(SimpleVariableType.STRING, SimpleVariableType.STRING);
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		toUpperCase(false) {
@@ -140,10 +151,14 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return thisContext.toUpperCase(Locale.ROOT);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.STRING;
 			}
 		},
 		toLowerCase(false) {
@@ -153,10 +168,14 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return thisContext.toLowerCase(Locale.ROOT);
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.STRING;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.STRING;
 			}
 		},
 		length(false) {
@@ -166,10 +185,14 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return NumberLangObject.create(thisContext.stringValue().length());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.NUMBER;
 			}
 		},
 		;

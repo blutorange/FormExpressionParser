@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -11,6 +10,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -51,10 +51,21 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 					throws EvaluationException {
 				return thisContext.or(args[0].coerceBoolean(ec));
 			}
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		/**
@@ -67,10 +78,21 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 					throws EvaluationException {
 				return thisContext.and(args[0].coerceBoolean(ec));
 			}
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		/**
@@ -83,27 +105,47 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 					throws EvaluationException {
 				return thisContext.xor(args[0].coerceBoolean(ec));
 			}
-
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		/**
 		 * @return {@link BooleanLangObject}. The logical negation of this boolean.
 		 */
-		NOT(false){
+		NOT(false) {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
 				return thisContext.not();
 			}
-
-			@Nullable
 			@Override
-			public IVariableType getReturnTypeFor(final IVariableType lhs, final IVariableType rhs) {
-				return lhs.equals(rhs) ? lhs : null;
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public IVariableType getRhsType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getRhsClass() {
+				return ELangObjectType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.BOOLEAN;
 			}
 		},
 		;

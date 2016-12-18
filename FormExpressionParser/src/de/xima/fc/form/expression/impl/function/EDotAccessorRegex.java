@@ -1,6 +1,5 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,10 +71,14 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 		return impl.hasVarArgs;
 	}
 
-	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
-		return impl.getDotAccessorReturnType(thisContext);
+	public ILangObjectClass getReturnClass() {
+		return impl.getReturnClass();
+	}
+
+	@Override
+	public IVariableType getReturnType(final IVariableType thisContext) {
+		return impl.getReturnType(thisContext);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<RegexLangObject> {
@@ -87,10 +90,14 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 				return BooleanLangObject.create(thisContext.patternValue().matcher(input).matches());
 			}
 
-			@Nullable
 			@Override
-			public IVariableType getDotAccessorReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext) {
 				return GenericVariableType.forSimpleFunction(SimpleVariableType.BOOLEAN, SimpleVariableType.STRING);
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectType.FUNCTION;
 			}
 		},
 		;

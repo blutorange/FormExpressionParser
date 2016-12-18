@@ -30,7 +30,7 @@ public class HashLangObject extends ALangObject {
 	}
 
 	@Override
-	public ILangObjectClass getType() {
+	public ILangObjectClass getObjectClass() {
 		return ELangObjectType.HASH;
 	}
 
@@ -201,6 +201,10 @@ public class HashLangObject extends ALangObject {
 		return value.size();
 	}
 
+	public void putAll(final HashLangObject that) {
+		value.putAll(that.value);
+	}
+
 	private class Itr implements INonNullIterator<ALangObject> {
 		private final Iterator<ALangObject> it;
 		public Itr(final Iterator<ALangObject> it) {
@@ -221,5 +225,4 @@ public class HashLangObject extends ALangObject {
 			it.remove();
 		}
 	}
-
 }

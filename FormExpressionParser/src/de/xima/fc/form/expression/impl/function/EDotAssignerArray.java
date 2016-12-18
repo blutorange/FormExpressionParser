@@ -3,33 +3,38 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.BooleanLangObject;
+import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
+import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public enum EDotAssignerBoolean implements IDotAssignerFunction<BooleanLangObject> {
+public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
+	/**
+	 * @param newLength The new length of the array. Padded with {@link NullLangObject} as necessary.
+	 */
+	length(Impl.length),
 	;
 
 	private final FunctionLangObject func;
 	private final Impl impl;
 	private final boolean hasVarArgs;
 
-	private EDotAssignerBoolean(final Impl impl) {
+	private EDotAssignerArray(final Impl impl) {
 		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
 		hasVarArgs = impl.hasVarArgs();
 	}
 
 	@Override
-	public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
+	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 			throws EvaluationException {
 		return func.functionValue().evaluate(ec, thisContext, args);
 	}
@@ -53,7 +58,7 @@ public enum EDotAssignerBoolean implements IDotAssignerFunction<BooleanLangObjec
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.BOOLEAN;
+		return ELangObjectType.ARRAY;
 	}
 
 	@Override
@@ -62,11 +67,35 @@ public enum EDotAssignerBoolean implements IDotAssignerFunction<BooleanLangObjec
 	}
 
 	@Override
-	public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
-		return impl.isDotAssignerDefined(thisContext, value);
+	public ILangObjectClass getValueClass() {
+		return impl.getValueClass();
 	}
 
-	private static enum Impl implements IDotAssignerFunction<BooleanLangObject> {
+	@Override
+	public IVariableType getValueType(final IVariableType thisContext) {
+		return impl.getValueType(thisContext);
+	}
+
+	private static enum Impl implements IDotAssignerFunction<ArrayLangObject> {
+		length(false, "newLength") { //$NON-NLS-1$
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final int len = args[2].coerceNumber(ec).intValue(ec);
+				thisContext.setLength(len);
+				return thisContext;
+			}
+
+			@Override
+			public IVariableType getValueType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getValueClass() {
+				return ELangObjectType.NUMBER;
+			}
+		}
 		;
 
 		private String[] argList;
@@ -102,19 +131,11 @@ public enum EDotAssignerBoolean implements IDotAssignerFunction<BooleanLangObjec
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.BOOLEAN;
+			return ELangObjectType.ARRAY;
 		}
 
 		@Override
-		public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
-				final ALangObject... args) throws EvaluationException {
-			throw new UncatchableEvaluationException(ec,
-					"Method called on non-existing enum. This is most likely a problem with the parser. Contact support."); //$NON-NLS-1$
-		}
-
-		@Override
-		public boolean isDotAssignerDefined(final IVariableType thisContext, final IVariableType value) {
-			return false;
-		}
+		public abstract ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
+				final ALangObject... args) throws EvaluationException;
 	}
 }

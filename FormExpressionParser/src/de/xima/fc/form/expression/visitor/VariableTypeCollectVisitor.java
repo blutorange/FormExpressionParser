@@ -93,7 +93,6 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	@Override
 	public void visit(final ASTFunctionClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
 		// TODO set type for *this* variable
-		// TODO type for functions: function foo(){return 42;};foo();
 		builder.setBasicType(ELangObjectType.FUNCTION);
 		builder.append(getType(node));
 		for (int i = node.getArgumentCount(); i-->0;) {

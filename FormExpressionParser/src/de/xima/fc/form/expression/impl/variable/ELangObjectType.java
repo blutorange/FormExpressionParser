@@ -370,4 +370,12 @@ public enum ELangObjectType implements ILangObjectClass {
 	public final boolean equalsClass(final ILangObjectClass clazz) {
 		return id == clazz.getClassId();
 	}
+
+	@Override
+	public boolean isSuperClassOf(final ILangObjectClass that) {
+		for (ILangObjectClass clazz = that; clazz != null; clazz = clazz.getSuperClass())
+			if (equalsClass(clazz))
+				return true;
+		return false;
+	}
 }
