@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.ILabelled;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, IVariableTyped {
@@ -68,7 +68,7 @@ public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, 
 			if (i == (hasType ? 1 : 0))
 				throw new ArrayIndexOutOfBoundsException();
 			if (hasType && i == 0)
-				return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
+				return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectClass.NULL);
 		}
 		return nullNode();
 	}

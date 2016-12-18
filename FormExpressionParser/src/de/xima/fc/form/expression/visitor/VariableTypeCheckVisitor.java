@@ -16,14 +16,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
-import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.parse.IllegalNumberOfVarArgFunctionParametersException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAccessorTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleConditionTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleDotAccessorTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleDotAssignerTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleForLoopHeaderTypeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionParameterTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
@@ -48,7 +49,7 @@ import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
@@ -390,7 +391,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	private IVariableType getFunctionType(final IVariableType typeDeclaredReturn, final ASTFunctionNode node)
 			throws SemanticsException {
 		final IVariableTypeBuilder builder = new VariableTypeBuilder();
-		builder.setBasicType(ELangObjectType.FUNCTION);
+		builder.setBasicType(ELangObjectClass.FUNCTION);
 		builder.append(typeDeclaredReturn);
 		for (int i = 0; i < node.getArgumentCount(); ++i) {
 			final NodeInfo infoArg = node.getArgumentNode(i).jjtAccept(this);
@@ -421,13 +422,110 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		}
 	}
 
+	private void visitScopeDefs(final IScopeDefinitions scopeDefs) throws SemanticsException {
+		// TODO implement me
+		// check and process scope defs
+	}
+
+	private NodeInfo visitPropertyExpression(final ASTPropertyExpressionNode node, final int propertyNodeCount)
+			throws SemanticsException {
+		final NodeInfo infoRes = node.getStartNode().jjtAccept(this);
+		if (!infoRes.hasImplicitType()) {
+			if (node.getPropertyNodeCount() > 0)
+				throw new UnreachableCodeException(node.getPropertyNode(0));
+			return infoRes;
+		}
+		for (int i = 0; i < propertyNodeCount; ++i) {
+			switch (node.getPropertyType(i)) {
+			case DOT: {
+				final String property = node.getDotPropertyName(i);
+				final IVariableType typeNew = factory.getNamespaceFactory().getDotAccessorReturnType(infoRes.getImplicitType(), property);
+				if (typeNew == null)
+					throw new IncompatibleDotAccessorTypeException(infoRes.getImplicitType(), property, node.getPropertyNode(i));
+				infoRes.replaceImplicitType(typeNew);
+				break;
+			}
+			case BRACKET: {
+				final NodeInfo infoProperty = node.getPropertyNode(i).jjtAccept(this);
+				infoRes.unifyJumps(infoProperty);
+				if (!infoProperty.hasImplicitType()) {
+					if (i < node.getPropertyNodeCount() - 1)
+						throw new UnreachableCodeException(node.jjtGetChild(i+1));
+					return infoRes;
+				}
+				final IVariableType typeNew = factory.getNamespaceFactory().getBracketAccessorReturnType(infoRes.getImplicitType(),
+						infoProperty.getImplicitType());
+				if (typeNew == null)
+					throw new IncompatibleBracketAccessorTypeException(infoRes.getImplicitType(), infoProperty.getImplicitType(),
+						node.getPropertyNode(i));
+				infoRes.replaceImplicitType(typeNew);
+				break;
+			}
+			case PARENTHESIS: {
+				// We cannot call anything that is not a function.
+				final IVariableType typeFunction = infoRes.getImplicitType();
+				if (!typeFunction.isA(ELangObjectClass.FUNCTION))
+					throw new NotAFunctionException(infoRes.getImplicitType(), node);
+				final int declaredArgCount = typeFunction.getGenericCount() - 1;
+				final int actualArgCount = node.getParenthesisArgNodeCount(i);
+				final int indexOneAfterEnd;
+				if (typeFunction.hasFlag(EVariableTypeFlag.VARARG)) {
+					// Function with varargs.
+					indexOneAfterEnd = declaredArgCount - 1;
+					if (actualArgCount < declaredArgCount - 1)
+						throw new IllegalNumberOfVarArgFunctionParametersException(declaredArgCount, actualArgCount, node.getPropertyNode(i));
+					IVariableType typeVarArg = SimpleVariableType.NULL;
+					for (int j = indexOneAfterEnd; j < actualArgCount; ++j) {
+						final NodeInfo infoVarArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
+						if (!infoVarArg.hasImplicitType())
+							throw new UnreachableCodeException(node.getPropertyNode(i));
+						infoRes.unifyJumps(infoVarArg);
+						typeVarArg = typeVarArg.union(infoVarArg.getImplicitType());
+						final IVariableType typeActualVarArgArray = GenericVariableType.forArray(typeVarArg);
+						final IVariableType typeDeclaredVarArgArray = GenericVariableType
+								.forArray(typeFunction.getGeneric(typeFunction.getGenericCount() - 1));
+						if (!typeDeclaredVarArgArray.isAssignableFrom(typeActualVarArgArray))
+							throw new IncompatibleFunctionParameterTypeException(
+									typeFunction.getGeneric(typeFunction.getGenericCount() - 1).getGeneric(0),
+									infoVarArg.getImplicitType(), node.getParenthesisArgNode(i, j));
+					}
+				}
+				else {
+					// Function without varargs.
+					if (declaredArgCount != actualArgCount)
+						throw new IllegalNumberOfFunctionParametersException(declaredArgCount, actualArgCount, node.getPropertyNode(i));
+					indexOneAfterEnd = actualArgCount;
+				}
+				for (int j = 0; j < indexOneAfterEnd; ++j) {
+					final NodeInfo infoArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
+					if (!infoArg.hasImplicitType())
+							throw new UnreachableCodeException(node.getPropertyNode(i));
+					if (!infoArg.getImplicitType().isAssignableFrom(typeFunction.getGeneric(j+1)))
+						throw new IncompatibleFunctionParameterTypeException(typeFunction.getGeneric(j + 1),
+								infoArg.getImplicitType(), node.getParenthesisArgNode(i, j));
+					infoRes.unifyJumps(infoArg);
+				}
+				//TODO handle void return type, do not allow assignment of void etc.
+				// Return return types as declared.
+				infoRes.replaceImplicitType(typeFunction.getGeneric(0));
+				break;
+			}
+			// $CASES-OMITTED$
+			default:
+				throw new SemanticsException(
+						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION, node.getPropertyType(i)),
+						node.getPropertyNode(i));
+			}
+		}
+		return infoRes;
+	}
+
 	@Override
 	public NodeInfo visit(final ASTExpressionNode node) throws SemanticsException {
 		// Empty expression node.
 		if (node.isLeaf())
 			return new NodeInfo(null, SimpleVariableType.NULL);
 
-		// Binary expression node.
 		// Get type of left most node.
 		final NodeInfo infoLhs = node.jjtGetChild(0).jjtAccept(this);
 		if (!infoLhs.hasImplicitType()) {
@@ -435,6 +533,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				throw new UnreachableCodeException(node.jjtGetChild(1));
 			return infoLhs;
 		}
+
 		// Process expression methods from the left to the right.
 		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
 			// Get type from right hand side.
@@ -464,36 +563,107 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			throw new UnreachableCodeException(node.getAssignableNode(node.getAssignableNodeCount()));
 		for (int i = node.getAssignableNodeCount(); i-- > 0;) {
 			final EMethod method = node.getAssignMethod(i);
-			switch (node.getAssignableNode(i).jjtGetNodeId()) {
-			case JJTVARIABLENODE:
+			switch (node.getAssignableNodeType(i)) {
+			case JJTVARIABLENODE: {
 				final NodeInfo infoVar = node.getAssignableNode(i).jjtAccept(this);
-				if (method != EMethod.EQUAL) {
-					// TODO perform expression method and check types
-					// Use method from method.equalMethod(node)
-					throw new FormExpressionException();
-				}
 				if (!infoVar.hasImplicitType()) {
 					if (i > 0)
 						throw new UnreachableCodeException(node.getAssignableNode(i - 1));
 				}
-				else if (!infoVar.getImplicitType().isAssignableFrom(infoResult.getImplicitType())) {
+				// For method assignments such as +=, -= etc., check method types.
+				if (method != EMethod.EQUAL) {
+					final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
+							infoVar.getImplicitType(), method.equalMethod(node.getAssignableNode(i)),
+							infoResult.getImplicitType());
+					if (typeMethod == null)
+						throw new IncompatibleVariableTypeForExpressionMethodException(infoVar.getImplicitType(),
+								method.equalMethod(node.getAssignableNode(i)), infoResult.getImplicitType(),
+								node.getAssignableNode(i));
+					infoResult.replaceImplicitType(typeMethod);
+				}
+				if (!infoVar.getImplicitType().isAssignableFrom(infoResult.getImplicitType())) {
 					throw new IncompatibleVariableAssignmentTypeException((ASTVariableNode) node.getAssignableNode(i),
 							infoVar.getImplicitType(), infoResult.getImplicitType());
 				}
-				else
-					infoResult.replaceImplicitType(infoVar.getImplicitType());
 				infoResult.unifyJumps(infoVar);
 				break;
-			case JJTPROPERTYEXPRESSIONNODE:
-				// TODO implement me
-				if (true)
-					throw new FormExpressionException();
+			}
+			case JJTPROPERTYEXPRESSIONNODE: {
+				final ASTPropertyExpressionNode nodeProp = node.getAssignablePropertyNode(i);
+				final NodeInfo infoProp = visitPropertyExpression(nodeProp, nodeProp.getPropertyNodeCount() - 1);
+				infoResult.unifyJumps(infoProp);
+				if (!infoProp.hasImplicitType())
+					throw new UnreachableCodeException(nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount()-1));
+				switch (nodeProp.getPropertyType(nodeProp.getPropertyNodeCount()-1)) {
+				case DOT: {
+					final String property = nodeProp.getDotPropertyName(nodeProp.getPropertyNodeCount()-1);
+					// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c
+					// etc.
+					// First we need to evaluate the last attribute accessor (a.b),
+					// then the expression method (+).
+					if (method != EMethod.EQUAL) {
+						final IVariableType typeAllProp = factory.getNamespaceFactory()
+								.getDotAccessorReturnType(infoProp.getImplicitType(), property);
+						if (typeAllProp == null)
+							throw new IncompatibleDotAccessorTypeException(infoProp.getImplicitType(), property,
+									nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount() - 1));
+						final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
+								typeAllProp, method.equalMethod(nodeProp), infoResult.getImplicitType());
+						if (typeMethod == null)
+							throw new IncompatibleVariableTypeForExpressionMethodException(typeAllProp,
+									method.equalMethod(nodeProp), infoResult.getImplicitType(), nodeProp);
+						infoResult.replaceImplicitType(typeMethod);
+					}
+					// Now we can call the attribute assigner and assign the
+					// value.
+					if (!factory.getNamespaceFactory().isDotAssignerDefined(infoProp.getImplicitType(), property,
+							infoResult.getImplicitType()))
+						throw new IncompatibleDotAssignerTypeException(infoProp.getImplicitType(), property,
+								infoResult.getImplicitType(),
+								nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount() - 1));
+					break;
+				}
+				case BRACKET: {
+					final NodeInfo infoEvaluated = nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount()-1).jjtAccept(this);
+					if (!infoEvaluated.hasImplicitType())
+						throw new UnreachableCodeException(nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount()-1));
+					// Compound assignments (a[b]+=c etc.) are the same as
+					// a[b]=a[b]+c etc.
+					// First we need to evaluate the last attribute accessor (a[b]),
+					// then the expression method (+).
+					if (method != EMethod.EQUAL) {
+						final IVariableType typeAllProp = factory.getNamespaceFactory()
+								.getBracketAccessorReturnType(infoProp.getImplicitType(), infoEvaluated.getImplicitType());
+						if (typeAllProp == null)
+							throw new IncompatibleBracketAccessorTypeException(infoProp.getImplicitType(),
+									infoEvaluated.getImplicitType(),
+									nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount() - 1));
+						final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
+								typeAllProp, method.equalMethod(nodeProp), infoResult.getImplicitType());
+						if (typeMethod == null)
+							throw new IncompatibleVariableTypeForExpressionMethodException(typeAllProp,
+									method.equalMethod(nodeProp), infoResult.getImplicitType(),
+									nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount() - 1));
+						infoResult.replaceImplicitType(typeMethod);
+					}
+					if (!factory.getNamespaceFactory().isBracketAssignerDefined(infoProp.getImplicitType(),
+							infoEvaluated.getImplicitType(), infoResult.getImplicitType()))
+						throw new IncompatibleBracketAssignerTypeException(infoProp.getImplicitType(),
+								infoEvaluated.getImplicitType(), infoResult.getImplicitType(),
+								nodeProp.getPropertyNode(nodeProp.getPropertyNodeCount() - 1));
+					break;
+				}
+				// $CASES-OMITTED$
+				default:
+					throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
+							nodeProp.getPropertyType(nodeProp.getPropertyNodeCount()-1), nodeProp.getClass().getSimpleName()),
+							nodeProp);
+				}
 				break;
+			}
 			default:
-				throw new SemanticsException(
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-								node.getAssignableNode(i).jjtGetNodeId(), node.getClass().getSimpleName()),
-						node.getAssignableNode(i));
+				throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_DURING_TYPECHECKING,
+						node.getAssignableNodeType(i)), node.getAssignableNode(i));
 			}
 		}
 		return infoResult;
@@ -638,7 +808,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 * When there is an else-clause, we unify both types. In case both branches
 	 * do not return normally, the if-else-clause does not return normally. When
 	 * there is no else-clause, this node may return {@link NullLangObject} and
-	 * we unify the if-clause type with {@link ELangObjectType#NULL}. Finally,
+	 * we unify the if-clause type with {@link ELangObjectClass#NULL}. Finally,
 	 * we return the unified type.
 	 * </p>
 	 */
@@ -938,97 +1108,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTPropertyExpressionNode node) throws SemanticsException {
-		final NodeInfo infoRes = node.getStartNode().jjtAccept(this);
-		if (!infoRes.hasImplicitType()) {
-			if (node.getPropertyNodeCount() > 0)
-				throw new UnreachableCodeException(node.getPropertyNode(0));
-			return infoRes;
-		}
-		for (int i = 0; i < node.getPropertyNodeCount(); ++i) {
-			switch (node.getPropertyType(i)) {
-			case DOT: {
-				final String property = node.getDotPropertyName(i);
-				final IVariableType typeNew = factory.getNamespaceFactory().getDotAccessorReturnType(infoRes.getImplicitType(), property);
-				if (typeNew == null)
-					throw new IncompatibleDotAccessorTypeException(infoRes.getImplicitType(), property, node.getPropertyNode(i));
-				infoRes.replaceImplicitType(typeNew);
-				break;
-			}
-			case BRACKET: {
-				final NodeInfo infoProperty = node.getPropertyNode(i).jjtAccept(this);
-				infoRes.unifyJumps(infoProperty);
-				if (!infoProperty.hasImplicitType()) {
-					if (i < node.getPropertyNodeCount() - 1)
-						throw new UnreachableCodeException(node.jjtGetChild(i+1));
-					return infoRes;
-				}
-				final IVariableType typeNew = factory.getNamespaceFactory().getBracketAccessorReturnType(infoRes.getImplicitType(),
-						infoProperty.getImplicitType());
-				if (typeNew == null)
-					throw new IncompatibleBracketAccessorTypeException(infoRes.getImplicitType(), infoProperty.getImplicitType(),
-						node.getPropertyNode(i));
-				infoRes.replaceImplicitType(typeNew);
-				break;
-			}
-			case PARENTHESIS: {
-				// We cannot call anything that is not a function.
-				final IVariableType typeFunction = infoRes.getImplicitType();
-				if (!typeFunction.isA(ELangObjectType.FUNCTION))
-					throw new NotAFunctionException(infoRes.getImplicitType(), node);
-				// TODO Check this context for the function
-				// Check argument count and argument types.
-				// Alternatively: bind functions to a certain this context?
-				final int declaredArgCount = typeFunction.getGenericCount() - 1;
-				final int actualArgCount = node.getParenthesisArgNodeCount(i);
-				final int indexOneAfterEnd;
-				if (typeFunction.hasFlag(EVariableTypeFlag.VARARG)) {
-					// Function with varargs.
-					indexOneAfterEnd = declaredArgCount - 1;
-					if (actualArgCount < declaredArgCount - 1)
-						throw new IllegalNumberOfVarArgFunctionParametersException(declaredArgCount, actualArgCount, node.getPropertyNode(i));
-					IVariableType typeVarArg = SimpleVariableType.NULL;
-					for (int j = indexOneAfterEnd; j < actualArgCount; ++j) {
-						final NodeInfo infoVarArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
-						if (!infoVarArg.hasImplicitType())
-							throw new UnreachableCodeException(node.getPropertyNode(i));
-						infoRes.unifyJumps(infoVarArg);
-						typeVarArg = typeVarArg.union(infoVarArg.getImplicitType());
-						final IVariableType typeActualVarArgArray = GenericVariableType.forArray(typeVarArg);
-						final IVariableType typeDeclaredVarArgArray = GenericVariableType
-								.forArray(typeFunction.getGeneric(typeFunction.getGenericCount() - 1));
-						if (!typeDeclaredVarArgArray.isAssignableFrom(typeActualVarArgArray))
-							throw new IncompatibleFunctionParameterTypeException(typeFunction.getGeneric(typeFunction.getGenericCount()-1).getGeneric(0),
-									infoVarArg.getImplicitType(), node.getParenthesisArgNode(i, j));
-					}
-				}
-				else {
-					// Function without varargs.
-					if (declaredArgCount != actualArgCount)
-						throw new IllegalNumberOfFunctionParametersException(declaredArgCount, actualArgCount, node.getPropertyNode(i));
-					indexOneAfterEnd = actualArgCount;
-				}
-				for (int j = 0; j < indexOneAfterEnd; ++j) {
-					final NodeInfo infoArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
-					if (!infoArg.hasImplicitType())
-							throw new UnreachableCodeException(node.getPropertyNode(i));
-					if (!infoArg.getImplicitType().isAssignableFrom(typeFunction.getGeneric(j+1)))
-						throw new IncompatibleFunctionParameterTypeException(typeFunction.getGeneric(j + 1),
-								infoArg.getImplicitType(), node.getParenthesisArgNode(i, j));
-					infoRes.unifyJumps(infoArg);
-				}
-				//TODO handle void return type, do not allow assignment of void etc.
-				// Return return types as declared.
-				infoRes.replaceImplicitType(typeFunction.getGeneric(0));
-				break;
-			}
-			// $CASES-OMITTED$
-			default:
-				throw new SemanticsException(
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION, node.getPropertyType(i)),
-						node.getPropertyNode(i));
-			}
-		}
-		return infoRes;
+		return visitPropertyExpression(node, node.getPropertyNodeCount());
 	}
 
 	@Override
@@ -1211,7 +1291,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			final IEvaluationContextContract<?> factory, final ISeverityConfig config,
 			final IScopeDefinitions scopeDefs) throws SemanticsException {
 		final VariableTypeCheckVisitor v = new VariableTypeCheckVisitor(symbolTypeTable, factory, config);
-		// TODO check and process scope defs
+		v.visitScopeDefs(scopeDefs);
 		final NodeInfo info = node.jjtAccept(v);
 		return info.hasImplicitType() ? info.getImplicitType() : null;
 	}

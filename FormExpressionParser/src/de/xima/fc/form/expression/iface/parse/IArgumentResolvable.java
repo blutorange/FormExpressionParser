@@ -10,8 +10,6 @@ public interface IArgumentResolvable {
 	public ISourceResolvable getArgResolvable(int i);
 	@Nonnull
 	public Node getBodyNode();
-	@Nonnull
-	public ISourceResolvable getThisResolvable();
 	/** @return Whether the last argument is a var args arguments. */
 	public boolean hasVarArgs();
 }

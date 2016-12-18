@@ -12,18 +12,13 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
-import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvableNode, IVariableTyped {
 	private static final long serialVersionUID = 1L;
-
-	@Nonnull
-	private final GenericSourceResolvable thisResolvable = new GenericSourceResolvable(CmnCnst.Name.VARIABLE_THIS);
 
 	private boolean hasVarArgs;
 	private boolean hasType;
@@ -49,7 +44,7 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		if (i == (hasType ? 1 : 0))
 			throw new ArrayIndexOutOfBoundsException();
 		if (i == 0 && hasType)
-			return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
+			return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectClass.NULL);
 		if (i != jjtGetNumChildren() - 1)
 			return null;
 		return nullNode();
@@ -100,11 +95,6 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	@Override
 	public final ASTFunctionArgumentNode getArgResolvable(final int i) {
 		return (ASTFunctionArgumentNode)jjtGetChild(i + (hasType ? 2 : 1));
-	}
-
-	@Override
-	public ISourceResolvable getThisResolvable() {
-		return thisResolvable;
 	}
 
 	@Nonnull

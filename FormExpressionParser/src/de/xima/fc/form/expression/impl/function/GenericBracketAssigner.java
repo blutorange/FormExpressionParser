@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IGenericBracketAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -60,7 +60,7 @@ public abstract class GenericBracketAssigner<T extends ALangObject> implements I
 	 *             When the index is too large or too small to be represented as
 	 *             an <code>int</code>.
 	 */
-	public final static IGenericBracketAssignerFunction<ArrayLangObject> ARRAY = new GenericBracketAssigner<ArrayLangObject>(ELangObjectType.ARRAY,
+	public final static IGenericBracketAssignerFunction<ArrayLangObject> ARRAY = new GenericBracketAssigner<ArrayLangObject>(ELangObjectClass.ARRAY,
 			"genericBracketAssignerArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 		@Override
@@ -86,12 +86,12 @@ public abstract class GenericBracketAssigner<T extends ALangObject> implements I
 
 		@Override
 		public ILangObjectClass getPropertyClass() {
-			return ELangObjectType.NUMBER;
+			return ELangObjectClass.NUMBER;
 		}
 
 		@Override
 		public ILangObjectClass getValueClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	};
 
@@ -104,7 +104,7 @@ public abstract class GenericBracketAssigner<T extends ALangObject> implements I
 	 *                 the key is mapped to {@link NullLangObject}. Use
 	 *                 {@link EDotAccessorHash#contains} to check.
 	 */
-	public final static IGenericBracketAssignerFunction<HashLangObject> HASH = new GenericBracketAssigner<HashLangObject>(ELangObjectType.HASH,
+	public final static IGenericBracketAssignerFunction<HashLangObject> HASH = new GenericBracketAssigner<HashLangObject>(ELangObjectClass.HASH,
 			"genericBracketAssignerHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 		@Override
@@ -126,12 +126,12 @@ public abstract class GenericBracketAssigner<T extends ALangObject> implements I
 
 		@Override
 		public ILangObjectClass getPropertyClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 
 		@Override
 		public ILangObjectClass getValueClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	};
 

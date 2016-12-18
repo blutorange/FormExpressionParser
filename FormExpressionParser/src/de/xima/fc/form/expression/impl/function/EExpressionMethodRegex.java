@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -59,12 +59,12 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.STRING;
+				return ELangObjectClass.STRING;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 		},
 		;
@@ -102,7 +102,7 @@ public enum EExpressionMethodRegex implements IMethod2Function<RegexLangObject> 
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.REGEX;
+			return ELangObjectClass.REGEX;
 		}
 	}
 }

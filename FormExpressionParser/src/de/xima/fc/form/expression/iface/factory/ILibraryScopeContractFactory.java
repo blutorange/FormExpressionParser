@@ -7,7 +7,7 @@ import javax.annotation.concurrent.Immutable;
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.iface.evaluate.ILibraryScope;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 
@@ -30,7 +30,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
  * </p>
  * This also means that there can be no function <code>getRandomObject</code>
  * that randomly returns a number or a string. (Unless the variable type is
- * indicated as {@link ELangObjectType#OBJECT}).
+ * indicated as {@link ELangObjectClass#OBJECT}).
  * </p>
  * <p><b>Must be immutable.</b></p>
  * @author madgaksha

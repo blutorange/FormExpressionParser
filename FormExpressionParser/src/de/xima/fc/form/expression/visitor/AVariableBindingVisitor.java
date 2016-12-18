@@ -138,9 +138,6 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		final int bookmark = binding.getBookmark();
 		binding.nestLocal();
 
-		final T objectThis = getNewObjectToSet(node.getThisResolvable());
-		binding.defineVariable(node.getThisResolvable().getVariableName(), objectThis);
-
 		try {
 			for (int i = 0; i < node.getArgumentCount(); ++i) {
 				final ISourceResolvable res = node.getArgResolvable(i);

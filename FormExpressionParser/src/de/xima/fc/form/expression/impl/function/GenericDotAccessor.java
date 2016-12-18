@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IGenericDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -45,7 +45,7 @@ public abstract class GenericDotAccessor<T extends ALangObject> implements IGene
 	 *                 {@link EDotAccessorHash#contains} to check.
 	 */
 	public final static IGenericDotAccessorFunction<HashLangObject> HASH = new GenericDotAccessor<HashLangObject>(
-			ELangObjectType.HASH, "genericBracketAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+			ELangObjectClass.HASH, "genericBracketAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override

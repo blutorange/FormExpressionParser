@@ -6,6 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import com.google.common.collect.ImmutableCollection;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -30,7 +31,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  */
 @ParametersAreNonnullByDefault
-public enum ELangObjectType implements ILangObjectClass {
+public enum ELangObjectClass implements ILangObjectClass {
 	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.OBJECT, false) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
@@ -84,7 +85,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	BOOLEAN(2, true, BooleanLangObject.class, CmnCnst.Syntax.BOOLEAN, false) {
@@ -112,7 +113,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	NUMBER(3, true, NumberLangObject.class, CmnCnst.Syntax.NUMBER, true) {
@@ -141,7 +142,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	STRING(4, true, StringLangObject.class, CmnCnst.Syntax.STRING, true) {
@@ -170,7 +171,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	REGEX(5, true, RegexLangObject.class, CmnCnst.Syntax.REGEX, false) {
@@ -198,7 +199,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	FUNCTION(6, true, FunctionLangObject.class, CmnCnst.Syntax.METHOD, false) {
@@ -231,7 +232,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 
 	},
@@ -260,7 +261,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	ARRAY(8, false, ArrayLangObject.class, CmnCnst.Syntax.ARRAY, true) {
@@ -289,7 +290,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	},
 	HASH(9, false, HashLangObject.class, CmnCnst.Syntax.HASH, true) {
@@ -318,7 +319,7 @@ public enum ELangObjectType implements ILangObjectClass {
 		@Nullable
 		@Override
 		public ILangObjectClass getSuperClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	};
 
@@ -328,7 +329,7 @@ public enum ELangObjectType implements ILangObjectClass {
 	private final Class<? extends ALangObject> clazz;
 	private final String syntacticalTypeName;
 
-	private ELangObjectType(final Integer id, final boolean isImmutable, final Class<? extends ALangObject> clazz,
+	private ELangObjectClass(final Integer id, final boolean isImmutable, final Class<? extends ALangObject> clazz,
 			final String syntacticalTypeName, final boolean isIterable) {
 		this.id = id;
 		this.clazz = clazz;
@@ -377,5 +378,19 @@ public enum ELangObjectType implements ILangObjectClass {
 			if (equalsClass(clazz))
 				return true;
 		return false;
+	}
+
+	@Override
+	public IVariableType upconvert(final IVariableType subType, final ILangObjectClass superType) {
+		IVariableType type = subType;
+		do {
+			if (type.isA(superType))
+				return type;
+			type = type.getBasicLangClass().getSuperType(type);
+		} while (type != null);
+		if (superType.isSuperClassOf(subType.getBasicLangClass()))
+			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.INCONSISTENT_CLASS_HIERARCHY,
+				subType.getBasicLangClass(), superType));
+		return SimpleVariableType.OBJECT;
 	}
 }

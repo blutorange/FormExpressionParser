@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 
 public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode implements IVariableTyped {
 	private static final long serialVersionUID = 1L;
@@ -29,7 +29,7 @@ public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode impl
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (i==0)
-			return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectType.NULL);
+			return new ASTVariableTypeNode(jjtGetChild(0), ELangObjectClass.NULL);
 		return null;
 	}
 

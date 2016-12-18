@@ -76,8 +76,7 @@ enum SemanticsSuccess implements ITestCase {
 
 	//Attribute accessors
 	PROP001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
-	PROP002("s='Ab3';f=s.toLocaleLowerCase;f.call(s,null);", StringLangObject.create("ab3")),
-	PROP003("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
+	PROP002("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
 
 	// Attribute assigners
 	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
@@ -149,8 +148,7 @@ enum SemanticsSuccess implements ITestCase {
 
 	// Functions and lambda support
 	FUNCTION001("function foo(a){a;}foo(3);", NumberLangObject.create(3)),
-	FUNCTION002("function foo(){this;}foo();", NullLangObject.getInstance()),
-	FUNCTION003("foo=''.toLocaleLowerCase;foo.call('BAR',null);", StringLangObject.create("bar")),
+	FUNCTION003("foo='BAR'.toLocaleLowerCase;foo(null);", StringLangObject.create("bar")),
 	FUNCTION004("foo=->(){42;};foo();", Tests.N42),
 	FUNCTION005("function foo(arg1,arg2,args...){args;}foo(1,2);", ArrayLangObject.create()),
 	FUNCTION006("function foo(arg1,arg2,args...){args;}foo(1,2,3);", ArrayLangObject.create(NumberLangObject.create(3))),
@@ -159,6 +157,7 @@ enum SemanticsSuccess implements ITestCase {
 	FUNCTION009("function foo(args...){args;}foo(3);", ArrayLangObject.create(NumberLangObject.create(3))),
 	FUNCTION010("function foo(args...){args;}foo(3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
 	FUNCTION011("function foo(arg1,arg2,args...){[arg1,arg2];}foo(1,2);", ArrayLangObject.create(NumberLangObject.create(1),NumberLangObject.create(2))),
+	FUNCTION012("a=[20,22];a.length;h={bar:a.get};h.bar(0)+h.bar(1);", Tests.N42),
 
 	//General
 	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci

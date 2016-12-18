@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.test;
 
-import static de.xima.fc.form.expression.impl.variable.ELangObjectType.ARRAY;
-import static de.xima.fc.form.expression.impl.variable.ELangObjectType.FUNCTION;
-import static de.xima.fc.form.expression.impl.variable.ELangObjectType.HASH;
-import static de.xima.fc.form.expression.impl.variable.ELangObjectType.NULL;
-import static de.xima.fc.form.expression.impl.variable.ELangObjectType.OBJECT;
-import static de.xima.fc.form.expression.impl.variable.ELangObjectType.STRING;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectClass.ARRAY;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectClass.FUNCTION;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectClass.HASH;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectClass.NULL;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectClass.OBJECT;
+import static de.xima.fc.form.expression.impl.variable.ELangObjectClass.STRING;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
 
@@ -213,7 +213,7 @@ public class VariableTypeTest {
 	@Nonnull
 	private List<Tuple> getSimpleTypes() {
 		final List<Tuple> list = new ArrayList<>();
-		for (final ILangObjectClass obj : ELangObjectType.values())
+		for (final ILangObjectClass obj : ELangObjectClass.values())
 			if (obj.allowsGenericsCountAndFlags(0, ImmutableSet.<EVariableTypeFlag>of()))
 				list.add(new Tuple(obj));
 		return list;

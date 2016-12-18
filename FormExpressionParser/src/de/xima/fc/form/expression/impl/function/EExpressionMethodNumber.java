@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
@@ -91,11 +91,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.OBJECT;
+				return ELangObjectClass.OBJECT;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		ADD(false, "summand") { //$NON-NLS-1$
@@ -117,12 +117,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		SUBTRACT(false, "subtrahend") { //$NON-NLS-1$
@@ -144,12 +144,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		INCREMENT(false) {
@@ -168,11 +168,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.OBJECT;
+				return ELangObjectClass.OBJECT;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		DECREMENT(false) {
@@ -191,11 +191,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.OBJECT;
+				return ELangObjectClass.OBJECT;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		NEGATE(false) {
@@ -214,11 +214,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.OBJECT;
+				return ELangObjectClass.OBJECT;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		MULTIPLY(false, "multiplicand") { //$NON-NLS-1$
@@ -240,12 +240,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		DIVIDE(false, "dividend") { //$NON-NLS-1$
@@ -267,12 +267,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		MODULO(false,"operand"){ //$NON-NLS-1$
@@ -294,12 +294,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		;
@@ -337,7 +337,7 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.NUMBER;
+			return ELangObjectClass.NUMBER;
 		}
 	}
 }

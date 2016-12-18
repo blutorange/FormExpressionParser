@@ -17,11 +17,12 @@ import de.xima.fc.form.expression.exception.evaluation.NoSuchMethodException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
+ * @formatter:off
  * <h1>Coercion rules</h1> Right: Object to be coerced. Down: Coercion target.
  * <table style="text-align:center;">
  * <th>
@@ -148,6 +149,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * <td>-</td>
  * </tr>
  * </table>
+ * @formatter:on
  *
  * @author mad_gaksha
  *
@@ -196,27 +198,27 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 *            Context to be used.
 	 */
 	public StringLangObject coerceString(final IEvaluationContext ec) {
-		if (getObjectClass() == ELangObjectType.STRING)
+		if (getObjectClass() == ELangObjectClass.STRING)
 			return (StringLangObject) this;
 		return StringLangObject.create(toString());
 	}
 
 	public ArrayLangObject coerceArray(final IEvaluationContext ec) throws CoercionException {
-		if (getObjectClass() == ELangObjectType.ARRAY)
+		if (getObjectClass() == ELangObjectClass.ARRAY)
 			return (ArrayLangObject) this;
-		throw new CoercionException(this, ELangObjectType.ARRAY, ec);
+		throw new CoercionException(this, ELangObjectClass.ARRAY, ec);
 	}
 
 	public HashLangObject coerceHash(final IEvaluationContext ec) throws CoercionException {
-		if (getObjectClass() == ELangObjectType.HASH)
+		if (getObjectClass() == ELangObjectClass.HASH)
 			return (HashLangObject) this;
-		throw new CoercionException(this, ELangObjectType.HASH, ec);
+		throw new CoercionException(this, ELangObjectClass.HASH, ec);
 	}
 
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
-		if (getObjectClass() == ELangObjectType.NUMBER)
+		if (getObjectClass() == ELangObjectClass.NUMBER)
 			return (NumberLangObject) this;
-		throw new CoercionException(this, ELangObjectType.NUMBER, ec);
+		throw new CoercionException(this, ELangObjectClass.NUMBER, ec);
 	}
 
 	/**
@@ -231,29 +233,29 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 *             When the object cannot be coerced.
 	 */
 	public final BooleanLangObject coerceBoolean(final IEvaluationContext ec) {
-		if (getObjectClass().getClassId() == ELangObjectType.BOOLEAN.getClassId())
+		if (getObjectClass().getClassId() == ELangObjectClass.BOOLEAN.getClassId())
 			return (BooleanLangObject) this;
-		if (getObjectClass().getClassId() == ELangObjectType.NULL.getClassId())
+		if (getObjectClass().getClassId() == ELangObjectClass.NULL.getClassId())
 			return BooleanLangObject.getFalseInstance();
 		return BooleanLangObject.getTrueInstance();
 	}
 
 	public ExceptionLangObject coerceException(final IEvaluationContext ec) throws CoercionException {
-		if (getObjectClass() == ELangObjectType.EXCEPTION)
+		if (getObjectClass() == ELangObjectClass.EXCEPTION)
 			return (ExceptionLangObject) this;
-		throw new CoercionException(this, ELangObjectType.EXCEPTION, ec);
+		throw new CoercionException(this, ELangObjectClass.EXCEPTION, ec);
 	}
 
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) throws CoercionException {
-		if (getObjectClass() == ELangObjectType.FUNCTION)
+		if (getObjectClass() == ELangObjectClass.FUNCTION)
 			return (FunctionLangObject) this;
-		throw new CoercionException(this, ELangObjectType.FUNCTION, ec);
+		throw new CoercionException(this, ELangObjectClass.FUNCTION, ec);
 	}
 
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
-		if (getObjectClass() == ELangObjectType.REGEX)
+		if (getObjectClass() == ELangObjectClass.REGEX)
 			return (RegexLangObject) this;
-		throw new CoercionException(this, ELangObjectType.REGEX, ec);
+		throw new CoercionException(this, ELangObjectClass.REGEX, ec);
 	}
 
 	/**
@@ -273,7 +275,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 *             When clazz and type do not match.
 	 */
 	@SuppressWarnings("unchecked")
-	public final <T extends ALangObject> T coerce(final ELangObjectType type, final Class<T> clazz,
+	public final <T extends ALangObject> T coerce(final ELangObjectClass type, final Class<T> clazz,
 			final IEvaluationContext ec) throws CoercionException, EvaluationException {
 		// This error can happen only if a subclass is constructed with the
 		// wrong type, or the Type enum contains the wrong class.
@@ -289,7 +291,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		case HASH:
 			return (T) coerceHash(ec);
 		case NULL:
-			throw new CoercionException(this, ELangObjectType.NULL, ec);
+			throw new CoercionException(this, ELangObjectClass.NULL, ec);
 		case NUMBER:
 			return (T) coerceNumber(ec);
 		case STRING:
@@ -332,52 +334,15 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		return id;
 	}
 
-	// protected final static <T extends ALangObject> ALangObject
-	// evaluateExpressionMethod(final T thisContext,
-	// @Nullable final IFunction<T> function, final EMethod method, final
-	// IEvaluationContext ec,
-	// final ALangObject... args) throws NoSuchMethodException,
-	// EvaluationException {
-	// if (function == null)
-	// throw new NoSuchMethodException(method, thisContext, ec);
-	// return ALangObject.create(function.evaluate(ec, thisContext, args));
-	// }
-	//
-	// protected final static <T extends ALangObject> ALangObject
-	// evaluateAttrAccessor(final T thisContext,
-	// @Nullable final IFunction<T> function, final ALangObject accessor, final
-	// boolean accessedViaDot,
-	// final IEvaluationContext ec) throws NoSuchAttrAccessorException,
-	// EvaluationException {
-	// if (function == null)
-	// throw new NoSuchAttrAccessorException(NullUtil.toString(accessor),
-	// thisContext, ec);
-	// return function.evaluate(ec, thisContext, accessor,
-	// BooleanLangObject.create(accessedViaDot));
-	// }
-	//
-	// protected final static <T extends ALangObject> void
-	// executeAttrAssigner(final T thisContext,
-	// @Nullable final IFunction<T> function, final ALangObject accessor, final
-	// boolean accessedViaDot,
-	// final ALangObject value, final IEvaluationContext ec)
-	// throws NoSuchAttrAccessorException, EvaluationException {
-	// if (function == null)
-	// throw new NoSuchAttrAssignerException(NullUtil.toString(accessor),
-	// thisContext, ec);
-	// function.evaluate(ec, thisContext, accessor,
-	// BooleanLangObject.create(accessedViaDot), value);
-	// }
-
 	public final ALangObject evaluateExpressionMethod(final EMethod method, final IEvaluationContext ec,
 			final ALangObject... args) throws EvaluationException {
 		// The namespace returns a function such that the generics argument is
 		// that of the current run-time class or some super class.
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "null" })
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) expressionMethod(method,
-				args.length > 0 ? args[0] : NullLangObject.getInstance(), ec);
+				args.length > 0 && args[0] != null ? args[0] : NullLangObject.getInstance(), ec);
 		if (func == null)
 			throw new NoSuchMethodException(method, this, ec);
 		return ALangObject.create(func.evaluate(ec, this, args));
@@ -495,7 +460,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 * <p>
 	 * This holds true. When the comparand is null <code>o.type</code> throws a
 	 * NullPointerException. When the two objects are of different type, they
-	 * are ordered according to {@link ELangObjectType#id} and cannot be equal.
+	 * are ordered according to {@link ELangObjectClass#id} and cannot be equal.
 	 * When the two objects are of the same type, the abstract method
 	 * {@link ALangObject#compareToSameType(ALangObject)} is called. Subclasses
 	 * are required to adhere to the above contract.
@@ -557,38 +522,38 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	public abstract ILangObjectClass getObjectClass();
 
 	public final boolean isArray() {
-		return getObjectClass() == ELangObjectType.ARRAY;
+		return getObjectClass() == ELangObjectClass.ARRAY;
 	}
 
 	public final boolean isNumber() {
-		return getObjectClass() == ELangObjectType.NUMBER;
+		return getObjectClass() == ELangObjectClass.NUMBER;
 	}
 
 	public final boolean isString() {
-		return getObjectClass() == ELangObjectType.STRING;
+		return getObjectClass() == ELangObjectClass.STRING;
 	}
 
 	public final boolean isHash() {
-		return getObjectClass() == ELangObjectType.HASH;
+		return getObjectClass() == ELangObjectClass.HASH;
 	}
 
 	public final boolean isBoolean() {
-		return getObjectClass() == ELangObjectType.BOOLEAN;
+		return getObjectClass() == ELangObjectClass.BOOLEAN;
 	}
 
 	public final boolean isFunction() {
-		return getObjectClass() == ELangObjectType.FUNCTION;
+		return getObjectClass() == ELangObjectClass.FUNCTION;
 	}
 
 	public final boolean isException() {
-		return getObjectClass() == ELangObjectType.EXCEPTION;
+		return getObjectClass() == ELangObjectClass.EXCEPTION;
 	}
 
 	public final boolean isRegex() {
-		return getObjectClass() == ELangObjectType.REGEX;
+		return getObjectClass() == ELangObjectClass.REGEX;
 	}
 
 	public final boolean isNull() {
-		return getObjectClass() == ELangObjectType.NULL;
+		return getObjectClass() == ELangObjectClass.NULL;
 	}
 }

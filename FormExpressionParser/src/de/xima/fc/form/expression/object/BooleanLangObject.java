@@ -7,7 +7,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -23,7 +23,7 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public ILangObjectClass getObjectClass() {
-		return ELangObjectType.BOOLEAN;
+		return ELangObjectClass.BOOLEAN;
 	}
 
 	private static class InstanceHolder {

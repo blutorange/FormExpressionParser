@@ -19,7 +19,6 @@ import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalExternalScopeAssignmentException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalNumberOfFunctionParametersException;
-import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.evaluation.MissingExternalContextException;
 import de.xima.fc.form.expression.exception.evaluation.ReturnClauseException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
@@ -28,12 +27,10 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
-import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -188,23 +185,20 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
 		ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0), ec);
-		ALangObject thisContext = NullLangObject.getInstance();
 		for (int i = 1; i < indexOneAfterEnd; ++i) {
 			final Node n = parentNode.jjtGetChild(i);
 			switch (n.getSiblingMethod()) {
 			case DOT:
-				thisContext = res;
 				final String attrDot = jjtAccept(parentNode, n, ec).coerceString(ec).stringValue();
 				res = res.evaluateDotAccessor(attrDot, ec);
 				break;
 			case BRACKET:
-				thisContext = res;
 				final ALangObject attrBracket = jjtAccept(parentNode, n, ec);
 				res = res.evaluateBracketAccessor(attrBracket, ec);
 				break;
 			case PARENTHESIS:
 				// Get a function object.
-				final IFunction<ALangObject> func = res.coerceFunction(ec).functionValue();
+				final FunctionLangObject func = res.coerceFunction(ec);
 
 				// Evaluate function arguments
 				final ALangObject[] args = evaluateChildren(n, ec);
@@ -214,20 +208,15 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 						|| func.hasVarArgs() && args.length < func.getDeclaredArgumentCount() - 1)
 					throw new IllegalNumberOfFunctionParametersException(func, args.length, ec);
 
-				// Check thisContext of the function.
-				if (func.getThisContextType() != ELangObjectType.NULL && func.getThisContextType() != thisContext.getObjectClass())
-					throw new IllegalThisContextException(thisContext, func.getThisContextType(), func, ec);
-
+				// Evaluate function
 				ec.getTracer().descend(parentNode);
 				try {
-					if (func.getThisContextType() == ELangObjectType.NULL)
-						thisContext = NullLangObject.getInstance();
-					// Evaluate function
-					thisContext = res = func.evaluate(ec, thisContext, args);
+					res = func.evaluate(ec, args);
 				}
 				finally {
 					ec.getTracer().ascend();
 				}
+
 				// Check for disallowed break / continue clauses.
 				if (mustJump) {
 					switch (jumpType) {
@@ -716,14 +705,16 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTFunctionNode node) throws EvaluationException {
-		return FunctionLangObject.create(new EvaluateVisitorAnonymousFunction(this, node, ec));
+		final FunctionLangObject func = FunctionLangObject.create(new EvaluateVisitorAnonymousFunction(this, node, ec));
+		func.bind(NullLangObject.getInstance(), ec);
+		return func;
 	}
 
 	@Override
 	public ALangObject visit(final ASTFunctionClauseNode node) throws EvaluationException {
-		final ALangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec));
-		// no need to set this, it is done when applying scopeDefs
-		return func;//setVariable(node.getVariableNode(), func, ec);
+		final FunctionLangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec));
+		func.bind(NullLangObject.getInstance(), ec);
+		return func;
 	}
 
 	@Override

@@ -1,9 +1,9 @@
 global scope {
-  number a;
-  number b;
-  number c;
-  number d;
+  method<void> m;
+  string s;
 }
-a = 5;
-logerror(++a);
-a;
+m = ->void() {
+  5;
+};
+s = m();
+s.toUpperCase;

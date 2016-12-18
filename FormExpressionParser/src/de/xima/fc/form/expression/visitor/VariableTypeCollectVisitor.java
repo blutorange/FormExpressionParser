@@ -9,7 +9,6 @@ import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
-import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
@@ -17,7 +16,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.DummyVariableTypeBuilder;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
@@ -39,11 +38,9 @@ public final class VariableTypeCollectVisitor
 extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
 
 	private final IVariableType[] table;
-	private final IEvaluationContextContract<?> factory;
 
-	public VariableTypeCollectVisitor(final int symbolTableSize, final IEvaluationContextContract<?> factory) {
+	public VariableTypeCollectVisitor(final int symbolTableSize) {
 		table = new IVariableType[symbolTableSize];
-		this.factory = factory;
 	}
 
 	@Override
@@ -92,8 +89,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTFunctionClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		// TODO set type for *this* variable
-		builder.setBasicType(ELangObjectType.FUNCTION);
+		builder.setBasicType(ELangObjectClass.FUNCTION);
 		builder.append(getType(node));
 		for (int i = node.getArgumentCount(); i-->0;) {
 			IVariableType type = visitTypedNode(node.getArgResolvable(i));
@@ -108,7 +104,6 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTFunctionNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		// TODO set type for *this* variable
 		for (int i = node.getArgumentCount(); i-->0;) {
 			visitTypedNode(node.getArgResolvable(i));
 			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
@@ -190,10 +185,9 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 					visitHeaderNode(header);
 	}
 
-	public static IVariableType[] collect(final Node node, final int symbolTableSize,
-			final IScopeDefinitions scopeDefs, 	final IEvaluationContextContract<?> factory)
+	public static IVariableType[] collect(final Node node, final int symbolTableSize, final IScopeDefinitions scopeDefs)
 					throws SemanticsException {
-		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize, factory);
+		final VariableTypeCollectVisitor v = new VariableTypeCollectVisitor(symbolTableSize);
 		v.visitScopeDefs(scopeDefs);
 		node.jjtAccept(v, DummyVariableTypeBuilder.INSTANCE);
 		return v.getTable();

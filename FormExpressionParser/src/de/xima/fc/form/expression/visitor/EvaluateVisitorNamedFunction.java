@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IUnparsableFunction;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.impl.config.UnparseConfig;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -63,9 +63,6 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 	@Override
 	public ALangObject evaluate(@Nonnull final IEvaluationContext ec, @Nonnull final NullLangObject thisContext,
 			@Nonnull final ALangObject... args) throws EvaluationException {
-		// TODO Set special variables 'this'
-		// As we are global function, set it to null?
-		set(ec, node.getThisResolvable(), thisContext);
 		final int normalArgCount;
 		if (node.hasVarArgs()) {
 			normalArgCount = node.getArgumentCount() - 1;
@@ -90,7 +87,7 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.NULL;
+		return ELangObjectClass.NULL;
 	}
 
 	@Override

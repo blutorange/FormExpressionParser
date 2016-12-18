@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -47,7 +47,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				if (args[0].getObjectClass() == ELangObjectType.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
+				if (args[0].getObjectClass() == ELangObjectClass.ARRAY) thisContext.addAll(args[0].coerceArray(ec));
 				else thisContext.add(args[0]);
 				return thisContext;
 			}
@@ -63,11 +63,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.ARRAY;
+				return ELangObjectClass.ARRAY;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.ARRAY;
+				return ELangObjectClass.ARRAY;
 			}
 		},
 		/**
@@ -78,7 +78,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				if (args[0].getObjectClass() == ELangObjectType.ARRAY) thisContext.removeAll(args[0].coerceArray(ec));
+				if (args[0].getObjectClass() == ELangObjectClass.ARRAY) thisContext.removeAll(args[0].coerceArray(ec));
 				else thisContext.remove(args[0]);
 				return thisContext;
 			}
@@ -93,11 +93,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.ARRAY;
+				return ELangObjectClass.ARRAY;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.ARRAY;
+				return ELangObjectClass.ARRAY;
 			}
 		},
 		;
@@ -135,7 +135,7 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.ARRAY;
+			return ELangObjectClass.ARRAY;
 		}
 	}
 }

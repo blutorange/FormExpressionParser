@@ -316,7 +316,7 @@ public final class FormExpressionFactory {
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
 		checkScopeDefsConstancy(scopeDefs);
 		if (severityConfig.hasOption(ESeverityOption.TREAT_UNMATCHING_VARIABLE_TYPES_AS_ERROR)) {
-			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs, factory);
+			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);
 			VariableTypeCheckVisitor.check(node, symbolTypeTable, factory, severityConfig, scopeDefs);
 		}
 		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, factory, symbolTableSize);

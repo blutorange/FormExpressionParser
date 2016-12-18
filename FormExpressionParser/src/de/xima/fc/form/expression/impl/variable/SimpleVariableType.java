@@ -15,13 +15,13 @@ import de.xima.fc.form.expression.util.CmnCnst;
 @Immutable
 @ParametersAreNonnullByDefault
 public enum SimpleVariableType implements IVariableType {
-	OBJECT(ELangObjectType.OBJECT),
-	NULL(ELangObjectType.NULL),
-	BOOLEAN(ELangObjectType.BOOLEAN),
-	NUMBER(ELangObjectType.NUMBER),
-	STRING(ELangObjectType.STRING),
-	REGEX(ELangObjectType.REGEX),
-	EXCEPTION(ELangObjectType.EXCEPTION),
+	OBJECT(ELangObjectClass.OBJECT),
+	NULL(ELangObjectClass.NULL),
+	BOOLEAN(ELangObjectClass.BOOLEAN),
+	NUMBER(ELangObjectClass.NUMBER),
+	STRING(ELangObjectClass.STRING),
+	REGEX(ELangObjectClass.REGEX),
+	EXCEPTION(ELangObjectClass.EXCEPTION),
 	;
 
 	private static final long serialVersionUID = 1L;

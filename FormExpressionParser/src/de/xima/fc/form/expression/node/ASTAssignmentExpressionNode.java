@@ -76,6 +76,15 @@ public class ASTAssignmentExpressionNode extends ANode {
 		return jjtGetChild(i);
 	}
 
+	@Nonnull
+	public ASTPropertyExpressionNode getAssignablePropertyNode(final int i) {
+		return (ASTPropertyExpressionNode)jjtGetChild(i);
+	}
+
+	public int getAssignableNodeType(final int i) {
+		return jjtGetChild(i).jjtGetNodeId();
+	}
+
 	/**
 	 * @param i Number of the node. Valid values are [0,{@link #getAssignableNodeCount()}).
 	 * @return Assignment method for the given node, eg. <code>=</code>, <code>+=</code> etc.

@@ -72,8 +72,6 @@ public final class CmnCnst {
 
 	public final static class Name {
 		private Name() {}
-		@Nonnull public static final String VARIABLE_ARGUMENTS = "arguments";
-		@Nonnull public static final String VARIABLE_THIS = "this";
 		@Nonnull public static final String ATTRIBUTE_ACCESSOR = "attribute accessor";
 		@Nonnull public static final String DOT_ATTRIBUTE_ACCESSOR = "dot attribute accessor";
 		@Nonnull public static final String BRACKET_ATTRIBUTE_ACCESSOR = "bracket attribute accessor";
@@ -202,7 +200,7 @@ public final class CmnCnst {
 		@Nonnull public static final String TRUE = "true";
 		@Nonnull public static final String FALSE = "false";
 		@Nonnull public static final String NULL = "null";
-		@Nonnull public static final String NATIVE_CODE = "'[native code]'";
+		@Nonnull public static final String NATIVE_CODE = "'native code'";
 		@Nonnull public static final String FAILED_TO_UNPARSE_LAMBDA = "'[error during unparsing]'";
 		@Nonnull public static final String QUOTE = "\"";
 		@Nonnull public static final String SINGLE_LINE_COMMENT_START = "//";
@@ -230,7 +228,7 @@ public final class CmnCnst {
 		@Nonnull public static final String CUSTOM_RUNTIME_EXCEPTION = "Custom Exception: {0}";
 		@Nonnull public static final String EMBEDMENT_OUPTUT = "Failed to write output due to an I/O exception.";
 		@Nonnull public static final String ILLEGAL_ARGUMENT_VALUE = "Illegal value {0} for argument {1} of function {2}: {3}.";
-		@Nonnull public static final String ILLEGAL_THIS_CONTEXT = "Provided this context <{0}> of type {1} does not match the expected type {2} for function <{3}>.";
+		@Nonnull public static final String ILLEGAL_THIS_CONTEXT = "Provided this context {0} of type {1} does not match the expected type {2} for function <{3}>.";
 		@Nonnull public static final String INVALID_REGEX_PATTERN = "Invalid regex pattern {0} and/or flags {1}.";
 		@Nonnull public static final String ITERATION_NOT_SUPPORTED = "Object {0} of type {1} does not support iteration.";
 		@Nonnull public static final String MATH_DIVISION_BY_ZERO = "Division by zero: {0} / {1}";
@@ -378,6 +376,9 @@ public final class CmnCnst {
 		@Nonnull public static final String NO_SUCH_DOT_ACCESSOR = "No such dot accessor {0} for this variable type.";
 		@Nonnull public static final String NOT_A_FUNCTION = "A function type is required.";
 		@Nonnull public static final String INCOMPATIBLE_FUNCTION_PARAMETER_TYPE = "Function parameter type not compatible.";
+		@Nonnull public static final String UNBOUND_FUNCTION_CALL = "No this context bound to called function {0}. " + INTERNAL_ERROR;
+		@Nonnull public static final String NO_SUCH_DOT_ASSIGNER = "No such dot assigner {0} to type {1} for this variable type.";
+		@Nonnull public static final String NO_SUCH_BRACKET_ASSIGNER = "No such bracket assigner of type {0} to type {1} for this variable type.";
 	}
 
 	public static final class ToString {

@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IGenericDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
@@ -54,7 +54,7 @@ public abstract class GenericDotAssigner<T extends ALangObject> implements IGene
 	 *                 the key is mapped to {@link NullLangObject}. Use
 	 *                 {@link EDotAccessorHash#contains} to check.
 	 */
-	public final static IGenericDotAssignerFunction<HashLangObject> HASH = new GenericDotAssigner<HashLangObject>(ELangObjectType.HASH,
+	public final static IGenericDotAssignerFunction<HashLangObject> HASH = new GenericDotAssigner<HashLangObject>(ELangObjectClass.HASH,
 			"genericBracketAssignerHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 		@Override
@@ -81,7 +81,7 @@ public abstract class GenericDotAssigner<T extends ALangObject> implements IGene
 
 		@Override
 		public ILangObjectClass getValueClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	};
 

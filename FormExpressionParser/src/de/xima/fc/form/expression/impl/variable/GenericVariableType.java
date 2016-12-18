@@ -133,18 +133,18 @@ public class GenericVariableType implements IVariableType {
 	}
 
 	public static IVariableType forArray(final IVariableType itemType) {
-		return new GenericVariableType(ELangObjectType.ARRAY, null, itemType);
+		return new GenericVariableType(ELangObjectClass.ARRAY, null, itemType);
 	}
 
 	public static IVariableType forHash(final IVariableType keyType, final IVariableType valueType) {
-		return new GenericVariableType(ELangObjectType.HASH, null, keyType, valueType);
+		return new GenericVariableType(ELangObjectClass.HASH, null, keyType, valueType);
 	}
 
 	public static IVariableType forSimpleFunction(final IVariableType returnType, final IVariableType... argType) {
 		final IVariableType[] arr = new IVariableType[argType.length + 1];
 		arr[0] = returnType;
 		System.arraycopy(argType, 0, arr, 1, argType.length);
-		return new GenericVariableType(ELangObjectType.FUNCTION, null, arr);
+		return new GenericVariableType(ELangObjectClass.FUNCTION, null, arr);
 	}
 
 	public static IVariableType forVarArgFunction(final IVariableType returnType, final IVariableType varArgType, final IVariableType... argType) {
@@ -152,7 +152,7 @@ public class GenericVariableType implements IVariableType {
 		arr[0] = returnType;
 		System.arraycopy(argType, 0, arr, 1, argType.length);
 		arr[arr.length-1] = varArgType;
-		return new GenericVariableType(ELangObjectType.FUNCTION, Sets.immutableEnumSet(EVariableTypeFlag.VARARG), arr);
+		return new GenericVariableType(ELangObjectClass.FUNCTION, Sets.immutableEnumSet(EVariableTypeFlag.VARARG), arr);
 	}
 
 	// @formatter:off
@@ -165,9 +165,9 @@ public class GenericVariableType implements IVariableType {
 	//   .      o      x     x     x   x
 	// @formatter:on
 	public static boolean isAssignableFrom(final IVariableType thisType, final IVariableType thatType) {
-		if (thatType.isA(ELangObjectType.NULL) || thisType.isA(ELangObjectType.OBJECT) || thisType.equalsType(thatType))
+		if (thatType.isA(ELangObjectClass.NULL) || thisType.isA(ELangObjectClass.OBJECT) || thisType.equalsType(thatType))
 			return true;
-		if (thisType.isA(ELangObjectType.NULL) || thatType.isA(ELangObjectType.OBJECT))
+		if (thisType.isA(ELangObjectClass.NULL) || thatType.isA(ELangObjectClass.OBJECT))
 			return false;
 		for (IVariableType i = thatType; i != null; i = i.getBasicLangClass().getSuperType(i)) {
 			if (thisType.getBasicLangClass().getClassId() == i.getBasicLangClass().getClassId()
@@ -184,9 +184,9 @@ public class GenericVariableType implements IVariableType {
 	}
 
 	public static IVariableType union(final IVariableType thisType, final IVariableType thatType) {
-		if (thisType.equalsType(thatType) || thatType.isA(ELangObjectType.NULL) || thisType.isA(ELangObjectType.OBJECT))
+		if (thisType.equalsType(thatType) || thatType.isA(ELangObjectClass.NULL) || thisType.isA(ELangObjectClass.OBJECT))
 			return thisType;
-		if (thisType.isA(ELangObjectType.NULL) || thatType.isA(ELangObjectType.OBJECT))
+		if (thisType.isA(ELangObjectClass.NULL) || thatType.isA(ELangObjectClass.OBJECT))
 			return thatType;
 		// Traverse the class tree upwards and look for the closest common
 		// superclass.
@@ -215,21 +215,8 @@ public class GenericVariableType implements IVariableType {
 
 	private static boolean genericsAllNull(final IVariableType type) {
 		for (int i = type.getGenericCount(); i-- > 0;)
-			if (!type.getGeneric(i).isA(ELangObjectType.NULL))
+			if (!type.getGeneric(i).isA(ELangObjectClass.NULL))
 				return false;
 		return true;
-	}
-
-	public static void main(final String[] args) {
-		// array<string> = [];
-		//
-		//
-		final IVariableType w = SimpleVariableType.OBJECT;
-		final IVariableType x = SimpleVariableType.BOOLEAN;
-		final IVariableType y = SimpleVariableType.STRING;
-		final IVariableType z = SimpleVariableType.NULL;
-		final IVariableType a = GenericVariableType.forSimpleFunction(SimpleVariableType.BOOLEAN,forArray(SimpleVariableType.NUMBER));
-		final IVariableType b = GenericVariableType.forVarArgFunction(SimpleVariableType.BOOLEAN, SimpleVariableType.NUMBER);
-		System.out.println(b);
 	}
 }

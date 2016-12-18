@@ -1,31 +1,35 @@
 package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
+@ParametersAreNonnullByDefault
 public class NullLangObject extends ALangObject {
 	private NullLangObject() {
 		super();
 	}
 
 	private static class InstanceHolder {
-		@Nonnull private static NullLangObject INSTANCE = new NullLangObject();
+		private static NullLangObject INSTANCE = new NullLangObject();
 	}
 
+	@Nullable
 	public Void nullValue() {
 		return null;
 	}
 
 	@Override
 	public ILangObjectClass getObjectClass() {
-		return ELangObjectType.NULL;
+		return ELangObjectClass.NULL;
 	}
 
 	/** @deprecated Use {@link #getInstance()} */
@@ -50,7 +54,6 @@ public class NullLangObject extends ALangObject {
 		return shallowClone();
 	}
 
-	@Nonnull
 	public static NullLangObject getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
@@ -61,7 +64,7 @@ public class NullLangObject extends ALangObject {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
+	public boolean equals(@Nullable final Object o) {
 		if (!(o instanceof NullLangObject)) return false;
 		return true;
 	}

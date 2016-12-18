@@ -7,7 +7,7 @@ import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -36,7 +36,8 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 			throws EvaluationException {
-		return func.functionValue().evaluate(ec, thisContext, args);
+		func.bind(thisContext, ec);
+		return func.evaluate(ec, args);
 	}
 
 	@SuppressWarnings("null")
@@ -58,7 +59,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.ARRAY;
+		return ELangObjectClass.ARRAY;
 	}
 
 	@Override
@@ -81,7 +82,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				final int len = args[2].coerceNumber(ec).intValue(ec);
+				final int len = args[1].coerceNumber(ec).intValue(ec);
 				thisContext.setLength(len);
 				return thisContext;
 			}
@@ -93,7 +94,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 
 			@Override
 			public ILangObjectClass getValueClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		}
 		;
@@ -131,7 +132,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.ARRAY;
+			return ELangObjectClass.ARRAY;
 		}
 
 		@Override

@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public class IllegalThisContextException extends CatchableEvaluationException {
+public class IllegalThisContextException extends UncatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 	public IllegalThisContextException(@Nonnull final ALangObject thisContext, @Nonnull final ILangObjectClass expectedType,
 			@Nonnull final IFunction<ALangObject> function, @Nonnull final IEvaluationContext ec) {
@@ -26,5 +26,4 @@ public class IllegalThisContextException extends CatchableEvaluationException {
 	public final ALangObject thisContext;
 	public final ILangObjectClass expectedType;
 	public final IFunction<ALangObject> function;
-
 }

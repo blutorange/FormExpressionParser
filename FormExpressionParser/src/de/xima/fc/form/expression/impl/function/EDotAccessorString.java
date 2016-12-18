@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.impl.function;
 
 import java.util.Locale;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -9,7 +10,7 @@ import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -55,20 +56,20 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 	length(Impl.length),
 	;
 
-	private final FunctionLangObject func;
+	@Nullable private FunctionLangObject func;
 	private final Impl impl;
-	private final boolean deferEvaluation;
 
 	private EDotAccessorString(final Impl impl) {
-		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
-		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
+		func = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs ? null : FunctionLangObject.create(impl);
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
-		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
+		if (func != null)
+			return func.bind(thisContext, ec).evaluate(ec, args);
+		return FunctionLangObject.create(impl).bind(thisContext, ec);
 	}
 
 	@SuppressWarnings("null")
@@ -90,7 +91,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.STRING;
+		return ELangObjectClass.STRING;
 	}
 
 	@Override
@@ -124,7 +125,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.FUNCTION;
+				return ELangObjectClass.FUNCTION;
 			}
 		},
 		toLocaleLowerCase(false, "locale") { //$NON-NLS-1$
@@ -141,7 +142,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.FUNCTION;
+				return ELangObjectClass.FUNCTION;
 			}
 		},
 		toUpperCase(false) {
@@ -158,7 +159,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.STRING;
+				return ELangObjectClass.STRING;
 			}
 		},
 		toLowerCase(false) {
@@ -175,7 +176,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.STRING;
+				return ELangObjectClass.STRING;
 			}
 		},
 		length(false) {
@@ -192,7 +193,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		;
@@ -231,7 +232,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.STRING;
+			return ELangObjectClass.STRING;
 		}
 
 		@Override

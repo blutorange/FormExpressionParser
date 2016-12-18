@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
@@ -67,12 +67,12 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.HASH;
+				return ELangObjectClass.HASH;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.HASH;
+				return ELangObjectClass.HASH;
 			}
 		},
 		;
@@ -110,7 +110,7 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.HASH;
+			return ELangObjectClass.HASH;
 		}
 	}
 }

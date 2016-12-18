@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidRegexPatternException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -34,7 +34,7 @@ public class RegexLangObject extends ALangObject {
 
 	@Override
 	public ILangObjectClass getObjectClass() {
-		return ELangObjectType.REGEX;
+		return ELangObjectClass.REGEX;
 	}
 
 	@Nonnull

@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.ComparatorEntryByKey;
@@ -31,7 +31,7 @@ public class HashLangObject extends ALangObject {
 
 	@Override
 	public ILangObjectClass getObjectClass() {
-		return ELangObjectType.HASH;
+		return ELangObjectClass.HASH;
 	}
 
 	// Coercion

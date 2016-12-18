@@ -1,6 +1,8 @@
 package de.xima.fc.form.expression.impl.function;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -11,7 +13,7 @@ import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -65,22 +67,23 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	 * @return array&lt;T&gt; This array for chaining.
 	 */
 	sortBy(Impl.sortBy),
+	map(Impl.map),
 	;
 
-	private final FunctionLangObject func;
+	@Nullable private FunctionLangObject func;
 	private final Impl impl;
-	private final boolean deferEvaluation;
 
 	private EDotAccessorArray(final Impl impl) {
-		this.func = FunctionLangObject.create(impl);
 		this.impl = impl;
-		deferEvaluation = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs;
+		func = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs ? null : FunctionLangObject.create(impl);
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
-		return deferEvaluation ? func : func.functionValue().evaluate(ec, thisContext, args);
+		if (func != null)
+			return func.bind(thisContext, ec).evaluate(ec, args);
+		return FunctionLangObject.create(impl).bind(thisContext, ec);
 	}
 
 	@SuppressWarnings("null")
@@ -102,7 +105,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 	@Override
 	public ILangObjectClass getThisContextType() {
-		return ELangObjectType.ARRAY;
+		return ELangObjectClass.ARRAY;
 	}
 
 	@Override
@@ -140,10 +143,10 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.FUNCTION;
+				return ELangObjectClass.FUNCTION;
 			}
 		},
-		push(true, "objectsToAdd") { //$NON-NLS-1$
+		push(true, "anObjectToAdd", "moreObjectsToAdd") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -161,7 +164,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.FUNCTION;
+				return ELangObjectClass.FUNCTION;
 			}
 		},
 		length(false) {
@@ -178,7 +181,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.NUMBER;
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		sort(false) {
@@ -196,7 +199,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.ARRAY;
+				return ELangObjectClass.ARRAY;
 			}
 		},
 		sortBy(false, "comparator") {
@@ -220,15 +223,38 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			public IVariableType getReturnType(final IVariableType thisContext) {
 				// array<string>.sort(comparator) => array<string>
 				// function<array<string>, function<number, string, string>>
-				return GenericVariableType.forSimpleFunction(thisContext, GenericVariableType
+				return GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), GenericVariableType
 						.forSimpleFunction(SimpleVariableType.NUMBER, thisContext.getGeneric(0), thisContext.getGeneric(0)));
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.FUNCTION;
+				return ELangObjectClass.FUNCTION;
 			}
-		},;
+		},
+		map(false, "mapper") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final FunctionLangObject mapper = args[0].coerceFunction(ec);
+				final List<ALangObject> mapped = new ArrayList<>(thisContext.length());
+				for (final ALangObject item : thisContext.listValue())
+					mapped.add(mapper.evaluate(ec, item));
+				return ArrayLangObject.create(mapped);
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(thisContext.getGeneric(0)),
+						GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), thisContext.getGeneric(0)));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.FUNCTION;
+			}
+		}
+		;
 
 		private String[] argList;
 		private boolean hasVarArgs;
@@ -263,7 +289,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.ARRAY;
+			return ELangObjectClass.ARRAY;
 		}
 
 		@Override
@@ -274,17 +300,15 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	private static class Comp implements Comparator<ALangObject> {
 		private final FunctionLangObject comparator;
 		private final IEvaluationContext ec;
-		private final NullLangObject nullLangObject = NullLangObject.getInstance();
 
 		private Comp(final FunctionLangObject comparator, final IEvaluationContext ec) {
 			this.comparator = comparator;
 			this.ec = ec;
 		}
-
 		@Override
 		public int compare(@Nullable final ALangObject o1, @Nullable final ALangObject o2) {
 			try {
-				return comparator.functionValue().evaluate(ec, nullLangObject, o1, o2).coerceNumber(ec)
+				return comparator.evaluate(ec, o1, o2).coerceNumber(ec)
 						.signumInt();
 			}
 			catch (final EvaluationException e) {

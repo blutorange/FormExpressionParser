@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IGenericBracketAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
@@ -49,7 +49,7 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 	 *             a 4 byte signed int.
 	 */
 	public final static IGenericBracketAccessorFunction<StringLangObject> STRING = new GenericBracketAccessor<StringLangObject>(
-			ELangObjectType.STRING, "genericBracketAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+			ELangObjectClass.STRING, "genericBracketAccessorString", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -74,12 +74,12 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 
 		@Override
 		public ILangObjectClass getPropertyClass() {
-			return ELangObjectType.NUMBER;
+			return ELangObjectClass.NUMBER;
 		}
 
 		@Override
 		public ILangObjectClass getReturnClass() {
-			return ELangObjectType.STRING;
+			return ELangObjectClass.STRING;
 		}
 	};
 
@@ -97,7 +97,7 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 	 *             a 4 byte signed int.
 	 */
 	public final static IGenericBracketAccessorFunction<ArrayLangObject> ARRAY = new GenericBracketAccessor<ArrayLangObject>(
-			ELangObjectType.ARRAY, "genericBracketAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
+			ELangObjectClass.ARRAY, "genericBracketAccessorArray", false, "index") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -122,12 +122,12 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 
 		@Override
 		public ILangObjectClass getPropertyClass() {
-			return ELangObjectType.NUMBER;
+			return ELangObjectClass.NUMBER;
 		}
 
 		@Override
 		public ILangObjectClass getReturnClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	};
 
@@ -142,7 +142,7 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 	 *                 {@link EDotAccessorHash#contains} to check.
 	 */
 	public final static IGenericBracketAccessorFunction<HashLangObject> HASH = new GenericBracketAccessor<HashLangObject>(
-			ELangObjectType.HASH, "genericBracketAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
+			ELangObjectClass.HASH, "genericBracketAccessorHash", false, "key") { //$NON-NLS-1$ //$NON-NLS-2$
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -163,12 +163,12 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 
 		@Override
 		public ILangObjectClass getPropertyClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 
 		@Override
 		public ILangObjectClass getReturnClass() {
-			return ELangObjectType.OBJECT;
+			return ELangObjectClass.OBJECT;
 		}
 	};
 

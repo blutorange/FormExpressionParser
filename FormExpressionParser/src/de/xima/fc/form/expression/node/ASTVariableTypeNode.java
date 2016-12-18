@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 @ParametersAreNonnullByDefault
@@ -27,7 +27,7 @@ public class ASTVariableTypeNode extends ANode {
 
 	private static final long serialVersionUID = 1L;
 
-	private ILangObjectClass variableType = ELangObjectType.OBJECT;
+	private ILangObjectClass variableType = ELangObjectClass.OBJECT;
 	private EVariableTypeFlag[] flags = CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_FLAG_ARRAY;
 
 	public ASTVariableTypeNode(final FormExpressionParser parser, final int nodeId) {
@@ -62,7 +62,7 @@ public class ASTVariableTypeNode extends ANode {
 	@Nullable
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
-		return new ASTVariableTypeNode(jjtGetChild(i), ELangObjectType.OBJECT);
+		return new ASTVariableTypeNode(jjtGetChild(i), ELangObjectClass.OBJECT);
 	}
 
 	@Override

@@ -5,11 +5,14 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
+import de.xima.fc.form.expression.exception.evaluation.UnboundFunctionCallException;
+import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IUnparsableFunction;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -17,6 +20,8 @@ import de.xima.fc.form.expression.util.NullUtil;
 @ParametersAreNonnullByDefault
 public class FunctionLangObject extends ALangObject {
 	private final IFunction<ALangObject> value;
+	@Nullable
+	private ALangObject thisContext;
 
 	private static class InstanceHolder {
 		public final static FunctionLangObject NO_OP = new FunctionLangObject(new IFunction<ALangObject>() {
@@ -43,7 +48,7 @@ public class FunctionLangObject extends ALangObject {
 
 			@Override
 			public ILangObjectClass getThisContextType() {
-				return ELangObjectType.NULL;
+				return ELangObjectClass.NULL;
 			}
 
 			@Override
@@ -58,18 +63,25 @@ public class FunctionLangObject extends ALangObject {
 		this.value = value;
 	}
 
-	@Override
-	public ILangObjectClass getObjectClass() {
-		return ELangObjectType.FUNCTION;
+	private FunctionLangObject(final IFunction<ALangObject> value, @Nullable final ALangObject thisContext) {
+		this(value);
+		this.thisContext = thisContext;
 	}
 
-	public IFunction<ALangObject> functionValue() {
-		return value;
+	@Override
+	public ILangObjectClass getObjectClass() {
+		return ELangObjectClass.FUNCTION;
+	}
+
+	public ALangObject evaluate(final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
+		if (thisContext != null)
+			return value.evaluate(ec, thisContext, args);
+		throw new UnboundFunctionCallException(value, ec);
 	}
 
 	@Override
 	public ALangObject shallowClone() {
-		return FunctionLangObject.create(value);
+		return new FunctionLangObject(value, thisContext);
 	}
 
 	@Override
@@ -86,12 +98,14 @@ public class FunctionLangObject extends ALangObject {
 		// Remove final comma
 		if (builder.length() > 3)
 			builder.setLength(builder.length() - 1);
+		if (hasVarArgs())
+			builder.append(CmnCnst.Syntax.TRIPLE_DOT);
 		builder.append(Syntax.PAREN_CLOSE).append(Syntax.BRACE_OPEN);
 		// Convert body.
 		if (value instanceof IUnparsableFunction)
 			((IUnparsableFunction<?>)value).unparseBody(builder);
 		else
-			builder.append(Syntax.NATIVE_CODE);
+			builder.append(Syntax.NATIVE_CODE).append(CmnCnst.Syntax.SEMI_COLON);
 		builder.append(Syntax.BRACE_CLOSE).append(Syntax.SEMI_COLON);
 	}
 
@@ -146,5 +160,24 @@ public class FunctionLangObject extends ALangObject {
 	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling the function.
 	public static FunctionLangObject create(final IFunction<? extends ALangObject> value) {
 		return new FunctionLangObject((IFunction<ALangObject>) value);
+	}
+
+	public boolean hasVarArgs() {
+		return value.hasVarArgs();
+	}
+
+	public int getDeclaredArgumentCount() {
+		return value.getDeclaredArgumentCount();
+	}
+
+	public FunctionLangObject bind(final ALangObject thisContext, final IEvaluationContext ec) throws UncatchableEvaluationException {
+		if (!value.getThisContextType().isSuperClassOf(thisContext.getObjectClass()))
+			throw new IllegalThisContextException(thisContext, value.getThisContextType(), value, ec);
+		this.thisContext = thisContext;
+		return this;
+	}
+
+	public String getDeclaredName() {
+		return value.getDeclaredName();
 	}
 }

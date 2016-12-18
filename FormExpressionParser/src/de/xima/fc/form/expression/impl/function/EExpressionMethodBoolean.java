@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExpressionFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IMethod2Function;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -61,11 +61,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 		},
 		/**
@@ -88,11 +88,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 		},
 		/**
@@ -115,11 +115,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 		},
 		/**
@@ -141,11 +141,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			}
 			@Override
 			public ILangObjectClass getRhsClass() {
-				return ELangObjectType.OBJECT;
+				return ELangObjectClass.OBJECT;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectType.BOOLEAN;
+				return ELangObjectClass.BOOLEAN;
 			}
 		},
 		;
@@ -183,7 +183,7 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectType.BOOLEAN;
+			return ELangObjectClass.BOOLEAN;
 		}
 	}
 }

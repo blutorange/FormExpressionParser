@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableCollection;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 
 @Immutable
 @ParametersAreNonnullByDefault
@@ -50,7 +50,7 @@ public interface IVariableType extends Serializable {
 	 * @param typpe
 	 *            Type to check this type with.
 	 * @return The merged type. When the types are not mutually compatible, it
-	 *         is of type {@link ELangObjectType#OBJECT}.
+	 *         is of type {@link ELangObjectClass#OBJECT}.
 	 */
 	public IVariableType union(IVariableType type);
 
@@ -85,7 +85,7 @@ public interface IVariableType extends Serializable {
 	 * <code>null</code> is sorted first. Sorts similar to string, with the
 	 * {@link #getBasicLangClass()} corresponding to the {@link String}'s first character;
 	 * and all the {@link #getGeneric(int)} types to the next characters.
-	 * The types themselves are compared via {@link ELangObjectType#id}.
+	 * The types themselves are compared via {@link ELangObjectClass#id}.
 	 */
 	public static Comparator<IVariableType> COMPARATOR = new Comparator<IVariableType>() {
 		@Override
