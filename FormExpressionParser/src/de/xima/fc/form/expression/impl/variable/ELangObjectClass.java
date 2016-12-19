@@ -6,7 +6,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import com.google.common.collect.ImmutableCollection;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
-import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -369,7 +368,7 @@ public enum ELangObjectClass implements ILangObjectClass {
 
 	@Override
 	public final boolean equalsClass(final ILangObjectClass clazz) {
-		return id == clazz.getClassId();
+		return id.equals(clazz.getClassId());
 	}
 
 	@Override
@@ -378,19 +377,5 @@ public enum ELangObjectClass implements ILangObjectClass {
 			if (equalsClass(clazz))
 				return true;
 		return false;
-	}
-
-	@Override
-	public IVariableType upconvert(final IVariableType subType, final ILangObjectClass superType) {
-		IVariableType type = subType;
-		do {
-			if (type.isA(superType))
-				return type;
-			type = type.getBasicLangClass().getSuperType(type);
-		} while (type != null);
-		if (superType.isSuperClassOf(subType.getBasicLangClass()))
-			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.INCONSISTENT_CLASS_HIERARCHY,
-				subType.getBasicLangClass(), superType));
-		return SimpleVariableType.OBJECT;
 	}
 }

@@ -51,17 +51,18 @@ package de.xima.fc.form.expression.grammar;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import de.xima.fc.form.expression.impl.variable.ELangObjectType;
+import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
+import de.xima.fc.form.expression.impl.variable.VoidClass;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
-import org.apache.commons.lang3.StringUtils;
+import de.xima.fc.form.expression.iface.parse.IComment;
+import de.xima.fc.form.expression.util.CommentFactory;
+import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.node.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.util.CommentFactory;
-import de.xima.fc.form.expression.node.*;
 
 public class FormExpressionParser
 {
@@ -514,7 +515,7 @@ void LosOpen(EMethod method) #LosNode :
   {
     if (!_customLosAllowed) throw new ParseException(
       java.lang.String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
-    jjtThis.init(method, StringUtils.EMPTY, t.image, false);
+    jjtThis.init(method, CmnCnst.NonnullConstant.STRING_EMPTY, t.image, false);
     
   }
 }
@@ -735,7 +736,7 @@ void UnspecificVariableType(EMethod method) #VariableTypeNode :
     < Var > | < TypeVar >
   )
   {
-    jjtThis.init(method, ELangObjectType.OBJECT);
+    jjtThis.init(method, ELangObjectClass.OBJECT);
   }
 }
 
@@ -746,35 +747,35 @@ void VoidVariableType(EMethod method) #VariableTypeNode :
   (
     < TypeVoid > | < Void >  )
   {
-    jjtThis.init(method, ELangObjectType.NULL);
+    jjtThis.init(method, VoidClass.INSTANCE);
   }
 }
 
 void SpecificVariableType(EMethod method) #VariableTypeNode :
 {
-  ELangObjectType type;
+  ELangObjectClass type;
   EVariableTypeFlag flag = null;
 }
 {
   (
     ( < Boolean >  | < TypeBoolean > )
     {
-      type = ELangObjectType.BOOLEAN;
+      type = ELangObjectClass.BOOLEAN;
     }
   | (< Number > | < TypeNumber >)
     {
-      type = ELangObjectType.NUMBER;
+      type = ELangObjectClass.NUMBER;
     }
   | (< String >  | < TypeString >)
     {
-      type = ELangObjectType.STRING;
+      type = ELangObjectClass.STRING;
     }
   |
     (
       ( < Array > | < TypeArray > )
       GenericsArray(null)
       {
-        type = ELangObjectType.ARRAY;
+        type = ELangObjectClass.ARRAY;
       }
     )
   |
@@ -782,23 +783,23 @@ void SpecificVariableType(EMethod method) #VariableTypeNode :
       ( < Hash > | < TypeHash > )
       GenericsHash(null)
       {
-        type = ELangObjectType.HASH;
+        type = ELangObjectClass.HASH;
       }
     )
   | ( < __Error > | < TypeError > )
     {
-      type = ELangObjectType.EXCEPTION;
+      type = ELangObjectClass.EXCEPTION;
     }
   | ( < Regex > | < TypeRegex > )
     {
-      type = ELangObjectType.REGEX;
+      type = ELangObjectClass.REGEX;
     }
   |
     (
       ( < Method >  | < TypeMethod > )
       flag = GenericsMethod(null)
       {
-        type = ELangObjectType.FUNCTION;
+        type = ELangObjectClass.FUNCTION;
       }
     )
   )

@@ -1,9 +1,1 @@
-global scope {
-  method<void> m;
-  string s;
-}
-m = ->void() {
-  5;
-};
-s = m();
-s.toUpperCase;
+global scope{method<void>v;}exception(v());

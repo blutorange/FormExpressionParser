@@ -91,4 +91,9 @@ public enum SimpleVariableType implements IVariableType {
 	public ImmutableCollection<EVariableTypeFlag> getFlags() {
 		return ImmutableSet.<EVariableTypeFlag>of();
 	}
+
+	@Override
+	public IVariableType upconvert(final ILangObjectClass superClass) {
+		return GenericVariableType.upconvert(this, superClass);
+	}
 }

@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -132,6 +133,11 @@ public class GenericVariableType implements IVariableType {
 		return flags;
 	}
 
+	@Override
+	public IVariableType upconvert(final ILangObjectClass superClass) {
+		return upconvert(this, superClass);
+	}
+
 	public static IVariableType forArray(final IVariableType itemType) {
 		return new GenericVariableType(ELangObjectClass.ARRAY, null, itemType);
 	}
@@ -165,12 +171,14 @@ public class GenericVariableType implements IVariableType {
 	//   .      o      x     x     x   x
 	// @formatter:on
 	public static boolean isAssignableFrom(final IVariableType thisType, final IVariableType thatType) {
+		if (thisType.isA(VoidClass.INSTANCE) || thatType.isA(VoidClass.INSTANCE))
+			return false;
 		if (thatType.isA(ELangObjectClass.NULL) || thisType.isA(ELangObjectClass.OBJECT) || thisType.equalsType(thatType))
 			return true;
 		if (thisType.isA(ELangObjectClass.NULL) || thatType.isA(ELangObjectClass.OBJECT))
 			return false;
 		for (IVariableType i = thatType; i != null; i = i.getBasicLangClass().getSuperType(i)) {
-			if (thisType.getBasicLangClass().getClassId() == i.getBasicLangClass().getClassId()
+			if (thisType.getBasicLangClass().getClassId().equals(i.getBasicLangClass().getClassId())
 					&& thisType.getGenericCount() == i.getGenericCount() && thisType.getFlags().equals(i.getFlags())) {
 				if (genericsAllNull(i))
 					return true;
@@ -184,6 +192,8 @@ public class GenericVariableType implements IVariableType {
 	}
 
 	public static IVariableType union(final IVariableType thisType, final IVariableType thatType) {
+		if (thisType.isA(VoidClass.INSTANCE) || thatType.isA(VoidClass.INSTANCE))
+			return VoidType.INSTANCE;
 		if (thisType.equalsType(thatType) || thatType.isA(ELangObjectClass.NULL) || thisType.isA(ELangObjectClass.OBJECT))
 			return thisType;
 		if (thisType.isA(ELangObjectClass.NULL) || thatType.isA(ELangObjectClass.OBJECT))
@@ -218,5 +228,18 @@ public class GenericVariableType implements IVariableType {
 			if (!type.getGeneric(i).isA(ELangObjectClass.NULL))
 				return false;
 		return true;
+	}
+	
+	public static IVariableType upconvert(final IVariableType subType, final ILangObjectClass superClass) {
+		IVariableType type = subType;
+		do {
+			if (type.isA(superClass))
+				return type;
+			type = type.getBasicLangClass().getSuperType(type);
+		} while (type != null);
+		if (superClass.isSuperClassOf(subType.getBasicLangClass()))
+			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.INCONSISTENT_CLASS_HIERARCHY,
+				subType.getBasicLangClass(), superClass));
+		return SimpleVariableType.OBJECT;
 	}
 }

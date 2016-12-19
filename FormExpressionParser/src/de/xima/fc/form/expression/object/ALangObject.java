@@ -46,7 +46,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * <td><code>[]</code></td>
  * <td><code>{}</code></td>
  * <td><code>exception("")</code></td>
- * <td>{@link FunctionLangObject#getNoOpInstance()}</td>
+ * <td>{@link FunctionLangObject#getNoOpNull()}</td>
  * </tr>
  * <tr>
  * <td>{@link BooleanLangObject}</td>
@@ -233,9 +233,9 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 *             When the object cannot be coerced.
 	 */
 	public final BooleanLangObject coerceBoolean(final IEvaluationContext ec) {
-		if (getObjectClass().getClassId() == ELangObjectClass.BOOLEAN.getClassId())
+		if (getObjectClass().equalsClass(ELangObjectClass.BOOLEAN))
 			return (BooleanLangObject) this;
-		if (getObjectClass().getClassId() == ELangObjectClass.NULL.getClassId())
+		if (getObjectClass().equalsClass(ELangObjectClass.NULL))
 			return BooleanLangObject.getFalseInstance();
 		return BooleanLangObject.getTrueInstance();
 	}
@@ -326,7 +326,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 * @return Whether this object is of the given type.
 	 */
 	public boolean is(final ILangObjectClass type) {
-		return getObjectClass().getClassId() == type.getClassId();
+		return getObjectClass().getClassId().equals(type.getClassId());
 	}
 
 	/** @return The id of this object. */

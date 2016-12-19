@@ -23,41 +23,6 @@ public class FunctionLangObject extends ALangObject {
 	@Nullable
 	private ALangObject thisContext;
 
-	private static class InstanceHolder {
-		public final static FunctionLangObject NO_OP = new FunctionLangObject(new IFunction<ALangObject>() {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext,
-					final ALangObject... args) throws EvaluationException {
-				return NullLangObject.getInstance();
-			}
-
-			@Override
-			public String getDeclaredArgument(final int i) {
-				throw new ArrayIndexOutOfBoundsException();
-			}
-
-			@Override
-			public int getDeclaredArgumentCount() {
-				return 0;
-			}
-
-			@Override
-			public String getDeclaredName() {
-				return CmnCnst.NonnullConstant.STRING_EMPTY;
-			}
-
-			@Override
-			public ILangObjectClass getThisContextType() {
-				return ELangObjectClass.NULL;
-			}
-
-			@Override
-			public boolean hasVarArgs() {
-				return false;
-			}
-		});
-	}
-
 	private FunctionLangObject(final IFunction<ALangObject> value) {
 		super();
 		this.value = value;
@@ -153,8 +118,39 @@ public class FunctionLangObject extends ALangObject {
 		return this;
 	}
 
-	public static FunctionLangObject getNoOpInstance() {
-		return InstanceHolder.NO_OP;
+	public static FunctionLangObject getNoOpNull() {
+		return new FunctionLangObject(new IFunction<ALangObject>() {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return NullLangObject.getInstance();
+			}
+
+			@Override
+			public String getDeclaredArgument(final int i) {
+				throw new ArrayIndexOutOfBoundsException();
+			}
+
+			@Override
+			public int getDeclaredArgumentCount() {
+				return 0;
+			}
+
+			@Override
+			public String getDeclaredName() {
+				return CmnCnst.NonnullConstant.STRING_EMPTY;
+			}
+
+			@Override
+			public ILangObjectClass getThisContextType() {
+				return ELangObjectClass.NULL;
+			}
+
+			@Override
+			public boolean hasVarArgs() {
+				return false;
+			}
+		}, NullLangObject.getInstance());
 	}
 
 	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling the function.

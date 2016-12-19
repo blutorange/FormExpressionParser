@@ -30,7 +30,6 @@ import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
@@ -268,7 +267,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		final IExpressionFunction<?> func = expressionMethod(thisContext.getBasicLangClass(), method, rhs.getBasicLangClass());
 		if (func == null)
 			return null;
-		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		final IVariableType convertedThisContext = thisContext.upconvert(func.getThisContextType());
 		if (!func.getRhsType(convertedThisContext).isAssignableFrom(rhs))
 			return null;
 		return func.getReturnType(convertedThisContext);
@@ -281,7 +280,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 				property.getBasicLangClass(), value.getBasicLangClass());
 		if (func == null)
 			return false;
-		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		final IVariableType convertedThisContext = thisContext.upconvert(func.getThisContextType());
 		if (!func.getPropertyType(convertedThisContext).isAssignableFrom(property)
 				|| !func.getValueType(convertedThisContext).isAssignableFrom(value))
 			return false;
@@ -295,7 +294,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 				property.getBasicLangClass());
 		if (func == null)
 			return null;
-		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		final IVariableType convertedThisContext = thisContext.upconvert(func.getThisContextType());
 		if (!func.getPropertyType(convertedThisContext).isAssignableFrom(property))
 			return null;
 		return func.getReturnType(convertedThisContext);
@@ -307,7 +306,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		final IFunction<?> func = dotAssigner(thisContext.getBasicLangClass(), property, value.getBasicLangClass());
 		if (func == null)
 			return false;
-		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		final IVariableType convertedThisContext = thisContext.upconvert(func.getThisContextType());
 		// Casting is better than repeating the search for a fitting function.
 		if (func instanceof IDotAssignerFunction<?>) {
 			final IDotAssignerFunction<?> f = ((IDotAssignerFunction<?>) func);
@@ -327,7 +326,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		final IFunction<?> func = dotAccessor(thisContext.getBasicLangClass(), property);
 		if (func == null)
 			return null;
-		final IVariableType convertedThisContext = upconvertSpecificType(thisContext, func.getThisContextType());
+		final IVariableType convertedThisContext = thisContext.upconvert(func.getThisContextType());
 		// Casting is better than repeating the search for a fitting function.
 		if (func instanceof IDotAccessorFunction<?>)
 			return ((IDotAccessorFunction<?>) func).getReturnType(convertedThisContext);
@@ -335,24 +334,6 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		if (!f.isHandlingProperty(convertedThisContext, property))
 			return null;
 		return f.getReturnType(convertedThisContext, property);
-	}
-
-	/**
-	 * For example, let the subType be <code>IntegerArray</code> and the super class
-	 * be <code>Array</code>. Then this method returns <code>Array&lt;Integer&gt;</code>.
-	 * @param subType Some subType, or the same as the super type.
-	 * @param superClass Some super (or the same) class of the sub type.
-	 * @return The specific variable type of the sub type in terms of the super class.
-	 */
-	private IVariableType upconvertSpecificType(IVariableType subType, final ILangObjectClass superClass) {
-		while (subType.getBasicLangClass().getClassId() != superClass.getClassId()) {
-			final IVariableType d = subType.getBasicLangClass().getSuperType(subType);
-			if (d == null)
-				throw new FormExpressionException(
-						NullUtil.messageFormat(CmnCnst.Error.INCONSISTENT_CLASS_HIERARCHY, subType, superClass));
-			subType = d;
-		}
-		return subType;
 	}
 
 	@NotThreadSafe

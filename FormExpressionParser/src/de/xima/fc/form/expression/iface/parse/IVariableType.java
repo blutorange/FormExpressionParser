@@ -81,6 +81,28 @@ public interface IVariableType extends Serializable {
 	public IVariableType getIterableItemType();
 
 	/**
+	 * Whether this type is an of the given class.
+	 * Return <code>false</code> when it is a super or subtype.
+	 * @param baseClass Class to check.
+	 * @return Whether this is of the given class.
+	 */
+	public boolean isA(ILangObjectClass baseClass);
+
+	/**
+	 * @param flag Flag to check for.
+	 * @return Whether the flag is set for this variable type.
+	 */
+	public boolean hasFlag(EVariableTypeFlag flag);
+
+	public ImmutableCollection<EVariableTypeFlag> getFlags();
+	
+	/**
+	 * @param superClass Super class to convert this type to.
+	 * @return This type in terms of the super class.
+	 */
+	public IVariableType upconvert(ILangObjectClass superClass);
+	
+	/**
 	 * A comparator for objects of {@link IVariableType}, supporting <code>null</code>.
 	 * <code>null</code> is sorted first. Sorts similar to string, with the
 	 * {@link #getBasicLangClass()} corresponding to the {@link String}'s first character;
@@ -109,20 +131,4 @@ public interface IVariableType extends Serializable {
 			return o1.getGenericCount() - o2.getGenericCount();
 		}
 	};
-
-	/**
-	 * Whether this type is an of the given class.
-	 * Return <code>false</code> when it is a super or subtype.
-	 * @param baseClass Class to check.
-	 * @return Whether this is of the given class.
-	 */
-	public boolean isA(ILangObjectClass baseClass);
-
-	/**
-	 * @param flag Flag to check for.
-	 * @return Whether the flag is set for this variable type.
-	 */
-	public boolean hasFlag(EVariableTypeFlag flag);
-
-	public ImmutableCollection<EVariableTypeFlag> getFlags();
 }

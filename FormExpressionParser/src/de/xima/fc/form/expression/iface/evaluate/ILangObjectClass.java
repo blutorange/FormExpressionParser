@@ -72,6 +72,4 @@ public interface ILangObjectClass extends Serializable {
 	public boolean equalsClass(ILangObjectClass clazz);
 
 	public boolean isSuperClassOf(ILangObjectClass that);
-
-	public IVariableType upconvert(IVariableType subType, ILangObjectClass superClass);
 }

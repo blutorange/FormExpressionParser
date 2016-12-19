@@ -30,7 +30,9 @@ import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionParameterT
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableAssignmentTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVariableConversionTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableTypeForExpressionMethodException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVoidReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingReturnException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
@@ -53,6 +55,7 @@ import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.impl.variable.VariableTypeBuilder;
+import de.xima.fc.form.expression.impl.variable.VoidType;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -411,9 +414,13 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	private void assertFunctionReturnType(final NodeInfo infoActual, final IVariableType typeDeclared, final Node node)
 			throws SemanticsException {
+		// Return statements are not allowed for functions of type void.
+		if (infoActual.hasReturnType() && VoidType.INSTANCE.equalsType(typeDeclared))
+			throw new IncompatibleVoidReturnTypeException(infoActual.getReturnType(), node);
+		// Check if type returned via return statements is compatible with the declared type.
 		if (infoActual.hasReturnType() && !typeDeclared.isAssignableFrom(infoActual.getReturnType()))
 			throw new IncompatibleFunctionReturnTypeException(typeDeclared, infoActual.getReturnType(), node);
-		if (!typeDeclared.equalsType(SimpleVariableType.NULL)) {
+		if (!VoidType.INSTANCE.equalsType(typeDeclared)) {
 			// non-void function
 			if (config.hasOption(TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR) && infoActual.hasImplicitType())
 				throw new MissingReturnException(typeDeclared, node);
@@ -505,8 +512,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 								infoArg.getImplicitType(), node.getParenthesisArgNode(i, j));
 					infoRes.unifyJumps(infoArg);
 				}
-				//TODO handle void return type, do not allow assignment of void etc.
-				// Return return types as declared.
+				// Return declared return type.
 				infoRes.replaceImplicitType(typeFunction.getGeneric(0));
 				break;
 			}
@@ -582,8 +588,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					infoResult.replaceImplicitType(typeMethod);
 				}
 				if (!infoVar.getImplicitType().isAssignableFrom(infoResult.getImplicitType())) {
-					throw new IncompatibleVariableAssignmentTypeException((ASTVariableNode) node.getAssignableNode(i),
-							infoVar.getImplicitType(), infoResult.getImplicitType());
+					throw new IncompatibleVariableAssignmentTypeException(infoVar.getImplicitType(),
+							infoResult.getImplicitType(), (ASTVariableNode) node.getAssignableNode(i));
 				}
 				infoResult.unifyJumps(infoVar);
 				break;
@@ -762,6 +768,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return getInfo(node);
 	}
 
+	/**
+	 * This simply returns the string type.
+	 */
 	@Override
 	public NodeInfo visit(final ASTStringNode node) throws SemanticsException {
 		return new NodeInfo(null, SimpleVariableType.STRING);
@@ -1008,16 +1017,21 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	/**
 	 * <p>
-	 * Any object can be converted to a string, so we only need to check the
-	 * error message node itself.
+	 * (Almost) any object can be converted to a string, so we only need to check the
+	 * error message node itself. However, we need to check if the type is the special
+	 * void type and throw an error if it is, as the void type must not be used for
+	 * anything.
 	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTExceptionNode node) throws SemanticsException {
-		// TODO check if it can be coerced to string? probably not necessary
 		final NodeInfo info = node.getErrorMessageNode().jjtAccept(this);
-		if (info.hasImplicitType())
+		if (info.hasImplicitType()) {
+			if (!ELangObjectClass.OBJECT.isSuperClassOf(info.getImplicitType().getBasicLangClass()))
+				throw new IncompatibleVariableConversionTypeException(SimpleVariableType.OBJECT, info.getImplicitType(),
+						node.getErrorMessageNode());
 			info.replaceImplicitType(SimpleVariableType.EXCEPTION);
+		}
 		return info;
 	}
 
@@ -1060,15 +1074,22 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	/**
 	 * <p>
 	 * Message node always returns the message coerced to a
-	 * {@link StringLangObject}.
+	 * {@link StringLangObject}. (Almost) any object can be
+	 * converted to a string. However, we need to check if
+	 * the type is the special void type and throw an error
+	 * if it is, as the void type must not be used for
+	 * anything.
 	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTLogNode node) throws SemanticsException {
-		// TODO should we check if result can be coerced to string?
 		final NodeInfo info = node.getLogMessageNode().jjtAccept(this);
-		if (info.hasImplicitType())
+		if (info.hasImplicitType()) {
+			if (!ELangObjectClass.OBJECT.isSuperClassOf(info.getImplicitType().getBasicLangClass()))
+				throw new IncompatibleVariableConversionTypeException(SimpleVariableType.OBJECT, info.getImplicitType(),
+						node.getLogMessageNode());
 			info.replaceImplicitType(SimpleVariableType.STRING);
+		}
 		return info;
 	}
 
@@ -1106,6 +1127,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return null;
 	}
 
+	/** @see #visitPropertyExpression(ASTPropertyExpressionNode, int) */
 	@Override
 	public NodeInfo visit(final ASTPropertyExpressionNode node) throws SemanticsException {
 		return visitPropertyExpression(node, node.getPropertyNodeCount());

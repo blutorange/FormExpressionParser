@@ -7,6 +7,17 @@ import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTime
 import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAccessorTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleDotAccessorTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleDotAssignerTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionParameterTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVariableAssignmentTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVariableConversionTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVariableTypeForExpressionMethodException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleVoidReturnTypeException;
+import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
@@ -69,6 +80,24 @@ enum SyntaxFailure implements ITestCase {
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),
 	STRICT003(new Cfg("math::pi;").err("Error during parsing at line 1, column 1: Scope math is provided by the context, but require scope statement is missing. Strict mode requires importing scopes explicitly.").err(MissingRequireScopeStatementException.class).strict()),
 
+	VOID001(new Cfg("global scope{method<void> m;method<string,string> m2;}m2(m());").err("Error during parsing at line 1, column 58: Found incompatible variable type VOID but expected STRING: Function parameter type not compatible.").err(IncompatibleFunctionParameterTypeException.class).strict()),
+	VOID002(new Cfg("global scope{method<void> m;}m()+0;").err("Error during parsing at line 1, column 34: Expression method PLUS(+) for type VOID does not accept the right hand side type NUMBER.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
+	VOID003(new Cfg("global scope{method<void> m;}0+m();").err("Error during parsing at line 1, column 32: Expression method PLUS(+) for type NUMBER does not accept the right hand side type VOID.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
+	VOID004(new Cfg("global scope{method<void> m;}m().toString;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such dot accessor toString for this variable type.").err(IncompatibleDotAccessorTypeException.class).strict()),
+	VOID005(new Cfg("global scope{method<void> m;}m()[0];").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such bracket accessor of type NUMBER for this variable type.").err(IncompatibleBracketAccessorTypeException.class).strict()),
+	VOID006(new Cfg("global scope{method<void> m;}m().length=0;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such dot assigner length to type NUMBER for this variable type.").err(IncompatibleDotAssignerTypeException.class).strict()),
+	VOID007(new Cfg("global scope{method<void> m;}m()[0]=0;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such bracket assigner of type NUMBER to type NUMBER for this variable type.").err(IncompatibleBracketAssignerTypeException.class).strict()),
+	VOID008(new Cfg("global scope{method<void> m;string v;}v=m();").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected STRING: Variable v cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
+	VOID009(new Cfg("global scope{method<void> m;var v;}v=m();").err("Error during parsing at line 1, column 36: Found incompatible variable type VOID but expected OBJECT: Variable v cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
+	VOID010(new Cfg("global scope{method<void> m;number v;}v+=m();").err("Error during parsing at line 1, column 39: Expression method PLUS(+) for type NUMBER does not accept the right hand side type VOID.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
+	VOID011(new Cfg("global scope{method<void> m;number v;}v=true ? 5 : m();").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected NUMBER: Variable v cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
+	VOID012(new Cfg("->void(){return 0;};").err("Error during parsing at line 1, column 1: Found incompatible variable type NUMBER: Void function must not return a value.").err(IncompatibleVoidReturnTypeException.class).strict()),
+	VOID013(new Cfg("global scope{method<void>v;}->void(){return v();};").err("Error during parsing at line 1, column 29: Found incompatible variable type VOID: Void function must not return a value.").err(IncompatibleVoidReturnTypeException.class).strict()),
+	VOID014(new Cfg("global scope{method<void>v;}->number(){return v();};").err("Error during parsing at line 1, column 29: Found incompatible variable type VOID but expected NUMBER: Type returned is not compatible with the declared return type.").err(IncompatibleFunctionReturnTypeException.class).strict()),
+	VOID015(new Cfg("global scope{method<void>v;}for(var x in v());").err("Error during parsing at line 1, column 42: Variable type VOID is not iterable.").err(IterationNotSupportedException.class).strict()),
+	VOID016(new Cfg("global scope{method<void>v;}loginfo(v());").err("Error during parsing at line 1, column 37: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),	
+	VOID017(new Cfg("global scope{method<void>v;}exception(v());").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),	
+	
 	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.").err(ParseException.class)),
 	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.").err(ParseException.class)),
 	TEMPLATE003(new Cfg("<foo> [%foo=0;foo(); <bar>").template().err("Encountered \" \"<\" \"< \"\" at line 1, column 22.").err(ParseException.class)),

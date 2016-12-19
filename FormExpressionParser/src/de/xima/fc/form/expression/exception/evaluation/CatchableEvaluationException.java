@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
@@ -9,24 +9,25 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
  * An evaluation exception that can be caught by the program itself via try-catch-clauses.
  * @author awa
  */
+@ParametersAreNonnullByDefault
 public class CatchableEvaluationException extends EvaluationException {
 	private static final long serialVersionUID = 1L;
 
-	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec) {
+	public CatchableEvaluationException(final IEvaluationContext ec) {
 		super(ec);
 	}
-	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, final Throwable cause) {
+	public CatchableEvaluationException(final IEvaluationContext ec, final Throwable cause) {
 		super(ec, cause);
 	}
-	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg) {
+	public CatchableEvaluationException(final IEvaluationContext ec, final String msg) {
 		super(ec, msg);
 	}
 
-	public CatchableEvaluationException(@Nonnull final IExternalContext externalContext, @Nonnull final String msg, @Nonnull final Throwable throwable) {
+	public CatchableEvaluationException(final IExternalContext externalContext, final String msg, final Throwable throwable) {
 		super(externalContext, msg, throwable);
 	}
 
-	public CatchableEvaluationException(@Nonnull final IEvaluationContext ec, @Nonnull final String msg, @Nonnull final Throwable throwable) {
+	public CatchableEvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
 		super(ec, msg, throwable);
 	}
 

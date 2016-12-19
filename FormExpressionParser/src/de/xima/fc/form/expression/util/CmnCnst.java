@@ -93,6 +93,7 @@ public final class CmnCnst {
 		@Nonnull public static final String EMPTY_LABEL = "without label";
 		@Nonnull public static final String PI = "pi";
 		@Nonnull public static final String E = "e";
+		@Nonnull public static final String VOID_TYPE = "VOID";
 	}
 
 	public final static class ExpressionMethod {
@@ -216,6 +217,7 @@ public final class CmnCnst {
 		@Nonnull public static final String ERROR = "error";
 		@Nonnull public static final String METHOD = "method";
 		@Nonnull public static final String OBJECT = "object";
+		@Nonnull public static final String VOID = "void";
 	}
 
 	public static final class Error {
@@ -370,6 +372,7 @@ public final class CmnCnst {
 		@Nonnull public static final String INCOMPATIBLE_FUNCTION_RETURN_TYPE = "Type returned is not compatible with the declared return type.";
 		@Nonnull public static final String NULL_MAP_VALUE = "Map must not contain any null value.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_ASSIGNMENT_TYPE = "Variable {0} cannot be assigned to this type.";
+		@Nonnull public static final String INCOMPATIBLE_VARIABLE_CONVERSION_TYPE = "Type cannot be upconverted to this type.";
 		@Nonnull public static final String INCOMPATIBLE_EXPRESSION_METHOD_TYPES = "Expression method {0} for type {1} does not accept the right hand side type {2}.";
 		@Nonnull public static final String INCONSISTENT_CLASS_HIERARCHY = "Inconsistent class hierarchy: {0} < {1}";
 		@Nonnull public static final String NO_SUCH_BRACKET_ACCESSOR = "No such bracket accessor of type {0} for this variable type.";
@@ -379,6 +382,7 @@ public final class CmnCnst {
 		@Nonnull public static final String UNBOUND_FUNCTION_CALL = "No this context bound to called function {0}. " + INTERNAL_ERROR;
 		@Nonnull public static final String NO_SUCH_DOT_ASSIGNER = "No such dot assigner {0} to type {1} for this variable type.";
 		@Nonnull public static final String NO_SUCH_BRACKET_ASSIGNER = "No such bracket assigner of type {0} to type {1} for this variable type.";
+		@Nonnull public static final String INCOMPATIBLE_VOID_RETURN_TYPE = "Void function must not return a value.";
 	}
 
 	public static final class ToString {

@@ -6,6 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
@@ -136,7 +137,7 @@ public class NullLangObject extends ALangObject {
 
 	@Nonnull
 	@Override
-	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
-		return FunctionLangObject.getNoOpInstance();
+	public FunctionLangObject coerceFunction(final IEvaluationContext ec) throws CoercionException {
+		return FunctionLangObject.getNoOpNull();
 	}
 }

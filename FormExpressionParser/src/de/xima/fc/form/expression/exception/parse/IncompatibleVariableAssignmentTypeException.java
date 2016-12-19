@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 @ParametersAreNonnullByDefault
 public class IncompatibleVariableAssignmentTypeException extends IncompatibleVariableTypeException {
 	private static final long serialVersionUID = 1L;
-	public IncompatibleVariableAssignmentTypeException(final ASTVariableNode node, final IVariableType lhs, final IVariableType rhs) {
+	public IncompatibleVariableAssignmentTypeException(final IVariableType lhs, final IVariableType rhs, final ASTVariableNode node) {
 		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_VARIABLE_ASSIGNMENT_TYPE, node.getVariableName()), lhs, rhs, node);
 		this.variableName = node.getVariableName();
 	}
