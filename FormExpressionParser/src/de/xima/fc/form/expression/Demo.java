@@ -42,7 +42,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
  * - update formatting js
  * - update highlighter with new token types (global, scope, require etc)
- * - everything returns a value; in strict mode, check that functions return explicitly
  */
 public class Demo {
 	@Nonnull
@@ -50,7 +49,7 @@ public class Demo {
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 

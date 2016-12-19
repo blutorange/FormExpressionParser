@@ -1264,7 +1264,6 @@ void ExpressionListCommaSeparated(EMethod method) #StatementListNode :
 void Statement(EMethod method) #StatementListNode(createNode = jjtree.nodeArity() != 1) :
 {
   boolean createNode;
-  
 }
 {
   (
@@ -1283,7 +1282,6 @@ void Statement(EMethod method) #StatementListNode(createNode = jjtree.nodeArity(
 
 Node EmptyStatement(EMethod method) #EmptyNode :
 {
-  
 }
 {
   (

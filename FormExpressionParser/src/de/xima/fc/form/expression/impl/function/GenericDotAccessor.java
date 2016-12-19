@@ -71,8 +71,7 @@ public abstract class GenericDotAccessor<T extends ALangObject> implements IGene
 
 		@Override
 		public ILangObjectClass getReturnClass() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("TODO - not yet implemented");
+			return ELangObjectClass.OBJECT;
 		}
 	};
 

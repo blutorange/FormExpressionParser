@@ -18,7 +18,9 @@ public enum ELibraryScopeContractFactoryVoid implements ILibraryScopeContractFac
 			new LibraryScopeContractFactoryVoid.Builder(CmnCnst.CustomScope.MATH)
 					.addVariable(CmnCnst.Name.PI, new StaticNumberVariableProvider(Math.PI))
 					.addVariable(CmnCnst.Name.E, new StaticNumberVariableProvider(Math.E))
-					.build());
+					.build()
+	)
+	;
 
 	private final ILibraryScopeContractFactory<Void> impl;
 

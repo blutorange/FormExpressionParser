@@ -97,6 +97,9 @@ enum SyntaxFailure implements ITestCase {
 	VOID015(new Cfg("global scope{method<void>v;}for(var x in v());").err("Error during parsing at line 1, column 42: Variable type VOID is not iterable.").err(IterationNotSupportedException.class).strict()),
 	VOID016(new Cfg("global scope{method<void>v;}loginfo(v());").err("Error during parsing at line 1, column 37: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),	
 	VOID017(new Cfg("global scope{method<void>v;}exception(v());").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),	
+	VOID018(new Cfg("global scope{method<void> m;}m()==5;").err("Error during parsing at line 1, column 30: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
+	VOID019(new Cfg("global scope{string s;method<void> m;}s=~m();").err("Error during parsing at line 1, column 42: Expression method EQUAL_TILDE(=~) for type STRING does not accept the right hand side type VOID.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
+	VOID020(new Cfg("global scope{number n;method<void>m;}n<m();").err("Error during parsing at line 1, column 40: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
 	
 	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \" \"%]\" \"%] \"\" at line 1, column 13.").err(ParseException.class)),
 	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.").err(ParseException.class)),

@@ -1,1 +1,2 @@
-global scope{method<void>v;}exception(v());
+[%%require scope field;%]
+[%tf1.length =~ #^HELLO$#%]

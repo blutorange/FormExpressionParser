@@ -14,9 +14,11 @@ import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -54,6 +56,11 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 	 * @return {@link NumberLangObject}. The length of this string, >=0.
 	 */
 	length(Impl.length),
+	/**
+	 * @param patternToCheck <code>regex</code>
+	 * @return <code>boolean</code> Whether this string matches the regex.
+	 */
+	matches(Impl.matches),
 	;
 
 	@Nullable private FunctionLangObject func;
@@ -114,7 +121,9 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				return thisContext.toUpperCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+				final Locale locale = args.length > 0 && !args[0].isNull()
+						? Locale.forLanguageTag(args[0].coerceString(ec).stringValue()) : Locale.ROOT;
+				return thisContext.toUpperCase(locale);
 			}
 
 			@Override
@@ -132,7 +141,9 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				return thisContext.toLowerCase(args[0].isNull() ? Locale.ROOT : Locale.forLanguageTag(args[0].coerceString(ec).stringValue()));
+				final Locale locale = args.length > 0 && !args[0].isNull()
+						? Locale.forLanguageTag(args[0].coerceString(ec).stringValue()) : Locale.ROOT;
+				return thisContext.toLowerCase(locale);
 			}
 
 			@Override
@@ -196,6 +207,24 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return ELangObjectClass.NUMBER;
 			}
 		},
+		matches(false, "patternToCheck") {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final RegexLangObject r = args.length > 0 ? args[0].coerceRegex(ec) : RegexLangObject.getUnmatchableInstance();
+				return BooleanLangObject.create(r.patternValue().matcher(thisContext.stringValue()).matches());
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(SimpleVariableType.BOOLEAN, SimpleVariableType.REGEX);
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.FUNCTION;
+			}			
+		}
 		;
 
 		private String[] argList;

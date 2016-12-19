@@ -3,8 +3,6 @@ package de.xima.fc.form.expression.impl.function;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import org.apache.commons.lang3.StringUtils;
-
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -18,6 +16,7 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
@@ -87,7 +86,8 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final RegexLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
-				final String input = args.length == 0 ? StringUtils.EMPTY : args[0].coerceString(ec).stringValue();
+				final String input = args.length > 0 ? args[0].coerceString(ec).stringValue()
+						: CmnCnst.NonnullConstant.STRING_EMPTY;
 				return BooleanLangObject.create(thisContext.patternValue().matcher(input).matches());
 			}
 

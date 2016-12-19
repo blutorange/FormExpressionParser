@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_EXPLICIT_RETURN_AS_ERROR;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_UNMATCHING_SWITCH_TYPE_AS_ERROR;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEMPTYNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
 
@@ -301,6 +302,17 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		this.factory = factory;
 	}
 
+	/**
+	 * @param info Variable type info tpo check.
+	 * @param node The node to check.
+	 * @throws IncompatibleVariableConversionTypeException When the given object is not an object or a subclass.
+	 */
+	private static void checkObject(final NodeInfo info, final Node node) throws IncompatibleVariableConversionTypeException {
+		if (!ELangObjectClass.OBJECT.isSuperClassOf(info.getImplicitType().getBasicLangClass()))
+			throw new IncompatibleVariableConversionTypeException(SimpleVariableType.OBJECT,
+					info.getImplicitType(), node);
+	}
+	
 	private NodeInfo visitLoop(final Node conditionNode, final Node bodyNode, @Nullable final String label,
 			final boolean isHeaderControlled) throws SemanticsException {
 		// Check if condition is boolean.
@@ -788,12 +800,19 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 * remaining statements are dead code and we issue an error. Otherwise, we
 	 * unify all return types and take the implicit return type of the last
 	 * statement.
+	 * </p><p>
+	 * When a statement is the empty node (<code>;</code>) the value from the
+	 * last statement is returned during evaluation, so we need to pass through
+	 * the last return type as well.
 	 * </p>
 	 */
 	@Override
 	public NodeInfo visit(final ASTStatementListNode node) throws SemanticsException {
 		final NodeInfo info = new NodeInfo(null, SimpleVariableType.NULL);
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
+			// Pass through value for empty nodes.
+			if (node.jjtGetChild(i).jjtGetNodeId() == JJTEMPTYNODE)
+				continue;
 			final NodeInfo infoChild = node.jjtGetChild(i).jjtAccept(this);
 			if (infoChild.hasImplicitType())
 				info.replaceImplicitType(infoChild.getImplicitType());
@@ -1027,9 +1046,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	public NodeInfo visit(final ASTExceptionNode node) throws SemanticsException {
 		final NodeInfo info = node.getErrorMessageNode().jjtAccept(this);
 		if (info.hasImplicitType()) {
-			if (!ELangObjectClass.OBJECT.isSuperClassOf(info.getImplicitType().getBasicLangClass()))
-				throw new IncompatibleVariableConversionTypeException(SimpleVariableType.OBJECT, info.getImplicitType(),
-						node.getErrorMessageNode());
+			checkObject(info, node.getErrorMessageNode());
 			info.replaceImplicitType(SimpleVariableType.EXCEPTION);
 		}
 		return info;
@@ -1085,9 +1102,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	public NodeInfo visit(final ASTLogNode node) throws SemanticsException {
 		final NodeInfo info = node.getLogMessageNode().jjtAccept(this);
 		if (info.hasImplicitType()) {
-			if (!ELangObjectClass.OBJECT.isSuperClassOf(info.getImplicitType().getBasicLangClass()))
-				throw new IncompatibleVariableConversionTypeException(SimpleVariableType.OBJECT, info.getImplicitType(),
-						node.getLogMessageNode());
+			checkObject(info, node.getLogMessageNode());
 			info.replaceImplicitType(SimpleVariableType.STRING);
 		}
 		return info;
@@ -1119,12 +1134,6 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 		// Return type of function.
 		return new NodeInfo(null, getFunctionType(typeDeclaredReturn, node));
-	}
-
-	@Override
-	public NodeInfo visit(final ASTUnaryExpressionNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/** @see #visitPropertyExpression(ASTPropertyExpressionNode, int) */
@@ -1167,15 +1176,15 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return new NodeInfo(null, typeFunction);
 	}
 
+	/**
+	 * <p>
+	 * Empty node returns <code>null</code>. Passing through the return type is
+	 * handled by {@link #visit(ASTStatementListNode)}
+	 * </p>
+	 */
 	@Override
 	public NodeInfo visit(final ASTEmptyNode node) throws SemanticsException {
-		// TODO Note to self: Needs to return the result of the last node,
-		// eg. function foo(){23;;} returns a number.
-		// TODO think about whether 23;;; should implicitly return
-		// 23 or nul
-		// TODO throws an error in strict mode (unreachable code)
-		// so lets just allow it in non strict mode
-		return null;
+		return new NodeInfo(null, SimpleVariableType.NULL);
 	}
 
 	@Override
@@ -1216,41 +1225,116 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		return node.getNode().jjtAccept(this);
 	}
 
+	/**
+	 * <p>
+	 * Equality is defined for (almost) every object and always
+	 * returns a {@link BooleanLangObject}. However, we need to
+	 * check whether any type is the special void type, as it must
+	 * not be used in any way. The return type is always a
+	 * {@link BooleanLangObject}.
+	 * </p><p>
+	 * The methods <code>=~</code> and <code>!~</code> both make use
+	 * of the method {@link EMethod#EQUAL_TILDE} and coerce the result
+	 * to a boolean. Here we need to check if this expression
+	 * method is defined.
+	 * </p>
+	 */
 	@Override
 	public NodeInfo visit(final ASTEqualExpressionNode node) throws SemanticsException {
+		// Empty expression node.
+		if (node.isLeaf())
+			return new NodeInfo(null, SimpleVariableType.NULL);
+		
+		// Get type for first node.
+		final NodeInfo infoRes = node.jjtGetChild(0).jjtAccept(this);
+		if (!infoRes.hasImplicitType()) {
+			if (node.jjtGetNumChildren() > 1)
+				throw new UnreachableCodeException(node.jjtGetChild(1));
+			return infoRes;
+		}
+		checkObject(infoRes, node.jjtGetChild(0));
+		
+		// Check methods for all other nodes.
+		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
+			final NodeInfo infoChild = node.jjtGetChild(i).jjtAccept(this);
+			infoRes.unifyJumps(infoChild);
+			if (!infoChild.hasImplicitType()) {
+				if (i < node.jjtGetNumChildren() - 1)
+					throw new UnreachableCodeException(node.jjtGetChild(i + 1));
+				infoRes.clearImplicitType();
+				return infoRes;
+			}
+			switch (node.jjtGetChild(i).getSiblingMethod()) {
+			case EXCLAMATION_TILDE:
+			case EQUAL_TILDE: {
+				final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
+						infoRes.getImplicitType(), EMethod.EQUAL_TILDE, infoChild.getImplicitType());
+				if (typeMethod == null)
+					throw new IncompatibleVariableTypeForExpressionMethodException(infoRes.getImplicitType(),
+							EMethod.EQUAL_TILDE, infoChild.getImplicitType(), node.jjtGetChild(i));
+				break;
+			}
+			// only == != === !=== =~ !~ can occur
+			//$CASES-OMITTED$
+			default:
+				checkObject(infoChild, node.jjtGetChild(i));
+				break;
+			}
+			infoRes.unifiyImplicitType(infoChild.getImplicitType());
+		}
+		infoRes.replaceImplicitType(SimpleVariableType.BOOLEAN);
+		return infoRes;
+	}
+	
+	/**
+	 * <p>
+	 * Comparisons are defined for (almost) all objects, so we simply
+	 * check all child nodes. However, we need to check for the special
+	 * void type as it must not be used in any way. The return type
+	 * is always a {@link BooleanLangObject}.
+	 * </p>
+	 */
+	@Override
+	public NodeInfo visit(final ASTComparisonExpressionNode node) throws SemanticsException {
+		// Empty expression node.
+		if (node.isLeaf())
+			return new NodeInfo(null, SimpleVariableType.NULL);
+		
+		// Get type for first node.
+		final NodeInfo infoRes = node.jjtGetChild(0).jjtAccept(this);
+		if (!infoRes.hasImplicitType()) {
+			if (node.jjtGetNumChildren() > 1)
+				throw new UnreachableCodeException(node.jjtGetChild(1));
+			return infoRes;
+		}
+		checkObject(infoRes, node.jjtGetChild(0));
+		
+		// Check methods for all other nodes.
+		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
+			final NodeInfo infoChild = node.jjtGetChild(i).jjtAccept(this);
+			infoRes.unifyJumps(infoChild);
+			if (!infoChild.hasImplicitType()) {
+				if (i < node.jjtGetNumChildren() - 1)
+					throw new UnreachableCodeException(node.jjtGetChild(i + 1));
+				infoRes.clearImplicitType();
+				return infoRes;
+			}
+			checkObject(infoChild, node.jjtGetChild(i));
+			infoRes.unifiyImplicitType(infoChild.getImplicitType());
+		}
+		infoRes.replaceImplicitType(SimpleVariableType.BOOLEAN);
+		return infoRes;
+	}
+	
+	@Override
+	public NodeInfo visit(final ASTUnaryExpressionNode node) throws SemanticsException {
 		// TODO Auto-generated method stub
-//		NodeInfo infoRes = node.jjtGetChild(0).jjtAccept(this);
-//		if (!infoRes.hasImplicitType()) {
-//			if (node.jjtGetNumChildren() > 1)
-//				throw new UnreachableCodeException(node.jjtGetChild(1));
-//			return infoRes;
-//		}
-//		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
-//			NodeInfo infoChild = node.jjtGetChild(i).jjtAccept(this);
-//			infoRes.unifyJumps(infoChild);
-//			if (!infoChild.hasImplicitType()) {
-//				if (i < node.jjtGetNumChildren() - 1)
-//					throw new UnreachableCodeException(node.jjtGetChild(i + 1));
-//				infoRes.clearImplicitType();
-//				return infoRes;
-//			}
-//			infoRes.unifiyImplicitType(infoChild.getImplicitType());
-//		}
-//		infoRes.replaceImplicitType(SimpleVariableType.BOOLEAN);
-//		return infoRes;
 		return null;
 	}
 
 	@Override
 	public NodeInfo visit(final ASTPostUnaryExpressionNode node) throws SemanticsException {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public NodeInfo visit(final ASTComparisonExpressionNode node) throws SemanticsException {
-		// TODO Auto-generated method stub
-
 		return null;
 	}
 
