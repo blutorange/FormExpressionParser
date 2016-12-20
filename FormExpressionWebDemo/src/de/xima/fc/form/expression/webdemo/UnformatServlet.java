@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,14 +33,14 @@ public class UnformatServlet extends AFormExpressionServlet {
 	}
 
 	@Override
-	protected Callable<JSONObject> getCallable() {
+	protected Callable<JSONObject> getCallable(final HttpServletRequest request) {
 		return new Callable<JSONObject>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public JSONObject call() throws Exception {
-				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
-				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
-				final Offset offset = getOffset();
+				final String code = getCode(request);
+				final String type = getType(request);
+				final Offset offset = getOffset(request);
 				final IUnparseConfig config = UnparseConfig.getUnstyledWithoutCommentsConfig();
 				final JSONObject json = new JSONObject();
 				final JSONArray lint = new JSONArray();

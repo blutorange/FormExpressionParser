@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,6 @@ import de.xima.fc.form.expression.impl.config.SeverityConfig;
 public abstract class AFormExpressionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	protected HttpServletRequest request;
 	private final int timeout;
 	private final TimeUnit timeoutUnit;
 
@@ -51,9 +51,8 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 	@Override
 	protected final void doGet(final HttpServletRequest request, final HttpServletResponse response)
 			throws ServletException, IOException {
-		this.request = request;
 		final ExecutorService executor = Executors.newSingleThreadExecutor();
-		final Future<JSONObject> future = executor.submit(getCallable());
+		final Future<JSONObject> future = executor.submit(getCallable(request));
 		JSONObject json;
 		try {
 			json = future.get(timeout, timeoutUnit);
@@ -78,21 +77,15 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		}
 		response.setStatus(200);
 		response.getWriter().append(json.toJSONString());
-		this.request = null;
 	}
 
-	private static Object getErrorMessage(final Throwable e) {
+	private static Object getErrorMessage(@Nonnull final Throwable e) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(e.getMessage()).append('\n');
-		for (final StackTraceElement el : e.getStackTrace()) {
-			sb.append(el.toString()).append('\n');
-		}
-		final Throwable cause = e.getCause();
-		if (cause != null) {
+		for (Throwable cause = e; cause != null; cause = cause.getCause()) {
+			sb.append(e.getClass().getCanonicalName()).append('\n');
 			sb.append(cause.getMessage()).append('\n');
-			for (final StackTraceElement el : cause.getStackTrace()) {
+			for (final StackTraceElement el : cause.getStackTrace())
 				sb.append(el.toString()).append('\n');
-			}
 		}
 		return sb.toString();
 	}
@@ -143,7 +136,7 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		lint.add(entry);
 	}
 
-	protected int asInt(final String value, final int defaultValue) {
+	protected static int asInt(final String value, final int defaultValue) {
 		if (value == null)
 			return defaultValue;
 		try {
@@ -154,8 +147,8 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		}
 	}
 
-	protected Offset getOffset() {
-		final HttpServletRequest request = this.request;
+	@Nonnull
+	protected static Offset getOffset(final HttpServletRequest request) {
 		if (request == null)
 			return new Offset(0, 0, 0, 0);
 		final int offsetLineBegin = asInt(request.getParameter(CmnCnst.URL_PARAM_KEY_OFFSET_LINE_BEGIN), 0);
@@ -166,14 +159,20 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		return offset;
 	}
 
-	protected String getType() {
+	@Nonnull
+	protected static String getType(final HttpServletRequest request) {
+		if (request == null)
+			return CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM;
 		final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
 		if (type == null)
 			return CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM;
 		return type;
 	}
 
-	protected String getContext() {
+	@Nonnull
+	protected static String getContext(final HttpServletRequest request) {
+		if (request == null)
+			return CmnCnst.URL_PARAM_VALUE_CONTEXT_GENERIC;
 		final String context = request.getParameter(CmnCnst.URL_PARAM_KEY_CONTEXT);
 		if (context == null)
 			return CmnCnst.URL_PARAM_VALUE_CONTEXT_GENERIC;
@@ -181,13 +180,34 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 	}
 
 	@Nonnull
-	protected ISeverityConfig getSeverityConfig() {
-		final boolean strict = Boolean.parseBoolean(request.getParameter(CmnCnst.URL_PARAM_KEY_STRICT));
+	protected static String getIndent(final HttpServletRequest request) {
+		if (request == null)
+			return " ";
+		final String indent= request.getParameter(CmnCnst.URL_PARAM_KEY_INDENT);
+		return indent != null ? indent : " ";
+	}
+
+	@Nonnull
+	protected static String getCssClassPrefix(final HttpServletRequest request) {
+		if (request == null)
+			return "";
+		final String prefix = request.getParameter(CmnCnst.URL_PARAM_KEY_PREFIX);
+		return prefix != null ? prefix : "";
+	}
+
+	@Nullable
+	protected static String getCode(final HttpServletRequest request) {
+		return request != null ? request.getParameter(CmnCnst.URL_PARAM_KEY_CODE) : null;
+	}
+
+	@Nonnull
+	protected static ISeverityConfig getSeverityConfig(final HttpServletRequest request) {
+		final boolean strict = request != null ? Boolean.parseBoolean(request.getParameter(CmnCnst.URL_PARAM_KEY_STRICT)) : false;
 		return strict ? SeverityConfig.getStrictConfig()
 				: SeverityConfig.getLooseConfig();
 	}
 
-	protected abstract Callable<JSONObject> getCallable();
+	protected abstract Callable<JSONObject> getCallable(HttpServletRequest request);
 
 	protected static class Offset {
 		public final int offsetLineBegin, offsetColumnBegin;

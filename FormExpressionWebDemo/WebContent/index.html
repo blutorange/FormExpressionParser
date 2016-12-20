@@ -3,21 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="js/script.js"></script>
 <script src="js/codemirror.js"></script>
 <script src="js/lint.js"></script>
+<script src="js/simplescrollbars.js"></script>
+<script src="js/annotatescrollbar.js"></script>
+<script src="js/dialog.js"></script>
+<script src="js/searchcursor.js"></script>
+<script src="js/jump-to-line.js"></script>
+<script src="js/search.js"></script>
+<script src="js/matchbrackets.js"></script>
+<script src="js/closebrackets.js"></script>
+<script src="js/formexpression-lint.js"></script>
 <script src="js/codemirror_simple.js"></script>
 <script src="js/codemirror_formexpression_template.js"></script>
 <script src="js/codemirror_formexpression_program.js"></script>
+<script src="js/script.js"></script>
 <link rel="stylesheet" type="text/css" href="css/style.css"/>
 <link rel="stylesheet" type="text/css" href="css/codemirror.css"/>
 <link rel="stylesheet" type="text/css" href="css/lint.css"/>
+<link rel="stylesheet" type="text/css" href="css/dialog.css"/>
+<link rel="stylesheet" type="text/css" href="css/simplescrollbars.css"/>
 <link rel="stylesheet" type="text/css" href="css/allThemes.css"/>
 <title>Insert title here</title>
 </head>
 <body>
     <h1>Input</h1>
 	<form id="codeForm" method="POST">
+		<label for="height">Height of the editor
+  			<input class="fullwidth" name="height" id="height" value="300" type="range" min="0" max="1000" step="32">
+ 		</label>
 		<textarea id="code" name="code" rows="16" placeholder="Enter code..."></textarea>
 		<select name="type" id="type">
 		  <option value="program">Program</option>
@@ -35,6 +49,7 @@
           <input type="checkbox" name="strict" id="strict"/>
         </label>
 		<input type="hidden" name="prefix" value="hglt"></input>
+	
 		<button id="buttonHighlight" type="button">Highlight</button>
 		<button id="buttonFormat" type="button">Format</button>
 		<button id="buttonMinify" type="button">Unformat</button>
@@ -54,7 +69,7 @@
       <li data-file="arraySort" data-program data-generic data-as-html-no class="codeExample"><a href="javascript:void(0);">Naive array sort</a></li>
       <li data-file="allLanguageElements" data-program data-generic data-as-html-no class="codeExample"><a href="javascript:void(0);">Quick language overview</a></li>
       <li data-file="allLanguageElementsBadlyFormatted" data-program data-generic data-as-html-no class="codeExample"><a href="javascript:void(0);">Quick language overview (badly formatted)</a></li>
-    </ul>  
+    </ul>
     <h1>Output</h1>
 	<section id="output">
 	  <p>No output yet, enter something above and click the button.</p>

@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 
@@ -30,14 +31,14 @@ public class HighlightServlet extends AFormExpressionServlet {
 	}
 
 	@Override
-	protected Callable<JSONObject> getCallable() {
+	protected Callable<JSONObject> getCallable(final HttpServletRequest request) {
 		return new Callable<JSONObject>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public JSONObject call() throws Exception {
-				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
-				final String cssClassPrefix = request.getParameter(CmnCnst.URL_PARAM_KEY_PREFIX);
-				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
+				final String code = getCode(request);
+				final String cssClassPrefix = getCssClassPrefix(request);
+				final String type = getType(request);
 				final JSONObject json = new JSONObject();
 				if (code == null) {
 					json.put(CmnCnst.RESPONSE_ERROR, CmnCnst.RESPONSE_ERROR_PARAM_CODE_REQUIRED);

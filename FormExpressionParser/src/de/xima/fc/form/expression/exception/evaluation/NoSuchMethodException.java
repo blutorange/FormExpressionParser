@@ -12,9 +12,9 @@ public class NoSuchMethodException extends NoSuchFunctionException {
 
 	private static final long serialVersionUID = 1L;
 
-	public NoSuchMethodException(@Nonnull final EMethod method, @Nonnull final ALangObject thisContext,
+	public NoSuchMethodException(@Nonnull final EMethod method, @Nonnull final ALangObject thisContext, final ALangObject rhs,
 			@Nonnull final IEvaluationContext ec) {
-		super(CmnCnst.Name.METHOD, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_METHOD, method.name(), method.methodName),
+		super(CmnCnst.Name.METHOD, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_METHOD, method.name(), method.methodName, rhs.getObjectClass()),
 				thisContext, ec);
 		this.method = method;
 	}

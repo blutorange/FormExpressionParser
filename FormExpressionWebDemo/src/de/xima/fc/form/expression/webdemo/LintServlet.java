@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -35,17 +36,17 @@ public class LintServlet extends AFormExpressionServlet {
 	}
 
 	@Override
-	protected Callable<JSONObject> getCallable() {
+	protected Callable<JSONObject> getCallable(final HttpServletRequest request) {
 		return new Callable<JSONObject>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public JSONObject call() throws Exception {
 				final JSONObject json = new JSONObject();
-				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
-				final String type = getType();
-				final String context = getContext();
-				final Offset offset = getOffset();
-				final ISeverityConfig config = getSeverityConfig();
+				final String code = getCode(request);
+				final String type = getType(request);
+				final String context = getContext(request);
+				final Offset offset = getOffset(request);
+				final ISeverityConfig config = getSeverityConfig(request);
 				final JSONArray lint = new JSONArray();
 				json.put(CmnCnst.RESPONSE_LINT, lint);
 				if (code == null) {

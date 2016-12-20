@@ -344,7 +344,8 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) expressionMethod(method,
 				args.length > 0 && args[0] != null ? args[0] : NullLangObject.getInstance(), ec);
 		if (func == null)
-			throw new NoSuchMethodException(method, this, ec);
+			throw new NoSuchMethodException(method, this,
+					args.length > 0 && args[0] != null ? args[0] : NullLangObject.getInstance(), ec);
 		return ALangObject.create(func.evaluate(ec, this, args));
 	}
 

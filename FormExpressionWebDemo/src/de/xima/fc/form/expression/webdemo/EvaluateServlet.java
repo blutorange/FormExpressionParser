@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -16,7 +17,6 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
-import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.impl.ec.EEvaluationContextContractFormcycle;
 import de.xima.fc.form.expression.impl.ec.EEvaluationContextContractWriter;
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
@@ -38,18 +38,17 @@ public class EvaluateServlet extends AFormExpressionServlet {
 	}
 
 	@Override
-	protected Callable<JSONObject> getCallable() {
+	protected Callable<JSONObject> getCallable(final HttpServletRequest request) {
 		return new Callable<JSONObject>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public JSONObject call() throws Exception {
 				final JSONObject json = new JSONObject();
-				final String code = request.getParameter(CmnCnst.URL_PARAM_KEY_CODE);
-				final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
-				final String context = request.getParameter(CmnCnst.URL_PARAM_KEY_CONTEXT);
-				final boolean strict = request.getParameterMap().containsKey(CmnCnst.URL_PARAM_KEY_STRICT);
-				final Offset offset = getOffset();
-				final ISeverityConfig config = strict ? SeverityConfig.getStrictConfig() : SeverityConfig.getLooseConfig();
+				final String code = getCode(request);
+				final String type = getType(request);
+				final String context = getContext(request);
+				final ISeverityConfig config = getSeverityConfig(request);
+				final Offset offset = getOffset(request);
 				final JSONArray lint = new JSONArray();
 				json.put(CmnCnst.RESPONSE_LINT, lint);
 				if (code == null) {

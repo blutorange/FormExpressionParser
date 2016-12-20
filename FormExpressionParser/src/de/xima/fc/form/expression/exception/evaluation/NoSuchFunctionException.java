@@ -12,12 +12,6 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class NoSuchFunctionException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
-	public NoSuchFunctionException(final String type, final String name, final IEvaluationContext ec) {
-		super(ec, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_FUNCTION_NO_THIS, type, name));
-		this.name = name;
-		thisContext = null;
-	}
-
 	public NoSuchFunctionException(final String type, final String name, final ALangObject thisContext,
 			final IEvaluationContext ec) {
 		super(ec,

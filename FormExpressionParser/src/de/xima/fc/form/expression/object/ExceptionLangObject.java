@@ -77,7 +77,7 @@ public class ExceptionLangObject extends ALangObject {
 	@Nonnull
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) {
-		return StringLangObject.create(value.getMessage());
+		return StringLangObject.create(value.getShortMessage());
 	}
 	@Nonnull
 	@Override

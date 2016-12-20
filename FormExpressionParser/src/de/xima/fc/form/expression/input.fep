@@ -1,4 +1,5 @@
 global scope {
-  array<var> a;
+  number n = null;
+  array<string> a = ["1","2"];
 }
-[].push(1,2,3);
+a[n];

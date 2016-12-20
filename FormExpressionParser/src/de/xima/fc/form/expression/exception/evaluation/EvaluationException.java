@@ -26,27 +26,32 @@ public class EvaluationException extends Exception implements IPositionedError {
 		if (exception != null) {
 			ec = exception.ec;
 			externalContext = ec != null ? ec.getExternalContext() : null;
+			this.shortMessage = exception.getMessage();
 		}
 		else {
 			ec = null;
 			externalContext = null;
+			this.shortMessage = "";
 		}
 	}
 
 	public EvaluationException(final IEvaluationContext ec) {
 		super(msgWithContext(StringUtils.EMPTY, ec));
+		this.shortMessage = "";
 		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
 
 	public EvaluationException(final IEvaluationContext ec, final Throwable cause) {
 		super(msgWithContext(cause.getMessage(), ec));
+		this.shortMessage = cause.getMessage();
 		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
 
 	public EvaluationException(final IEvaluationContext ec, final String msg) {
 		super(msgWithContext(msg, ec));
+		this.shortMessage = msg;
 		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
@@ -61,20 +66,27 @@ public class EvaluationException extends Exception implements IPositionedError {
 	 */
 	protected EvaluationException(final String msg, final Throwable throwable) {
 		super(msg, throwable);
+		shortMessage = msg;
 		ec = null;
 		externalContext = null;
 	}
 
 	protected EvaluationException(final IExternalContext externalContext, final String msg, final Throwable throwable) {
 		super(msg, throwable);
+		shortMessage = msg;
 		ec = null;
 		this.externalContext = externalContext;
 	}
 
 	public EvaluationException(final IEvaluationContext ec, final String msg, final Throwable throwable) {
 		super(msgWithContext(msg, ec), throwable);
+		this.shortMessage = msg;
 		this.ec = ec;
 		externalContext = ec.getExternalContext();
+	}
+
+	public String getShortMessage() {
+		return NullUtil.or(shortMessage, CmnCnst.NonnullConstant.STRING_EMPTY);
 	}
 
 	/**
@@ -158,6 +170,9 @@ public class EvaluationException extends Exception implements IPositionedError {
 
 	@Nullable
 	public final transient IExternalContext externalContext;
+
+	@Nullable
+	private final String shortMessage;
 
 	@Override
 	public boolean isPositionInformationAvailable() {

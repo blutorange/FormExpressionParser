@@ -240,7 +240,7 @@ public final class CmnCnst {
 		@Nonnull public static final String NO_SUCH_FUNCTION_NO_THIS = "No such {0} named {1}.";
 		@Nonnull public static final String NO_SUCH_FUNCTION_WITH_THIS = "No such {0} named {1} for object {2} of type {3}.";
 		@Nonnull public static final String NO_SUCH_FUNCTION_WITH_NULL = "Null pointer exception: No such {0} named {1} for null pointer of type {3}.";
-		@Nonnull public static final String NO_SUCH_METHOD = "{0}({1})";
+		@Nonnull public static final String NO_SUCH_METHOD = "{0}({1}) with rhs {2}";
 		@Nonnull public static final String OPERATION_NOT_YET_IMPLEMENTED = "Operation {0} has not yet been implemented yet.";
 		@Nonnull public static final String RETURN_CLAUSE = "Return clause used outside a function.";
 		@Nonnull public static final String STRING_INDEX_OUT_OF_BOUNDS = "Index {0} out of bounds for string {1}";
