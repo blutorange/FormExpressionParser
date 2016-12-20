@@ -212,8 +212,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// position as a non-comment node.
 		IComment ct;
 		while ((ct = this.commentToken) != null
-				&& (node.getStartLine() > ct.getLine() || node.getStartLine() == ct.getLine()
-				&& node.getStartColumn() >= ct.getColumn())) {
+				&& (node.getBeginLine() > ct.getLine() || node.getBeginLine() == ct.getLine()
+				&& node.getBeginColumn() >= ct.getColumn())) {
 			writeComment(prefix, isBlock);
 		}
 	}

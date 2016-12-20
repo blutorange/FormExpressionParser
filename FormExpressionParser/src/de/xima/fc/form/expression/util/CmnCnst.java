@@ -26,6 +26,7 @@ public final class CmnCnst {
 		private Warning(){}
 		@Nonnull public static final String UNUSED_VARIABLE = "Variable {0} is never used.";
 		@Nonnull public static final String EMPTY_STATEMENT = "Encountered an empty statement.";
+		@Nonnull public static final String MISSING_FORM_FIELD = "Form field {0} does not exist in the current form version.";
 	}
 
 	public final static class NonnullConstant {
@@ -236,8 +237,9 @@ public final class CmnCnst {
 		@Nonnull public static final String MATH_DIVISION_BY_ZERO = "Division by zero: {0} / {1}";
 		@Nonnull public static final String MATH = "Error during math operation: {0}";
 		@Nonnull public static final String NESTING_LEVEL_TOO_DEEP = "Nesting level too deep: {0}.";
-		@Nonnull public static final String NO_SUCH_FUNCTION_1 = "No such {0} named {1}.";
-		@Nonnull public static final String NO_SUCH_FUNCTION_2 = "No such {0} named {1} for object {2} of type {3}.";
+		@Nonnull public static final String NO_SUCH_FUNCTION_NO_THIS = "No such {0} named {1}.";
+		@Nonnull public static final String NO_SUCH_FUNCTION_WITH_THIS = "No such {0} named {1} for object {2} of type {3}.";
+		@Nonnull public static final String NO_SUCH_FUNCTION_WITH_NULL = "Null pointer exception: No such {0} named {1} for null pointer of type {3}.";
 		@Nonnull public static final String NO_SUCH_METHOD = "{0}({1})";
 		@Nonnull public static final String OPERATION_NOT_YET_IMPLEMENTED = "Operation {0} has not yet been implemented yet.";
 		@Nonnull public static final String RETURN_CLAUSE = "Return clause used outside a function.";
@@ -293,7 +295,7 @@ public final class CmnCnst {
 		@Nonnull public static final String NULL_TYPE = "Type must not be null.";
 		@Nonnull public static final String INVALID_HTML_TEMPLATE = "Invalid html.";
 		@Nonnull public static final String UNKNOWN_COMMAND_FOR_HTML_CONTEXT = "Command {0}.{1} cannot be processed by AHtmlExternalContext.";
-		@Nonnull public static final String UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT = "Command {0}.{1} cannot be processed by SystemOutExternalContext.";
+		@Nonnull public static final String UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT = "Command {0}. {1} cannot be processed by SystemOutExternalContext.";
 		@Nonnull public static final String NULL_CHILD_NODE = "Child node must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String NULL_METHOD = "Method must not be null. " + INTERNAL_ERROR;
 		@Nonnull public static final String NULL_NODE_INTERNAL = "Node must not be null." + INTERNAL_ERROR;
@@ -373,7 +375,7 @@ public final class CmnCnst {
 		@Nonnull public static final String NULL_MAP_VALUE = "Map must not contain any null value.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_ASSIGNMENT_TYPE = "Variable {0} cannot be assigned to this type.";
 		@Nonnull public static final String INCOMPATIBLE_VARIABLE_CONVERSION_TYPE = "Type cannot be upconverted to this type.";
-		@Nonnull public static final String INCOMPATIBLE_EXPRESSION_METHOD_TYPES = "Expression method {0} for type {1} does not accept the right hand side type {2}.";
+		@Nonnull public static final String INCOMPATIBLE_EXPRESSION_METHOD_TYPES = "Expression method {0} for type {1} does not exist or does not accept the right hand side type {2}.";
 		@Nonnull public static final String INCONSISTENT_CLASS_HIERARCHY = "Inconsistent class hierarchy: {0} < {1}";
 		@Nonnull public static final String NO_SUCH_BRACKET_ACCESSOR = "No such bracket accessor of type {0} for this variable type.";
 		@Nonnull public static final String NO_SUCH_DOT_ACCESSOR = "No such dot accessor {0} for this variable type.";
@@ -383,6 +385,7 @@ public final class CmnCnst {
 		@Nonnull public static final String NO_SUCH_DOT_ASSIGNER = "No such dot assigner {0} to type {1} for this variable type.";
 		@Nonnull public static final String NO_SUCH_BRACKET_ASSIGNER = "No such bracket assigner of type {0} to type {1} for this variable type.";
 		@Nonnull public static final String INCOMPATIBLE_VOID_RETURN_TYPE = "Void function must not return a value.";
+		@Nonnull public static final String TOKEN_MGR_ERROR = "Lexical error at line {0}, column {1}. Encountered {2} after \"{3}\"";
 	}
 
 	public static final class ToString {

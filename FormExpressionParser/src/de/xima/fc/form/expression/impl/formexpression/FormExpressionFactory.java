@@ -336,7 +336,7 @@ public final class FormExpressionFactory {
 		if (collection == null)
 			return;
 		for (final IHeaderNode hn : collection)
-			if (hn.hasNode() && !hn.getNode().jjtAccept(visitor))
+			if (!hn.getNode().jjtAccept(visitor))
 				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getNode());
 	}
 }

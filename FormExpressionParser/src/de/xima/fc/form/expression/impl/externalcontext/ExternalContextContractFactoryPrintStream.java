@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
 import de.xima.fc.form.expression.impl.warning.GenericWarning;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -75,7 +75,7 @@ public final class ExternalContextContractFactoryPrintStream extends AGenericExt
 				}
 			}
 			else {
-				ec.getLogger().info(String.format(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
+				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
 			}
 		}
 

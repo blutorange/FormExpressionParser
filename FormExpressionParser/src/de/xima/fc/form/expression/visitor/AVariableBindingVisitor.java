@@ -229,8 +229,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		// Global scope.
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode hn = it.next().getValue();
-			if (hn.hasNode())
-				hn.getNode().jjtAccept(this);
+			hn.getNode().jjtAccept(this);
 		}
 		// Manual scopes.
 		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
@@ -240,8 +239,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 				if (it2 != null) {
 					while (it2.hasNext()) {
 						final IHeaderNode hn = it2.next().getValue();
-						if (hn.hasNode())
-							hn.getNode().jjtAccept(this);
+						hn.getNode().jjtAccept(this);
 					}
 				}
 			}

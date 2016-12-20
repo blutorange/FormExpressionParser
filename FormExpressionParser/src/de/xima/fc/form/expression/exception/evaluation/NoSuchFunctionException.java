@@ -1,30 +1,35 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class NoSuchFunctionException extends CatchableEvaluationException {
-
 	private static final long serialVersionUID = 1L;
 
-	public NoSuchFunctionException(@Nonnull final String type, @Nonnull final String name, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_FUNCTION_1, type, name));
+	public NoSuchFunctionException(final String type, final String name, final IEvaluationContext ec) {
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_FUNCTION_NO_THIS, type, name));
 		this.name = name;
 		thisContext = null;
 	}
 
-	public NoSuchFunctionException(@Nonnull final String type, @Nonnull final String name, @Nonnull final ALangObject thisContext, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_FUNCTION_2,
-				type, name, thisContext.inspect(), thisContext.getObjectClass()));
+	public NoSuchFunctionException(final String type, final String name, final ALangObject thisContext,
+			final IEvaluationContext ec) {
+		super(ec,
+				NullUtil.messageFormat(
+						thisContext.isNull() ? CmnCnst.Error.NO_SUCH_FUNCTION_WITH_NULL
+								: CmnCnst.Error.NO_SUCH_FUNCTION_WITH_THIS,
+						type, name, thisContext.inspect(), thisContext.getObjectClass()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}
 
-	public final @Nonnull String name;
-	public final @Nullable ALangObject thisContext;
+	public final String name;
+	@Nullable
+	public final ALangObject thisContext;
 }

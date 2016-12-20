@@ -1,16 +1,16 @@
-function arraySort(array) {
-  len = array.length;
+function arraySort(arr) {
+  len = arr.length;
   for (i = 0; i < len; i+=1) {
     for (j=i+1; j<len; j+=1) {
-      tmp1 = array[i];
-      tmp2 = array[j];
+      tmp1 = arr[i];
+      tmp2 = arr[j];
       if (tmp1 > tmp2) {
-        array[i] = tmp2;
-        array[j] = tmp1;
+        arr[i] = tmp2;
+        arr[j] = tmp1;
       }
     }
   }
-  array;
+  arr;
 }
 
 // Of course, in practice it would be easier to

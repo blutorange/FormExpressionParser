@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -13,17 +13,17 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public class ASTUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTUnaryExpressionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTUnaryExpressionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	@Nonnull
 	private EMethod unaryMethod = EMethod.PLUS_UNARY;
 
-	public final void init(@Nullable final EMethod method, @Nonnull final EMethod unary) throws ParseException {
+	public final void init(@Nullable final EMethod method, final EMethod unary) throws ParseException {
 		assertChildrenExactly(1);
 		assertNonNull(unary, CmnCnst.Error.NULL_METHOD);
 		if (unary.isAssigning())
@@ -32,6 +32,7 @@ public class ASTUnaryExpressionNode extends ANode {
 		unaryMethod = unary;
 	}
 
+	@Nullable
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		throw new ArrayIndexOutOfBoundsException();
@@ -42,9 +43,12 @@ public class ASTUnaryExpressionNode extends ANode {
 		sb.append(unaryMethod).append(',');
 	}
 
-	@Nonnull
 	public EMethod getUnaryMethod() {
 		return unaryMethod;
+	}
+
+	public Node getUnaryNode() {
+		return jjtGetChild(0);
 	}
 
 	@Override

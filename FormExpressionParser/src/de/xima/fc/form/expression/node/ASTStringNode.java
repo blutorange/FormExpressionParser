@@ -61,7 +61,7 @@ public class ASTStringNode extends ANode {
 		}
 		catch (final IllegalArgumentException e) {
 			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING,
-					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
+					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));
 		}
 	}
 

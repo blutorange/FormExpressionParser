@@ -25,9 +25,6 @@ public class ImmutableScopeDefinitions implements IScopeDefinitions {
 	@Nonnull
 	private final ImmutableMap<String, ImmutableCollection<IHeaderNode>> manualMap;
 
-	private int globalVariableCount;
-	private int globalFunctionCount;
-
 	public ImmutableScopeDefinitions(final @Nonnull Map<String, IHeaderNode> globalMap,
 			final Map<String, Map<String, IHeaderNode>> manualMap, final @Nonnull Set<String> externalSet) {
 		this.externalSet = ImmutableSet.copyOf(externalSet);
@@ -37,10 +34,6 @@ public class ImmutableScopeDefinitions implements IScopeDefinitions {
 			this.globalList = ImmutableList.copyOf(chn);
 		else
 			this.globalList = ImmutableList.of();
-		
-		for (final IHeaderNode global : globalList)
-			if (global.isFunction()) ++globalFunctionCount;
-			else ++globalVariableCount;
 
 		final ImmutableMap.Builder<String, ImmutableCollection<IHeaderNode>> manualBuilder = new ImmutableMap.Builder<>();
 		for (final Entry<String, Map<String, IHeaderNode>> entry : manualMap.entrySet()) {
@@ -65,15 +58,5 @@ public class ImmutableScopeDefinitions implements IScopeDefinitions {
 	@Override
 	public ImmutableMap<String, ImmutableCollection<IHeaderNode>> getManual() {
 		return manualMap;
-	}
-
-	@Override
-	public boolean hasGlobalVariable() {
-		return globalVariableCount > 0;
-	}
-
-	@Override
-	public boolean hasGlobalFunction() {
-		return globalFunctionCount > 0;
 	}
 }

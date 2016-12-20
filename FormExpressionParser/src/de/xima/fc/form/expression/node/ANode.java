@@ -83,8 +83,8 @@ public abstract class ANode implements Node {
 		this.uniqueId = ID_PROVIDER.incrementAndGet();
 		this.nodeId = nodeId;
 		this.embedment = prototype.getEmbedment();
-		this.beginColumn = prototype.getStartColumn();
-		this.beginLine = prototype.getStartLine();
+		this.beginColumn = prototype.getBeginColumn();
+		this.beginLine = prototype.getBeginLine();
 		this.endColumn = prototype.getEndColumn();
 		this.endLine = prototype.getEndLine();
 		this.siblingMethod = prototype.getSiblingMethod();
@@ -155,8 +155,8 @@ public abstract class ANode implements Node {
 		.append(',')
 		.append(siblingMethod)
 		.append(',')
-		.append(getStartLine()).append(':')
-		.append(getStartColumn())
+		.append(getBeginLine()).append(':')
+		.append(getBeginColumn())
 		.append('-')
 		.append(getEndLine())
 		.append(':')
@@ -323,12 +323,12 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public final int getStartLine() {
+	public final int getBeginLine() {
 		return beginLine;
 	}
 
 	@Override
-	public final int getStartColumn() {
+	public final int getBeginColumn() {
 		return beginColumn;
 	}
 
@@ -403,14 +403,14 @@ public abstract class ANode implements Node {
 					// Cannot do assignment a.foobar() = 42;
 					final String msg = NullUtil.messageFormat(
 							CmnCnst.Error.ILLEGAL_LVALUE_FUNCTION, children[i],
-							assignType, new Integer(getStartLine()), new Integer(getStartColumn()));
+							assignType, new Integer(getBeginLine()), new Integer(getBeginColumn()));
 					throw new ParseException(msg);
 				}
 				break;
 			default:
 				final String msg = NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_LVALUE,
-						children[i].getClass().getSimpleName(), assignType, children[i].getStartLine(),
-						children[i].getStartColumn());
+						children[i].getClass().getSimpleName(), assignType, children[i].getBeginLine(),
+						children[i].getBeginColumn());
 				throw new ParseException(msg);
 			}
 		}

@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.object;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -19,9 +18,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
-public class StringLangObject extends ALangObject implements Serializable {
-	private static final long serialVersionUID = 1L;
-
+public class StringLangObject extends ALangObject {
 	@Nonnull private final String value;
 
 	private static class InstanceHolder {

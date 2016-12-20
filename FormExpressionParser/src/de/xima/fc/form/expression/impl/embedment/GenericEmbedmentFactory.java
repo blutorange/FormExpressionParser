@@ -44,7 +44,8 @@ public class GenericEmbedmentFactory implements IEmbedmentContractFactory {
 	@Nullable
 	@Override
 	public String[] getScopesForEmbedment(final String embedment) {
-		return map.get(embedment).getScopeList();
+		final IEmbedmentHandler handler = map.get(embedment);
+		return handler != null ? handler.getScopeList() : null;
 	}
 
 	private final static class EmbedmentImpl implements IEmbedment {

@@ -10,12 +10,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import de.xima.fc.form.expression.iface.IPositionedError;
+import de.xima.fc.form.expression.iface.config.ISeverityConfig;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
+import de.xima.fc.form.expression.impl.config.SeverityConfig;
 
 /**
  * Servlet implementation class HighlightServlet
@@ -80,6 +87,13 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		for (final StackTraceElement el : e.getStackTrace()) {
 			sb.append(el.toString()).append('\n');
 		}
+		final Throwable cause = e.getCause();
+		if (cause != null) {
+			sb.append(cause.getMessage()).append('\n');
+			for (final StackTraceElement el : cause.getStackTrace()) {
+				sb.append(el.toString()).append('\n');
+			}
+		}
 		return sb.toString();
 	}
 
@@ -93,5 +107,96 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
+	protected static void addError(final IPositionedError e, final JSONArray lint, final Offset offset) {
+		addError(e, lint, e.getMessage(), offset);
+	}
+
+	protected static void addError(final IPositionedError e, final JSONArray lint, final String message, final Offset offset) {
+		if (e.isPositionInformationAvailable())
+			addEntry(lint, message, CmnCnst.RESPONSE_LINT_ERROR, e.getBeginLine(), e.getBeginColumn(), e.getEndLine(), e.getEndColumn(), offset);
+	}
+
+	protected static void addWarning(final IEvaluationWarning warning, final JSONArray lint, final Offset offset) {
+		addEntry(lint, warning.getMessage(), CmnCnst.RESPONSE_LINT_WARNING, warning.getBeginLine(),
+				warning.getBeginColumn(), warning.getEndLine(), warning.getEndColumn(), offset);
+	}
+
+	protected static void addWarning(final Iterable<IEvaluationWarning> warnings, final JSONArray lint, final Offset offset) {
+		for (final IEvaluationWarning warning : warnings)
+			addWarning(warning, lint, offset);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void addEntry(final JSONArray lint, final String message, final String severity, final int beginLine,
+			final int beginColumn, final int endLine, final int endColumn, final Offset offset) {
+		final JSONObject entry = new JSONObject();
+		final JSONObject from = new JSONObject();
+		final JSONObject to = new JSONObject();
+		entry.put(CmnCnst.RESPONSE_LINT_FROM, from);
+		entry.put(CmnCnst.RESPONSE_LINT_TO, to);
+		entry.put(CmnCnst.RESPONSE_LINT_MESSAGE, message);
+		entry.put(CmnCnst.RESPONSE_LINT_SEVERITY, severity);
+		from.put(CmnCnst.RESPONSE_LINT_LINE, beginLine-offset.offsetLineBegin);
+		from.put(CmnCnst.RESPONSE_LINT_COLUMN, beginColumn-offset.offsetColumnBegin);
+		to.put(CmnCnst.RESPONSE_LINT_LINE, endLine-offset.offsetLineEnd);
+		to.put(CmnCnst.RESPONSE_LINT_COLUMN, endColumn-offset.offsetColumnEnd);
+		lint.add(entry);
+	}
+
+	protected int asInt(final String value, final int defaultValue) {
+		if (value == null)
+			return defaultValue;
+		try {
+			return Integer.parseInt(value, 10);
+		}
+		catch (final NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	protected Offset getOffset() {
+		final HttpServletRequest request = this.request;
+		if (request == null)
+			return new Offset(0, 0, 0, 0);
+		final int offsetLineBegin = asInt(request.getParameter(CmnCnst.URL_PARAM_KEY_OFFSET_LINE_BEGIN), 0);
+		final int offsetColumnBegin = asInt(request.getParameter(CmnCnst.URL_PARAM_KEY_OFFSET_COLUMN_BEGIN), 0);
+		final int offsetLineEnd = asInt(request.getParameter(CmnCnst.URL_PARAM_KEY_OFFSET_LINE_END), 0);
+		final int offsetColumnEnd = asInt(request.getParameter(CmnCnst.URL_PARAM_KEY_OFFSET_COLUMN_END), 0);
+		final Offset offset = new Offset(offsetLineBegin, offsetColumnBegin, offsetLineEnd, offsetColumnEnd);
+		return offset;
+	}
+
+	protected String getType() {
+		final String type = request.getParameter(CmnCnst.URL_PARAM_KEY_TYPE);
+		if (type == null)
+			return CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM;
+		return type;
+	}
+
+	protected String getContext() {
+		final String context = request.getParameter(CmnCnst.URL_PARAM_KEY_CONTEXT);
+		if (context == null)
+			return CmnCnst.URL_PARAM_VALUE_CONTEXT_GENERIC;
+		return context;
+	}
+
+	@Nonnull
+	protected ISeverityConfig getSeverityConfig() {
+		final boolean strict = Boolean.parseBoolean(request.getParameter(CmnCnst.URL_PARAM_KEY_STRICT));
+		return strict ? SeverityConfig.getStrictConfig()
+				: SeverityConfig.getLooseConfig();
+	}
+
 	protected abstract Callable<JSONObject> getCallable();
+
+	protected static class Offset {
+		public final int offsetLineBegin, offsetColumnBegin;
+		public final int offsetLineEnd, offsetColumnEnd;
+		public Offset(final int lineBegin, final int columnBegin,final int lineEnd, final int columnEnd) {
+			offsetLineBegin = lineBegin;
+			offsetColumnBegin = columnBegin;
+			offsetLineEnd = lineEnd;
+			offsetColumnEnd = columnEnd;
+		}
+	}
 }

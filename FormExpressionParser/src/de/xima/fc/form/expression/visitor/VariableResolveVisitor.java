@@ -25,6 +25,7 @@ import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
+import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -209,6 +210,8 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode header = it.next().getValue();
 			header.resolveSource(getNewObjectToSet());
+			if (header.isFunction())
+				((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getSource());
 		}
 		// Manual scopes.
 		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
@@ -217,7 +220,10 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<Integer> {
 				final Iterator<Entry<String, IHeaderNode>> it2 = scopeDefBuilder.getManual(scope);
 				if (it2 != null) {
 					while (it2.hasNext()) {
-						it2.next().getValue().resolveSource(getNewObjectToSet());
+						final IHeaderNode header = it2.next().getValue();
+						header.resolveSource(getNewObjectToSet());
+						if (header.isFunction())
+							((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getSource());
 					}
 				}
 			}

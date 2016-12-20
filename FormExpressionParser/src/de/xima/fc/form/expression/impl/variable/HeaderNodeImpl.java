@@ -26,7 +26,6 @@ public class HeaderNodeImpl implements IHeaderNode {
 	@Nullable
 	private final Node typedNode;
 	private final boolean isFunction;
-	private final boolean hasNode;
 	private int source = EVariableSource.ID_UNRESOLVED;
 
 	public HeaderNodeImpl(final ASTVariableDeclarationClauseNode node) {
@@ -34,7 +33,6 @@ public class HeaderNodeImpl implements IHeaderNode {
 		this.typedNode = node.hasType() ? node.getTypeNode() : null;
 		this.isFunction = false;
 		this.variableName = node.getVariableName();
-		this.hasNode = true;
 	}
 
 	public HeaderNodeImpl(final ASTFunctionClauseNode node) {
@@ -42,7 +40,6 @@ public class HeaderNodeImpl implements IHeaderNode {
 		this.typedNode = node;
 		this.isFunction = true;
 		this.variableName = node.getVariableName();
-		this.hasNode = true;
 	}
 
 	/**
@@ -56,7 +53,6 @@ public class HeaderNodeImpl implements IHeaderNode {
 		this.variableName = variableName;
 		this.node = new ASTNullNode(prototype);
 		this.typedNode = null;
-		this.hasNode = false;
 	}
 
 	@Override
@@ -104,12 +100,15 @@ public class HeaderNodeImpl implements IHeaderNode {
 	}
 
 	@Override
-	public boolean hasNode() {
-		return hasNode;
+	public String toString() {
+		return NullUtil.messageFormat("HeaderNodeImpl({0},source={1})", variableName, source);
 	}
 
 	@Override
-	public String toString() {
-		return NullUtil.messageFormat("HeaderNodeImpl({0},source={1})", variableName, source);
+	public Node getDeclarationNode() {
+		final Node parent = node.jjtGetParent();
+		if (!isFunction && parent != null)
+			return parent;
+		return node;
 	}
 }

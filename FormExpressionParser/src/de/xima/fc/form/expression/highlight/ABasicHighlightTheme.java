@@ -1,92 +1,5 @@
 package de.xima.fc.form.expression.highlight;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Ampersand;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AmpersandEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleCloseEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.AngleOpenEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BackslashQuotedRegex;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Bar;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BarEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BracesClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BracesOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BracketClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.BracketOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Break;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Case;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Catch;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Circumflex;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.CircumflexEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Colon;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Comma;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Continue;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Dash;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DashEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Default;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Do;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Dot;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleAmpersand;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleAmpersandEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleAngleCloseEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleAngleOpenEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleBar;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleBarEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleDash;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoublePlus;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleQuotedString;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleStar;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.DoubleStarEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Else;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Equal;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Exclamation;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ExclamationDoubleEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ExclamationEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.False;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Float;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.For;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Function;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Global;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Identifier;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.IdentifierAfterDot;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.If;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Integer;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LambdaArrow;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LogDebug;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LogError;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LogInfo;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LogWarn;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosBodyClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosChar;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.LosOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.MultiLineComment;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Null;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenClose;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ParenOpen;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Percent;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PercentEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Plus;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.PlusEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.QuestionMark;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Require;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Return;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Scope;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.ScopeSeparator;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SemiColon;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleLineComment;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SingleQuotedString;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Slash;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.SlashEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Star;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.StarEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Switch;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Throw;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.TripleEqual;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.True;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Try;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.Var;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.While;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.With;
-import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.__Exception;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.*;
 
 /**
  * Groups several similar tokens and allows you to specify a style
@@ -125,9 +38,30 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case Global:
 		case Scope:
 		case Require:
-		case Var:
 		case __Exception:
 			return getStyleKeyword();
+
+		case Array:
+		case Boolean:
+		case __Error:
+		case Hash:
+		case Method:
+		case Number:
+		case Regex:
+		case String:
+		case Var:
+		case Void:
+		case TypeArray:
+		case TypeBoolean:
+		case TypeError:
+		case TypeHash:
+		case TypeMethod:
+		case TypeNumber:
+		case TypeRegex:
+		case TypeString:
+		case TypeVar:
+		case TypeVoid:
+			return getStyleType();
 
 		case Identifier:
 			return getStyleIdentifier();
@@ -169,7 +103,9 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 
 		case Ampersand:
 		case AngleClose:
+		case TypeAngleClose:
 		case AngleOpen:
+		case TypeAngleOpen:
 		case Bar:
 		case Circumflex:
 		case Dash:
@@ -211,6 +147,9 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case SemiColon:
 		case Colon:
 		case Comma:
+		case TripleDot:
+		case TypeTripleDot:
+		case TypeComma:
 		case ScopeSeparator:
 			return getStylePunctuation();
 
@@ -223,6 +162,8 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 
 		case SingleLineComment:
 		case MultiLineComment:
+		case TypeMultiLineComment:
+		case TypeSingleLineComment:
 			return getStyleComment();
 
 		default:
@@ -231,6 +172,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 	}
 
 	protected abstract Style getStyleKeyword();
+	protected abstract Style getStyleType();
 	protected abstract Style getStyleIdentifier();
 	/** @return Style for identifiers after a dot, eg. <code>myVar.someAttribute()</code>.*/
 	protected abstract Style getStyleAttributeIdentifier();

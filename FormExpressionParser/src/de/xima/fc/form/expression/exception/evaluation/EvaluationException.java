@@ -5,6 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.IPositionedError;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.ITraceElement;
@@ -13,8 +15,11 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public class EvaluationException extends Exception {
+public class EvaluationException extends Exception implements IPositionedError {
 	private static final long serialVersionUID = 1L;
+
+	private static int beginLine, beginColumn, endLine, endColumn;
+	private static boolean hasPosition;
 
 	public EvaluationException(@Nullable final EvaluationException exception) {
 		super(exception);
@@ -85,6 +90,7 @@ public class EvaluationException extends Exception {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(msg).append(System.lineSeparator());
 		if (ec != null) {
+			setPositionInfo(ec.getTracer().getCurrentlyProcessed());
 			appendTraceElement(sb, ec.getTracer().getCurrentlyProcessed());
 			for (final ITraceElement el : ec.getTracer().getStackTrace()) {
 				sb.append(System.lineSeparator());
@@ -118,6 +124,16 @@ public class EvaluationException extends Exception {
 		return NullUtil.checkNotNull(sb.toString());
 	}
 
+	private static void setPositionInfo(@Nullable final Node node) {
+		if (node != null) {
+			hasPosition = true;
+			beginLine = node.getBeginLine();
+			beginColumn = node.getBeginColumn();
+			endLine = node.getEndLine();
+			endColumn = node.getEndColumn();
+		}
+	}
+
 	private static void appendObject(final StringBuilder sb, final String format, final Object object) {
 		sb.append(NullUtil.messageFormat(format, object, object.getClass().getCanonicalName()))
 				.append(System.lineSeparator());
@@ -126,8 +142,8 @@ public class EvaluationException extends Exception {
 	private static void appendTraceElement(final StringBuilder sb, @Nullable final ITraceElement el) {
 		sb.append('\t');
 		if (el != null)
-			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_KNOWN_POSITION, el.getMethodName(), el.getStartLine(),
-					el.getStartColumn()));
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_KNOWN_POSITION, el.getMethodName(), el.getBeginLine(),
+					el.getBeginColumn()));
 		else
 			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_UNKNOWN_POSITION));
 	}
@@ -142,4 +158,29 @@ public class EvaluationException extends Exception {
 
 	@Nullable
 	public final transient IExternalContext externalContext;
+
+	@Override
+	public boolean isPositionInformationAvailable() {
+		return hasPosition;
+	}
+
+	@Override
+	public int getBeginLine() {
+		return beginLine;
+	}
+
+	@Override
+	public int getEndLine() {
+		return endLine;
+	}
+
+	@Override
+	public int getBeginColumn() {
+		return beginColumn;
+	}
+
+	@Override
+	public int getEndColumn() {
+		return endColumn;
+	}
 }

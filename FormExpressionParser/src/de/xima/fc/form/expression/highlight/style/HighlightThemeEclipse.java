@@ -93,4 +93,8 @@ public class HighlightThemeEclipse extends ABasicHighlightTheme {
 	public static IHighlightTheme getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
+	@Override
+	protected Style getStyleType() {
+		return new Style(Color.BLACK);
+	}
 }

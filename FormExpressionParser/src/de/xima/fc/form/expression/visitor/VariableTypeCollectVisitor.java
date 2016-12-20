@@ -170,8 +170,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		else
 			type = SimpleVariableType.OBJECT;
 		resolveTypedNode(header, header.getNode(), type);
-		if (header.hasNode())
-			header.getNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
+		header.getNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
 	}
 
 	private void visitScopeDefs(final IScopeDefinitions scopeDefs) throws SemanticsException {

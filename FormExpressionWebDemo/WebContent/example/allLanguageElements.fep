@@ -97,7 +97,7 @@ switch (name) {
 // Labels
 // Supported, but remember good coding styles!
 while<outer> (true) {
-  for<inner> (i : 10) {
+  for<inner> (i in 10) {
     if (i > 5) break outer;
     continue inner;
   }
@@ -113,9 +113,7 @@ catch (e) {
 
 // Functions
 function foo(bar, baz) {
-  arguments; // => An array with the arguments actually passed to the function.
-  baz; // May be null when only 1 argument has been given.
-  return arguments.length == 2 ? bar + baz : null; // Return is optional. Functions return the last evaluated statement.
+  return (bar != null ? bar : "") + (baz != null ? baz : "");
 }
 foo(1,2);      // => 3
 foo("1", "2"); // => "12"

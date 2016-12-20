@@ -14,8 +14,8 @@ public class GenericWarning implements IEvaluationWarning {
 
 	public GenericWarning(final String message, final Node node) {
 		this.message = message;
-		startColumn = node.getStartColumn();
-		startLine = node.getStartLine();
+		startColumn = node.getBeginColumn();
+		startLine = node.getBeginLine();
 		endColumn = node.getEndColumn();
 		endLine = node.getEndLine();
 	}
@@ -24,8 +24,8 @@ public class GenericWarning implements IEvaluationWarning {
 		this.message = message;
 		final Node node = ec.getTracer().getCurrentlyProcessed();
 		if (node != null) {
-			startColumn = node.getStartColumn();
-			startLine = node.getStartLine();
+			startColumn = node.getBeginColumn();
+			startLine = node.getBeginLine();
 			endColumn = node.getEndColumn();
 			endLine = node.getEndLine();
 		}
@@ -40,12 +40,12 @@ public class GenericWarning implements IEvaluationWarning {
 	}
 
 	@Override
-	public final int getStartLine() {
+	public final int getBeginLine() {
 		return startLine;
 	}
 
 	@Override
-	public final int getStartColumn() {
+	public final int getBeginColumn() {
 		return startColumn;
 	}
 

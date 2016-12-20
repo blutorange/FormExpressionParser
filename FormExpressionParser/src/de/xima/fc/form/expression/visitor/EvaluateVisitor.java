@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
@@ -87,17 +88,18 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangObject, EvaluationException> {
 
-	@Nonnull
 	private ALangObject currentResult = NullLangObject.getInstance();
-	@Nonnull
 	private final IEvaluationContext ec;
 	private boolean mustJump;
+	@Nullable
 	private EJump jumpType;
+	@Nullable
 	private String jumpLabel;
 
-	private EvaluateVisitor(@Nonnull final IEvaluationContext ec)
+	private EvaluateVisitor(final IEvaluationContext ec)
 			throws EvaluationException {
 		reinit();
 		this.ec = ec;
@@ -111,7 +113,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	}
 
 	private void assertNoJumps() throws UncatchableEvaluationException {
-		if (mustJump) {
+		if (mustJump && jumpType != null) {
 			switch (jumpType) {
 			case BREAK:
 				throw new BreakClauseException(jumpLabel, ec);
@@ -126,9 +128,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		}
 	}
 
-	@Nonnull
-	private ALangObject jjtAccept(@Nonnull final Node parentNode, @Nullable final Node node,
-			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+	private ALangObject jjtAccept(final Node parentNode, @Nullable final Node node,
+			final IEvaluationContext ec) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		ec.getTracer().setCurrentlyProcessed(node);
@@ -141,9 +142,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		}
 	}
 
-	@Nonnull
-	private ALangObject setVariable(@Nullable final IScopedSourceResolvable node, @Nonnull final ALangObject val,
-			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+	private ALangObject setVariable(@Nullable final IScopedSourceResolvable node, final ALangObject val,
+			final IEvaluationContext ec) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
 		switch (node.getSource()) {
@@ -158,9 +158,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		}
 	}
 
-	@Nonnull
-	private ALangObject setSimpleVariable(@Nullable final ISourceResolvable node, @Nonnull final ALangObject val,
-			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+	private ALangObject setSimpleVariable(@Nullable final ISourceResolvable node, final ALangObject val,
+			final IEvaluationContext ec) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
 		if (node.getSource() < 0)
@@ -169,8 +168,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return val;
 	}
 
-	@Nonnull
-	private ALangObject[] evaluateChildren(@Nonnull final Node node, @Nonnull final IEvaluationContext ec)
+	private ALangObject[] evaluateChildren(final Node node, final IEvaluationContext ec)
 			throws EvaluationException {
 		final int len = node.jjtGetNumChildren();
 		final ALangObject[] res = new ALangObject[len];
@@ -179,9 +177,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return res;
 	}
 
-	@Nonnull
-	private ALangObject evaluatePropertyExpression(@Nonnull final Node parentNode, final int indexOneAfterEnd,
-			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+	private ALangObject evaluatePropertyExpression(final Node parentNode, final int indexOneAfterEnd,
+			final IEvaluationContext ec) throws EvaluationException {
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
 		ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0), ec);
@@ -218,7 +215,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				}
 
 				// Check for disallowed break / continue clauses.
-				if (mustJump) {
+				if (mustJump && jumpType != null) {
 					switch (jumpType) {
 					case RETURN:
 						mustJump = false;
@@ -241,9 +238,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return res;
 	}
 
-	@Nonnull
-	private ALangObject performAssignment(@Nonnull final Node node, @Nullable final Node child,
-			@Nullable final EMethod method, @Nullable ALangObject assignee, @Nonnull final IEvaluationContext ec)
+	private ALangObject performAssignment(final Node node, @Nullable final Node child,
+			@Nullable final EMethod method, @Nullable ALangObject assignee, final IEvaluationContext ec)
 					throws EvaluationException {
 		if (child == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
@@ -312,9 +308,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return assignee;
 	}
 
-	@Nonnull
-	private ALangObject performPostUnaryAssignment(@Nonnull final Node node, @Nullable final Node child,
-			@Nonnull final EMethod method, @Nonnull final IEvaluationContext ec) throws EvaluationException {
+	private ALangObject performPostUnaryAssignment(final Node node, @Nullable final Node child,
+			final EMethod method, final IEvaluationContext ec) throws EvaluationException {
 		if (child == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		final ALangObject res, tmp;
@@ -903,9 +898,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	 * @throws EvaluationException
 	 *             When the code cannot be evaluated.
 	 */
-	@Nonnull
-	public static ALangObject evaluateCode(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
-			@Nonnull final IEvaluationContext ec) throws EvaluationException {
+	public static ALangObject evaluateCode(final Node node, final IScopeDefinitions scopeDefs,
+			final IEvaluationContext ec) throws EvaluationException {
 		final EvaluateVisitor v = new EvaluateVisitor(ec);
 		final ALangObject res;
 		final IExternalContext ex = ec.getExternalContext();
@@ -924,17 +918,16 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		return res;
 	}
 
-	private void applyScopeDefs(@Nonnull final IScopeDefinitions scopeDefs) throws EvaluationException {
+	private void applyScopeDefs(final IScopeDefinitions scopeDefs) throws EvaluationException {
 		applyAll(scopeDefs.getGlobal());
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
-			applyAll(coll);
+			if (coll != null)
+				applyAll(coll);
 	}
 
 	private void applyAll(final Collection<IHeaderNode> coll) throws EvaluationException {
 		for (final IHeaderNode header : coll) {
-			if (header.hasNode()) {
-				ec.getSymbolTable()[header.getSource()].setCurrentObject(header.getNode().jjtAccept(this));
-			}
+			ec.getSymbolTable()[header.getSource()].setCurrentObject(header.getNode().jjtAccept(this));
 		}
 	}
 }

@@ -1,2 +1,1 @@
-[%%require scope field;%]
-[%tf1.length =~ #^HELLO$#%]
+if (i==0) { alert() }

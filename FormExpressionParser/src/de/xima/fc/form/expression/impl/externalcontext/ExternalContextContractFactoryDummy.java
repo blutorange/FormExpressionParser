@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 
 @ParametersAreNonnullByDefault
 public final class ExternalContextContractFactoryDummy<T> extends AGenericExternalContextFactory<T> {

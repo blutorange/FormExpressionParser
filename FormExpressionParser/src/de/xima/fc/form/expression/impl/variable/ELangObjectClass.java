@@ -31,7 +31,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @ParametersAreNonnullByDefault
 public enum ELangObjectClass implements ILangObjectClass {
-	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.OBJECT, false) {
+	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.VAR, false) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();

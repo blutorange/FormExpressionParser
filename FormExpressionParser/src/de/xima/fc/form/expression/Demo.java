@@ -34,6 +34,20 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
+//TODO consider enlargening the type system
+// allow lower OR upper bound
+// Generics limited by
+//   extends this class or sub type; upper bound
+//     return type of function can be this type or super type
+//       List<Number> m = new ArrayList<>();
+//       List<? extends Number > extend = m;
+//       Object n = extend.get(0);	//   super  this class or super type, lower bound
+//  super this class or super type, lower bound
+//     parameters passed into function can be this type or sub type
+//       List<Number> m = new ArrayList<>();
+//       List<? super Number > extend = m;
+//       extend.add(new Float(2));
+
 /**
  * TODO
  * - check all serializable / immutable classes
@@ -41,7 +55,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  * - unparse: los nicer
  * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
  * - update formatting js
- * - update highlighter with new token types (global, scope, require etc)
  */
 public class Demo {
 	@Nonnull
@@ -49,11 +62,11 @@ public class Demo {
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 
-	public static void main(final String args[]) {
+	public static void main(final String args[]) throws ParseException, TokenMgrError, EvaluationException {
 		final String code = readArgs(args);
 		if (code == null)
 			throw new FormExpressionException("Code must not be null."); //$NON-NLS-1$
@@ -104,8 +117,8 @@ public class Demo {
 					expression.analyze(new Formcycle()));
 			Collections.sort(warningList, IEvaluationWarning.COMPARATOR);
 			for (final IEvaluationWarning warning : warningList) {
-				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getStartLine(),
-						warning.getStartColumn(), warning.getMessage()));
+				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getBeginLine(),
+						warning.getBeginColumn(), warning.getMessage()));
 				System.out.println();
 			}
 		}

@@ -7,8 +7,8 @@ import javax.annotation.Nonnull;
 public interface IEvaluationWarning {
 	@Nonnull
 	public String getMessage();
-	public int getStartLine();
-	public int getStartColumn();
+	public int getBeginLine();
+	public int getBeginColumn();
 	public int getEndLine();
 	public int getEndColumn();
 
@@ -17,14 +17,14 @@ public interface IEvaluationWarning {
 		public int compare(final IEvaluationWarning o1, final IEvaluationWarning o2) {
 			if (o1 == null || o2 == null)
 				throw new NullPointerException();
-			if (o1.getStartLine() == o2.getStartLine()) {
-				if (o1.getStartColumn() < o2.getStartColumn())
+			if (o1.getBeginLine() == o2.getBeginLine()) {
+				if (o1.getBeginColumn() < o2.getBeginColumn())
 					return -1;
-				else if (o1.getStartColumn() == o2.getStartColumn())
+				else if (o1.getBeginColumn() == o2.getBeginColumn())
 					return 0;
 				return 1;
 			}
-			if (o1.getStartLine() < o2.getStartLine())
+			if (o1.getBeginLine() < o2.getBeginLine())
 				return -1;
 			return 1;
 		}

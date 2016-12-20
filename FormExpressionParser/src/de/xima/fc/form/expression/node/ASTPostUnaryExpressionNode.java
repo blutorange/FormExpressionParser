@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -13,15 +14,16 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class ASTPostUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
-	@Nonnull private EMethod unaryMethod = EMethod.PLUS_UNARY;
+	private EMethod unaryMethod = EMethod.PLUS_UNARY;
 
-	public ASTPostUnaryExpressionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTPostUnaryExpressionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	public final void init(final EMethod method, @Nonnull final EMethod unary) throws ParseException {
+	public final void init(final EMethod method, final EMethod unary) throws ParseException {
 		assertChildrenExactly(1);
 		NullUtil.checkNotNull(unary);
 		if (unary.isAssigning())
@@ -30,6 +32,7 @@ public class ASTPostUnaryExpressionNode extends ANode {
 		unaryMethod = unary;
 	}
 
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		throw new ArrayIndexOutOfBoundsException();
@@ -40,13 +43,17 @@ public class ASTPostUnaryExpressionNode extends ANode {
 		sb.append(unaryMethod).append(',');
 	}
 
-	@Nonnull
 	public EMethod getUnaryMethod() {
 		return unaryMethod;
 	}
 
+	public Node getUnaryNode() {
+		return jjtGetChild(0);
+	}
+
 	@Override
-	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor,
+			final T data) throws E {
 		return visitor.visit(this, data);
 	}
 
@@ -56,7 +63,8 @@ public class ASTPostUnaryExpressionNode extends ANode {
 	}
 
 	@Override
-	public <T, E extends Throwable> void jjtAccept(final IFormExpressionVoidDataVisitor<T, E> visitor, final T data) throws E {
+	public <T, E extends Throwable> void jjtAccept(final IFormExpressionVoidDataVisitor<T, E> visitor, final T data)
+			throws E {
 		visitor.visit(this, data);
 	}
 

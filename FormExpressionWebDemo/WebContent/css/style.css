@@ -6,9 +6,13 @@ textarea {
 }
 
 #output {
-    border: 1px solid black;
-    padding: 10px;
-    margin: 2px;
-    overflow: scroll;
-    max-height: 80vh;
+	border: 1px solid black;
+	padding: 10px;
+	margin: 2px;
+	overflow: scroll;
+	max-height: 80vh;
+}
+
+.erronousCode {
+	text-decoration: underline;
 }

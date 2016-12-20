@@ -1,13 +1,14 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 	FORM_FIELD_SILENT(CmnCnst.CustomScope.PREFIX_FORM_FIELD_SILENT, false, CmnCnst.CustomScope.FORM_FIELD),
 	SYSTEM_SILENT(CmnCnst.CustomScope.PREFIX_FC_SYSTEM_SILENT, false, CmnCnst.CustomScope.FC_SYSTEM),
@@ -17,10 +18,10 @@ public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 	TEMPLATE_VERBOSE(CmnCnst.CustomScope.PREFIX_TEMPLATE_VERBOSE, true, CmnCnst.CustomScope.TEMPLATE),
 	;
 
-	@Nonnull private final String name;
-	@Nonnull private final String[] scopeList;
+	private final String name;
+	private final String[] scopeList;
 	private final boolean doOutput;
-	private EmbedmentHandlerBundleFormcycle(@Nonnull final String name, final boolean doOutput, @Nullable final String... scopeList) {
+	private EmbedmentHandlerBundleFormcycle(final String name, final boolean doOutput, @Nullable final String... scopeList) {
 		checkNotNull(name);
 		this.name = name;
 		this.doOutput = doOutput;

@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
-import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 
 public abstract class AGenericExternalContextFactory<T> implements IExternalContextContractFactory<T> {

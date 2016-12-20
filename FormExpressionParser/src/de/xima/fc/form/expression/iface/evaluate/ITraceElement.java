@@ -12,8 +12,8 @@ import de.xima.fc.form.expression.grammar.Node;
  * @author madgaksha
  */
 public interface ITraceElement {
-	public int getStartLine();
-	public int getStartColumn();
+	public int getBeginLine();
+	public int getBeginColumn();
 	public int getEndLine();
 	public int getEndColumn();
 	@Nonnull public String getMethodName();

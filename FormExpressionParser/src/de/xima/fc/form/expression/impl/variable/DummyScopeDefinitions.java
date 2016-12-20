@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 
 public enum DummyScopeDefinitions implements IScopeDefinitions {
 	INSTANCE;
-	
+
 	@Override
 	public ImmutableCollection<String> getExternal() {
 		return ImmutableList.of();
@@ -23,15 +23,5 @@ public enum DummyScopeDefinitions implements IScopeDefinitions {
 	@Override
 	public ImmutableMap<String, ImmutableCollection<IHeaderNode>> getManual() {
 		return ImmutableMap.of();
-	}
-
-	@Override
-	public boolean hasGlobalVariable() {
-		return false;
-	}
-
-	@Override
-	public boolean hasGlobalFunction() {
-		return false;
 	}
 }

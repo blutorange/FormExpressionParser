@@ -357,7 +357,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		@SuppressWarnings("unchecked")
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) dotAccessor(property, ec);
 		if (func == null)
-			throw new NoSuchAttrAccessorException(property, this, ec);
+			throw new NoSuchAttrAccessorException(property, this, true, ec);
 		return func.evaluate(ec, this, StringLangObject.create(property));
 	}
 
@@ -370,7 +370,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		@SuppressWarnings("unchecked")
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAccessor(property, ec);
 		if (func == null)
-			throw new NoSuchAttrAccessorException(NullUtil.toString(property), this, ec);
+			throw new NoSuchAttrAccessorException(NullUtil.toString(property), this, false, ec);
 		return func.evaluate(ec, this, property);
 	}
 
@@ -383,7 +383,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		@SuppressWarnings("unchecked")
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) dotAssigner(property, value, ec);
 		if (func == null)
-			throw new NoSuchAttrAssignerException(property, this, ec);
+			throw new NoSuchAttrAssignerException(property, this, true, ec);
 		func.evaluate(ec, this, StringLangObject.create(property), value);
 	}
 
@@ -396,7 +396,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		@SuppressWarnings("unchecked")
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAssigner(property, value, ec);
 		if (func == null)
-			throw new NoSuchAttrAssignerException(NullUtil.toString(property), this, ec);
+			throw new NoSuchAttrAssignerException(NullUtil.toString(property), this, false, ec);
 		func.evaluate(ec, this, property, value);
 	}
 

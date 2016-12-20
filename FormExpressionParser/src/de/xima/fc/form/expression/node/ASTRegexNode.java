@@ -40,7 +40,7 @@ public class ASTRegexNode extends ANode {
 		}
 		catch (final PatternSyntaxException e) {
 			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_REGEX,
-					new Integer(getStartLine()), new Integer(getStartColumn()), e.getMessage()));
+					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));
 		}
 	}
 

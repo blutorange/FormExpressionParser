@@ -7,8 +7,11 @@ CodeMirror.defineSimpleMode("formexpression-program", {
     {regex: /#(?:[^\\]|\\.)*?(?:#|$)[msi]*/, token: "string-2"},
     {regex: /(for|switch|do|while)(\s*)(<[a-zA-Z_][a-zA-Z0-9_]*>)/, token: ["keyword", null, "def"]},
     {regex: /(break|continue)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)/, token: ["keyword", null, "def"]},
-    {regex: /(function)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)/, token: ["keyword", null, "variable-2"]},    
-    {regex: /(?:var|global|scope|require|boolean|number|string|regex|error|array|hash|method)\b/, token: "def"},
+    {regex: /(function)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)/, token: ["keyword", null, "meta", null, "variable"]},
+    {regex: /(function)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)/, token: ["keyword", null, "variable"]},
+    {regex: /(require)(\s+)(scope)(\s+)([a-zA-Z_][a-zA-Z0-9_$]*)/, token: ["def", null, "def", null, "qualifier"]},
+    {regex: /(?:global|scope|require)\b/, token: "def"},
+    {regex: /(?:var|boolean|number|string|regex|error|array|hash|method|void)\b/, token: "meta"},
     {regex: /(?:function|with|return|throw|continue|in|break|if|for|while|else|do|try|catch|switch|case|default|loginfo|logwarn|logerror|logdebug)\b/, token: "keyword"},
     {regex: /true|false|null|exception/, token: "atom"},
     {regex: /[-+]?(?:\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?/, token: "number"},
@@ -16,14 +19,14 @@ CodeMirror.defineSimpleMode("formexpression-program", {
     {regex: /\/\/.*/, token: "comment"},
     // Multi line comment.
     {regex: /\/\*/, token: "comment", next: "comment"},
-    {regex: /[-+\/*=<>!]+/, token: "operator"},
+    {regex: /[-+\/*=<>!~\?]+/, token: "operator"},
     // indent and dedent properties guide autoindentation
     {regex: /[\{\[\(]/, indent: true},
     {regex: /[\}\]\)]/, dedent: true},
     // Scoped variables
     {regex: /([a-zA-Z_][a-zA-Z0-9_]*)(::)/, token: ["qualifier", null]},
     // Normal variables
-    {regex: /(\.)([a-zA-Z_][a-zA-Z0-9_]*)/, token: ["operator", "variable-3"]},
+    {regex: /(\.)([a-zA-Z_][a-zA-Z0-9_]*)/, token: ["operator", "variable-2"]},
     {regex: /[a-zA-Z_][a-zA-Z0-9_$]*/, token: "variable"}
   ],
   // The multi-line comment state.

@@ -9,10 +9,11 @@ import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 
 public class GenericSourceResolvable implements ISourceResolvable, Serializable {
 	private static final long serialVersionUID = 1L;
+
 	@Nonnull
 	private final String name;
-	
 	private int source = EVariableSource.ID_UNRESOLVED;
+
 	public GenericSourceResolvable(@Nonnull final String name) {
 		this.name = name;
 	}
@@ -22,17 +23,17 @@ public class GenericSourceResolvable implements ISourceResolvable, Serializable 
 		if (this.source == EVariableSource.ID_UNRESOLVED)
 			this.source = source;
 	}
-	
+
 	@Override
 	public int getSource() {
 		return source;
 	}
-	
+
 	@Override
 	public boolean isResolved() {
 		return source != EVariableSource.ID_UNRESOLVED;
 	}
-	
+
 	@Override
 	public String getVariableName() {
 		return name;

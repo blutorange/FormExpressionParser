@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.externalcontext;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -11,13 +11,14 @@ import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
-import de.xima.fc.form.expression.iface.evaluate.IExternalContextContractFactory;
+import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 import de.xima.fc.form.expression.impl.contextcommand.ESystemOutCommand;
 import de.xima.fc.form.expression.impl.warning.GenericWarning;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class ExternalContextContractFactoryWriter extends AGenericExternalContextFactory<Writer> {
 	private static final long serialVersionUID = 1L;
 
@@ -26,13 +27,11 @@ public class ExternalContextContractFactoryWriter extends AGenericExternalContex
 		return new ExImpl(writer);
 	}
 
-	@Nonnull
 	public static IExternalContextContractFactory<Writer> getInstance() {
 		return InstanceHolder.INSTANCE;
 	}
 
 	private static class InstanceHolder {
-		@Nonnull
 		public final static IExternalContextContractFactory<Writer> INSTANCE = new ExternalContextContractFactoryWriter();
 	}
 
@@ -72,7 +71,7 @@ public class ExternalContextContractFactoryWriter extends AGenericExternalContex
 		 */
 		@Override
 		public String toString() {
-			return writer.toString();
+			return NullUtil.checkNotNull(writer.toString());
 		}
 
 		@Override
@@ -95,7 +94,7 @@ public class ExternalContextContractFactoryWriter extends AGenericExternalContex
 				}
 			}
 			else {
-				ec.getLogger().info(String.format(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
+				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
 			}
 		}
 

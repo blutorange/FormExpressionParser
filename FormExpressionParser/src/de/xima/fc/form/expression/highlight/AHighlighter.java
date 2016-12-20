@@ -43,7 +43,7 @@ public abstract class AHighlighter {
 		else {
 			// Process joined los token.
 			if (embed.length() > 0 && embedBegin != null && embedEnd != null)
-				processToken(AToken.newToken(FormExpressionParserConstants.LosChar, embed.toString(), embedBegin.beginLine,
+				processToken(AToken.newToken(FormExpressionParserConstants.LosChar, NullUtil.toString(embed), embedBegin.beginLine,
 						embedBegin.beginColumn, embedEnd.endLine, embedEnd.endColumn), styleList);
 			embed.setLength(0);
 			// Process comment tokens, when present.
@@ -60,7 +60,7 @@ public abstract class AHighlighter {
 	private void finishInternal() throws IOException {
 		// Process joined los token.
 		if (embed.length() > 0 && embedBegin != null && embedEnd != null)
-			processToken(AToken.newToken(FormExpressionParserConstants.LosChar, embed.toString(), embedBegin.beginLine,
+			processToken(AToken.newToken(FormExpressionParserConstants.LosChar, NullUtil.toString(embed), embedBegin.beginLine,
 					embedBegin.beginColumn, embedEnd.endLine, embedEnd.endColumn), styleList);
 		embed.setLength(0);
 		styleList.clear();
