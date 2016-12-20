@@ -1,1 +1,4 @@
-if (i==0) { alert() }
+global scope {
+  array<var> a;
+}
+[].push(1,2,3);
