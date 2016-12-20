@@ -530,12 +530,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 							throw new UnreachableCodeException(node.getPropertyNode(i));
 						infoRes.unifyJumps(infoVarArg);
 						typeVarArg = typeVarArg.union(infoVarArg.getImplicitType());
-						final IVariableType typeActualVarArgArray = GenericVariableType.forArray(typeVarArg);
-						final IVariableType typeDeclaredVarArgArray = GenericVariableType
-								.forArray(typeFunction.getGeneric(typeFunction.getGenericCount() - 1));
-						if (!typeDeclaredVarArgArray.isAssignableFrom(typeActualVarArgArray))
+						if (!typeFunction.getGeneric(typeFunction.getGenericCount() - 1).isAssignableFrom(typeVarArg))
 							throw new IncompatibleFunctionParameterTypeException(
-									typeFunction.getGeneric(typeFunction.getGenericCount() - 1).getGeneric(0),
+									typeFunction.getGeneric(typeFunction.getGenericCount() - 1),
 									infoVarArg.getImplicitType(), node.getParenthesisArgNode(i, j));
 					}
 				}
@@ -549,7 +546,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					final NodeInfo infoArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
 					if (!infoArg.hasImplicitType())
 							throw new UnreachableCodeException(node.getPropertyNode(i));
-					if (!infoArg.getImplicitType().isAssignableFrom(typeFunction.getGeneric(j+1)))
+					if (!typeFunction.getGeneric(j+1).isAssignableFrom(infoArg.getImplicitType()))
 						throw new IncompatibleFunctionParameterTypeException(typeFunction.getGeneric(j + 1),
 								infoArg.getImplicitType(), node.getParenthesisArgNode(i, j));
 					infoRes.unifyJumps(infoArg);
