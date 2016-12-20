@@ -58,11 +58,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return GenericVariableType.forArray(thisContext.getGeneric(0));
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.ARRAY;
 			}
 			@Override
@@ -88,11 +88,11 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 				return GenericVariableType.forArray(thisContext.getGeneric(0));
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return GenericVariableType.forArray(thisContext.getGeneric(0));
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.ARRAY;
 			}
 			@Override

@@ -340,12 +340,10 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// that of the current run-time class or some super class.
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
-		@SuppressWarnings({ "unchecked", "null" })
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) expressionMethod(method,
-				args.length > 0 && args[0] != null ? args[0] : NullLangObject.getInstance(), ec);
+		@SuppressWarnings({ "unchecked" })
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) expressionMethod(method, ec);
 		if (func == null)
-			throw new NoSuchMethodException(method, this,
-					args.length > 0 && args[0] != null ? args[0] : NullLangObject.getInstance(), ec);
+			throw new NoSuchMethodException(method, this, ec);
 		return ALangObject.create(func.evaluate(ec, this, args));
 	}
 
@@ -369,7 +367,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAccessor(property, ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAccessor(ec);
 		if (func == null)
 			throw new NoSuchAttrAccessorException(NullUtil.toString(property), this, false, ec);
 		return func.evaluate(ec, this, property);
@@ -382,7 +380,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) dotAssigner(property, value, ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) dotAssigner(property, ec);
 		if (func == null)
 			throw new NoSuchAttrAssignerException(property, this, true, ec);
 		func.evaluate(ec, this, StringLangObject.create(property), value);
@@ -395,15 +393,15 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		// This is better than having to add all 10 methods to each subclass to
 		// get the correct generics type.
 		@SuppressWarnings("unchecked")
-		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAssigner(property, value, ec);
+		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAssigner(ec);
 		if (func == null)
 			throw new NoSuchAttrAssignerException(NullUtil.toString(property), this, false, ec);
 		func.evaluate(ec, this, property, value);
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> expressionMethod(final EMethod method, final ALangObject rhs, final IEvaluationContext ec) {
-		return ec.getNamespace().expressionMethod(getObjectClass(), method, rhs.getObjectClass());
+	public final IFunction<? extends ALangObject> expressionMethod(final EMethod method, final IEvaluationContext ec) {
+		return ec.getNamespace().expressionMethod(getObjectClass(), method);
 	}
 
 	@Nullable
@@ -412,21 +410,18 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> dotAssigner(final String property, final ALangObject value,
-			final IEvaluationContext ec) {
-		return ec.getNamespace().dotAssigner(getObjectClass(), property, value.getObjectClass());
+	public final IFunction<? extends ALangObject> dotAssigner(final String property, final IEvaluationContext ec) {
+		return ec.getNamespace().dotAssigner(getObjectClass(), property);
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> bracketAccessor(final ALangObject property,
-			final IEvaluationContext ec) {
-		return ec.getNamespace().bracketAccessor(getObjectClass(), property.getObjectClass());
+	public final IFunction<? extends ALangObject> bracketAccessor(final IEvaluationContext ec) {
+		return ec.getNamespace().bracketAccessor(getObjectClass());
 	}
 
 	@Nullable
-	public final IFunction<? extends ALangObject> bracketAssigner(final ALangObject property, final ALangObject value,
-			final IEvaluationContext ec) {
-		return ec.getNamespace().bracketAssigner(getObjectClass(), property.getObjectClass(), value.getObjectClass());
+	public final IFunction<? extends ALangObject> bracketAssigner(final IEvaluationContext ec) {
+		return ec.getNamespace().bracketAssigner(getObjectClass());
 	}
 
 	public INonNullIterable<ALangObject> getIterable(final IEvaluationContext ec)

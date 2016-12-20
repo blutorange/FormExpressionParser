@@ -1,0 +1,26 @@
+// Computes the first n prime numbers.
+// Uses the sieve.
+scope algo {
+  function array<number> primeNumbers(number max) {
+    if (max < 2) return [];
+    number m = max;
+    array<number> arr = [];
+    for (number n in m)
+      arr.push(n);
+    arr.push(m);
+    for (number n = 2; n <= max; ++n) {
+      for (number r = n+n; r <= m; r+=n) {
+        arr[r] = -1;
+      }
+    }
+    array<number> primes = [];
+    for (number n in max-1) {
+      if (arr[n+2]>=0) {
+        primes.push(n+2);
+      }
+    }
+    return primes;
+  }
+}
+
+algo::primeNumbers(20);

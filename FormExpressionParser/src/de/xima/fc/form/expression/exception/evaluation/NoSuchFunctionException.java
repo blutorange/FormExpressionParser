@@ -18,7 +18,7 @@ public class NoSuchFunctionException extends CatchableEvaluationException {
 				NullUtil.messageFormat(
 						thisContext.isNull() ? CmnCnst.Error.NO_SUCH_FUNCTION_WITH_NULL
 								: CmnCnst.Error.NO_SUCH_FUNCTION_WITH_THIS,
-						type, name, thisContext.inspect(), thisContext.getObjectClass()));
+						type, name, thisContext.inspect()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}

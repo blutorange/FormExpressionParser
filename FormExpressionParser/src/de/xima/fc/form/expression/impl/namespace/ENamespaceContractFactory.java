@@ -74,25 +74,27 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 	}
 	@Nullable
 	@Override
-	public IVariableType getExpressionMethodReturnType(final IVariableType lhs, final EMethod method, final IVariableType rhs) {
-		return impl.getExpressionMethodReturnType(lhs, method, rhs);
-	}
-	@Override
-	public boolean isBracketAssignerDefined(final IVariableType thisContext, final IVariableType property, final IVariableType value) {
-		return impl.isBracketAssignerDefined(thisContext, property, value);
+	public IValueReturn getExpressionMethodInfo(final IVariableType thisContext, final EMethod method) {
+		return impl.getExpressionMethodInfo(thisContext, method);
 	}
 	@Nullable
 	@Override
-	public IVariableType getBracketAccessorReturnType(final IVariableType thisContext, final IVariableType property) {
-		return impl.getBracketAccessorReturnType(thisContext, property);
-	}
-	@Override
-	public boolean isDotAssignerDefined(final IVariableType thisContext, final String property, final IVariableType value) {
-		return impl.isDotAssignerDefined(thisContext, property, value);
+	public IPropertyValue getBracketAssignerInfo(final IVariableType thisContext) {
+		return impl.getBracketAssignerInfo(thisContext);
 	}
 	@Nullable
 	@Override
-	public IVariableType getDotAccessorReturnType(final IVariableType thisContext, final String property) {
-		return impl.getDotAccessorReturnType(thisContext, property);
+	public IPropertyReturn getBracketAccessorInfo(final IVariableType thisContext) {
+		return impl.getBracketAccessorInfo(thisContext);
+	}
+	@Nullable
+	@Override
+	public IValue getDotAssignerInfo(final IVariableType thisContext, final String property) {
+		return impl.getDotAssignerInfo(thisContext, property);
+	}
+	@Nullable
+	@Override
+	public IReturn getDotAccessorInfo(final IVariableType thisContext, final String property) {
+		return impl.getDotAccessorInfo(thisContext, property);
 	}
 }

@@ -1,11 +1,11 @@
 // Computes the first n prime numbers.
-// Uses the ...'s sieve.
+// Uses the sieve.
 scope algo {
   function primeNumbers(max) {
     if (max < 2) return [];
     var m = max;
     var arr = [];
-    for (n : m) arr.push(n);
+    for (n in m) arr.push(n);
     arr.push(m);
     for (var n = 2; n <= max; ++n) {
       for (var r = n+n; r <= m; r+=n) {
@@ -13,7 +13,7 @@ scope algo {
       }
     }
     var primes = [];
-    for (n : max-1) {
+    for (n in max-1) {
       if (arr[n+2]>=0) {
         primes.push(n+2);
       }
@@ -21,3 +21,5 @@ scope algo {
     return primes;
   }
 }
+
+algo::primeNumbers(20);

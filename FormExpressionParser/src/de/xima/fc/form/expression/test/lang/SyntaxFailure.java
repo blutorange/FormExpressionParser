@@ -8,16 +8,16 @@ import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignment
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAccessorTypeException;
-import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerTypeException;
-import de.xima.fc.form.expression.exception.parse.IncompatibleDotAccessorTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerValueTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleDotAssignerTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleExpressionMethodTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionParameterTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableAssignmentTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableConversionTypeException;
-import de.xima.fc.form.expression.exception.parse.IncompatibleVariableTypeForExpressionMethodException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVoidReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
+import de.xima.fc.form.expression.exception.parse.NoSuchDotAccessorException;
 import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclarationException;
@@ -80,15 +80,15 @@ enum SyntaxFailure implements ITestCase {
 	STRICT003(new Cfg("math::pi;").err("Error during parsing at line 1, column 1: Scope math is provided by the context, but require scope statement is missing. Strict mode requires importing scopes explicitly.").err(MissingRequireScopeStatementException.class).strict()),
 
 	VOID001(new Cfg("global scope{method<void> m;method<string,string> m2;}m2(m());").err("Error during parsing at line 1, column 58: Found incompatible variable type VOID but expected STRING: Function parameter type not compatible.").err(IncompatibleFunctionParameterTypeException.class).strict()),
-	VOID002(new Cfg("global scope{method<void> m;}m()+0;").err("Error during parsing at line 1, column 34: Expression method PLUS(+) for type VOID does not exist or does not accept the right hand side type NUMBER.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
-	VOID003(new Cfg("global scope{method<void> m;}0+m();").err("Error during parsing at line 1, column 32: Expression method PLUS(+) for type NUMBER does not exist or does not accept the right hand side type VOID.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
-	VOID004(new Cfg("global scope{method<void> m;}m().toString;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such dot accessor toString for this variable type.").err(IncompatibleDotAccessorTypeException.class).strict()),
+	VOID002(new Cfg("global scope{method<void> m;}m()+0;").err("Error during parsing at line 1, column 34: Expression method PLUS(+) for type VOID does not exist or does not accept the right hand side type NUMBER.").err(IncompatibleExpressionMethodTypeException.class).strict()),
+	VOID003(new Cfg("global scope{method<void> m;}0+m();").err("Error during parsing at line 1, column 32: Expression method PLUS(+) for type NUMBER does not exist or does not accept the right hand side type VOID.").err(IncompatibleExpressionMethodTypeException.class).strict()),
+	VOID004(new Cfg("Error during parsing at line 1, column 32: No such dot accesor named VOID for type toString.").err(NoSuchDotAccessorException.class).strict()),
 	VOID005(new Cfg("global scope{method<void> m;}m()[0];").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such bracket accessor of type NUMBER for this variable type.").err(IncompatibleBracketAccessorTypeException.class).strict()),
 	VOID006(new Cfg("global scope{method<void> m;}m().length=0;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such dot assigner length to type NUMBER for this variable type.").err(IncompatibleDotAssignerTypeException.class).strict()),
-	VOID007(new Cfg("global scope{method<void> m;}m()[0]=0;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such bracket assigner of type NUMBER to type NUMBER for this variable type.").err(IncompatibleBracketAssignerTypeException.class).strict()),
+	VOID007(new Cfg("global scope{method<void> m;}m()[0]=0;").err("Error during parsing at line 1, column 34: Found incompatible variable type VOID: No such bracket assigner of type NUMBER to type NUMBER for this variable type.").err(IncompatibleBracketAssignerValueTypeException.class).strict()),
 	VOID008(new Cfg("global scope{method<void> m;string v;}v=m();").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected STRING: Variable v cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
 	VOID009(new Cfg("global scope{method<void> m;var v;}v=m();").err("Error during parsing at line 1, column 36: Found incompatible variable type VOID but expected OBJECT: Variable v cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
-	VOID010(new Cfg("global scope{method<void> m;number v;}v+=m();").err("Error during parsing at line 1, column 39: Expression method PLUS(+) for type NUMBER does not exist or does not accept the right hand side type VOID.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
+	VOID010(new Cfg("global scope{method<void> m;number v;}v+=m();").err("Error during parsing at line 1, column 39: Expression method PLUS(+) for type NUMBER does not exist or does not accept the right hand side type VOID.").err(IncompatibleExpressionMethodTypeException.class).strict()),
 	VOID011(new Cfg("global scope{method<void> m;number v;}v=true ? 5 : m();").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected NUMBER: Variable v cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
 	VOID012(new Cfg("->void(){return 0;};").err("Error during parsing at line 1, column 1: Found incompatible variable type NUMBER: Void function must not return a value.").err(IncompatibleVoidReturnTypeException.class).strict()),
 	VOID013(new Cfg("global scope{method<void>v;}->void(){return v();};").err("Error during parsing at line 1, column 45: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
@@ -97,7 +97,7 @@ enum SyntaxFailure implements ITestCase {
 	VOID016(new Cfg("global scope{method<void>v;}loginfo(v());").err("Error during parsing at line 1, column 37: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
 	VOID017(new Cfg("global scope{method<void>v;}exception(v());").err("Error during parsing at line 1, column 39: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
 	VOID018(new Cfg("global scope{method<void> m;}m()==5;").err("Error during parsing at line 1, column 30: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
-	VOID019(new Cfg("global scope{string s;method<void> m;}s=~m();").err("Error during parsing at line 1, column 42: Expression method EQUAL_TILDE(=~) for type STRING does not exist or does not accept the right hand side type VOID.").err(IncompatibleVariableTypeForExpressionMethodException.class).strict()),
+	VOID019(new Cfg("global scope{string s;method<void> m;}s=~m();").err("Error during parsing at line 1, column 42: Expression method EQUAL_TILDE(=~) for type STRING does not exist or does not accept the right hand side type VOID.").err(IncompatibleExpressionMethodTypeException.class).strict()),
 	VOID020(new Cfg("global scope{number n;method<void>m;}n<m();").err("Error during parsing at line 1, column 40: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
 
 	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \"%]\" \"%]\" at line 1, column 13.").err(ParseException.class)),

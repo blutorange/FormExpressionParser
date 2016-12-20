@@ -61,12 +61,12 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return GenericVariableType.forHash(thisContext.getGeneric(0), thisContext.getGeneric(1));
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.HASH;
 			}
 

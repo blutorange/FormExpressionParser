@@ -1,5 +1,15 @@
-global scope {
-  number n = null;
-  array<string> a = ["1","2"];
+function max(var arg, var args...) {
+  number len = args.length + 1;
+  var max = arg;
+  for (number i = 0; i < len; ++i) {
+    if (args[i] > max) max = args[i];
+  }
+  return max;
 }
-a[n];
+
+try {
+  max(1,0);
+}
+catch (e) {
+  "caught: " + e.toString;
+}

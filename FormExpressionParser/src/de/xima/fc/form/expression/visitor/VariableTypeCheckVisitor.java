@@ -25,20 +25,25 @@ import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.parse.IllegalNumberOfVarArgFunctionParametersException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAccessorTypeException;
-import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerPropertyTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleBracketAssignerValueTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleConditionTypeException;
-import de.xima.fc.form.expression.exception.parse.IncompatibleDotAccessorTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleDotAssignerTypeException;
+import de.xima.fc.form.expression.exception.parse.IncompatibleExpressionMethodTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleForLoopHeaderTypeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionParameterTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleSwitchCaseTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableAssignmentTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVariableConversionTypeException;
-import de.xima.fc.form.expression.exception.parse.IncompatibleVariableTypeForExpressionMethodException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleVoidReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingReturnException;
+import de.xima.fc.form.expression.exception.parse.NoSuchBracketAccessorException;
+import de.xima.fc.form.expression.exception.parse.NoSuchBracketAssignerException;
+import de.xima.fc.form.expression.exception.parse.NoSuchDotAccessorException;
+import de.xima.fc.form.expression.exception.parse.NoSuchDotAssignerException;
+import de.xima.fc.form.expression.exception.parse.NoSuchExpressionMethodException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
 import de.xima.fc.form.expression.exception.parse.NotAFunctionException;
 import de.xima.fc.form.expression.exception.parse.ScopeMissingVariableException;
@@ -49,6 +54,11 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
+import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory.IPropertyReturn;
+import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory.IPropertyValue;
+import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory.IReturn;
+import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory.IValue;
+import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory.IValueReturn;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
@@ -488,10 +498,12 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			switch (node.getPropertyType(i)) {
 			case DOT: {
 				final String property = node.getDotPropertyName(i);
-				final IVariableType typeNew = factory.getNamespaceFactory().getDotAccessorReturnType(infoRes.getImplicitType(), property);
-				if (typeNew == null)
-					throw new IncompatibleDotAccessorTypeException(infoRes.getImplicitType(), property, node.getPropertyNode(i));
-				infoRes.replaceImplicitType(typeNew);
+				final IReturn typeReturn = factory.getNamespaceFactory().getDotAccessorInfo(infoRes.getImplicitType(),
+						property);
+				if (typeReturn == null)
+					throw new NoSuchDotAccessorException(infoRes.getImplicitType(), property,
+							i == 0 ? node.getStartNode() : node.getPropertyNode(i - 1));
+				infoRes.replaceImplicitType(typeReturn.getReturn());
 				break;
 			}
 			case BRACKET: {
@@ -499,15 +511,18 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				infoRes.unifyJumps(infoProperty);
 				if (!infoProperty.hasImplicitType()) {
 					if (i < node.getPropertyNodeCount() - 1)
-						throw new UnreachableCodeException(node.jjtGetChild(i+1));
+						throw new UnreachableCodeException(node.jjtGetChild(i + 1));
 					return infoRes;
 				}
-				final IVariableType typeNew = factory.getNamespaceFactory().getBracketAccessorReturnType(infoRes.getImplicitType(),
-						infoProperty.getImplicitType());
-				if (typeNew == null)
-					throw new IncompatibleBracketAccessorTypeException(infoRes.getImplicitType(), infoProperty.getImplicitType(),
-						node.getPropertyNode(i));
-				infoRes.replaceImplicitType(typeNew);
+				final IPropertyReturn typePropertyReturn = factory.getNamespaceFactory()
+						.getBracketAccessorInfo(infoRes.getImplicitType());
+				if (typePropertyReturn == null)
+					throw new NoSuchBracketAccessorException(infoRes.getImplicitType(),
+							i == 0 ? node.getStartNode() : node.getPropertyNode(i - 1));
+				if (!typePropertyReturn.getProperty().isAssignableFrom(infoProperty.getImplicitType()))
+					throw new IncompatibleBracketAccessorTypeException(infoRes.getImplicitType(),
+							typePropertyReturn.getProperty(), infoProperty.getImplicitType(), node.getPropertyNode(i));
+				infoRes.replaceImplicitType(typePropertyReturn.getReturn());
 				break;
 			}
 			case PARENTHESIS: {
@@ -522,7 +537,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					// Function with varargs.
 					indexOneAfterEnd = declaredArgCount - 1;
 					if (actualArgCount < declaredArgCount - 1)
-						throw new IllegalNumberOfVarArgFunctionParametersException(declaredArgCount, actualArgCount, node.getPropertyNode(i));
+						throw new IllegalNumberOfVarArgFunctionParametersException(declaredArgCount, actualArgCount,
+								node.getPropertyNode(i));
 					IVariableType typeVarArg = SimpleVariableType.NULL;
 					for (int j = indexOneAfterEnd; j < actualArgCount; ++j) {
 						final NodeInfo infoVarArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
@@ -539,7 +555,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				else {
 					// Function without varargs.
 					if (declaredArgCount != actualArgCount)
-						throw new IllegalNumberOfFunctionParametersException(declaredArgCount, actualArgCount, node.getPropertyNode(i));
+						throw new IllegalNumberOfFunctionParametersException(declaredArgCount, actualArgCount,
+								node.getPropertyNode(i));
 					indexOneAfterEnd = actualArgCount;
 				}
 				for (int j = 0; j < indexOneAfterEnd; ++j) {
@@ -574,12 +591,15 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				throw new UnreachableCodeException(node);
 			// For method assignments such as +=, -= etc., check method types.
 			if (method != EMethod.EQUAL) {
-				final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
-						infoVar.getImplicitType(), method.equalMethod(node), infoCurrent.getImplicitType());
-				if (typeMethod == null)
-					throw new IncompatibleVariableTypeForExpressionMethodException(infoVar.getImplicitType(),
-							method.equalMethod(node), infoCurrent.getImplicitType(), node);
-				infoCurrent.replaceImplicitType(typeMethod);
+				final IValueReturn typeValueReturn = factory.getNamespaceFactory()
+						.getExpressionMethodInfo(infoVar.getImplicitType(), method.equalMethod(node));
+				if (typeValueReturn == null)
+					throw new NoSuchExpressionMethodException(infoVar.getImplicitType(),
+							method.equalMethod(node), node);
+				if (!typeValueReturn.getValue().isAssignableFrom(infoCurrent.getImplicitType()))
+					throw new IncompatibleExpressionMethodTypeException(infoVar.getImplicitType(),
+							method.equalMethod(node), typeValueReturn.getValue(), infoCurrent.getImplicitType(), node);
+				infoCurrent.replaceImplicitType(typeValueReturn.getReturn());
 			}
 			if (!infoVar.getImplicitType().isAssignableFrom(infoCurrent.getImplicitType())) {
 				throw new IncompatibleVariableAssignmentTypeException(infoVar.getImplicitType(),
@@ -602,24 +622,31 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				// First we need to evaluate the last attribute accessor (a.b),
 				// then the expression method (+).
 				if (method != EMethod.EQUAL) {
-					final IVariableType typeAllProp = factory.getNamespaceFactory()
-							.getDotAccessorReturnType(infoProperty.getImplicitType(), property);
-					if (typeAllProp == null)
-						throw new IncompatibleDotAccessorTypeException(infoProperty.getImplicitType(), property,
+					final IReturn typeDot = factory.getNamespaceFactory()
+							.getDotAccessorInfo(infoProperty.getImplicitType(), property);
+					if (typeDot == null)
+						throw new NoSuchDotAccessorException(infoProperty.getImplicitType(), property,
 								nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
-					final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
-							typeAllProp, method.equalMethod(nodeProperty), infoCurrent.getImplicitType());
+					final IValueReturn typeMethod = factory.getNamespaceFactory().getExpressionMethodInfo(typeDot.getReturn(), method.equalMethod(nodeProperty));
 					if (typeMethod == null)
-						throw new IncompatibleVariableTypeForExpressionMethodException(typeAllProp,
-								method.equalMethod(nodeProperty), infoCurrent.getImplicitType(), nodeProperty);
-					infoCurrent.replaceImplicitType(typeMethod);
+						throw new NoSuchExpressionMethodException(typeDot.getReturn(),
+								method.equalMethod(nodeProperty), nodeProperty);
+					if (!typeMethod.getValue().isAssignableFrom(infoCurrent.getImplicitType()))
+						throw new IncompatibleExpressionMethodTypeException(typeDot.getReturn(),
+								method.equalMethod(nodeProperty), typeMethod.getValue(), infoCurrent.getImplicitType(),
+								nodeProperty);
+					infoCurrent.replaceImplicitType(typeMethod.getReturn());
 				}
 				// Now we can call the attribute assigner and assign the
 				// value.
-				if (!factory.getNamespaceFactory().isDotAssignerDefined(infoProperty.getImplicitType(), property,
-						infoCurrent.getImplicitType()))
+				final IValue typeDotAssigner = factory.getNamespaceFactory()
+						.getDotAssignerInfo(infoProperty.getImplicitType(), property);
+				if (typeDotAssigner == null)
+					throw new NoSuchDotAssignerException(infoProperty.getImplicitType(), property,
+							nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
+				if (!typeDotAssigner.getValue().isAssignableFrom(infoCurrent.getImplicitType()))
 					throw new IncompatibleDotAssignerTypeException(infoProperty.getImplicitType(), property,
-							infoCurrent.getImplicitType(),
+							typeDotAssigner.getValue(), infoCurrent.getImplicitType(),
 							nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
 				break;
 			}
@@ -633,24 +660,39 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				// First we need to evaluate the last attribute accessor (a[b]),
 				// then the expression method (+).
 				if (method != EMethod.EQUAL) {
-					final IVariableType typeBracketReturn = factory.getNamespaceFactory()
-							.getBracketAccessorReturnType(infoProperty.getImplicitType(), infoEvaluated.getImplicitType());
-					if (typeBracketReturn == null)
+					final IPropertyReturn typeBracket = factory.getNamespaceFactory()
+							.getBracketAccessorInfo(infoProperty.getImplicitType());
+					if (typeBracket == null)
+						throw new NoSuchBracketAccessorException(infoProperty.getImplicitType(),
+								nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
+					if (!typeBracket.getProperty().isAssignableFrom(infoEvaluated.getImplicitType()))
 						throw new IncompatibleBracketAccessorTypeException(infoProperty.getImplicitType(),
-								infoEvaluated.getImplicitType(),
+								typeBracket.getProperty(), infoEvaluated.getImplicitType(),
 								nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
-					final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
-							typeBracketReturn, method.equalMethod(nodeProperty), infoCurrent.getImplicitType());
+					final IValueReturn typeMethod = factory.getNamespaceFactory()
+							.getExpressionMethodInfo(typeBracket.getReturn(), method.equalMethod(nodeProperty));
 					if (typeMethod == null)
-						throw new IncompatibleVariableTypeForExpressionMethodException(typeBracketReturn,
-								method.equalMethod(nodeProperty), infoCurrent.getImplicitType(),
+						throw new NoSuchExpressionMethodException(typeBracket.getReturn(),
+								method.equalMethod(nodeProperty),
 								nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
-					infoCurrent.replaceImplicitType(typeMethod);
+					if (!typeMethod.getValue().isAssignableFrom(infoCurrent.getImplicitType()))
+						throw new IncompatibleExpressionMethodTypeException(typeBracket.getReturn(),
+								method.equalMethod(nodeProperty), typeMethod.getValue(), infoCurrent.getImplicitType(),
+								nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
+					infoCurrent.replaceImplicitType(typeMethod.getReturn());
 				}
-				if (!factory.getNamespaceFactory().isBracketAssignerDefined(infoProperty.getImplicitType(),
-						infoEvaluated.getImplicitType(), infoCurrent.getImplicitType()))
-					throw new IncompatibleBracketAssignerTypeException(infoProperty.getImplicitType(),
-							infoEvaluated.getImplicitType(), infoCurrent.getImplicitType(),
+				final IPropertyValue typeAssign = factory.getNamespaceFactory()
+						.getBracketAssignerInfo(infoProperty.getImplicitType());
+				if (typeAssign == null)
+					throw new NoSuchBracketAssignerException(infoProperty.getImplicitType(),
+							nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
+				if (!typeAssign.getProperty().isAssignableFrom(infoEvaluated.getImplicitType()))
+					throw new IncompatibleBracketAssignerPropertyTypeException(infoProperty.getImplicitType(),
+							typeAssign.getProperty(), infoEvaluated.getImplicitType(),
+							nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
+				if (!typeAssign.getValue().isAssignableFrom(infoCurrent.getImplicitType()))
+					throw new IncompatibleBracketAssignerValueTypeException(infoProperty.getImplicitType(),
+							typeAssign.getValue(), infoCurrent.getImplicitType(),
 							nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
 				break;
 			}
@@ -693,13 +735,14 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				return infoRhs.unifyJumps(infoLhs);
 			}
 			// Check if there is such an expression method.
-			final IVariableType typeCombined = factory.getNamespaceFactory().getExpressionMethodReturnType(
-					infoLhs.getImplicitType(), rhs.getSiblingMethod(), infoRhs.getImplicitType());
-			if (typeCombined == null)
-				throw new IncompatibleVariableTypeForExpressionMethodException(infoLhs.getImplicitType(),
-						rhs.getSiblingMethod(), infoRhs.getImplicitType(), rhs);
+			final IValueReturn typeValueReturn = factory.getNamespaceFactory().getExpressionMethodInfo(infoLhs.getImplicitType(), rhs.getSiblingMethod());
+			if (typeValueReturn == null)
+				throw new NoSuchExpressionMethodException(infoLhs.getImplicitType(), rhs.getSiblingMethod(), node.jjtGetChild(i));
+			if (!typeValueReturn.getValue().isAssignableFrom(infoRhs.getImplicitType()))
+				throw new IncompatibleExpressionMethodTypeException(infoLhs.getImplicitType(),
+						rhs.getSiblingMethod(), typeValueReturn.getValue(), infoRhs.getImplicitType(), rhs);
 			infoLhs.unifyJumps(infoRhs);
-			infoLhs.replaceImplicitType(typeCombined);
+			infoLhs.replaceImplicitType(typeValueReturn.getReturn());
 		}
 		return infoLhs;
 	}
@@ -1143,6 +1186,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 */
 	@Override
 	public NodeInfo visit(final ASTFunctionNode node) throws SemanticsException {
+		// Get actual return type.
+		final NodeInfo infoActualReturn = node.getBodyNode().jjtAccept(this);
+
 		// Declared return type.
 		final IVariableType typeDeclaredReturn;
 		if (node.hasType()) {
@@ -1150,11 +1196,15 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			typeDeclaredReturn = info.hasImplicitType() ? info.getImplicitType()
 					: SimpleVariableType.OBJECT;
 		}
-		else
-			typeDeclaredReturn = SimpleVariableType.OBJECT;
+		else {
+			// No declared type, guess type from actual return type.
+			typeDeclaredReturn = (infoActualReturn.hasImplicitType() ? infoActualReturn.getImplicitType()
+					: SimpleVariableType.NULL)
+							.union(infoActualReturn.hasReturnType() ? infoActualReturn.getReturnType()
+									: SimpleVariableType.NULL);
+		}
 
 		// Check with actual return type.
-		final NodeInfo infoActualReturn = node.getBodyNode().jjtAccept(this);
 		assertFunctionReturnType(infoActualReturn, typeDeclaredReturn, node);
 
 		// Return type of function.
@@ -1291,19 +1341,23 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			switch (node.jjtGetChild(i).getSiblingMethod()) {
 			case EXCLAMATION_TILDE:
 			case EQUAL_TILDE: {
-				final IVariableType typeMethod = factory.getNamespaceFactory().getExpressionMethodReturnType(
-						infoRes.getImplicitType(), EMethod.EQUAL_TILDE, infoChild.getImplicitType());
-				if (typeMethod == null)
-					throw new IncompatibleVariableTypeForExpressionMethodException(infoRes.getImplicitType(),
-							EMethod.EQUAL_TILDE, infoChild.getImplicitType(), node.jjtGetChild(i));
+				final IValueReturn typeValueReturn= factory.getNamespaceFactory().getExpressionMethodInfo(
+						infoRes.getImplicitType(), EMethod.EQUAL_TILDE);
+				if (typeValueReturn == null)
+					throw new NoSuchExpressionMethodException(infoRes.getImplicitType(),
+							EMethod.EQUAL_TILDE, node.jjtGetChild(i-1));
+				if (!typeValueReturn.getValue().isAssignableFrom(infoChild.getImplicitType()))
+					throw new IncompatibleExpressionMethodTypeException(infoRes.getImplicitType(),
+							EMethod.EQUAL_TILDE, typeValueReturn.getValue(), infoChild.getImplicitType(),
+							node.jjtGetChild(i));
 				break;
 			}
 			// only == != === !=== =~ !~ can occur
 			//$CASES-OMITTED$
 			default:
-				checkObject(infoChild, node.jjtGetChild(i));
 				break;
 			}
+			checkObject(infoChild, node.jjtGetChild(i));
 			infoRes.unifiyImplicitType(infoChild.getImplicitType());
 		}
 		infoRes.replaceImplicitType(SimpleVariableType.BOOLEAN);

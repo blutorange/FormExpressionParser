@@ -8,17 +8,15 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public class IncompatibleDotAssignerTypeException extends IncompatibleVariableTypeException {
+public class IncompatibleBracketAssignerPropertyTypeException extends IncompatibleVariableTypeException {
 	private static final long serialVersionUID = 1L;
 
-	public IncompatibleDotAssignerTypeException(final IVariableType thisContext, final String property,
-			final IVariableType shouldType, final IVariableType isType, final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_DOT_ASSIGNER_TYPES, property, thisContext), shouldType,
-				isType, node);
+	public IncompatibleBracketAssignerPropertyTypeException(final IVariableType thisContext, final IVariableType shouldProperty,
+			final IVariableType isProperty, final Node node) {
+		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_BRACKET_ASSIGNER_PROPERTY_TYPES, thisContext), shouldProperty,
+				isProperty, node);
 		this.thisContext = thisContext;
-		this.property = property;
 	}
 
 	public final IVariableType thisContext;
-	public final String property;
 }

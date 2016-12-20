@@ -68,6 +68,8 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	 */
 	sortBy(Impl.sortBy),
 	map(Impl.map),
+	mapString(Impl.mapString),
+	mapNumber(Impl.mapNumber),
 	;
 
 	@Nullable private FunctionLangObject func;
@@ -233,14 +235,11 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 		},
 		map(false, "mapper") {
+			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				final FunctionLangObject mapper = args[0].coerceFunction(ec);
-				final List<ALangObject> mapped = new ArrayList<>(thisContext.length());
-				for (final ALangObject item : thisContext.listValue())
-					mapped.add(mapper.evaluate(ec, item));
-				return ArrayLangObject.create(mapped);
+				return map(thisContext, args[0], ec);
 			}
 
 			@Override
@@ -249,6 +248,40 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 						GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), thisContext.getGeneric(0)));
 			}
 
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.FUNCTION;
+			}
+		},
+		mapString(false, "mapper") {
+			@SuppressWarnings("null")
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return map(thisContext, args[0], ec);
+			}
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(SimpleVariableType.STRING),
+						GenericVariableType.forSimpleFunction(SimpleVariableType.STRING, thisContext.getGeneric(0)));
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.FUNCTION;
+			}
+		},
+		mapNumber(false, "mapper") {
+			@SuppressWarnings("null")
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return map(thisContext, args[0], ec);
+			}
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(SimpleVariableType.NUMBER),
+						GenericVariableType.forSimpleFunction(SimpleVariableType.NUMBER, thisContext.getGeneric(0)));
+			}
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
@@ -324,5 +357,14 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		public EncapsulatingEvaluationException(final EvaluationException exception) {
 			this.exception = exception;
 		}
+	}
+
+	private static ALangObject map(final ArrayLangObject list, final ALangObject mapper, final IEvaluationContext ec)
+			throws EvaluationException {
+		final FunctionLangObject mapperFunc = mapper.coerceFunction(ec);
+		final List<ALangObject> mapped = new ArrayList<>(list.length());
+		for (final ALangObject item : list.listValue())
+			mapped.add(mapperFunc.evaluate(ec, item));
+		return ArrayLangObject.create(mapped);
 	}
 }

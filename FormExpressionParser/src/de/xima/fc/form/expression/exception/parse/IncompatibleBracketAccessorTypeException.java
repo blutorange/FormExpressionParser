@@ -10,11 +10,13 @@ import de.xima.fc.form.expression.util.NullUtil;
 @ParametersAreNonnullByDefault
 public class IncompatibleBracketAccessorTypeException extends IncompatibleVariableTypeException {
 	private static final long serialVersionUID = 1L;
-	public IncompatibleBracketAccessorTypeException(final IVariableType thisContext, final IVariableType property, final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_BRACKET_ACCESSOR, property), null , thisContext, node);
+
+	public IncompatibleBracketAccessorTypeException(final IVariableType thisContext, final IVariableType shouldProperty,
+			final IVariableType isProperty, final Node node) {
+		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_BRACKET_ACCESSOR_TYPES, thisContext), shouldProperty,
+				isProperty, node);
 		this.thisContext = thisContext;
-		this.property = property;
 	}
+
 	public final IVariableType thisContext;
-	public final IVariableType property;
 }

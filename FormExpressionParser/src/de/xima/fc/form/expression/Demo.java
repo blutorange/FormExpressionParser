@@ -36,11 +36,19 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
- * - check all serializable / immutable classes
+ * - inline expressions for string: "result is #{2+3}"
+ * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
+ * - add some type inference
+ *    a = 9;   // a must be a number
+ *    a = 2+3; // a must be a number
+ *    method<string,string> m;
+ *    m(a);    // a must be a string
+ *    3 + b;   // b must be a number
+ * - A range object (0..9) [0..9] (0..9] [0..9)
+ * - Doc commands. doc::write doc::writeln doc::removeParagraph etc.
+ * - Special modes for outputting text html-escaped for HTML templates.
  * - replace logger with tracer ?
  * - unparse: los nicer
- * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
- * - update formatting js
  */
 public class Demo {
 	@Nonnull

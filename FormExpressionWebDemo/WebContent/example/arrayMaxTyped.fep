@@ -1,0 +1,8 @@
+function var max(var arg, var args...) {
+  for (var item in args)
+    if (item > max)
+      arg = item;
+  return arg;
+}
+
+max(4,3,1,99,7);

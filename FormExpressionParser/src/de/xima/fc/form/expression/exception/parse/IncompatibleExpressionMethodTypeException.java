@@ -9,14 +9,16 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public class IncompatibleVariableTypeForExpressionMethodException extends SemanticsException {
+public class IncompatibleExpressionMethodTypeException extends IncompatibleVariableTypeException {
 	private static final long serialVersionUID = 1L;
-	public IncompatibleVariableTypeForExpressionMethodException(final IVariableType lhs, final EMethod method, final IVariableType rhs, final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_EXPRESSION_METHOD_TYPES, method, lhs, rhs), node);
-		this.lhs = lhs;
-		this.rhs = rhs;
+
+	public IncompatibleExpressionMethodTypeException(final IVariableType thisContext, final EMethod method,
+			final IVariableType shouldType, final IVariableType isType, final Node node) {
+		super(NullUtil.messageFormat(CmnCnst.Error.INCOMPATIBLE_EXPRESSION_METHOD_TYPES, method, thisContext), shouldType, isType, node);
+		this.thisContext = thisContext;
 		this.method = method;
 	}
-	public final IVariableType lhs, rhs;
+
+	public final IVariableType thisContext;
 	public final EMethod method;
 }

@@ -52,12 +52,12 @@ public enum EExpressionMethodObject implements IMethod2Function<StringLangObject
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.STRING;
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.STRING;
 			}
 

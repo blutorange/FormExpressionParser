@@ -86,11 +86,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return SimpleVariableType.NUMBER;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.OBJECT;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.OBJECT;
 			}
 			@Override
@@ -111,12 +111,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.NUMBER;
 			}
 
@@ -138,12 +138,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return thisContext;
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.NUMBER;
 			}
 
@@ -163,11 +163,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return SimpleVariableType.NUMBER;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.OBJECT;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.OBJECT;
 			}
 			@Override
@@ -186,11 +186,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return SimpleVariableType.NUMBER;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.OBJECT;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.OBJECT;
 			}
 			@Override
@@ -209,11 +209,11 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 				return SimpleVariableType.NUMBER;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.OBJECT;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.OBJECT;
 			}
 			@Override
@@ -234,12 +234,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.NUMBER;
 			}
 
@@ -261,12 +261,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.NUMBER;
 			}
 
@@ -288,12 +288,12 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			}
 
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.NUMBER;
 			}
 

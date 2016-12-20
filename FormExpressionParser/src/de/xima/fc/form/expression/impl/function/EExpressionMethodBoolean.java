@@ -56,11 +56,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.BOOLEAN;
 			}
 			@Override
@@ -83,11 +83,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.BOOLEAN;
 			}
 			@Override
@@ -110,11 +110,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.BOOLEAN;
 			}
 			@Override
@@ -136,11 +136,11 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 				return SimpleVariableType.BOOLEAN;
 			}
 			@Override
-			public IVariableType getRhsType(final IVariableType thisContext) {
+			public IVariableType getValueType(final IVariableType thisContext) {
 				return SimpleVariableType.OBJECT;
 			}
 			@Override
-			public ILangObjectClass getRhsClass() {
+			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.OBJECT;
 			}
 			@Override
