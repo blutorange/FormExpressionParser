@@ -34,20 +34,6 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
-//TODO consider enlargening the type system
-// allow lower OR upper bound
-// Generics limited by
-//   extends this class or sub type; upper bound
-//     return type of function can be this type or super type
-//       List<Number> m = new ArrayList<>();
-//       List<? extends Number > extend = m;
-//       Object n = extend.get(0);	//   super  this class or super type, lower bound
-//  super this class or super type, lower bound
-//     parameters passed into function can be this type or sub type
-//       List<Number> m = new ArrayList<>();
-//       List<? super Number > extend = m;
-//       extend.add(new Float(2));
-
 /**
  * TODO
  * - check all serializable / immutable classes

@@ -164,6 +164,22 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		return outer;
 	}
 
+	/* FIXME This is not working as it should. Do we need to make some type info (basic class) available during run time??
+	 *
+	 * global scope {
+	 *  number n = null;
+	 *  array<string> a = ["1","2"];
+	 * }
+	 * a[n];
+	 *
+	 * And also:
+	 *
+	 * global scope {
+	 *  string a = null;
+	 *  string b = "foo";
+	 * }
+	 * b+a;
+	 */
 	@Nullable
 	@Override
 	public IExpressionFunction<?> expressionMethod(final ILangObjectClass thisContext, final EMethod method,
