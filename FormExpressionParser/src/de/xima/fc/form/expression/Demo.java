@@ -14,6 +14,7 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
@@ -36,7 +37,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
- * - inline expressions for string: "result is #{2+3}"
+ * - check for absolute error even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
  * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
  * - add some type inference
  *    a = 9;   // a must be a number
@@ -51,11 +52,11 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  */
 public class Demo {
 	@Nonnull
-	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getLooseConfig();
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 
@@ -161,7 +162,11 @@ public class Demo {
 		System.out.println("===Token stream==="); //$NON-NLS-1$
 		int charsWithoutLf = 0;
 		for (final Token token : tokenArray) {
-			final String s = token.image.replaceAll("[ \n\r\t]", "") + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			final String s;
+			if (token.kind == FormExpressionParserConstants.TemplateLiteralChars)
+				s = token.image + " ";
+			else
+				s = token.image.replaceAll("[ \n\r\t]", "") + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			System.out.print(s);
 			charsWithoutLf += s.length();
 			if (charsWithoutLf > 40) {

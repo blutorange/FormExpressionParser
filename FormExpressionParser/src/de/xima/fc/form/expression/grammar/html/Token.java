@@ -145,7 +145,7 @@ public class Token implements java.io.Serializable {
 
 	public Token insertDoubleString(final String string) {
 		return insertToken(HtmlParserConstants.attvDoubleString,
-				Syntax.QUOTE + StringEscapeUtils.escapeHtml4(string) + Syntax.QUOTE);
+				Syntax.QUOTE_DOUBLE + StringEscapeUtils.escapeHtml4(string) + Syntax.QUOTE_DOUBLE);
 	}
 
 	/**

@@ -6,8 +6,8 @@
 	
 	<!-- 0.1 Initial. Control statements, expressions, functions working. -->
 	<!-- 0.2 Semantic checking: variable scoping, unused variables, labels. Scope (namespace) support. Many minor issues and bugs. Strict mode for even more checking. -->
-	<!-- 0.3 (work in progress) Improved semantic checking: checking variable types in methods, expression, functions, if-conditionals etc. -->
-	<!-- 0.4 (planned) Closures for lambda expressions, RangeLangObject, inline expressions in strings (eg. "2 + 3 = #{2+3}") -->
+	<!-- 0.3 (work in progress) Improved semantic checking: checking variable types in methods, expression, functions, if-conditionals etc. Javascript-like stringf interpolation: `Three plus four is ${3+4}.`-->
+	<!-- 0.4 (planned) Closures for lambda expressions, RangeLangObject.-->
 	<!-- 0.5 (the future) Some type-inference for non-strict mode. -->
 	<version>0.3-SNAPSHOT</version>
 	<name>FormExpressionParser</name>

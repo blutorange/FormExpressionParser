@@ -36,6 +36,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -172,6 +173,11 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 
 	@Override
 	public final R visit(final ASTStringNode node, final T data) throws E {
+		return processNode(node, data);
+	}
+
+	@Override
+	public final R visit(final ASTStringCharactersNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 

@@ -36,6 +36,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -118,6 +119,11 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTStringNode node) {
+		return visitChildren(node);
+	}
+
+	@Override
+	public Boolean visit(final ASTStringCharactersNode node) {
 		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 

@@ -33,14 +33,14 @@ import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
 
 @SuppressWarnings("nls")
 enum SyntaxFailure implements ITestCase {
-	TEST001("if (i==0) { alert() }", "Encountered \"}\" \"}\" at line 1, column 21."),
-	TEST002("if(a) a; else b; else if(c) c;", "Encountered \"else\" \"else\" at line 1, column 18."),
-	TEST003("if(a) a; else if (c) c; else b; else c;", "Encountered \"else\" \"else\" at line 1, column 33."),
+	TEST001("if (i==0) { alert() }", "Encountered \"}\" at line 1, column 21."),
+	TEST002("if(a) a; else b; else if(c) c;", "Encountered \"else\" at line 1, column 18."),
+	TEST003("if(a) a; else if (c) c; else b; else c;", "Encountered \"else\" at line 1, column 33."),
 	TEST004("with (me you) stuff;", "Encountered <Identifier> \"you\" at line 1, column 10."),
-	TEST005("with (me::you) stuff;", "Encountered \"::\" \"::\" at line 1, column 9."),
-	TEST006("try { 1/0; } catch (e) { log(me) };","Encountered \"}\" \"}\" at line 1, column 34."),
+	TEST005("with (me::you) stuff;", "Encountered \"::\" at line 1, column 9."),
+	TEST006("try { 1/0; } catch (e) { log(me) };","Encountered \"}\" at line 1, column 34."),
 	TEST007("a()9;","Encountered <Integer> \"9\" at line 1, column 4."),
-	TEST008("^|n};","Encountered \"^\" \"^\" at line 1, column 1."),
+	TEST008("^|n};","Encountered \"^\" at line 1, column 1."),
 	TEST009("with (foo bar) foobar;","Encountered <Identifier> \"bar\" at line 1, column 11."),
 	TEST010("foo()%]", "Embedded blocks are not allowed."),
 	TEST011(new Cfg("foo=bar;/*unclosed").err("Lexical error at line 1, column 19. Encountered <EOF> after \"\"").err(TokenMgrError.class)),
@@ -51,11 +51,11 @@ enum SyntaxFailure implements ITestCase {
 	TEST016("++(1+2);", "Encountered illegal LVALUE ASTParenthesisExpressionNode in prefix operation at line 1, column 3."),
 	TEST017("++a.b();", "Encountered illegal LVALUE (function call) ASTPropertyExpressionNode(null,NONE(),1:3-1:7) in prefix operation at line 1, column 1."),
 	TEST018("++--a;", "Encountered illegal LVALUE ASTUnaryExpressionNode in prefix operation at line 1, column 3."),
-	TEST019("if (true) require scope math;", "Encountered \"require\" \"require\" at line 1, column 11."),
-	TEST020("scoped::var.works['great']();", "Encountered \"var\" \"var\" at line 1, column 9."),
-	TEST021("a = var b = c;", "Encountered \"var\" \"var\" at line 1, column 5."),
+	TEST019("if (true) require scope math;", "Encountered \"require\" at line 1, column 11."),
+	TEST020("scoped::var.works['great']();", "Encountered \"var\" at line 1, column 9."),
+	TEST021("a = var b = c;", "Encountered \"var\" at line 1, column 5."),
 	TEST022(new Cfg("var i = i;").err("Error during parsing at line 1, column 1: Encountered variable declaration for i at global scope. Global variable must be declared in a global block.").err(IllegalVariableDeclarationAtGlobalScopeException.class)),
-	TEST024("if(false){function foo(){}}", "Encountered \"function\" \"function\" at line 1, column 11."),
+	TEST024("if(false){function foo(){}}", "Encountered \"function\" at line 1, column 11."),
 	TEST025(new Cfg("global scope {var i=0;var j=i;}j;").err("Error during parsing at line 1, column 29: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
 	TEST026(new Cfg("scope myscope{var j=''.lower();}myscope::j;").err("Error during parsing at line 1, column 21: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
 	TEST027(new Cfg("if(true){var i=0;}else{var j=i+3;}").err("Error during parsing at line 1, column 30: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
@@ -75,6 +75,13 @@ enum SyntaxFailure implements ITestCase {
 	TEST040(new Cfg("function foo(){arguments.length;}foo(1,2,3);").err("Error during parsing at line 1, column 16: Variable arguments cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	TEST041(new Cfg("\"foo\\\";").err(TokenMgrError.class).err("Lexical error at line 1, column 8. Encountered <EOF> after \"\"foo\\\";\"")),
 	TEST042(new Cfg("#(\\d#;").err(ParseException.class).err("Encountered invalid regex at line 1, column 1: Unclosed group near index 3")),
+	TEST043(new Cfg("''';").err("Lexical error at line 1, column 5. Encountered <EOF> after \"';\"").err(TokenMgrError.class)),
+	TEST044(new Cfg("'\\';").err("Lexical error at line 1, column 4. Encountered <EOF> after \"\'\\\'\"").err(TokenMgrError.class)),
+	TEST045(new Cfg("\"\"\";").err("Lexical error at line 1, column 4. Encountered <EOF> after \"\"").err(TokenMgrError.class)),
+	TEST046(new Cfg("\"\\\";").err("Lexical error at line 1, column 4. Encountered <EOF> after \"\"\\\"\"").err(TokenMgrError.class)),
+	TEST047(new Cfg("```;").err("Encountered \"`\" at line 1, column 3.").err(ParseException.class)),
+	TEST048(new Cfg("`\\`;").err("Encountered <EOF> at line 1, column 3.").err(ParseException.class)),
+	TEST049(new Cfg("`$`;").err("Lexical error at line 1, column 4. Encountered <EOF> after \"$`\"").err(TokenMgrError.class)),
 
 	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),
@@ -101,9 +108,9 @@ enum SyntaxFailure implements ITestCase {
 	VOID019(new Cfg("global scope{string s;method<void> m;}s=~m();").err("Error during parsing at line 1, column 42: Found incompatible variable type VOID but expected REGEX: Expression method EQUAL_TILDE(=~) for STRING does not accept this type on the right hand side.").err(IncompatibleExpressionMethodTypeException.class).strict()),
 	VOID020(new Cfg("global scope{number n;method<void>m;}n<m();").err("Error during parsing at line 1, column 40: Found incompatible variable type VOID but expected OBJECT: Type cannot be upconverted to this type.").err(IncompatibleVariableConversionTypeException.class).strict()),
 
-	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \"%]\" \"%]\" at line 1, column 13.").err(ParseException.class)),
+	TEMPLATE001(new Cfg("<foo>[% i = %]</foo> [% 42; %]").template().err("Encountered \"%]\" at line 1, column 13.").err(ParseException.class)),
 	TEMPLATE002(new Cfg("<foo>[% i = 0;").template().err("Final code block in templates must be closed.").err(ParseException.class)),
-	TEMPLATE003(new Cfg("<foo> [%foo=0;foo(); <bar>").template().err("Encountered \"<\" \"<\" at line 1, column 22.").err(ParseException.class)),
+	TEMPLATE003(new Cfg("<foo> [%foo=0;foo(); <bar>").template().err("Encountered \"<\" at line 1, column 22.").err(ParseException.class)),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

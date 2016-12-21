@@ -50,6 +50,7 @@ PARSER_BEGIN(FormExpressionParser)
 package de.xima.fc.form.expression.grammar;
 import java.lang.StringBuilder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.VoidClass;
@@ -89,10 +90,39 @@ public class FormExpressionParser
 }
 PARSER_END(FormExpressionParser)
 
+/*
+We use a counter and a stack to keep track of nested template literals and
+inline expressions. The following example illustrates this. Consider the
+following code:
+
+  1+2;
+  `Some literal words ${{foo:`${}`}}, I hope.`;
+
+Step by step, this shows the values of the counter and step at each token:
+
+ <beg>[]    code        (start out in mode code)
+ ...
+ `  0 []    ->template  (` switches to mode template)
+ ...
+ ${ 1 [0]   ->code      (syntax for inline expressions, switch to mode code)
+ {  2 [0]   code        (in mode code, this is the syntax for a hash literal)
+ ...
+ `  2 [0]   ->template  (we are in mode code, so this starts another template literal)
+ ${ 3 [0,2] ->code      (start another inline expression)
+ }  2 [0]   ->template  (2 is on the stack, so go back to template literal)
+ `  2 [0]   ->code      (we are in mode template, so this ends it)
+ }  1 [0]   code        (1 is not on top of the stack, so we stay in mode code)
+ }  0 []    ->template  (0 is on top of the stack, so we go back to template literal)
+ ...
+ `  0 []    ->code      (we are in mode template, so this ends it)
+*/
 TOKEN_MGR_DECLS :
 {
   private int typeLevel = 0;
   private Token lastToken;
+  private int countBraces = 0;
+  private int[] stackTemplateLiteral = new int[4];
+  private int posTemplateLiteral = -1;
   void CommonTokenAction(final Token token) {
     // Retrieve all comments, if there are any.
     lastToken = token;
@@ -104,6 +134,18 @@ TOKEN_MGR_DECLS :
         parser.addComment(special);
         special = special.next;
       }
+    }
+  }
+  void pushTemplateLiteral() {
+    if (posTemplateLiteral + 1 >= stackTemplateLiteral.length)
+      stackTemplateLiteral = Arrays.copyOf(stackTemplateLiteral, 2*(posTemplateLiteral+2));
+    stackTemplateLiteral[++posTemplateLiteral] = countBraces;
+  }
+  
+  void popTemplateLiteralIfMatching() {
+    if (posTemplateLiteral >= 0 && stackTemplateLiteral[posTemplateLiteral] == countBraces) {
+      SwitchTo(FormExpressionParserConstants.TEMPLATE_LITERAL);
+      --posTemplateLiteral;
     }
   }
 }
@@ -191,6 +233,22 @@ TOKEN:
   < IdentifierAfterDot : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* > : CODE
 }
 
+< TEMPLATE_LITERAL >
+TOKEN:
+{
+  < TemplateLiteralInlineOpen : "${" > {
+    pushTemplateLiteral();
+    ++countBraces;
+  } : CODE
+| < TemplateLiteralClose : "`" >
+  : CODE
+| < TemplateLiteralChars :
+    (
+      ("\\" ~[ ])
+    | ~[ "$", "\\", "`" ]
+    )+ >
+}
+
 < CODE >
 SKIP :
 {
@@ -248,9 +306,14 @@ TOKEN :
 | 
   < ParenClose : ")" >
 |
-  < BracesOpen : "{" >
+  < BracesOpen : "{" > {
+    ++countBraces;
+  }
 |
-  < BracesClose : "}" >
+  < BracesClose : "}" > {
+    --countBraces;
+    popTemplateLiteralIfMatching();
+  }
 |
   < BracketOpen : "[" >
 |
@@ -267,6 +330,8 @@ TOKEN :
   < Exclamation : "!" >
 |
   < Percent : "%" >
+|
+  < TemplateLiteralOpen : "`"> : TEMPLATE_LITERAL
 |
   < LosBodyClose : "%]" > : LOS
 |
@@ -1882,38 +1947,69 @@ void Number(EMethod method) #NumberNode :
     }
   )
   {
-    
     jjtThis.init(method, t.image, isInt);
   }
 }
 
 void String(EMethod method) #StringNode :
 {
-  Token t;
   char delimiter;
-  
 }
 {
   (
-    t = < SingleQuotedString >
-    {
-      delimiter = '\'';
-    }
-  | 
-    t = < DoubleQuotedString >
-    {
-      delimiter = '"';
-    }
+    (
+      delimiter = StringLiteral(null)
+    )
+  |
+    (
+      < TemplateLiteralOpen >
+      (
+        TemplateLiteralCharacters(null)
+      |
+        (
+          < TemplateLiteralInlineOpen > [ Expression(null) ] < BracesClose >
+        )
+      )*
+      < TemplateLiteralClose >
+      {
+        delimiter = '`';
+      }
+    )
   )
   {
-    
-    jjtThis.init(method, t.image, delimiter);
+    jjtThis.init(method, delimiter);
+  }
+}
+
+char StringLiteral(EMethod method) #StringCharactersNode :
+{
+  Token t;
+  char delimiter;
+}
+{
+  (
+    t = < DoubleQuotedString > { delimiter = '"'; }
+  | t = < SingleQuotedString > { delimiter = '\''; }  )
+  {
+    jjtThis.init(method, t.image.substring(1,t.image.length()-1), delimiter);
+    return delimiter;
+  }
+}
+
+void TemplateLiteralCharacters(EMethod method) #StringCharactersNode :
+{
+  Token t;
+}
+{
+  (
+    t = < TemplateLiteralChars >  )
+  {
+    jjtThis.init(method, t.image, '`');
   }
 }
 
 void Array(EMethod method) #ArrayNode :
 {
-  
 }
 {
   (

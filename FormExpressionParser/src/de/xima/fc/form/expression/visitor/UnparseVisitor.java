@@ -77,6 +77,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -364,9 +365,24 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	@Override
 	public void visit(@Nonnull final ASTStringNode node, @Nonnull final String prefix) throws IOException {
-		StringLangObject.toExpression(node.getStringValue(), writer);
+		writer.write(node.getDelimiter());
+		for (int i = 0; i < node.getStringNodeCount(); ++i) {
+			if (node.isInlineExpressionNode(i)) {
+				writer.write(CmnCnst.Syntax.INLNE_EXPRESSION_OPEN);
+				node.getStringNode(i).jjtAccept(this, prefix);
+				writer.write(CmnCnst.Syntax.INLNE_EXPRESSION_CLOSE);
+			}
+			else
+				node.getStringNode(i).jjtAccept(this, prefix);
+		}
+		writer.write(node.getDelimiter());
 	}
 
+	@Override
+	public void visit(@Nonnull final ASTStringCharactersNode node, @Nonnull final String prefix) throws IOException {
+		writer.write(StringLangObject.escape(node.getStringValue(), node.getDelimiter()));
+	}
+	
 	@Override
 	public void visit(@Nonnull final ASTStatementListNode node, @Nonnull final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();

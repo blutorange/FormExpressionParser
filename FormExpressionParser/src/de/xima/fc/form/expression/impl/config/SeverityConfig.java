@@ -54,10 +54,10 @@ public final class SeverityConfig implements ISeverityConfig {
 
 	private final static class InstanceHolder {
 		public final static SeverityConfig STRICT = new Builder()
-				.enableOption(ESeverityOption.values())
+				.enableOption(NullUtil.checkNotNull(ESeverityOption.values()))
 				.build();
 		public final static SeverityConfig LOOSE = new Builder()
-				.disableOption(ESeverityOption.values())
+				.disableOption(NullUtil.checkNotNull(ESeverityOption.values()))
 				.build();
 	}
 

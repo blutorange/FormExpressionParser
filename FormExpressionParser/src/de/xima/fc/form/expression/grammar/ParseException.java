@@ -132,11 +132,14 @@ public class ParseException extends Exception implements IPositionedError {
 				break;
 			}
 			retval += tokenImage[tok.kind];
-			retval += " \"";
-			retval += add_escapes(tok.image);
+			final String img = "\"" + add_escapes(tok.image) + "\"";
+			if (tokenImage[tok.kind] == null || !tokenImage[tok.kind].equals(img)) {
+				retval += " ";
+				retval += img;
+			}
 			tok = tok.next;
 		}
-		retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
+		retval += " at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
 		retval += "." + eol;
 		if (expectedTokenSequences.length == 1) {
 			retval += "Was expecting:" + eol + "    ";

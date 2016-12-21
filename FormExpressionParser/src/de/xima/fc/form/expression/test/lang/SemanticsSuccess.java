@@ -75,6 +75,11 @@ enum SemanticsSuccess implements ITestCase {
 	SCOPE012("function foo(){0;}function foo::bar(){42;};with(foo)bar();", Tests.N42), // scoped function
 	SCOPE013("scope myscope{var a=42;}with(myscope){a;}", Tests.N42), // resolving scopes
 
+	// Template literals
+	TEMPLIT001("a=20;b=22;`0${{res:`1${`2${`3${`4--${a+b}--4`}3`}2`}1`}}0`;",StringLangObject.create("0{\"res\":\"1234--42--4321\"}0")),
+	TEMPLIT002("`${20+22}`;", StringLangObject.create("42")),
+	TEMPLIT003("`${}`;", StringLangObject.create("")),
+	
 	//Attribute accessors
 	PROP001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
 	PROP002("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes

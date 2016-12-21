@@ -35,6 +35,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -77,55 +78,51 @@ implements IFormExpressionVoidDataVisitor<T, E> {
 	@Override
 	public void visit(final ASTArrayNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTHashNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTNullNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTBooleanNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTVariableNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTStringNode node, final T data) throws E {
 		visitChildren(node, data);
+	}
 
+	@Override
+	public void visit(final ASTStringCharactersNode node, final T data) throws E {
+		visitChildren(node, data);
 	}
 
 	@Override
 	public void visit(final ASTStatementListNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTIfClauseNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override
 	public void visit(final ASTForLoopNode node, final T data) throws E {
 		visitChildren(node, data);
-
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.object;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -156,7 +155,6 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @ParametersAreNonnullByDefault
 public abstract class ALangObject implements INonNullIterable<ALangObject>, Comparable<ALangObject> {
-	private final static Logger LOG = NullUtil.checkNotNull(Logger.getLogger(ALangObject.class.getCanonicalName()));
 	private static AtomicLong ID_COUNTER = new AtomicLong();
 
 	private final long id;

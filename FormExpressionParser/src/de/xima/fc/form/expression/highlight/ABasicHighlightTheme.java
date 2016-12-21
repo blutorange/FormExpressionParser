@@ -86,9 +86,12 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 
 		case BackslashQuotedRegex:
 			return getStyleRegexLiteral();
-
+			
 		case DoubleQuotedString:
 		case SingleQuotedString:
+		case TemplateLiteralOpen:
+		case TemplateLiteralChars:
+		case TemplateLiteralClose:
 			return getStyleStringLiteral();
 
 		case BracesClose:
@@ -119,6 +122,7 @@ public abstract class ABasicHighlightTheme implements IHighlightTheme {
 		case Plus:
 		case Slash:
 		case Star:
+		case TemplateLiteralInlineOpen:
 			return getStyleOperator();
 
 		case AmpersandEqual:

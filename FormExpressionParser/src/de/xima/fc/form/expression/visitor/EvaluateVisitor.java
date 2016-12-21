@@ -63,6 +63,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -421,9 +422,23 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTStringNode node) throws EvaluationException {
-		return StringLangObject.create(node.getStringValue());
+		// Most common case is no inline expressions.
+		if (node.getStringNodeCount() == 1)
+			return node.getStringNode(0).jjtAccept(this).coerceString(ec);
+		// Join result of all children.
+		// Template literals can contain only expressions and therefore
+		//  no return, continue, or break clauses that would cause jumping.
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < node.getStringNodeCount(); ++i)
+			sb.append(node.getStringNode(i).jjtAccept(this).coerceString(ec).stringValue());
+		return StringLangObject.create(sb.toString());
 	}
 
+	@Override
+	public ALangObject visit(final ASTStringCharactersNode node) throws EvaluationException {
+		return StringLangObject.create(node.getStringValue());
+	}
+	
 	@Override
 	public ALangObject visit(final ASTArrayNode node) throws EvaluationException {
 		final int len = node.jjtGetNumChildren();

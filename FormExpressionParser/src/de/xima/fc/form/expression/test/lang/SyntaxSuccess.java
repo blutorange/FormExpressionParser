@@ -79,6 +79,11 @@ enum SyntaxSuccess implements ITestCase {
 	TEST065("global scope {method<void, string> bar;}function void foo(string x){return x;};bar=foo;"),
 	TEST066("global scope {method<void, var...> bar;array<var> a;hash<var,string> h;}"),
 	TEST067("for(var x in 8);"),
+	TEST068("a=5;b=10;`result=${a+b}`;"),
+	TEST069("`${}`;"),
+	TEST070("'\"`$\\'\\\\';"),
+	TEST071("\"'`$\\\"\\\\\";"),
+	TEST072("`\"'\\$\\`\\\\`;"),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

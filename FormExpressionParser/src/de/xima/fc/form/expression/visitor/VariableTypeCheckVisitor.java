@@ -102,6 +102,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -855,6 +856,26 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 */
 	@Override
 	public NodeInfo visit(final ASTStringNode node) throws SemanticsException {
+		final NodeInfo info = new NodeInfo(null, SimpleVariableType.STRING);
+		for (int i = 0; i < node.getStringNodeCount(); ++i) {
+			final NodeInfo infoChild = node.getStringNode(i).jjtAccept(this);
+			info.unifyJumps(infoChild);
+			if (!infoChild.hasImplicitType()) {
+				if (i < node.getStringNodeCount()-1)
+					throw new UnreachableCodeException(node.getStringNode(i+1));
+				infoChild.clearImplicitType();
+				return infoChild;
+			}
+			checkObject(infoChild, node);
+		}
+		return info;
+	}
+
+	/**
+	 * This simply returns the string type.
+	 */
+	@Override
+	public NodeInfo visit(final ASTStringCharactersNode node) throws SemanticsException {
 		return new NodeInfo(null, SimpleVariableType.STRING);
 	}
 

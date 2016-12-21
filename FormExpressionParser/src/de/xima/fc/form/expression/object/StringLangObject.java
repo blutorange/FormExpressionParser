@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
@@ -90,13 +89,15 @@ public class StringLangObject extends ALangObject {
 	}
 
 	public static void toExpression(final String value, final StringBuilder builder) {
-		builder.append(Syntax.QUOTE).append(StringEscapeUtils.escapeJava(value)).append(Syntax.QUOTE);
+		builder.append(Syntax.QUOTE_DOUBLE);
+		escape(value, '"', builder);
+		builder.append(Syntax.QUOTE_DOUBLE);
 	}
 
 	public static void toExpression(final String value, final Writer writer) throws IOException {
-		writer.write('"');
-		writer.write(StringEscapeUtils.escapeJava(value));
-		writer.write('"');
+		writer.write(Syntax.QUOTE_DOUBLE);
+		writer.write(escape(value, '"'));
+		writer.write(Syntax.QUOTE_DOUBLE);
 	}
 
 	// Coercion
@@ -155,18 +156,6 @@ public class StringLangObject extends ALangObject {
 	public static StringLangObject create(final char value) {
 		final String s = String.valueOf(value);
 		return new StringLangObject(s == null ? CmnCnst.NonnullConstant.STRING_EMPTY : s);
-	}
-
-	@Nonnull
-	public static StringLangObject createFromEscapedJava(final String value) {
-		if (value == null) return StringLangObject.create(StringUtils.EMPTY);
-		return StringLangObject.create(StringEscapeUtils.unescapeJava(value));
-	}
-
-	@Nonnull
-	public static StringLangObject createFromEscapedEcmaScript(final String value) {
-		if (value == null) return StringLangObject.create(StringUtils.EMPTY);
-		return StringLangObject.create(StringEscapeUtils.unescapeEcmaScript(value));
 	}
 
 	@Nonnull
@@ -243,6 +232,71 @@ public class StringLangObject extends ALangObject {
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(CmnCnst.Error.STRING_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
+		}
+	}
+
+	@SuppressWarnings("null")
+	@Nonnull
+	public static String escape(final String value, final char delimiter) {
+		final StringBuilder sb = new StringBuilder(value.length());
+		escape(value, delimiter, sb);
+		return sb.toString();
+	}
+
+	@SuppressWarnings("null")
+	@Nonnull
+	public static String unescape(final CharSequence value, final char delimiter) throws IllegalArgumentException {
+		final StringBuilder sb = new StringBuilder(2*value.length());
+		unescape(value, delimiter, sb);
+		return sb.toString();
+	}
+
+	public static void escape(final String value, final char delimiter, final StringBuilder sb) {
+		final int len = value.length();
+		char c;
+		for (int i = 0; i< len; ++i) {
+			switch (c = value.charAt(i)) {
+			case '\\':
+				sb.append('\\').append('\\');
+				break;
+			case '$':
+				// template literal
+				if (delimiter == '`')
+					sb.append('\\');
+				sb.append('$');
+				break;				
+			default:
+				if (c == delimiter)
+					sb.append('\\');
+				sb.append(c);
+			}
+		}		
+	}
+
+	public static void unescape(final CharSequence value, final char delimiter, final StringBuilder sb) throws IllegalArgumentException {
+		final int len = value.length();
+		int i = 0;
+		char c;
+		while (i< len) {
+			switch (c = value.charAt(i)) {
+			case '\\':
+				if (i >= len - 1)
+					throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_ENDS_ON_BACKSLASH));
+				sb.append(value.charAt(++i));
+				break;
+			case '$':
+			if (delimiter == '`')
+				throw new IllegalArgumentException(
+						NullUtil.messageFormat(CmnCnst.Error.TEMPLATE_LITERAL_CONTAINS_DOLLAR, i));
+				sb.append('$');
+				break;
+			default:
+				if (c == delimiter)
+					throw new IllegalArgumentException(
+							NullUtil.messageFormat(CmnCnst.Error.STRING_CONTAINS_DELIMITER, delimiter, i));
+				sb.append(c);
+			}
+			++i;
 		}
 	}
 }

@@ -35,6 +35,7 @@ import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTStatementListNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.node.ASTStringNode;
 import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTernaryExpressionNode;
@@ -98,6 +99,11 @@ implements IFormExpressionVoidVoidVisitor<E> {
 
 	@Override
 	public void visit(final ASTStringNode node) throws E {
+		visitChildren(node);
+	}
+
+	@Override
+	public void visit(final ASTStringCharactersNode node) throws E {
 		visitChildren(node);
 	}
 

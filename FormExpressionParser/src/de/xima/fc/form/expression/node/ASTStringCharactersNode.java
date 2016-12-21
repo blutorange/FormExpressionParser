@@ -14,61 +14,54 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
+import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public class ASTStringNode extends ANode {
+public class ASTStringCharactersNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	private char delimiter = '"';
-	
-	public ASTStringNode(final FormExpressionParser parser, final int nodeId) {
+
+	private String stringValue = CmnCnst.NonnullConstant.STRING_EMPTY;
+
+	public ASTStringCharactersNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
-	public ASTStringNode(final Node prototype) {
+	public ASTStringCharactersNode(final Node prototype) {
 		super(prototype, FormExpressionParserTreeConstants.JJTSTRINGNODE);
 	}
 
-	/**
-	 * @param delimiter
-	 *            Character which delimits the string. " or '
-	 */
-	public void init(@Nullable final EMethod method, final char delimiter) throws ParseException {
-		if (delimiter != '"' && delimiter != '\'' && delimiter != '`')
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.INVALID_STRING_DELIMITER, delimiter));
-		assertDelimiterChildrenEquals(delimiter);
-		super.init(method);
-		this.delimiter = delimiter;
+	public ASTStringCharactersNode(final Node prototype, final String string) {
+		super(prototype, FormExpressionParserTreeConstants.JJTSTRINGNODE);
+		this.stringValue = string;
 	}
 
-	private void assertDelimiterChildrenEquals(final char delimiter) throws ParseException {
-		for (int i = children.length; i-- > 0;) {
-			if (children[i].jjtGetNodeId() == FormExpressionParserTreeConstants.JJTSTRINGCHARACTERSNODE) {
-				if (((ASTStringCharactersNode) children[i]).getDelimiter() != delimiter)
-					throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.UNMATCHING_STRING_DELIMITER,
-							((ASTStringCharactersNode) children[i]).getDelimiter(), delimiter));
-			}
+	/** @param value Characters of the string. */
+	public void init(@Nullable final EMethod method, final String value, final char delimiter) throws ParseException {
+		assertChildrenExactly(0);
+		assertNonNull(value, CmnCnst.Error.NODE_NULL_STRING);
+		if (delimiter != '"' && delimiter != '\'' && delimiter != '`')
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.INVALID_STRING_DELIMITER, delimiter));
+		final String s;
+		try {
+			s = StringLangObject.unescape(value, delimiter);
 		}
+		catch (final IllegalArgumentException e) {
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING,
+					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));			
+		}
+		super.init(method);
+		this.delimiter = delimiter;
+		this.stringValue = s;
 	}
 
 	@Nullable
 	@Override
 	protected Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;
-	}
-
-	public String parseString(final String literal) throws ParseException {
-		if (literal.length() < 2)
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_IMPROPER_STRING_TERMINATION, literal));
-		try {
-			return NullUtil.checkNotNull(StringEscapeUtils.unescapeJava(literal.substring(1, literal.length() - 1)));
-		}
-		catch (final IllegalArgumentException e) {
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING,
-					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));
-		}
 	}
 
 	@Override
@@ -91,23 +84,16 @@ public class ASTStringNode extends ANode {
 		visitor.visit(this);
 	}
 
+	public String getStringValue() {
+		return stringValue;
+	}
+
 	@Override
 	protected void additionalToStringFields(final StringBuilder sb) {
-		sb.append(delimiter).append(',');
-	}
-
-	public int getStringNodeCount() {
-		return jjtGetNumChildren();
-	}
-
-	public boolean isInlineExpressionNode(final int i) {
-		return jjtGetChild(i).jjtGetNodeId() != FormExpressionParserTreeConstants.JJTSTRINGCHARACTERSNODE;
+		sb.append('"').append(StringEscapeUtils.escapeJava(stringValue)).append('"').append(',').append(delimiter)
+				.append(',');
 	}
 	
-	public Node getStringNode(final int i) {
-		return jjtGetChild(i);
-	}
-
 	public char getDelimiter() {
 		return delimiter;
 	}
