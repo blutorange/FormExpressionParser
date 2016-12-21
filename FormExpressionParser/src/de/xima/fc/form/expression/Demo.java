@@ -45,7 +45,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  *    m(a);    // a must be a string
  *    3 + b;   // b must be a number
  * - A range object (0..9) [0..9] (0..9] [0..9)
- * - Doc commands. doc::write doc::writeln doc::removeParagraph etc.
  * - Special modes for outputting text html-escaped for HTML templates.
  * - replace logger with tracer ?
  * - unparse: los nicer
