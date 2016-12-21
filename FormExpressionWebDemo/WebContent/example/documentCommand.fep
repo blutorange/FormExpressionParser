@@ -1,0 +1,20 @@
+[%%
+  require scope doc;
+  require scope field;
+%]
+<html>
+  <head></head>
+  <body>
+    <h1>I am a headline</h1>
+    <p>
+      <b>Me the super paragraph.</b>
+      <p>
+        <a href="epic.failure.com">You should not see me!</a>
+        [%@ if(tf1 == "Hello") doc::unwrap("p"); %]
+      </p>
+      <p>
+        [%% doc::write("I am visible again."); %]
+      </p>
+    </p>
+  </body>
+</html>

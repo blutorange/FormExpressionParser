@@ -52,11 +52,11 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  */
 public class Demo {
 	@Nonnull
-	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getLooseConfig();
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 

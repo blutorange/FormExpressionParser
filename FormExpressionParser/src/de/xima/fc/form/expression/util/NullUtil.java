@@ -43,8 +43,8 @@ public class NullUtil {
 	}
 
 	@Nonnull
-	public static String or(@Nullable final String string, @Nonnull final String orString) {
-		return string != null ? string : orString;
+	public static <T> T or(@Nullable final T value, @Nonnull final T orValue) {
+		return value != null ? value : orValue;
 	}
 
 	public static void main(final String[] args) {

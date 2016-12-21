@@ -258,65 +258,20 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		throw new CoercionException(this, ELangObjectClass.REGEX, ec);
 	}
 
-	/**
-	 * Convenience method when the caller does not need the result of the
-	 * correct class.
-	 *
-	 * @param type
-	 *            Type to which this object should be coerced.
-	 * @param clazz
-	 *            Expected return class of the coercion. Must match the type.
-	 * @param ec
-	 *            Current evaluation context.
-	 * @return The coerced object.
-	 * @throws CoercionException
-	 *             When this object cannot be coerced to the given type.
-	 * @throws EvaluationException
-	 *             When clazz and type do not match.
-	 */
 	@SuppressWarnings("unchecked")
-	public final <T extends ALangObject> T coerce(final ELangObjectClass type, final Class<T> clazz,
-			final IEvaluationContext ec) throws CoercionException, EvaluationException {
-		// This error can happen only if a subclass is constructed with the
-		// wrong type, or the Type enum contains the wrong class.
-		if (clazz != type.getLangObjectClass())
-			throw new EvaluationException(ec, CmnCnst.Error.COERCION_TYPE_NOT_MATCHING);
-		if (type == getObjectClass())
-			return (T) this;
-		switch (type) {
-		case OBJECT:
-			return (T) this;
-		case ARRAY:
-			return (T) coerceArray(ec);
-		case HASH:
-			return (T) coerceHash(ec);
-		case NULL:
-			throw new CoercionException(this, ELangObjectClass.NULL, ec);
-		case NUMBER:
-			return (T) coerceNumber(ec);
-		case STRING:
-			return (T) coerceString(ec);
-		case BOOLEAN:
-			return (T) coerceBoolean(ec);
-		case EXCEPTION:
-			return (T) coerceException(ec);
-		case FUNCTION:
-			return (T) coerceFunction(ec);
-		case REGEX:
-			return (T) coerceRegex(ec);
-		default:
-			// Try to coerce object with the special coerce method, when
-			// defined.
-			LOG.info("Enum might not be implemented: " + type); //$NON-NLS-1$
-			try {
-				return (T) evaluateExpressionMethod(EMethod.COERCE, ec, StringLangObject.create(type.name()));
-			}
-			catch (final EvaluationException e) {
-				throw new CoercionException(this, type, ec);
-			}
-			catch (final ClassCastException e) {
-				throw new CoercionException(this, type, ec);
-			}
+	public final <T extends ALangObject> T coerce(final ILangObjectClass type, final IEvaluationContext ec)
+			throws CoercionException {
+		if (type.supportsBasicCoercion())
+			return (T) type.coerce(this, ec);
+		// Try to coerce object with the special coerce method, when defined.
+		try {
+			return (T) evaluateExpressionMethod(EMethod.COERCE, ec, StringLangObject.create(type.getSyntacticalTypeName()));
+		}
+		catch (final EvaluationException e) {
+			throw new CoercionException(this, type, ec);
+		}
+		catch (final ClassCastException e) {
+			throw new CoercionException(this, type, ec);
 		}
 	}
 

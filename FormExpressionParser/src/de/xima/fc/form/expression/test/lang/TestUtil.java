@@ -79,6 +79,8 @@ public final class TestUtil {
 		Class<? extends Throwable> errClass;
 		@Nonnull
 		ISeverityConfig config = SeverityConfig.getLooseConfig();
+		@Nullable
+		ALangObject res;
 
 		Cfg(@Nonnull final String code) {
 			this.code = code;
@@ -123,6 +125,12 @@ public final class TestUtil {
 		@Nonnull
 		Cfg fc() {
 			context = EContextType.FORMCYCLE;
+			return this;
+		}
+
+		@Nonnull
+		Cfg res(final ALangObject res) {
+			this.res = res;
 			return this;
 		}
 	}

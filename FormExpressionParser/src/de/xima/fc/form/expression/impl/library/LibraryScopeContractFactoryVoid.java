@@ -17,6 +17,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILibraryScope;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableProvider;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.impl.variable.provider.SimpleFunctionVariableProvider;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.Void;
 
@@ -109,6 +110,11 @@ public final class LibraryScopeContractFactoryVoid implements ILibraryScopeContr
 		 */
 		public Builder addVariable(final String variableName, final IVariableProvider<?> value) {
 			getBuilder().put(variableName, value);
+			return this;
+		}
+
+		public Builder addFunction(final SimpleFunctionVariableProvider<?> value) {
+			getBuilder().put(value.getDeclaredName(), value);
 			return this;
 		}
 

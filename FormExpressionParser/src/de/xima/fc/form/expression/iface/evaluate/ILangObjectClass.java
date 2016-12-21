@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableCollection;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 
@@ -72,4 +73,8 @@ public interface ILangObjectClass extends Serializable {
 	public boolean equalsClass(ILangObjectClass clazz);
 
 	public boolean isSuperClassOf(ILangObjectClass that);
+
+	public boolean supportsBasicCoercion();
+
+	public ALangObject coerce(ALangObject object, IEvaluationContext ec) throws CoercionException;
 }

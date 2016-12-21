@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableCollection;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
@@ -31,7 +33,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @ParametersAreNonnullByDefault
 public enum ELangObjectClass implements ILangObjectClass {
-	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.VAR, false) {
+	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.VAR, false, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -58,8 +60,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return null;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) {
+			return object;
+		}
 	},
-	NULL(1, true, NullLangObject.class, CmnCnst.Syntax.VAR, false) {
+	NULL(1, true, NullLangObject.class, CmnCnst.Syntax.VAR, false, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -86,8 +93,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			throw new CoercionException(NullLangObject.getInstance(), ELangObjectClass.NULL, ec);
+		}
 	},
-	BOOLEAN(2, true, BooleanLangObject.class, CmnCnst.Syntax.BOOLEAN, false) {
+	BOOLEAN(2, true, BooleanLangObject.class, CmnCnst.Syntax.BOOLEAN, false, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -114,8 +126,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) {
+			return object.coerceBoolean(ec);
+		}
 	},
-	NUMBER(3, true, NumberLangObject.class, CmnCnst.Syntax.NUMBER, true) {
+	NUMBER(3, true, NumberLangObject.class, CmnCnst.Syntax.NUMBER, true, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -143,8 +160,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			return object.coerceNumber(ec);
+		}
 	},
-	STRING(4, true, StringLangObject.class, CmnCnst.Syntax.STRING, true) {
+	STRING(4, true, StringLangObject.class, CmnCnst.Syntax.STRING, true, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -172,8 +194,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) {
+			return object.coerceString(ec);
+		}
 	},
-	REGEX(5, true, RegexLangObject.class, CmnCnst.Syntax.REGEX, false) {
+	REGEX(5, true, RegexLangObject.class, CmnCnst.Syntax.REGEX, false, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -200,8 +227,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			return object.coerceRegex(ec);
+		}
 	},
-	FUNCTION(6, true, FunctionLangObject.class, CmnCnst.Syntax.METHOD, false) {
+	FUNCTION(6, true, FunctionLangObject.class, CmnCnst.Syntax.METHOD, false, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			for (final EVariableTypeFlag flag : flags) {
@@ -234,8 +266,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 			return ELangObjectClass.OBJECT;
 		}
 
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			return object.coerceFunction(ec);
+		}
+
 	},
-	EXCEPTION(7, true, ExceptionLangObject.class, CmnCnst.Syntax.ERROR, false) {
+	EXCEPTION(7, true, ExceptionLangObject.class, CmnCnst.Syntax.ERROR, false, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 0 && flags.isEmpty();
@@ -262,8 +299,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			return object.coerceRegex(ec);
+		}
 	},
-	ARRAY(8, false, ArrayLangObject.class, CmnCnst.Syntax.ARRAY, true) {
+	ARRAY(8, false, ArrayLangObject.class, CmnCnst.Syntax.ARRAY, true, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 1 && flags.isEmpty();
@@ -291,8 +333,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			return object.coerceArray(ec);
+		}
 	},
-	HASH(9, false, HashLangObject.class, CmnCnst.Syntax.HASH, true) {
+	HASH(9, false, HashLangObject.class, CmnCnst.Syntax.HASH, true, true) {
 		@Override
 		public boolean allowsGenericsCountAndFlags(final int i, final ImmutableCollection<EVariableTypeFlag> flags) {
 			return i == 2 && flags.isEmpty();
@@ -320,8 +367,14 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ILangObjectClass getSuperClass() {
 			return ELangObjectClass.OBJECT;
 		}
+
+		@Override
+		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
+			return object.coerceHash(ec);
+		}
 	};
 
+	private final boolean supportsCoercion;
 	private final boolean isImmutable;
 	private final Integer id;
 	private final boolean isIterable;
@@ -329,12 +382,13 @@ public enum ELangObjectClass implements ILangObjectClass {
 	private final String syntacticalTypeName;
 
 	private ELangObjectClass(final Integer id, final boolean isImmutable, final Class<? extends ALangObject> clazz,
-			final String syntacticalTypeName, final boolean isIterable) {
+			final String syntacticalTypeName, final boolean isIterable, final boolean supportsCoercion) {
 		this.id = id;
 		this.clazz = clazz;
 		this.syntacticalTypeName = syntacticalTypeName;
 		this.isIterable = isIterable;
 		this.isImmutable = isImmutable;
+		this.supportsCoercion = supportsCoercion;
 	}
 
 	@Override
@@ -369,6 +423,11 @@ public enum ELangObjectClass implements ILangObjectClass {
 	@Override
 	public final boolean equalsClass(final ILangObjectClass clazz) {
 		return id.equals(clazz.getClassId());
+	}
+
+	@Override
+	public final boolean supportsBasicCoercion() {
+		return supportsCoercion;
 	}
 
 	@Override

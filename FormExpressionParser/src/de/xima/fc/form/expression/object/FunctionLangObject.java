@@ -158,6 +158,12 @@ public class FunctionLangObject extends ALangObject {
 		return new FunctionLangObject((IFunction<ALangObject>) value);
 	}
 
+	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling the function.
+	public static FunctionLangObject createNull(final IFunction<NullLangObject> value) {
+		final IFunction<?> f = value;
+		return new FunctionLangObject((IFunction<ALangObject>) f, NullLangObject.getInstance());
+	}
+
 	public boolean hasVarArgs() {
 		return value.hasVarArgs();
 	}

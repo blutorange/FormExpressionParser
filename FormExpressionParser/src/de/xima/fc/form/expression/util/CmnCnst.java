@@ -68,7 +68,19 @@ public final class CmnCnst {
 		@Nonnull public static final String FORM_FUNCTIONS = "form";
 		/** Scope for math-related utilities. */
 		@Nonnull public static final String MATH = "math";
-
+		@Nonnull public static final String MATH_PI = "pi";
+		@Nonnull public static final String MATH_E = "e";
+		/**
+		 * Scope for document commands, manipulating the document. Usually used by templates.
+		 * Document command names are loosely based on jQuery names.
+		 */
+		@Nonnull public static final String DOC = "doc";
+		@Nonnull public static final String DOC_REMOVE_ENCLOSING_TAG = "unwrap";
+		@Nonnull public static final String DOC_REMOVE_ENCLOSING_TAG_ARG0 = "tagName";
+		@Nonnull public static final String DOC_OUTPUT = "write";
+		@Nonnull public static final String DOC_OUTPUT_ARG0 = "dataToWrite";
+		@Nonnull public static final String DOC_OUTPUT_NEWLINE = "writeln";
+		@Nonnull public static final String DOC_OUTPUT_NEWLINE_ARG0 = "dataToWrite";
 	}
 
 	public final static class Name {
@@ -92,8 +104,6 @@ public final class CmnCnst {
 		@Nonnull public static final String HASH = "hash";
 		@Nonnull public static final String VALUE = "value";
 		@Nonnull public static final String EMPTY_LABEL = "without label";
-		@Nonnull public static final String PI = "pi";
-		@Nonnull public static final String E = "e";
 		@Nonnull public static final String VOID_TYPE = "VOID";
 	}
 

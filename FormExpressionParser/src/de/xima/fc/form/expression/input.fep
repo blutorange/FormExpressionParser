@@ -1,15 +1,1 @@
-function max(var arg, var args...) {
-  number len = args.length + 1;
-  var max = arg;
-  for (number i = 0; i < len; ++i) {
-    if (args[i] > max) max = args[i];
-  }
-  return max;
-}
-
-try {
-  max(1,0);
-}
-catch (e) {
-  "caught: " + e.toString;
-}
+<p><p>[%%doc::unwrap("p")%]</p></p>

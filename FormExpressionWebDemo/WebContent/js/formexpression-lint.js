@@ -19,7 +19,8 @@
  *          "type": "program",
  *          "context": "generic",
  *          "strict": "false",
- *          "servlet": "./LintServlet"
+ *          "servlet": "./LintServlet",
+ *          "disabled": false
  *      }
  *  })
  *  
@@ -33,6 +34,8 @@
  */
 if (typeof CodeMirror === "function") {
 	CodeMirror.formexpressionValidator = function(text, updateLinting, options) {
+		if (options.disabled)
+			return;
 		var params = {
 			code : text,
 			type : options.hasOwnProperty("type") ? String(options.type)

@@ -46,7 +46,8 @@ $(function(){
 	    	"type": "program",
 	    	"context": "generic",
 	    	"strict": "false",
-	    	"servlet": "./LintServlet"
+	    	"servlet": "./LintServlet",
+	    	"disabled": false
 	    }
 	})
 	
@@ -61,6 +62,25 @@ $(function(){
 	var controlContext = $("#context")
 	var controlStrict = $("#strict")
 	var controlHeight = $("#height")
+	
+	var lastChange = 0;
+	myCodeMirror.on("change", function(){
+		lastChange = new Date().getTime();
+		myCodeMirror.getOption("lint").disabled = true
+	})
+	myCodeMirror.on("cursorActivity", function(){
+		lastChange = new Date().getTime();
+		myCodeMirror.getOption("lint").disabled = true
+	})
+	window.setInterval(function(){
+		var deltaTime = (new Date().getTime())-lastChange
+		if (deltaTime > 1500) {
+			var performLint = myCodeMirror.getOption("lint").disabled
+			myCodeMirror.getOption("lint").disabled = false
+			if (performLint)
+				myCodeMirror.performLint()
+		}
+	}, 1000)	
 	
 	// Setup saving current code.
 	myCodeMirror.setValue(localStorage.code || 'foobar = "Enter your code here...";')

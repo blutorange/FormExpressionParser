@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
 import de.xima.fc.form.expression.test.lang.TestUtil.ETestType;
 import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
@@ -127,6 +128,11 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODBIN027("1<'1';", Tests.TRUE),
 
 
+	// Document commands
+	DOC001(new Cfg("<p><p>[%%doc::unwrap('p')%]</p></p>").res(StringLangObject.create("<p></p>")).template().fc()),
+	DOC002(new Cfg("Hello, [%%doc::write('foobar')%]!").res(StringLangObject.create("Hello, foobar!")).template()),
+	DOC003(new Cfg("Hello, [%%doc::writeln('foobar')%]!").res(StringLangObject.create("Hello, foobar\n!")).template()),
+
 	// Variable resolution
 	RESOLUTION001("i=0;if(true)i=42;i;", Tests.N42),
 	RESOLUTION002("i=42;if(true)var i=0;i;", Tests.N42),
@@ -179,17 +185,29 @@ enum SemanticsSuccess implements ITestCase {
 	private final ALangObject expectedResult;
 	@Nonnull private final ETestType type;
 	@Nonnull private final EContextType context;
+
 	private SemanticsSuccess(@Nonnull final String code, final ALangObject expectedResult) {
 		this(code, EContextType.GENERIC, expectedResult);
 	}
-	private SemanticsSuccess(@Nonnull final String code, @Nonnull final EContextType context, final ALangObject expectedResult) {
+
+	private SemanticsSuccess(@Nonnull final String code, @Nonnull final EContextType context,
+			final ALangObject expectedResult) {
 		this(code, ETestType.PROGRAM, context, expectedResult);
 	}
-	private SemanticsSuccess(@Nonnull final String code, @Nonnull final ETestType type, @Nonnull final EContextType context, final ALangObject expectedResult) {
+
+	private SemanticsSuccess(@Nonnull final String code, @Nonnull final ETestType type,
+			@Nonnull final EContextType context, final ALangObject expectedResult) {
 		this.code = code;
 		this.expectedResult = expectedResult;
 		this.context = context;
 		this.type = type;
+	}
+
+	private SemanticsSuccess(final Cfg cfg) {
+		this.code = cfg.code;
+		this.expectedResult = NullUtil.or(cfg.res, NullLangObject.getInstance());
+		this.context = cfg.context;
+		this.type = cfg.type;
 	}
 
 	@Override

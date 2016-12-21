@@ -153,7 +153,8 @@ public class GenericVariableType implements IVariableType {
 		return new GenericVariableType(ELangObjectClass.FUNCTION, null, arr);
 	}
 
-	public static IVariableType forVarArgFunction(final IVariableType returnType, final IVariableType varArgType, final IVariableType... argType) {
+	public static IVariableType forVarArgFunction(final IVariableType returnType, final IVariableType varArgType,
+			final IVariableType... argType) {
 		final IVariableType[] arr = new IVariableType[argType.length + 2];
 		arr[0] = returnType;
 		System.arraycopy(argType, 0, arr, 1, argType.length);
@@ -229,7 +230,7 @@ public class GenericVariableType implements IVariableType {
 				return false;
 		return true;
 	}
-	
+
 	public static IVariableType upconvert(final IVariableType subType, final ILangObjectClass superClass) {
 		IVariableType type = subType;
 		do {

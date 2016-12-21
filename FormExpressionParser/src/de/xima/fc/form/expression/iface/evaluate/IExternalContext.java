@@ -27,7 +27,7 @@ public interface IExternalContext extends IReset {
 	 *            The data to be written.
 	 * @throws EmbedmentOutputException
 	 *             When an I/O error occurs.
-	 * @throw InvalidTemplateDataException When the data is syntactically or
+	 * @throws InvalidTemplateDataException When the data is syntactically or
 	 *        semantically invalid.
 	 */
 	public void write(@Nonnull String data) throws EmbedmentOutputException, InvalidTemplateDataException;
