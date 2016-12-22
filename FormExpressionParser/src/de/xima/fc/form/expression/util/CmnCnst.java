@@ -277,7 +277,7 @@ public final class CmnCnst {
 		public static final String NODE_INCORRECT_TYPE = "Node type is {0}, but expected {1}. " + INTERNAL_ERROR;
 		public static final String NODE_NULL_STRING = "String is null. " + INTERNAL_ERROR;
 		public static final String NODE_IMPROPER_STRING_TERMINATION = "String {0} not terminated properly. " + INTERNAL_ERROR;
-		public static final String NODE_INVALID_STRING = "Encountered invalid string at line {0}, column {1}: {2}";
+		public static final String NODE_INVALID_STRING = "Encountered invalid string: {0}";
 		public static final String NODE_NULL_REGEX = "Regex is null. " + INTERNAL_ERROR;
 		public static final String NODE_IMPROPER_REGEX_TERMINATION = "Regex {0} not terminated properly. " + INTERNAL_ERROR;
 		public static final String NODE_INVALID_REGEX = "Encountered invalid regex: {0}";
@@ -413,6 +413,8 @@ public final class CmnCnst {
 		public static final String EMBEDDED_BLOCK_NOT_ALLOWED = "Embedded blocks are not allowed.";
 		public static final String FINAL_CODE_BLOCK_NOT_CLOSED = "Final code block in templates must be closed.";
 		public static final String VAR_ARG_IN_NON_FINAL_PLACE = "Variable argument specifier allowed only for the final argument.";
+		public static final String STRING_INVALID_UNICODE_HEX = "Invalid hex digit encountered in string unicode escape: {0}";
+		public static final String STRING_UNFINISHED_UNICODE_ESCAPE = "String unicode escape must contain exactly four hex digits.";
 	}
 
 	public static final class ToString {

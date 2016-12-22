@@ -264,25 +264,59 @@ public class StringLangObject extends ALangObject {
 				if (delimiter == '`')
 					sb.append('\\');
 				sb.append('$');
-				break;				
+				break;
 			default:
-				if (c == delimiter)
-					sb.append('\\');
-				sb.append(c);
+				if (c < 32 | c >= 127) {
+					sb.append('\\').append('u');
+					sb.append(escapeHex(sb, (c & 0b1111000000000000) >> 12));
+					sb.append(escapeHex(sb, (c & 0b0000111100000000) >> 8));
+					sb.append(escapeHex(sb, (c & 0b0000000011110000) >> 4));
+					sb.append(escapeHex(sb, c & 0b0000000000001111));
+				}
+				else if (c == delimiter)
+					sb.append('\\').append(c);
+				else
+					sb.append(c);
 			}
 		}		
 	}
 
 	public static void unescape(final CharSequence value, final char delimiter, final StringBuilder sb) throws IllegalArgumentException {
 		final int len = value.length();
+		final char[] buffer = new char[2];
 		int i = 0;
-		char c;
+		char c, c2;
 		while (i< len) {
 			switch (c = value.charAt(i)) {
 			case '\\':
 				if (i >= len - 1)
 					throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_ENDS_ON_BACKSLASH));
-				sb.append(value.charAt(++i));
+				switch (c2 = value.charAt(++i)) {
+				case 'u':
+				case 'U': {
+					if (i+4>=len)
+						throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_UNFINISHED_UNICODE_ESCAPE));
+					final int hex = (unescapeHex(value.charAt(++i))<<12)|(unescapeHex(value.charAt(++i))<<8)|(unescapeHex(value.charAt(++i))<<4)|unescapeHex(value.charAt(++i));
+					sb.append((char)hex);
+					break;
+				}
+				case 's':
+				case 'S': {
+					if (i+8>=len)
+						throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_UNFINISHED_UNICODE_ESCAPE));
+					final int hex = (unescapeHex(value.charAt(++i)) << 12) | (unescapeHex(value.charAt(++i)) << 24)
+							| (unescapeHex(value.charAt(++i)) << 20) | (unescapeHex(value.charAt(++i)) << 16)
+							| (unescapeHex(value.charAt(++i)) << 12) | (unescapeHex(value.charAt(++i)) << 8)
+							| (unescapeHex(value.charAt(++i)) << 4) | unescapeHex(value.charAt(++i));
+					Character.toChars(hex, buffer, 0);
+					sb.append(buffer[0]);
+					if (buffer.length>1)
+							sb.append(buffer[1]);
+					break;
+				}
+				default:
+					sb.append(c2);
+				}
 				break;
 			case '$':
 			if (delimiter == '`')
@@ -298,5 +332,21 @@ public class StringLangObject extends ALangObject {
 			}
 			++i;
 		}
+	}
+
+	private static char escapeHex(final StringBuilder sb, final int i) {
+		if (i<10)
+			return (char)('0'+i);
+		return (char)('a'+i-10);
+	}
+
+	private static int unescapeHex(final char charAt) {
+		if (charAt >= '0' && charAt <= '9')
+			return charAt - '0';
+		if (charAt >= 'A' && charAt <= 'F')
+			return charAt - 'A' + 10;
+		if (charAt >= 'a' && charAt <= 'f')
+			return charAt - 'a' + 10;
+		throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_INVALID_UNICODE_HEX, charAt));
 	}
 }

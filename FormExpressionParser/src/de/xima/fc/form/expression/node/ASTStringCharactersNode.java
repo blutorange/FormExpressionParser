@@ -50,8 +50,7 @@ public class ASTStringCharactersNode extends ANode {
 			s = StringLangObject.unescape(value, delimiter);
 		}
 		catch (final IllegalArgumentException e) {
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING,
-					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));			
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING, e.getMessage()), getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 		}
 		super.init(method);
 		this.delimiter = delimiter;

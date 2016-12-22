@@ -41,7 +41,7 @@ true == !false;  // Booleans.
 
 // Special objects.
 exception("myexception");       // Exception object, can the thrown.
-lambda = ->(foo){return foo;};  // Lamba object.
+lambda = (foo)=>{return foo;};  // Lamba object.
 lambda(42);                     // Calling a lambda object.
 lambda.call(null, 42);          // apply(this, arg1, arg2, ...)
 lambda.apply(null, [42]);       // call(this, argsArray)
@@ -79,7 +79,7 @@ for (key in {1:null,2:null,3:null})
   loginfo(key);              // => 1 2 3
 
 // While loop, Do-While loop
-while (false) ->(){};
+while (false) ()=>{};
 do 1+2; while (false);
 
 // Switch

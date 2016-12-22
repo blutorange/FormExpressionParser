@@ -68,7 +68,7 @@ public class Demo {
 		showInputCode(code);
 
 		final Token[] tokenArray = showTokenStream(code);
-
+		
 		showHighlighting(tokenArray);
 
 		IFormExpression<Formcycle> expression = parseCode(code);

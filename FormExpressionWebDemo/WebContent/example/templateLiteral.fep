@@ -9,16 +9,16 @@ function div(a, b) {
 <section>
   Let us add some numbers:
   <ul>
-    <li> [%% add(5,10) %] </li>
-    <li> [%% add(-2,2) %] </li>
-    <li> [%% add(1,41) %] </li>
+    <li> [% add(5,10) %] </li>
+    <li> [% add(-2,2) %] </li>
+    <li> [% add(1,41) %] </li>
   </ul>
 </section>
 <section>
   Let us divide some numbers:
   <ul>
-    <li> [%% div(9,3) %] </li>
-    <li> [%% add(-7,-4) %] </li>
-    <li> [%% add(10,0) %] </li>
+    <li> [% div(9,3) %] </li>
+    <li> [% div(-7,-4) %] </li>
+    <li> [% div(10,0) %] </li>
   </ul>
 </section>
