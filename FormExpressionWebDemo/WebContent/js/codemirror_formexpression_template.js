@@ -27,9 +27,12 @@ CodeMirror.defineSimpleMode("formexpression-template", {
     // Multi line comment.
     {regex: /\/\*/, token: "comment", next: "comment"},
     {regex: /[-+\/*=<>!~\?]+/, token: "operator"},
-    // indent and dedent properties guide autoindentation
+    // Template literal
+    {regex: /`/, token: "string", next: "templateliteral"},
+    // Indent and dedent properties guide autoindentation
     {regex: /[\{\[\(]/, indent: true},
-    {regex: /[\}\]\)]/, dedent: true},
+    {regex: /\}/, dedent: true, pop: true},
+    {regex: /[\]\)]/, dedent: true},
     // Scoped variables
     {regex: /([a-zA-Z_][a-zA-Z0-9_]*)(::)/, token: ["qualifier", null]},
     // Normal variables
@@ -40,6 +43,13 @@ CodeMirror.defineSimpleMode("formexpression-template", {
   comment: [
     {regex: /.*?\*\//, token: "comment", next: "code"},
     {regex: /.*/, token: "comment"}
+  ],
+  // The template literal state.
+  templateliteral: [
+    {regex: /`/, token: "string", next: "start"},
+    {regex: /\$\{/, token: "string", indent: true, push: "start"},
+    {regex: /./, token: "string"}
+    {regex: /[^]*/, token: "string"}
   ],
   // The meta property contains global information about the mode. It
   // can contain properties like lineComment, which are supported by
