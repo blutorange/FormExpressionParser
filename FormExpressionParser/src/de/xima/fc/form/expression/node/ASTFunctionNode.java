@@ -67,12 +67,12 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvableNode, I
 	}
 
 	public Node getArgumentNode(final int i) {
-		return jjtGetChild(i + (hasType ? 1 : 0));
+		return jjtGetChild(i);
 	}
 
 	@Override
 	public final ASTFunctionArgumentNode getArgResolvable(final int i) {
-		return (ASTFunctionArgumentNode)jjtGetChild(i + (hasType ? 1 : 0));
+		return (ASTFunctionArgumentNode)jjtGetChild(i);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvableNode, I
 	@Override
 	@Nonnull
 	public Node getTypeNode() {
-		return jjtGetChild(0);
+		return jjtGetChild(jjtGetNumChildren()-2);
 	}
 
 	@Override

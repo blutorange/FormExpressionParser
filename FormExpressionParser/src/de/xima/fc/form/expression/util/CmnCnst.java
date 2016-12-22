@@ -191,7 +191,7 @@ public final class CmnCnst {
 		public static final String LOG_WARN = "logwarn";
 		public static final String VAR = "var";
 		public static final String LOS_CLOSE = "%]";
-		public static final String LAMBDA_ARROW = "->";
+		public static final String LAMBDA_ARROW = "=>";
 		public static final String BRACE_OPEN = "{";
 		public static final String BRACE_CLOSE = "}";
 		public static final String PAREN_OPEN = "(";
@@ -265,8 +265,8 @@ public final class CmnCnst {
 		public static final String VARIABLE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
 		public static final String EXTERNAL_SCOPE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
 		public static final String MANUAL_SCOPE_NODE_NULL_NAME = "Name is null. " + INTERNAL_ERROR;
-		public static final String ILLEGAL_LVALUE_FUNCTION = "Encountered illegal LVALUE (function call) {0} in {1} at line {2}, column {3}.";
-		public static final String ILLEGAL_LVALUE = "Encountered illegal LVALUE {0} in {1} at line {2}, column {3}.";
+		public static final String ILLEGAL_LVALUE_FUNCTION = "Encountered illegal LVALUE (function call) {0} in {1}.";
+		public static final String ILLEGAL_LVALUE = "Encountered illegal LVALUE {0} in {1}.";
 		public static final String NODE_COUNT_NOT_ODD = "Node count is not odd: {0}. " + INTERNAL_ERROR;
 		public static final String NODE_COUNT_NOT_EVEN = "Node count is not even: {0}. " + INTERNAL_ERROR;
 		public static final String NODE_COUNT_AT_MOST = "Node can have at most {0} children, but it has {1}. " + INTERNAL_ERROR;
@@ -280,7 +280,7 @@ public final class CmnCnst {
 		public static final String NODE_INVALID_STRING = "Encountered invalid string at line {0}, column {1}: {2}";
 		public static final String NODE_NULL_REGEX = "Regex is null. " + INTERNAL_ERROR;
 		public static final String NODE_IMPROPER_REGEX_TERMINATION = "Regex {0} not terminated properly. " + INTERNAL_ERROR;
-		public static final String NODE_INVALID_REGEX = "Encountered invalid regex at line {0}, column {1}: {2}";
+		public static final String NODE_INVALID_REGEX = "Encountered invalid regex: {0}";
 		public static final String NODE_INVALID_NUMBER = "Encountered invalid number {0} at line {1}, column {2}: {3}";
 		public static final String NULL_EXTERNAL_CONTEXT = "External context must not be null";
 		public static final String TOKEN_ITERATOR_DOES_NOT_SUPPORT_REMOVAL = "Token iterator does not support removal.";
@@ -410,6 +410,9 @@ public final class CmnCnst {
 		public static final String STRING_CONTAINS_DELIMITER = "String contains delimiter {0} at position {1}.";
 		public static final String STRING_ENDS_ON_BACKSLASH = "String ends on a backslash.";
 		public static final String TEMPLATE_LITERAL_CONTAINS_DOLLAR = "Template literal contains unescaped $ at position {0}.";
+		public static final String EMBEDDED_BLOCK_NOT_ALLOWED = "Embedded blocks are not allowed.";
+		public static final String FINAL_CODE_BLOCK_NOT_CLOSED = "Final code block in templates must be closed.";
+		public static final String VAR_ARG_IN_NON_FINAL_PLACE = "Variable argument specifier allowed only for the final argument.";
 	}
 
 	public static final class ToString {

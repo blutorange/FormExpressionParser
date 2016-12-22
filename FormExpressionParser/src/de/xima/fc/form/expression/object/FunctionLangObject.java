@@ -56,17 +56,20 @@ public class FunctionLangObject extends ALangObject {
 
 	@Override
 	public void toExpression(final StringBuilder builder) {
-		builder.append(Syntax.LAMBDA_ARROW).append(Syntax.PAREN_OPEN);
 		// Add arguments.
+		builder.append(Syntax.PAREN_OPEN);
 		for (int i = 0; i < value.getDeclaredArgumentCount(); ++i)
 			builder.append(value.getDeclaredArgument(i)).append(Syntax.COMMA);
 		// Remove final comma
 		if (builder.length() > 3)
 			builder.setLength(builder.length() - 1);
+		// Add triple dot for varargs.
 		if (hasVarArgs())
 			builder.append(CmnCnst.Syntax.TRIPLE_DOT);
-		builder.append(Syntax.PAREN_CLOSE).append(Syntax.BRACE_OPEN);
+		builder.append(Syntax.PAREN_CLOSE);
+		builder.append(Syntax.LAMBDA_ARROW);
 		// Convert body.
+		builder.append(Syntax.BRACE_OPEN);
 		if (value instanceof IUnparsableFunction)
 			((IUnparsableFunction<?>)value).unparseBody(builder);
 		else

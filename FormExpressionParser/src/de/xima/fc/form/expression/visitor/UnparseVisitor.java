@@ -691,12 +691,6 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	public void visit(@Nonnull final ASTFunctionNode node, @Nonnull final String prefix) throws IOException {
 		final int count = node.getArgumentCount();
 		final String next = prefix + config.getIndentPrefix();
-		// Function arrow ->
-		writer.write(Syntax.LAMBDA_ARROW);
-		if (node.hasType()) {
-			writer.write(config.getOptionalSpace());
-			expression(node.getTypeNode(), prefix);
-		}
 		// Function argument (foo, bar)
 		writer.write(Syntax.PAREN_OPEN);
 		for (int i = 0; i < node.getArgumentCount(); ++i) {
@@ -709,6 +703,13 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		if (node.hasVarArgs())
 			writer.write(Syntax.TRIPLE_DOT);
 		writer.write(Syntax.PAREN_CLOSE);
+		writer.write(config.getOptionalSpace());
+		// Function arrow ->
+		writer.write(Syntax.LAMBDA_ARROW);
+		if (node.hasType()) {
+			writer.write(config.getOptionalSpace());
+			expression(node.getTypeNode(), prefix);
+		}
 		writer.write(config.getOptionalSpace());
 		// Opening brace {
 		writer.write(Syntax.BRACE_OPEN);

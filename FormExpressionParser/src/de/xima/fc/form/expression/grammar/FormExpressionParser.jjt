@@ -60,6 +60,7 @@ import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.iface.parse.IComment;
 import de.xima.fc.form.expression.util.CommentFactory;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.node.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -337,7 +338,7 @@ TOKEN :
 |
   < ScopeSeparator : "::" >
 |
-  < LambdaArrow : "->" >
+  < LambdaArrow : "=>" >
 |
   < DoublePlus : "++" >
 |
@@ -539,7 +540,7 @@ Node Template(EMethod method) #StatementListNode :
   )
   {
     if (token_source.curLexState == FormExpressionParserConstants.CODE)
-      throw new ParseException("Final code block in templates must be closed.");
+      throw new ParseException(CmnCnst.Error.FINAL_CODE_BLOCK_NOT_CLOSED, token);
     jjtThis.init(method);
     
     return jjtThis;
@@ -579,9 +580,8 @@ void LosOpen(EMethod method) #LosNode :
   )
   {
     if (!_customLosAllowed) throw new ParseException(
-      java.lang.String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
-    jjtThis.init(method, CmnCnst.NonnullConstant.STRING_EMPTY, t.image, false);
-    
+      NullUtil.messageFormat(CmnCnst.Error.EMBEDDED_BLOCK_NOT_ALLOWED), token);
+    jjtThis.init(method, CmnCnst.NonnullConstant.STRING_EMPTY, t.image, false);    
   }
 }
 
@@ -606,9 +606,8 @@ void LosBody(EMethod method) #LosNode :
   )
   {
     if (!_customLosAllowed) throw new ParseException(
-      java.lang.String.format("Embedded blocks are not allowed. (line %s, column %s)", token.beginLine, token.beginColumn));
+      NullUtil.messageFormat(CmnCnst.Error.EMBEDDED_BLOCK_NOT_ALLOWED), token);
     jjtThis.init(method, sb.toString(), p != null ? p.image : null, true);
-    
   }
 }
 
@@ -758,16 +757,18 @@ void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
   }
 }
 
-void FunctionArgument(EMethod method) #FunctionArgumentNode :
+boolean FunctionArgument(EMethod method) #FunctionArgumentNode :
 {
   Token t;
+  boolean hasVarArg = false;
 }
 {
   (
-      [ VariableType(null) ] t = < Identifier >
+      [ VariableType(null) ] [ <TripleDot > { hasVarArg = true; }] t = < Identifier >
   )
   {
     jjtThis.init(method, t.image);
+    return hasVarArg;
   }
 }
 
@@ -961,7 +962,7 @@ void GenericsFunction(EMethod method) #void :
 void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
 {
   Token t;
-  Token varArgs = null;
+  boolean hasVarArg = false;
   boolean hasType = false;
 }
 {
@@ -972,11 +973,15 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
     < ParenOpen >
     (
       [
-        FunctionArgument(null)
+        hasVarArg = FunctionArgument(null)
         (
-          < Comma > FunctionArgument(null)
+          {
+            if (hasVarArg)
+              throw new ParseException(CmnCnst.Error.VAR_ARG_IN_NON_FINAL_PLACE, token);
+          }
+          (            < Comma > hasVarArg = FunctionArgument(null)
+          )
         )*
-        [varArgs = < TripleDot >]
       ]
     )
     < ParenClose >
@@ -985,14 +990,14 @@ void FunctionClauseWithOptionalScope(EMethod method) #FunctionClauseNode :
     )
   )
   {
-    jjtThis.init(method, varArgs != null, hasType);
+    jjtThis.init(method, hasVarArg, hasType);
   }
 }
 
 void FunctionClause(EMethod method) #FunctionClauseNode :
 {
   Token t;
-  Token varArgs = null;
+  boolean hasVarArg = false;
   boolean hasType = false;
 }
 {
@@ -1003,11 +1008,16 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
     < ParenOpen >
     (
       [
-        FunctionArgument(null)
+        hasVarArg = FunctionArgument(null)
         (
-          < Comma > FunctionArgument(null)
+          {
+            if (hasVarArg)
+              throw new ParseException(CmnCnst.Error.VAR_ARG_IN_NON_FINAL_PLACE, token);
+          }
+          (
+            < Comma > hasVarArg = FunctionArgument(null)
+          )
         )*
-        [varArgs = < TripleDot >]
       ]
     )
     < ParenClose >
@@ -1016,8 +1026,7 @@ void FunctionClause(EMethod method) #FunctionClauseNode :
     )
   )
   {
-    jjtThis.init(method, varArgs != null, hasType);
-    
+    jjtThis.init(method, hasVarArg, hasType);
   }
 }
 
@@ -1880,12 +1889,23 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
 {
   boolean createNode = false;
 }
+  // An parenthesis ( can be the start of a parenthesized expression
+  //or the start of a lambda.
+  //
+  // The worst case scenario is 3 identical tokens:
+  //
+  //   (foo)->
+  //
+  // (foo) is a valid expression, only the arrow tells us it must be a lambda
 {
   (
     (
-      Literal(method)
-    | 
       VariableWithOptionalScope(method)
+    |
+      LiteralWithoutFunction(method)
+    |
+      LOOKAHEAD(4)
+      Function(method)
     |
       (
         < ParenOpen > Expression(null) < ParenClose > { createNode = true; }
@@ -2145,31 +2165,38 @@ void Exception(EMethod method) #ExceptionNode :
   }
 }
 
+// function foo(x, ...bar)
+// function foo(x, number... bar)
 
 void Function(EMethod method) #FunctionNode :
 {
-  Token varArgs = null;
+  boolean hasVarArg = false;
   boolean hasType = false;
 }
 {
   (
-    < LambdaArrow >
-    [ GenericsFunction(null) { hasType = true; } ]
     < ParenOpen >
     (
       [
-        FunctionArgument(null)
+        hasVarArg = FunctionArgument(null)
         (
-          < Comma > FunctionArgument(null)
+          {
+            if (hasVarArg)
+              throw new ParseException(CmnCnst.Error.VAR_ARG_IN_NON_FINAL_PLACE, token);
+          }
+          (
+            < Comma > hasVarArg = FunctionArgument(null)
+          )
         )*
-        [varArgs = < TripleDot >]
       ]
     )
-    < ParenClose > 
+    < ParenClose >
+    < LambdaArrow >
+    [ GenericsFunction(null) { hasType = true; } ]
     Block(null)
   )
   {
-    jjtThis.init(method, varArgs != null, hasType);
+    jjtThis.init(method, hasVarArg, hasType);
   }
 }
 
@@ -2192,14 +2219,21 @@ void Literal(EMethod method) #void :
 {
 }
 {
-  Array(method)
-| Hash(method)
-| String(method)
-| Regex(method)
+  LiteralWithoutFunction(method)
+| Function(method)
+}
+
+void LiteralWithoutFunction(EMethod method) #void :
+{
+}
+{
+  String(method)
 | Number(method)
 | Boolean(method)
+| Array(method)
+| Hash(method)
+| Regex(method)
 | Null(method)
 | Log(method)
-| Function(method)
 | Exception(method)
 }

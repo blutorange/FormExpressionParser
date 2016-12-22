@@ -39,8 +39,8 @@ public class ASTRegexNode extends ANode {
 			pattern = NullUtil.checkNotNull(Pattern.compile(regex.substring(1, lastHash), flags(regex, lastHash+1)));
 		}
 		catch (final PatternSyntaxException e) {
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_REGEX,
-					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_REGEX, e.getMessage()),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 		}
 	}
 

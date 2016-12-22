@@ -53,7 +53,7 @@ enum SemanticsSuccess implements ITestCase {
 			BooleanLangObject.getFalseInstance(),
 			NumberLangObject.getOneInstance()
 			)),
-	LITERALS015("->(x){x;}(42);", Tests.N42),
+	LITERALS015("(x)=>{x;}(42);", Tests.N42),
 	LITERALS016("{foo:'bar'};", HashLangObject.create(
 			StringLangObject.create("foo"),
 			StringLangObject.create("bar")
@@ -63,10 +63,10 @@ enum SemanticsSuccess implements ITestCase {
 	// Variables and scopes.
 	SCOPE001("k=42;k;", Tests.N42), // local variables
 	SCOPE002("k=0;if(true)k=42;k;", Tests.N42), // can access parent when nesting
-	SCOPE003("k=42;->(){var k=0;}();k;", Tests.N42), // functions with separate scope
+	SCOPE003("k=42;()=>{var k=0;}();k;", Tests.N42), // functions with separate scope
 	SCOPE004("k=42;function foo(){var k=0;};foo();k;", Tests.N42), // functions with separate scope
-	SCOPE005("k=42;->(){k;}();", Tests.N42), // accessing global variables
-	SCOPE006("k=0;->(){k=42;k;}();", Tests.N42), // shadowing global variables
+	SCOPE005("k=42;()=>{k;}();", Tests.N42), // accessing global variables
+	SCOPE006("k=0;()=>{k=42;k;}();", Tests.N42), // shadowing global variables
 	SCOPE007("foo::k=0;bar::k=42;bar::k;",Tests.N42), // scopes
 	SCOPE008("foo::k=0;bar::k=42;with(foo,bar)k;",Tests.N42), // default scopes reading vars
 	SCOPE009("foo::k=0;with(foo){k=42;k;}", Tests.N42), // default scopes writing to vars
@@ -82,7 +82,7 @@ enum SemanticsSuccess implements ITestCase {
 	
 	//Attribute accessors
 	PROP001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
-	PROP002("h={'f':->(){42;}};h.f();", Tests.N42), // can call methods from hashes
+	PROP002("h={'f':()=>{42;}};h.f();", Tests.N42), // can call methods from hashes
 
 	// Attribute assigners
 	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
@@ -96,7 +96,7 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODUN004("!!42;", BooleanLangObject.getTrueInstance()),
 	EMETHODUN005("!'asd';", BooleanLangObject.getFalseInstance()),
 	EMETHODUN006("!#foo#;", BooleanLangObject.getFalseInstance()),
-	EMETHODUN007("!->(){};", BooleanLangObject.getFalseInstance()),
+	EMETHODUN007("!()=>{};", BooleanLangObject.getFalseInstance()),
 	EMETHODUN008("!null;", BooleanLangObject.getTrueInstance()),
 	EMETHODUN009("!true;", BooleanLangObject.getFalseInstance()),
 	EMETHODUN010("!false;", BooleanLangObject.getTrueInstance()),
@@ -163,16 +163,18 @@ enum SemanticsSuccess implements ITestCase {
 	// Functions and lambda support
 	FUNCTION001("function foo(a){a;}foo(3);", NumberLangObject.create(3)),
 	FUNCTION003("foo='BAR'.toLocaleLowerCase;foo(null);", StringLangObject.create("bar")),
-	FUNCTION004("foo=->(){42;};foo();", Tests.N42),
-	FUNCTION005("function foo(arg1,arg2,args...){args;}foo(1,2);", ArrayLangObject.create()),
-	FUNCTION006("function foo(arg1,arg2,args...){args;}foo(1,2,3);", ArrayLangObject.create(NumberLangObject.create(3))),
-	FUNCTION007("function foo(arg1,arg2,args...){args;}foo(1,2,3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
-	FUNCTION008("function foo(args...){args;}foo();", ArrayLangObject.create()),
-	FUNCTION009("function foo(args...){args;}foo(3);", ArrayLangObject.create(NumberLangObject.create(3))),
-	FUNCTION010("function foo(args...){args;}foo(3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
-	FUNCTION011("function foo(arg1,arg2,args...){[arg1,arg2];}foo(1,2);", ArrayLangObject.create(NumberLangObject.create(1),NumberLangObject.create(2))),
+	FUNCTION004("foo=()=>{42;};foo();", Tests.N42),
+	FUNCTION005("function foo(arg1,arg2,...args){args;}foo(1,2);", ArrayLangObject.create()),
+	FUNCTION006("function foo(arg1,arg2,...args){args;}foo(1,2,3);", ArrayLangObject.create(NumberLangObject.create(3))),
+	FUNCTION007("function foo(arg1,arg2,...args){args;}foo(1,2,3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
+	FUNCTION008("function foo(...args){args;}foo();", ArrayLangObject.create()),
+	FUNCTION009("function foo(...args){args;}foo(3);", ArrayLangObject.create(NumberLangObject.create(3))),
+	FUNCTION010("function foo(...args){args;}foo(3,4);", ArrayLangObject.create(NumberLangObject.create(3),NumberLangObject.create(4))),
+	FUNCTION011("function foo(arg1,arg2,...args){[arg1,arg2];}foo(1,2);", ArrayLangObject.create(NumberLangObject.create(1),NumberLangObject.create(2))),
 	FUNCTION012("a=[20,22];a.length;h={bar:a.get};h.bar(0)+h.bar(1);", Tests.N42),
-
+	FUNCTION013("(((((m)=>{(m(42));}))))((x)=>{((x));});", Tests.N42),
+	FUNCTION014("(string a,string b)=>string{return a+\" \"+b;}(\"foo\",\"bar\");", StringLangObject.create("foo bar")),
+	
 	//General
 	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary

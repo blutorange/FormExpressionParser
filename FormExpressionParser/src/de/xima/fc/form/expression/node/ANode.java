@@ -401,17 +401,17 @@ public abstract class ANode implements Node {
 				final Node pen = ((ASTPropertyExpressionNode)children[i]).getLastChildOrNull();
 				if (pen == null || pen.getSiblingMethod() == EMethod.PARENTHESIS) {
 					// Cannot do assignment a.foobar() = 42;
-					final String msg = NullUtil.messageFormat(
-							CmnCnst.Error.ILLEGAL_LVALUE_FUNCTION, children[i],
-							assignType, new Integer(getBeginLine()), new Integer(getBeginColumn()));
-					throw new ParseException(msg);
+					final String msg = NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_LVALUE_FUNCTION, children[i],
+							assignType);
+					throw new ParseException(msg, children[i].getBeginLine(), children[i].getBeginColumn(),
+							children[i].getEndLine(), children[i].getEndColumn());
 				}
 				break;
 			default:
 				final String msg = NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_LVALUE,
-						children[i].getClass().getSimpleName(), assignType, children[i].getBeginLine(),
-						children[i].getBeginColumn());
-				throw new ParseException(msg);
+						children[i].getClass().getSimpleName(), assignType);
+				throw new ParseException(msg, children[i].getBeginLine(), children[i].getBeginColumn(),
+						children[i].getEndLine(), children[i].getEndColumn());
 			}
 		}
 	}

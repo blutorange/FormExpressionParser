@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.iface.IPositionedError;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
@@ -40,6 +41,14 @@ public class ParseException extends Exception implements IPositionedError {
 		tokenImage = tokenImageVal;
 	}
 
+	public ParseException(final String msg, final Token currentTokenVal, @Nullable final int[][] expectedTokenSequencesVal,
+			final String[] tokenImageVal) {
+		super(initialise(currentTokenVal, expectedTokenSequencesVal, tokenImageVal) + ": " + msg);
+		currentToken = currentTokenVal;
+		expectedTokenSequences = expectedTokenSequencesVal;
+		tokenImage = tokenImageVal;
+	}
+	
 	/**
 	 * The following constructors are for use by you for whatever purpose you
 	 * can think of. Constructing the exception in this manner makes the
@@ -63,8 +72,17 @@ public class ParseException extends Exception implements IPositionedError {
 
 	/** Constructor with message and token. */
 	public ParseException(final String message, @Nullable final Token currentToken) {
-		super(message);
+		super(NullUtil.messageFormat(CmnCnst.Error.SEMANTIC_PARSE_EXCEPTION,
+				currentToken != null ? currentToken.beginLine : 0, currentToken != null ? currentToken.beginColumn : 0,
+				message));
 		this.currentToken = currentToken;
+		this.expectedTokenSequences = null;
+		this.tokenImage = null;
+	}
+
+	public ParseException(final String message, final int beginLine, final int beginColumn, final int endLine, final int endColumn) {
+		super(NullUtil.messageFormat(CmnCnst.Error.SEMANTIC_PARSE_EXCEPTION, beginLine, beginColumn, message));
+		this.currentToken = AToken.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn);
 		this.expectedTokenSequences = null;
 		this.tokenImage = null;
 	}
@@ -99,32 +117,35 @@ public class ParseException extends Exception implements IPositionedError {
 	 * parse error, and you do not catch it (it gets thrown from the parser) the
 	 * correct error message gets displayed.
 	 */
-	private static String initialise(final Token currentToken, final int[][] expectedTokenSequences,
+	private static String initialise(final Token currentToken, @Nullable final int[][] expectedTokenSequences,
 			final String[] tokenImage) {
 		final String eol = System.getProperty("line.separator", "\n");
 		final StringBuffer expected = new StringBuffer();
 		int maxSize = 0;
 
-		final Set<String> expectedSet = new TreeSet<>();
-		for (int i = 0; i < expectedTokenSequences.length; i++) {
-			if (maxSize < expectedTokenSequences[i].length) {
-				maxSize = expectedTokenSequences[i].length;
+		if (expectedTokenSequences != null) {
+			final Set<String> expectedSet = new TreeSet<>();
+			for (int i = 0; i < expectedTokenSequences.length; i++) {
+				if (maxSize < expectedTokenSequences[i].length) {
+					maxSize = expectedTokenSequences[i].length;
+				}
+				for (int j = 0; j < expectedTokenSequences[i].length; j++) {
+					expected.append(tokenImage[expectedTokenSequences[i][j]]).append(' ');
+				}
+				if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
+					expected.append("...");
+				}
+				expectedSet.add(expected.toString());
+				expected.setLength(0);
 			}
-			for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-				expected.append(tokenImage[expectedTokenSequences[i][j]]).append(' ');
-			}
-			if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-				expected.append("...");
-			}
-			expectedSet.add(expected.toString());
-			expected.setLength(0);
+			for (final String s : expectedSet)
+				expected.append(s).append(eol).append("    ");
 		}
-		for (final String s : expectedSet)
-			expected.append(s).append(eol).append("    ");
 
 		String retval = "Encountered ";
 		Token tok = currentToken.next;
-		for (int i = 0; i < maxSize; i++) {
+		maxSize = maxSize == 0 && tok != null ? 1 : maxSize;
+		for (int i = 0; i < maxSize && tok != null; i++) {
 			if (i != 0)
 				retval += ", ";
 			if (tok.kind == 0) {
@@ -141,11 +162,13 @@ public class ParseException extends Exception implements IPositionedError {
 		}
 		retval += " at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
 		retval += "." + eol;
-		if (expectedTokenSequences.length == 1) {
-			retval += "Was expecting:" + eol + "    ";
-		}
-		else {
-			retval += "Was expecting one of:" + eol + "    ";
+		if (expectedTokenSequences != null) {
+			if (expectedTokenSequences.length == 1) {
+				retval += "Was expecting:" + eol + "    ";
+			}
+			else {
+				retval += "Was expecting one of:" + eol + "    ";
+			}
 		}
 		retval += expected.toString();
 		return retval;
