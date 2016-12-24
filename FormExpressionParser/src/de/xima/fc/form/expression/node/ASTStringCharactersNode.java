@@ -40,7 +40,7 @@ public class ASTStringCharactersNode extends ANode {
 	}
 
 	/** @param value Characters of the string. */
-	public void init(@Nullable final EMethod method, final String value, final char delimiter) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String value, final char delimiter) throws ParseException {
 		assertChildrenExactly(0);
 		assertNonNull(value, CmnCnst.Error.NODE_NULL_STRING);
 		if (delimiter != '"' && delimiter != '\'' && delimiter != '`')

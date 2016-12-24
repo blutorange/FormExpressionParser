@@ -82,7 +82,7 @@ public class ParseException extends Exception implements IPositionedError {
 
 	public ParseException(final String message, final int beginLine, final int beginColumn, final int endLine, final int endColumn) {
 		super(NullUtil.messageFormat(CmnCnst.Error.SEMANTIC_PARSE_EXCEPTION, beginLine, beginColumn, message));
-		this.currentToken = AToken.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn);
+		this.currentToken = Token.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn);
 		this.expectedTokenSequences = null;
 		this.tokenImage = null;
 	}
@@ -160,7 +160,9 @@ public class ParseException extends Exception implements IPositionedError {
 			}
 			tok = tok.next;
 		}
-		retval += " at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
+		final Token next = currentToken.next;
+		if (next != null)
+			retval += " at line " + next.beginLine + ", column " + next.beginColumn;
 		retval += "." + eol;
 		if (expectedTokenSequences != null) {
 			if (expectedTokenSequences.length == 1) {

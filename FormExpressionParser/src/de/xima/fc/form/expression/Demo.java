@@ -3,12 +3,16 @@ package de.xima.fc.form.expression;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -17,8 +21,8 @@ import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.highlight.highlighter.HtmlHighlighter;
 import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
@@ -26,13 +30,13 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IToken;
 import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.impl.config.UnparseConfig;
 import de.xima.fc.form.expression.impl.ec.EEvaluationContextContractFormcycle;
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.FormExpressionHighlightingUtil;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
@@ -56,7 +60,7 @@ public class Demo {
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 
@@ -67,9 +71,9 @@ public class Demo {
 
 		showInputCode(code);
 
-		final Token[] tokenArray = showTokenStream(code);
+		showTokenStream(code);
 		
-		showHighlighting(tokenArray);
+		showHighlighting(code);
 
 		IFormExpression<Formcycle> expression = parseCode(code);
 
@@ -144,29 +148,28 @@ public class Demo {
 		System.out.println(code);
 	}
 
-	@Nonnull
-	private static Token[] showTokenStream(@Nonnull final String code) {
-		final Token[] tokenArray;
+	private static void showTokenStream(@Nonnull final String code) {
+		final Iterator<IToken> tokenStream;
 		try {
 			final long t1 = System.nanoTime();
-			tokenArray = EXPRESSION_FACTORY.asTokenArray(code);
+			tokenStream = EXPRESSION_FACTORY.asTokenStream(code);
 			final long t2 = System.nanoTime();
 			System.out.println("\nTokenizing took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final TokenMgrError e) {
 			e.printStackTrace();
 			System.exit(-1);
-			return new Token[0];
+			return;
 		}
 
 		System.out.println("===Token stream==="); //$NON-NLS-1$
 		int charsWithoutLf = 0;
-		for (final Token token : tokenArray) {
+		for (final IToken token : IteratorUtils.asIterable(tokenStream)) {
 			final String s;
-			if (token.kind == FormExpressionParserConstants.TemplateLiteralChars)
-				s = token.image + " ";
+			if (token.getKind() == FormExpressionParserConstants.TemplateLiteralChars)
+				s = token.getImage() + " ";
 			else
-				s = token.image.replaceAll("[ \n\r\t]", "") + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				s = token.getImage().replaceAll("[ \n\r\t]", "") + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			System.out.print(s);
 			charsWithoutLf += s.length();
 			if (charsWithoutLf > 40) {
@@ -177,14 +180,17 @@ public class Demo {
 		if (charsWithoutLf > 0)
 			System.out.println();
 		System.out.println();
-		return tokenArray;
 	}
 
-	private static void showHighlighting(@Nonnull final Token[] tokenArray) {
+	private static void showHighlighting(@Nonnull final String code) {
 		System.out.println("===Syntax highlighted HTML==="); //$NON-NLS-1$
 		try {
-			System.out.println(FormExpressionHighlightingUtil.highlightHtml(tokenArray,
-					HighlightThemeEclipse.getInstance(), null, true));
+			final HtmlHighlighter highlighter = HtmlHighlighter.create();
+			EXPRESSION_FACTORY.highlight(code, highlighter, HighlightThemeEclipse.get.Instance);
+			System.out.println(highlighter.getHtmlWithInlinedCss());
+		}
+		catch (final ParseException e) {
+			e.printStackTrace();
 		}
 		catch (final IOException e) {
 			e.printStackTrace();
@@ -208,10 +214,52 @@ public class Demo {
 		return ex;
 	}
 
+	public static Node asNode(final IFormExpressionFactory factory, final String code)
+			throws ParseException, TokenMgrError, IllegalArgumentException {
+		final Method method;
+		try {
+			method = factory.getClass().getDeclaredMethod("asNode", String.class);
+			final Class<?> clazz = method.getReturnType();
+			if (!Node.class.isAssignableFrom(clazz))
+				throw new IllegalArgumentException("return type not a node, but " + clazz);
+			method.setAccessible(true);
+			return (Node) method.invoke(factory, code);
+		}
+		catch (final NoSuchMethodException e) {
+			throw new IllegalArgumentException(e);
+		}
+		catch (final SecurityException e) {
+			throw new IllegalArgumentException(e);
+		}
+		catch (final IllegalAccessException e) {
+			throw new IllegalArgumentException(e);
+		}
+		catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException(e);
+		}
+		catch (final InvocationTargetException e) {
+			final Throwable t = e.getTargetException();
+			if (t instanceof ParseException)
+				throw (ParseException)t;
+			if (t instanceof TokenMgrError)
+				throw (TokenMgrError)t;
+			if (t instanceof RuntimeException)
+				throw (RuntimeException)t;
+			if (t instanceof Error)
+				throw (Error)t;
+			throw new IllegalArgumentException(e);
+		}
+	}
+	
 	private static Node showParseTree(@Nonnull final String code) {
 		final Node node;
 		try {
-			node = EXPRESSION_FACTORY.asNode(code);
+			node = asNode(EXPRESSION_FACTORY, code);
+		}
+		catch (final TokenMgrError e) {
+			e.printStackTrace();
+			System.exit(-1);
+			return null;
 		}
 		catch (final ParseException e) {
 			e.printStackTrace();

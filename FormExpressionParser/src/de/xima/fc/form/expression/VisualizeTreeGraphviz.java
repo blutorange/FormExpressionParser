@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.visitor.GraphvizVisitor;
 
@@ -26,8 +27,15 @@ public class VisualizeTreeGraphviz {
 			throw new FormExpressionException("First argument (code) must not be null."); //$NON-NLS-1$
 		final Node rootNode;
 		try {
-			rootNode = FormExpressionFactory.forProgram().asNode(expression);
-		} catch (final ParseException e) {
+			rootNode = Demo.asNode(FormExpressionFactory.forProgram(), expression);
+		}
+		catch (final TokenMgrError e) {
+			System.out.println("Failed to parse expression."); //$NON-NLS-1$
+			e.printStackTrace();
+			System.exit(-1);
+			return;
+		}
+		catch (final ParseException e) {
 			System.out.println("Failed to parse expression."); //$NON-NLS-1$
 			e.printStackTrace();
 			System.exit(-1);

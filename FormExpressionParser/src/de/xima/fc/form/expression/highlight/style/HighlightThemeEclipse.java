@@ -1,100 +1,126 @@
 package de.xima.fc.form.expression.highlight.style;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.highlight.ABasicHighlightTheme;
 import de.xima.fc.form.expression.highlight.Color;
-import de.xima.fc.form.expression.highlight.IHighlightTheme;
 import de.xima.fc.form.expression.highlight.Style;
 import de.xima.fc.form.expression.highlight.Weight;
+import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 
-public class HighlightThemeEclipse extends ABasicHighlightTheme {
-	private final static class InstanceHolder {
-		@Nonnull public final static HighlightThemeEclipse INSTANCE = new HighlightThemeEclipse();
+@ParametersAreNonnullByDefault
+public enum HighlightThemeEclipse {
+	get;
+	public final IFormExpressionHighlightTheme Instance;
+
+	private HighlightThemeEclipse() {
+		Instance = new Impl();
 	}
-	private HighlightThemeEclipse(){}
-	@Override
-	protected Style getStyleKeyword() {
-		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
-	}
-	@Override
-	protected Style getStyleBooleanLiteral() {
-		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
-	}
-	@Override
-	protected Style getStyleNullLiteral() {
-		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
-	}
-	@Override
-	protected Style getStyleNumberLiteral() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleStringLiteral() {
-		return new Style(new Color(0x2A00FFFF));
-	}
-	@Override
-	protected Style getStyleRegexLiteral() {
-		return new Style(new Color(0x8A2BE2FF));
-	}
-	@Override
-	protected Style getStyleBracket() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleBraces() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleParenthesis() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleOperator() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleOperatorEqual() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleLosBody() {
-		return new Style(Color.GRAY40);
-	}
-	@Override
-	protected Style getStyleLosSeparator() {
-		return new Style(new Color(0x7F7F9FFF), Weight.BOLDER);
-	}
-	@Override
-	protected Style getStylePunctuation() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleComment() {
-		return new Style(new Color(0x3F7F5FFF));
-	}
-	@Override
-	protected Style getStyleIdentifier() {
-		return new Style(new Color(0x0000C0FF));
-	}
-	@Override
-	protected Style getStyleAttributeIdentifier() {
-		return new Style(Color.BLACK);
-	}
-	@Override
-	protected Style getStyleLambdaLiteral() {
-		return new Style(new Color(0x7F0055FF), Weight.BOLDER);
-	}
-	@Override
-	public Color getColorForBackground() {
-		return Color.TRANSPARENT_WHITE;
-	}
-	@Nonnull
-	public static IHighlightTheme getInstance() {
-		return InstanceHolder.INSTANCE;
-	}
-	@Override
-	protected Style getStyleType() {
-		return new Style(Color.BLACK);
+
+	@Immutable
+	private final class Impl extends ABasicHighlightTheme {
+		private Impl() {
+		}
+
+		@Override
+		protected Style getStyleKeyword() {
+			return new Style(new Color(0x7F0055FF), Weight.BOLDER);
+		}
+
+		@Override
+		protected Style getStyleBooleanLiteral() {
+			return new Style(new Color(0x7F0055FF), Weight.BOLDER);
+		}
+
+		@Override
+		protected Style getStyleNullLiteral() {
+			return new Style(new Color(0x7F0055FF), Weight.BOLDER);
+		}
+
+		@Override
+		protected Style getStyleNumberLiteral() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleStringLiteral() {
+			return new Style(new Color(0x2A00FFFF));
+		}
+
+		@Override
+		protected Style getStyleRegexLiteral() {
+			return new Style(new Color(0x8A2BE2FF));
+		}
+
+		@Override
+		protected Style getStyleBracket() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleBraces() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleParenthesis() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleOperator() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleOperatorEqual() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleLosBody() {
+			return new Style(Color.GRAY40);
+		}
+
+		@Override
+		protected Style getStyleLosSeparator() {
+			return new Style(new Color(0x7F7F9FFF), Weight.BOLDER);
+		}
+
+		@Override
+		protected Style getStylePunctuation() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleComment() {
+			return new Style(new Color(0x3F7F5FFF));
+		}
+
+		@Override
+		protected Style getStyleIdentifier() {
+			return new Style(new Color(0x0000C0FF));
+		}
+
+		@Override
+		protected Style getStyleAttributeIdentifier() {
+			return new Style(Color.BLACK);
+		}
+
+		@Override
+		protected Style getStyleLambdaLiteral() {
+			return new Style(new Color(0x7F0055FF), Weight.BOLDER);
+		}
+
+		@Override
+		public Color getColorForBackground() {
+			return Color.TRANSPARENT_WHITE;
+		}
+
+		@Override
+		protected Style getStyleType() {
+			return new Style(Color.BLACK);
+		}
 	}
 }

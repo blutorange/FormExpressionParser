@@ -31,8 +31,10 @@ package de.xima.fc.form.expression.visualize;
 
 import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 
+import de.xima.fc.form.expression.Demo;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 
 /**
@@ -41,13 +43,13 @@ import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
  * @author Udo Borkowski (ub@abego.org)
  */
 public class FormExpressionTreeFactory {
-	public static DefaultTreeForTreeLayout<TextInBox> createForExpression(String expression) throws ParseException {
+	public static DefaultTreeForTreeLayout<TextInBox> createForExpression(String expression) throws ParseException, TokenMgrError {
 		expression = expression == null ? "EMPTY" : expression; //$NON-NLS-1$
 		final TextInBox root = new TextInBox(expression.isEmpty() ? "<EMPTY>" : expression); //$NON-NLS-1$
 		final DefaultTreeForTreeLayout<TextInBox> tree = new DefaultTreeForTreeLayout<TextInBox>(
 				root);
 
-		final Node rootNode = FormExpressionFactory.forProgram().asNode(expression);
+		final Node rootNode = Demo.asNode(FormExpressionFactory.forProgram(), expression);
 		addNodes(tree, rootNode, root);
 		return tree;
 	}

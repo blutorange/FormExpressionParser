@@ -28,7 +28,7 @@ public class ASTRegexNode extends ANode {
 		super(parser, nodeId);
 	}
 
-	public void init(@Nullable final EMethod method, @Nonnull final String regex) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String regex) throws ParseException {
 		assertChildrenExactly(0);
 		Preconditions.checkNotNull(regex, new ParseException(CmnCnst.Error.NODE_NULL_REGEX));
 		if (regex.length() < 2)

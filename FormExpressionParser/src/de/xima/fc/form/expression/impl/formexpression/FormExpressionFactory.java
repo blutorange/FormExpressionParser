@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.impl.formexpression;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Preconditions;
 
@@ -23,6 +25,8 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.SimpleCharStream;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
+import de.xima.fc.form.expression.iface.IFormExpressionHighlighter;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.config.IUnparseConfig;
 import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
@@ -31,8 +35,10 @@ import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
+import de.xima.fc.form.expression.iface.parse.IToken;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.CompileTimeConstantCheckVisitor;
 import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
@@ -42,6 +48,7 @@ import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCollectVisitor;
 
+@ParametersAreNonnullByDefault
 public final class FormExpressionFactory {
 	private FormExpressionFactory() {
 	}
@@ -82,7 +89,6 @@ public final class FormExpressionFactory {
 	 *
 	 * @see #forProgram()
 	 */
-	@Nonnull
 	public static IFormExpressionFactory forTemplate() {
 		return TemplateImpl.INSTANCE;
 	}
@@ -92,7 +98,6 @@ public final class FormExpressionFactory {
 	 *
 	 * @see #forTemplate()
 	 */
-	@Nonnull
 	public static IFormExpressionFactory forProgram() {
 		return ProgramImpl.INSTANCE;
 	}
@@ -131,9 +136,9 @@ public final class FormExpressionFactory {
 			}
 		}
 
-		@Override
-		@Nonnull
-		public Node asNode(@Nonnull final String code) throws ParseException, TokenMgrError {
+		// Called reflectively by Demo.asNode(String code), only for testing.
+		@SuppressWarnings("unused")
+		public Node asNode(final String code) throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			try (final StringReader reader = new StringReader(code)) {
 				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
@@ -143,33 +148,35 @@ public final class FormExpressionFactory {
 			}
 		}
 
-		@Override
-		@Nonnull
-		public FormExpressionParserTokenManager asTokenManager(@Nonnull final Reader reader) {
-			Preconditions.checkNotNull(reader);
+		private FormExpressionParserTokenManager asTokenManager(final Reader reader) {
 			return tokenManagerForState(reader, FormExpressionParserTokenManager.CODE);
 		}
-
+		
 		@Override
-		@Nonnull
-		public Iterator<Token> asTokenStream(@Nonnull final Reader reader) throws TokenMgrError {
-			Preconditions.checkNotNull(reader);
-			return new TokenIterator(asTokenManager(reader));
+		public void highlight(final String code, final IFormExpressionHighlighter highlighter,
+				final IFormExpressionHighlightTheme theme) throws IOException, ParseException {
+			Preconditions.checkNotNull(code);
+			Preconditions.checkNotNull(highlighter);
+			Preconditions.checkNotNull(theme);
+			try (StringReader reader = new StringReader(code)) {
+				highlighter.process(new TokenIterator(asTokenManager(reader)), theme);
+			}
 		}
 
 		@Override
-		@Nonnull
-		public Token[] asTokenArray(@Nonnull final String code) throws TokenMgrError {
+		public Iterator<IToken> asTokenStream(final String code) throws TokenMgrError {
 			Preconditions.checkNotNull(code);
-			try (final StringReader reader = new StringReader(code)) {
-				return tokenManagerToArray(asTokenManager(reader));
+			try (StringReader reader = new StringReader(code)) {
+				return NullUtil.iterator(tokenManagerToList(asTokenManager(reader)));
 			}
 		}
 	}
 
 	private static enum TemplateImpl implements IFormExpressionFactory {
 		INSTANCE;
-		@Override
+
+		// Called reflectively by Demo.asNode(String code), only for testing.
+		@SuppressWarnings("unused")
 		public Node asNode(final String code) throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			try (final StringReader reader = new StringReader(code)) {
@@ -215,31 +222,34 @@ public final class FormExpressionFactory {
 		}
 
 		@Override
-		public Iterator<Token> asTokenStream(final Reader reader) throws TokenMgrError {
-			Preconditions.checkNotNull(reader);
-			return new TokenIterator(asTokenManager(reader));
-		}
-
-		@Override
-		public Token[] asTokenArray(final String code) throws TokenMgrError {
+		public void highlight(final String code, final IFormExpressionHighlighter highlighter,
+				final IFormExpressionHighlightTheme theme) throws IOException, ParseException {
 			Preconditions.checkNotNull(code);
-			try (final StringReader reader = new StringReader(code)) {
-				return tokenManagerToArray(asTokenManager(reader));
+			Preconditions.checkNotNull(highlighter);
+			Preconditions.checkNotNull(theme);
+			try (StringReader reader = new StringReader(code)) {
+				highlighter.process(new TokenIterator(asTokenManager(reader)), theme);
 			}
 		}
 
 		@Override
-		public FormExpressionParserTokenManager asTokenManager(final Reader reader) {
-			Preconditions.checkNotNull(reader);
-			return tokenManagerForState(reader, FormExpressionParserTokenManager.LOS);
+		public Iterator<IToken> asTokenStream(final String code) throws TokenMgrError {
+			try (StringReader reader = new StringReader(code)) {
+				return NullUtil.iterator(tokenManagerToList(asTokenManager(reader)));
+			}
 		}
+		
 	}
 
+	private static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
+		return tokenManagerForState(reader, FormExpressionParserTokenManager.LOS);
+	}
+	
 	private final static class TokenIterator implements Iterator<Token> {
 		private boolean hasNext = true;
 		private final FormExpressionParserTokenManager tm;
 
-		public TokenIterator(@Nonnull final FormExpressionParserTokenManager tm) {
+		public TokenIterator(final FormExpressionParserTokenManager tm) {
 			this.tm = tm;
 		}
 
@@ -262,30 +272,25 @@ public final class FormExpressionFactory {
 		}
 	}
 
-	@Nonnull
-	private static FormExpressionParserTokenManager tokenManagerForState(@Nonnull final Reader reader, final int state)
+	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state)
 			throws TokenMgrError {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
 		return new FormExpressionParserTokenManager(null, stream, state);
 	}
 
-	@Nonnull
-	private static FormExpressionParser asParser(@Nonnull final FormExpressionParserTokenManager tm) {
+	private static FormExpressionParser asParser(final FormExpressionParserTokenManager tm) {
 		final FormExpressionParser parser = new FormExpressionParser(tm);
 		tm.parser = parser;
 		return parser;
 	}
 
-	@Nonnull
-	private static Token[] tokenManagerToArray(@Nonnull final FormExpressionParserTokenManager tm)
+	private static List<IToken> tokenManagerToList(final FormExpressionParserTokenManager tm)
 			throws TokenMgrError {
-		final List<Token> list = new ArrayList<>();
+		final List<IToken> list = new ArrayList<>();
 		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm
 				.getNextToken())
 			list.add(token);
-		final Token[] res = new Token[list.size()];
-		list.toArray(res);
-		return res;
+		return list;
 	}
 
 	/**
@@ -303,11 +308,10 @@ public final class FormExpressionFactory {
 	 * @return
 	 * @throws ParseException
 	 */
-	@Nonnull
-	private static <T> IFormExpression<T> postProcess(final @Nonnull Node node,
-			@Nonnull final FormExpressionParser parser,
-			@Nonnull final IEvaluationContextContract<T> factory,
-			@Nonnull final ISeverityConfig severityConfig) throws ParseException {
+	private static <T> IFormExpression<T> postProcess(final Node node,
+			final FormExpressionParser parser,
+			final IEvaluationContextContract<T> factory,
+			final ISeverityConfig severityConfig) throws ParseException {
 		JumpCheckVisitor.check(node);
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, factory, severityConfig);
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, factory, severityConfig);
@@ -331,7 +335,7 @@ public final class FormExpressionFactory {
 	}
 
 	private static void checkScopeDefsConstancy(@Nullable final Collection<IHeaderNode> collection,
-			@Nonnull final CompileTimeConstantCheckVisitor visitor)
+			final CompileTimeConstantCheckVisitor visitor)
 					throws HeaderAssignmentNotCompileTimeConstantException {
 		if (collection == null)
 			return;

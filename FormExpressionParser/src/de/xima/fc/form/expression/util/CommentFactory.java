@@ -23,16 +23,23 @@ public final class CommentFactory {
 			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
 		}
 		final Token t = NullUtil.checkNotNull(token);
-		final ECommentType type = t.image.charAt(1) == '/' ? ECommentType.SINGLE_LINE : ECommentType.MULTI_LINE;
+		final String img = t.getImage();
+		final ECommentType type = img.charAt(1) == '/' ? ECommentType.SINGLE_LINE : ECommentType.MULTI_LINE;
 		final int column = t.beginColumn;
 		final int line = t.beginLine;
 		final String text;
 		switch (type) {
 		case MULTI_LINE:
-			text = NullUtil.checkNotNull(t.image.substring(2, t.image.length()-2));
+			if (img.length() >= 4)
+				text = NullUtil.checkNotNull(img.substring(2, t.getImage().length()-2));
+			else
+				text = CmnCnst.NonnullConstant.STRING_EMPTY;
 			break;
 		case SINGLE_LINE:
-			text = NullUtil.checkNotNull(t.image.substring(2));
+			if (img.length() >= 2)
+				text = NullUtil.checkNotNull(img.substring(2));
+			else
+				text = CmnCnst.NonnullConstant.STRING_EMPTY;
 			break;
 		default:
 			text = CmnCnst.NonnullConstant.STRING_EMPTY;

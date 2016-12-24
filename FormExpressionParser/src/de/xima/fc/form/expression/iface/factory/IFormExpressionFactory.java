@@ -1,25 +1,23 @@
 package de.xima.fc.form.expression.iface.factory;
 
-import java.io.Reader;
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
-import de.xima.fc.form.expression.grammar.FormExpressionParserTokenManager;
-import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
+import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
+import de.xima.fc.form.expression.iface.IFormExpressionHighlighter;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.config.IUnparseConfig;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
+import de.xima.fc.form.expression.iface.parse.IToken;
 
 @ParametersAreNonnullByDefault
 public interface IFormExpressionFactory {
-	Node asNode(String code) throws ParseException, TokenMgrError;
-
 	/**
 	 * Parses the given string and returns the top level node of the parse
 	 * tree.
@@ -36,7 +34,7 @@ public interface IFormExpressionFactory {
 	 *             semantically invalid. This is a subclass of
 	 *             {@link ParseException}.
 	 */
-	<T> IFormExpression<T> parse(String code,
+	public <T> IFormExpression<T> parse(String code,
 			IEvaluationContextContract<T> factory, ISeverityConfig config)
 					throws ParseException, TokenMgrError;
 
@@ -52,8 +50,11 @@ public interface IFormExpressionFactory {
 	 *             When the code is not a valid program. Specifically, when
 	 *             the code cannot be parsed into valid tokens.
 	 */
-	String format(String code, IUnparseConfig config)
+	public String format(String code, IUnparseConfig config)
 			throws ParseException, TokenMgrError;
+	
+	public void highlight(String code, IFormExpressionHighlighter highlighter, IFormExpressionHighlightTheme theme)
+			throws ParseException, IOException;
 
 	/**
 	 * @param code
@@ -61,14 +62,5 @@ public interface IFormExpressionFactory {
 	 * @return An iterator for the tokens the code consists of.
 	 * @throws TokenMgrError When the code is invalid.
 	 */
-	Iterator<Token> asTokenStream(Reader reader) throws TokenMgrError;
-
-	Token[] asTokenArray(String code) throws TokenMgrError;
-
-	/**
-	 * @param reader
-	 *            Reader to read from.
-	 * @return A token manager for tokenizing the stream.
-	 */
-	FormExpressionParserTokenManager asTokenManager(Reader reader);
+	public Iterator<IToken> asTokenStream(String code) throws TokenMgrError;
 }

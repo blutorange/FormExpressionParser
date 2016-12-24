@@ -15,7 +15,6 @@ import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 public final class CmnCnst {
 	private CmnCnst() {}
 
-
 	// Used when constructing the stack trace.
 	public static final String TRACER_POSITION_NAME_ANONYMOUS_FUNCTION = "anonymous function";
 	public static final String TRACER_POSITION_NAME_GLOBAL = "main";
@@ -415,6 +414,7 @@ public final class CmnCnst {
 		public static final String VAR_ARG_IN_NON_FINAL_PLACE = "Variable argument specifier allowed only for the final argument.";
 		public static final String STRING_INVALID_UNICODE_HEX = "Invalid hex digit encountered in string unicode escape: {0}";
 		public static final String STRING_UNFINISHED_UNICODE_ESCAPE = "String unicode escape must contain exactly four hex digits.";
+		public static final String NULL_TOKEN_IMAGE = "Token image must not be null. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

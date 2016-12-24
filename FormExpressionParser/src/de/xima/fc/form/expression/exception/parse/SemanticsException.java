@@ -2,10 +2,10 @@ package de.xima.fc.form.expression.exception.parse;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.grammar.AToken;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
+import de.xima.fc.form.expression.grammar.Token;
 
 @ParametersAreNonnullByDefault
 public class SemanticsException extends ParseException {
@@ -17,7 +17,7 @@ public class SemanticsException extends ParseException {
 
 	public SemanticsException(final String message, final int beginLine, final int beginColumn, final int endLine,
 			final int endColumn) {
-		super(message, AToken.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn));
+		super(message, Token.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn));
 		this.beginColumn = beginColumn;
 		this.beginLine = beginLine;
 		this.endLine = endLine;

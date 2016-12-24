@@ -43,7 +43,7 @@ options {
   SUPPORT_CLASS_VISIBILITY_PUBLIC = true;
   STATIC = false;
   TOKEN_MANAGER_USES_PARSER = true;
-  TOKEN_EXTENDS = "AToken";
+  TOKEN_EXTENDS = "";
   TOKEN_FACTORY = "";
 }
 PARSER_BEGIN(FormExpressionParser)
@@ -559,7 +559,7 @@ void LosChars(EMethod method) #LosNode :
     (
       t = < LosChar >
       {
-        sb.append(t.image.charAt(0));
+        sb.append(t.getNonnullImage().charAt(0));
       }
     )+
   )
@@ -581,7 +581,7 @@ void LosOpen(EMethod method) #LosNode :
   {
     if (!_customLosAllowed) throw new ParseException(
       NullUtil.messageFormat(CmnCnst.Error.EMBEDDED_BLOCK_NOT_ALLOWED), token);
-    jjtThis.init(method, CmnCnst.NonnullConstant.STRING_EMPTY, t.image, false);    
+    jjtThis.init(method, CmnCnst.NonnullConstant.STRING_EMPTY, t.getNonnullImage(), false);    
   }
 }
 
@@ -599,7 +599,7 @@ void LosBody(EMethod method) #LosNode :
     (
       t = < LosChar >
       {
-        sb.append(t.image.charAt(0));
+        sb.append(t.getNonnullImage().charAt(0));
       }
     )*
     [ p = < LosOpen > ]
@@ -691,7 +691,7 @@ void ScopeManual(EMethod method) #ScopeManualNode :
     < BracesClose >
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 
@@ -704,7 +704,7 @@ void ScopeExternal(EMethod method) #ScopeExternalNode :
   < Require > < Scope > t = < Identifier > < SemiColon >
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 
@@ -739,7 +739,7 @@ void VariableDeclarationClauseWithoutAssignment(EMethod method) #VariableDeclara
       t = < Identifier > < SemiColon >
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 
@@ -753,7 +753,7 @@ void VariableDeclarationClause(EMethod method) #VariableDeclarationClauseNode :
       t = < Identifier > [ < Equal > Expression(null) ] < SemiColon >
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 
@@ -767,7 +767,7 @@ boolean FunctionArgument(EMethod method) #FunctionArgumentNode :
       [ VariableType(null) ] [ <TripleDot > { hasVarArg = true; }] t = < Identifier >
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
     return hasVarArg;
   }
 }
@@ -781,7 +781,7 @@ void VariableDeclarationExpressionWithAssignment(EMethod method) #VariableDeclar
       VariableType(null) t = < Identifier > [ < Equal > Expression(null) ]
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 
@@ -1057,7 +1057,7 @@ void ContinueClause(EMethod method) #ContinueClauseNode :
   < Continue > [ t = < Identifier > ] < SemiColon >
   )
   {
-    jjtThis.init(method, t == null ? null : t.image);
+    jjtThis.init(method, t == null ? null : t.getNonnullImage());
     
   }
 }
@@ -1072,7 +1072,7 @@ void BreakClause(EMethod method) #BreakClauseNode :
   < Break > [ t = < Identifier > ] < SemiColon >
   )
   {
-    jjtThis.init(method, t == null ? null : t.image);
+    jjtThis.init(method, t == null ? null : t.getNonnullImage());
     
   }
 }
@@ -1169,7 +1169,7 @@ void TryClause(EMethod method) #TryClauseNode :
     )
   )
   {
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
     
   }
 }
@@ -1851,7 +1851,7 @@ void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
     t = < IdentifierAfterDot >
   )
   {
-    jjtThis.init(method, t.image);    
+    jjtThis.init(method, t.getNonnullImage());    
   }
 }
 
@@ -1865,7 +1865,7 @@ void IdentifierName(EMethod method) #IdentifierNameNode :
     t = < Identifier >
   )
   {
-    jjtThis.init(method, t.image);   
+    jjtThis.init(method, t.getNonnullImage());   
   }
 }
 
@@ -1928,7 +1928,7 @@ void Variable(EMethod method) #VariableNode :
     t = < Identifier >
   )
   {
-    jjtThis.init(method, null, t.image);
+    jjtThis.init(method, null, t.getNonnullImage());
   }
 }
 
@@ -1943,9 +1943,9 @@ void VariableWithOptionalScope(EMethod method) #VariableNode :
   )
   {
     if (part2 == null) 
-      jjtThis.init(method, null, part1.image);
+      jjtThis.init(method, null, part1.getNonnullImage());
     else 
-      jjtThis.init(method, part1.image, part2.image);
+      jjtThis.init(method, part1.image, part2.getNonnullImage());
   }
 }
 
@@ -1967,7 +1967,7 @@ void Number(EMethod method) #NumberNode :
     }
   )
   {
-    jjtThis.init(method, t.image, isInt);
+    jjtThis.init(method, t.getNonnullImage(), isInt);
   }
 }
 
@@ -2011,7 +2011,8 @@ char StringLiteral(EMethod method) #StringCharactersNode :
     t = < DoubleQuotedString > { delimiter = '"'; }
   | t = < SingleQuotedString > { delimiter = '\''; }  )
   {
-    jjtThis.init(method, t.image.substring(1,t.image.length()-1), delimiter);
+    String image = t.getNonnullImage();
+    jjtThis.init(method, image.substring(1, image.length()-1), delimiter);
     return delimiter;
   }
 }
@@ -2024,7 +2025,7 @@ void TemplateLiteralCharacters(EMethod method) #StringCharactersNode :
   (
     t = < TemplateLiteralChars >  )
   {
-    jjtThis.init(method, t.image, '`');
+    jjtThis.init(method, t.getNonnullImage(), '`');
   }
 }
 
@@ -2211,7 +2212,7 @@ void Regex(EMethod method) #RegexNode :
   (
     t = < BackslashQuotedRegex >  )
   {    
-    jjtThis.init(method, t.image);
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 

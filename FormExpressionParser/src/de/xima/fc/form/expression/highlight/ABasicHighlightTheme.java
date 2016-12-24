@@ -1,6 +1,10 @@
 package de.xima.fc.form.expression.highlight;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.*;
 
+import javax.annotation.concurrent.Immutable;
+
+import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
+
 /**
  * Groups several similar tokens and allows you to specify a style
  * for each group. All methods will only be called once when processing
@@ -8,8 +12,8 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserConstants.*
  * {@link Style} / {@link Color} objects.
  * @author mad_gaksha
  */
-public abstract class ABasicHighlightTheme implements IHighlightTheme {
-
+@Immutable
+public abstract class ABasicHighlightTheme implements IFormExpressionHighlightTheme {
 	@Override
 	public Style getStyleForToken(final int tokenType) {
 		switch (tokenType) {
