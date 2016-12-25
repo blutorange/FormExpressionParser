@@ -85,11 +85,10 @@ public enum ELibraryScopeContractFactoryFormcycle implements ILibraryScopeContra
 				String value = formcycle.getByAlias(name);
 				if (value == null)
 					value = formcycle.getByName(name);
-				if (value == null) {
-					ec.getTracer().appendWarning(new MissingFormFieldWarning(name, ec));
-					return StringLangObject.getEmptyInstance();
-				}
-				return StringLangObject.create(value);
+				if (value != null)
+					return StringLangObject.create(value);
+				ec.getTracer().appendWarning(new MissingFormFieldWarning(name, ec));
+				return StringLangObject.getEmptyInstance();
 			}
 		},
 		// Dummy for illustration, provides the action::RESULT[index].key object

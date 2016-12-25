@@ -186,7 +186,7 @@ public class Demo {
 		System.out.println("===Syntax highlighted HTML==="); //$NON-NLS-1$
 		try {
 			final HtmlHighlighter highlighter = HtmlHighlighter.create();
-			EXPRESSION_FACTORY.highlight(code, highlighter, HighlightThemeEclipse.get.Instance);
+			EXPRESSION_FACTORY.highlight(code, highlighter, HighlightThemeEclipse.ECLIPSE);
 			System.out.println(highlighter.getHtmlWithInlinedCss());
 		}
 		catch (final ParseException e) {
@@ -202,7 +202,7 @@ public class Demo {
 		final IFormExpression<Formcycle> ex;
 		try {
 			final long t1 = System.nanoTime();
-			ex = EXPRESSION_FACTORY.parse(code, CONTRACT_FACTORY, SEVERITY_CONFIG);
+			ex = EXPRESSION_FACTORY.compile(code, CONTRACT_FACTORY, SEVERITY_CONFIG);
 			final long t2 = System.nanoTime();
 			System.out.println("\nParsing took " + (t2 - t1) / 1000000 + "ms\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}

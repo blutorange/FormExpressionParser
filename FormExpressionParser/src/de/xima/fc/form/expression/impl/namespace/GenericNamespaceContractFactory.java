@@ -193,6 +193,11 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	public INamespace make() {
 		return this;
 	}
+	
+	@Override
+	public void reset() {
+		// nothing to reset, we are immutable
+	}
 
 	@Nullable
 	@Override

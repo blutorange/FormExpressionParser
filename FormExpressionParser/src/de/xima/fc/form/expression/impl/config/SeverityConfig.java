@@ -5,6 +5,8 @@ import java.util.EnumSet;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.google.common.base.Preconditions;
+
 import de.xima.fc.form.expression.enums.ESeverityOption;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
@@ -36,6 +38,7 @@ public final class SeverityConfig implements ISeverityConfig {
 		}
 
 		public Builder enableOption(final ESeverityOption... option) {
+			Preconditions.checkNotNull(option);
 			Collections.addAll(options, option);
 			return this;
 		}
@@ -70,5 +73,4 @@ public final class SeverityConfig implements ISeverityConfig {
 	public static SeverityConfig getLooseConfig() {
 		return InstanceHolder.LOOSE;
 	}
-
 }

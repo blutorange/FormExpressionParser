@@ -107,7 +107,7 @@ public final class FormExpressionFactory {
 
 		@Override
 		@Nonnull
-		public <T> IFormExpression<T> parse(@Nonnull final String code,
+		public <T> IFormExpression<T> compile(@Nonnull final String code,
 				@Nonnull final IEvaluationContextContract<T> factory, final ISeverityConfig config)
 						throws ParseException, TokenMgrError, SemanticsException {
 			Preconditions.checkNotNull(code);
@@ -138,8 +138,7 @@ public final class FormExpressionFactory {
 
 		// Called reflectively by Demo.asNode(String code), only for testing.
 		@SuppressWarnings("unused")
-		public Node asNode(final String code) throws ParseException, TokenMgrError {
-			Preconditions.checkNotNull(code);
+		private Node asNode(final String code) throws ParseException, TokenMgrError {
 			try (final StringReader reader = new StringReader(code)) {
 				final Node node = asParser(asTokenManager(reader)).CompleteProgram(null);
 				if (node == null)
@@ -177,7 +176,7 @@ public final class FormExpressionFactory {
 
 		// Called reflectively by Demo.asNode(String code), only for testing.
 		@SuppressWarnings("unused")
-		public Node asNode(final String code) throws ParseException, TokenMgrError {
+		private Node asNode(final String code) throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
 			try (final StringReader reader = new StringReader(code)) {
 				final FormExpressionParser parser = asParser(asTokenManager(reader));
@@ -190,7 +189,7 @@ public final class FormExpressionFactory {
 		}
 
 		@Override
-		public <T> IFormExpression<T> parse(final String code,
+		public <T> IFormExpression<T> compile(final String code,
 				final IEvaluationContextContract<T> factory, final ISeverityConfig config)
 						throws ParseException, TokenMgrError {
 			Preconditions.checkNotNull(code);
@@ -234,6 +233,7 @@ public final class FormExpressionFactory {
 
 		@Override
 		public Iterator<IToken> asTokenStream(final String code) throws TokenMgrError {
+			Preconditions.checkNotNull(code);
 			try (StringReader reader = new StringReader(code)) {
 				return NullUtil.iterator(tokenManagerToList(asTokenManager(reader)));
 			}

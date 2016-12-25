@@ -80,6 +80,8 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 		library.reset();
 		embedment.reset();
 		tracer.reset();
+		namespace.reset();
+		logger.reset();
 		if (externalContext != null)
 			externalContext.reset();
 		symbolTable = CmnCnst.NonnullConstant.EMPTY_SYMBOL_TABLE;

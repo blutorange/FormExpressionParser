@@ -107,4 +107,8 @@ public class SystemLogger implements ILogger {
 		final Date now = new Date();
 		return DateFormat.getDateInstance().format(now) + StringUtils.SPACE + DateFormat.getTimeInstance().format(now);
 	}
+
+	@Override
+	public void reset() {
+	}
 }

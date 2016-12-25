@@ -14,8 +14,10 @@ import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class GenericTracer implements ITracer<Node> {
-	@Nullable private Node processed;
-	@Nonnull private Node[] stackTrace;
+	@Nullable
+	private Node processed;
+	@Nonnull
+	private Node[] stackTrace;
 	@Nullable
 	private List<IEvaluationWarning> warnList;
 	private int pos;
@@ -59,9 +61,9 @@ public class GenericTracer implements ITracer<Node> {
 
 	@Override
 	public Node[] getStackTrace() {
-		final Node[] newArray = new Node[pos+1];
+		final Node[] newArray = new Node[pos + 1];
 		for (int i = pos; i >= 0; --i)
-			newArray[pos-i] = stackTrace[i];
+			newArray[pos - i] = stackTrace[i];
 		return newArray;
 	}
 
@@ -71,7 +73,8 @@ public class GenericTracer implements ITracer<Node> {
 		if (stackTrace.length != initialSize)
 			stackTrace = new Node[initialSize];
 		pos = -1;
-		if (warnList != null) warnList.clear();
+		if (warnList != null)
+			warnList.clear();
 		warnList = null;
 		warningsEnabled = false;
 	}
@@ -93,10 +96,12 @@ public class GenericTracer implements ITracer<Node> {
 	public void enableWarnings() {
 		warningsEnabled = true;
 	}
+
 	@Override
 	public void disableWarnings() {
 		warningsEnabled = false;
 	}
+
 	@Override
 	public boolean isWarningsEnabled() {
 		return warningsEnabled;
@@ -104,6 +109,7 @@ public class GenericTracer implements ITracer<Node> {
 
 	@Override
 	public List<IEvaluationWarning> buildWarnings() {
-		return warnList != null ? new ArrayList<>(warnList) : NullUtil.checkNotNull(Collections.<IEvaluationWarning>emptyList());
+		return warnList != null ? new ArrayList<>(warnList)
+				: NullUtil.checkNotNull(Collections.<IEvaluationWarning> emptyList());
 	}
 }

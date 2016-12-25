@@ -62,12 +62,12 @@ public class EvaluateServlet extends AFormExpressionServlet {
 							try (final Writer writer = new StringBuilderWriter()) {
 								if (CmnCnst.URL_PARAM_VALUE_CONTEXT_FORMCYCLE.equalsIgnoreCase(context)) {
 									res = FormExpressionFactory.forProgram()
-											.parse(code, EEvaluationContextContractFormcycle.INSTANCE, config)
+											.compile(code, EEvaluationContextContractFormcycle.INSTANCE, config)
 											.evaluate(new Formcycle(writer));
 								}
 								else {
 									res = FormExpressionFactory.forProgram()
-											.parse(code, EEvaluationContextContractWriter.INSTANCE, config)
+											.compile(code, EEvaluationContextContractWriter.INSTANCE, config)
 											.evaluate(writer);
 								}
 								output = writer.toString();
@@ -77,12 +77,12 @@ public class EvaluateServlet extends AFormExpressionServlet {
 							try (final Writer writer = new StringBuilderWriter()) {
 								if (CmnCnst.URL_PARAM_VALUE_CONTEXT_FORMCYCLE.equalsIgnoreCase(context)) {
 									res = FormExpressionFactory.forTemplate()
-											.parse(code, EEvaluationContextContractFormcycle.INSTANCE, config)
+											.compile(code, EEvaluationContextContractFormcycle.INSTANCE, config)
 											.evaluate(new Formcycle(writer));
 								}
 								else {
 									res = FormExpressionFactory.forTemplate()
-											.parse(code, EEvaluationContextContractWriter.INSTANCE, config)
+											.compile(code, EEvaluationContextContractWriter.INSTANCE, config)
 											.evaluate(writer);
 
 								}

@@ -50,4 +50,7 @@ public class JavaLogger implements ILogger {
 		if (level.numeric >= Level.DEBUG.numeric)
 			logger.fine(message);
 	}
+	@Override
+	public void reset() {		
+	}
 }

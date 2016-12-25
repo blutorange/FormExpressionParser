@@ -18,4 +18,7 @@ public enum DummyLogger implements ILogger {
 	@Override
 	public void debug(@Nullable final String message) {
 	}
+	@Override
+	public void reset() {
+	}
 }

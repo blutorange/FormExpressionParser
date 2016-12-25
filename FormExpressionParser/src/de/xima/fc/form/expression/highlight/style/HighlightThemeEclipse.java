@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.highlight.style;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
@@ -10,17 +11,17 @@ import de.xima.fc.form.expression.highlight.Weight;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 
 @ParametersAreNonnullByDefault
-public enum HighlightThemeEclipse {
-	get;
-	public final IFormExpressionHighlightTheme Instance;
+public enum HighlightThemeEclipse implements IFormExpressionHighlightTheme {
+	ECLIPSE(new EclipseImpl());
+	private final IFormExpressionHighlightTheme impl;
 
-	private HighlightThemeEclipse() {
-		Instance = new Impl();
+	private HighlightThemeEclipse(final IFormExpressionHighlightTheme impl) {
+		this.impl = impl;
 	}
 
 	@Immutable
-	private final class Impl extends ABasicHighlightTheme {
-		private Impl() {
+	private static final class EclipseImpl extends ABasicHighlightTheme {
+		private EclipseImpl() {
 		}
 
 		@Override
@@ -122,5 +123,16 @@ public enum HighlightThemeEclipse {
 		protected Style getStyleType() {
 			return new Style(Color.BLACK);
 		}
+	}
+
+	@Nullable
+	@Override
+	public Style getStyleForToken(final int tokenType) {
+		return impl.getStyleForToken(tokenType);
+	}
+
+	@Override
+	public Color getColorForBackground() {
+		return impl.getColorForBackground();
 	}
 }

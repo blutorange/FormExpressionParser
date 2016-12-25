@@ -35,7 +35,7 @@ public interface IFormExpression<T> extends Serializable {
 	 * @param loggerName Some default is used when not set explicitly.
 	 * @return this for chaining.
 	 */
-	public IFormExpression<T> setLogLevel(String loggerName);
+	public IFormExpression<T> setLogName(String loggerName);
 
 	/**
 	 * @return A list of comment this program contains.

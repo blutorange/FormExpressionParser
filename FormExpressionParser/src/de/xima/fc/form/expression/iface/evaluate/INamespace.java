@@ -2,9 +2,9 @@ package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.iface.IReset;
 
 /**
  * <p>
@@ -19,9 +19,8 @@ import de.xima.fc.form.expression.enums.EMethod;
  * <b>Must be immutable.</b>
  * @author madgaksha
  */
-@Immutable
 @ParametersAreNonnullByDefault
-public interface INamespace {
+public interface INamespace extends IReset{
 	/**
 	 * Expression method for the given object type. For example
 	 * the thisContext for <code>"foo" * 3</code> is <code>string</code>.

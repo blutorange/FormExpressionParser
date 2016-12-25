@@ -57,13 +57,13 @@ public class LintServlet extends AFormExpressionServlet {
 						if (CmnCnst.URL_PARAM_VALUE_TYPE_PROGRAM.equalsIgnoreCase(type)) {
 							if (CmnCnst.URL_PARAM_VALUE_CONTEXT_FORMCYCLE.equalsIgnoreCase(context)) {
 								IFormExpression<Formcycle> expression;
-								expression = FormExpressionFactory.forProgram().parse(code,
+								expression = FormExpressionFactory.forProgram().compile(code,
 										EEvaluationContextContractFormcycle.INSTANCE, config);
 								addWarning(expression.analyze(new Formcycle()), lint, offset);
 							}
 							else {
 								IFormExpression<Void> expression;
-								expression = FormExpressionFactory.forProgram().parse(code,
+								expression = FormExpressionFactory.forProgram().compile(code,
 										EEvaluationContextContractVoid.GENERIC, config);
 								addWarning(expression.analyze(Void.NULL), lint, offset);
 							}
@@ -71,13 +71,13 @@ public class LintServlet extends AFormExpressionServlet {
 						else {
 							if (CmnCnst.URL_PARAM_VALUE_CONTEXT_FORMCYCLE.equalsIgnoreCase(context)) {
 								IFormExpression<Formcycle> expression;
-								expression = FormExpressionFactory.forTemplate().parse(code,
+								expression = FormExpressionFactory.forTemplate().compile(code,
 										EEvaluationContextContractFormcycle.INSTANCE, config);
 								addWarning(expression.analyze(new Formcycle()), lint, offset);
 							}
 							else {
 								IFormExpression<Void> expression;
-								expression = FormExpressionFactory.forTemplate().parse(code,
+								expression = FormExpressionFactory.forTemplate().compile(code,
 										EEvaluationContextContractVoid.GENERIC, config);
 								addWarning(expression.analyze(Void.NULL), lint, offset);
 							}

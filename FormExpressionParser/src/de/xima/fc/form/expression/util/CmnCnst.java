@@ -281,7 +281,7 @@ public final class CmnCnst {
 		public static final String NODE_IMPROPER_REGEX_TERMINATION = "Regex {0} not terminated properly. " + INTERNAL_ERROR;
 		public static final String NODE_INVALID_REGEX = "Encountered invalid regex: {0}";
 		public static final String NODE_INVALID_NUMBER = "Encountered invalid number {0} at line {1}, column {2}: {3}";
-		public static final String NULL_EXTERNAL_CONTEXT = "External context must not be null";
+		public static final String NULL_EXTERNAL_CONTEXT_OBJECT = "Object for the external context must not be null";
 		public static final String TOKEN_ITERATOR_DOES_NOT_SUPPORT_REMOVAL = "Token iterator does not support removal.";
 		public static final String INVALID_JUMP_TYPE = "Invalid jump type {0}. " + INTERNAL_ERROR;
 		public static final String ILLEGAL_ENUM_PROPERTY_EXPRESSION = "Illegal enum constant {0} at ASTPropertyExpressionNode. " + INTERNAL_ERROR;

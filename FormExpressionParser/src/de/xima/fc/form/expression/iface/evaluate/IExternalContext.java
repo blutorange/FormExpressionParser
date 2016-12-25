@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -9,7 +9,9 @@ import de.xima.fc.form.expression.iface.IReset;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.object.NullLangObject;
 
+@ParametersAreNonnullByDefault
 public interface IExternalContext extends IReset {
 	/**
 	 * Called once before evaluation begins.
@@ -30,7 +32,7 @@ public interface IExternalContext extends IReset {
 	 * @throws InvalidTemplateDataException When the data is syntactically or
 	 *        semantically invalid.
 	 */
-	public void write(@Nonnull String data) throws EmbedmentOutputException, InvalidTemplateDataException;
+	public void write(String data) throws EmbedmentOutputException, InvalidTemplateDataException;
 
 	/**
 	 * Called once after evaluation is finished.
@@ -43,7 +45,7 @@ public interface IExternalContext extends IReset {
 	public void finishWriting() throws EmbedmentOutputException, InvalidTemplateDataException;
 
 	/**
-	 * Processes an isused command. For example, a function may issue the
+	 * Processes an issued command. For example, a function may issue the
 	 * command {@link DocumentCommand#removeParagraph}. When the external
 	 * context supports it, it takes that command and removes the current
 	 * paragraph (eg. the current &lt;p&gt; tag) from the output.
@@ -51,21 +53,17 @@ public interface IExternalContext extends IReset {
 	 * @param command
 	 *            The command to process.
 	 */
-	public void process(@Nonnull IExternalContextCommand command, @Nonnull IEvaluationContext ec);
+	public void process(IExternalContextCommand command, IEvaluationContext ec);
 
 	/**
 	 * <p>
 	 * Used by external contexts to provide custom variables. By defining an
 	 * appropriate embedment, these variables can be used even without their
 	 * fully qualified name. For example, the embedment <code>[% %]</code>
-	 * defines the default scope <code>fields</code>, which allow
-	 * <code>fields::tf1</code> to be written as <code>tf1</code>. Note however
-	 * that local variables take precedence:
-	 * </p>
-	 * <p>
-	 * <code>[% tf1 = 0; tf1 != fields::tf1;%]</code>
-	 * </p>
-	 * <p>
+	 * defines the default scope <code>field</code>, which allows
+	 * <code>[%%= field::tf1 %]</code> to be written as <code>[% tf1 %]</code>.
+	 * Note however that local variables take precedence:
+	 * <pre>[% tf1 = 0; tf1 != field::tf1 %]</pre>
 	 * This comparison will yield <code>true</code> in general.
 	 * </p>
 	 *
@@ -76,13 +74,14 @@ public interface IExternalContext extends IReset {
 	 * @param ec
 	 *            Current evaluation context.
 	 * @return The value of the variable. It must adhere to the contract
-	 *  given by {@link IEvaluationContextContract} and may opt
-	 *  to return a default value for some instances.
-	 * @throws EvaluationException Only when a scope and variable is
-	 * requested not defined by the {@link IEvaluationContextContract}.
+	 *  given by {@link IEvaluationContextContract}, ie. it must return
+	 *  variables of the correct type. It may opt to return a default
+	 *  value instead of a {@link NullLangObject}.
+	 * @throws EvaluationException Only when a scoped variable is
+	 * requested the {@link IEvaluationContextContract} did not
+	 * promise this external context could provide.
 	 * @see IEvaluationContextContract
 	 */
-	@Nonnull
-	public ALangObject fetchScopedVariable(@Nonnull String scope, @Nonnull String name, @Nonnull IEvaluationContext ec)
+	public ALangObject fetchScopedVariable(String scope, String name, IEvaluationContext ec)
 			throws EvaluationException;
 }

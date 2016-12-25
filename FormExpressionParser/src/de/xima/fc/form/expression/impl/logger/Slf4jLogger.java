@@ -40,4 +40,7 @@ public class Slf4jLogger implements ILogger {
 		if (level.numeric >= Level.DEBUG.numeric)
 			logger.debug(message);
 	}
+	@Override
+	public void reset() {
+	}
 }

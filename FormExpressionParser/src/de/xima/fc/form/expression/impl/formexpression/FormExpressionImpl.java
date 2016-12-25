@@ -52,12 +52,13 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	@Override
 	@Nonnull
 	public IEvaluationResult evaluate(@Nonnull final T object) throws EvaluationException {
-		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
+		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
 		ec.createSymbolTable(symbolTableSize);
 		final ALangObject result = EvaluateVisitor.evaluateCode(node, scopeDefs, ec);
+		final List<IEvaluationWarning> warnings = ec.getTracer().buildWarnings();
 		ec.reset();
-		return new ResImpl(result, ec.getTracer().buildWarnings());
+		return new ResImpl(result, warnings);
 	}
 
 	@Override
@@ -72,7 +73,7 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 
 	@Override
 	public List<IEvaluationWarning> analyze(final T object) throws EvaluationException {
-		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT);
+		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
 		final List<IEvaluationWarning> result;
 		try {
@@ -109,19 +110,15 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 		}
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public IFormExpression<T> setLogLevel(final ELogLevel logLevel) {
-		if (logLevel != null)
-			this.logLevel = logLevel;
+		this.logLevel = NullUtil.or(logLevel, this.logLevel);
 		return this;
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public IFormExpression<T> setLogLevel(final String logName) {
-		if (logName != null)
-			this.logName = logName;
+	public IFormExpression<T> setLogName(final String logName) {
+		this.logName = NullUtil.or(logName, this.logName);
 		return this;
 	}
 }
