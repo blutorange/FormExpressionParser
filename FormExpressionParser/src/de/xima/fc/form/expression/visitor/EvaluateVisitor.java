@@ -13,7 +13,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
-import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
 import de.xima.fc.form.expression.exception.evaluation.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
@@ -147,16 +146,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			final IEvaluationContext ec) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
-		switch (node.getSource()) {
-		case EVariableSource.ID_LIBRARY:
-		case EVariableSource.ID_EXTERNAL_CONTEXT:
+		if (!node.getSourceType().isAssignable())
 			throw new IllegalExternalScopeAssignmentException(node.getScope(), node.getVariableName(), ec);
-		case EVariableSource.ID_UNRESOLVED:
+		if (!node.getSourceType().isResolved())
 			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
-		default:
-			ec.getSymbolTable()[node.getSource()].setCurrentObject(val);
-			return val;
-		}
+		ec.getSymbolTable()[node.getSource()].setCurrentObject(val);
+		return val;
 	}
 
 	private ALangObject setSimpleVariable(@Nullable final ISourceResolvable node, final ALangObject val,
@@ -476,20 +471,21 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	@Override
 	public ALangObject visit(final ASTVariableNode node) throws EvaluationException {
 		final String scope = node.getScope();
-		switch (node.getSource()) {
-		case EVariableSource.ID_LIBRARY:
+		switch (node.getSourceType()) {
+		case LIBRARY:
 			if (scope == null)
 				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
 			return ec.getLibrary().getVariable(scope, node.getVariableName(), ec);
-		case EVariableSource.ID_EXTERNAL_CONTEXT:
+		case EXTERNAL_CONTEXT:
 			final IExternalContext ex = ec.getExternalContext();
 			if (ex == null)
 				throw new MissingExternalContextException(ec);
 			if (scope == null)
 				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
 			return ex.fetchScopedVariable(scope, node.getVariableName(), ec);
-		case EVariableSource.ID_UNRESOLVED:
+		case UNRESOLVED:
 			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
+			//$CASES-OMITTED$
 		default:
 			return ec.getSymbolTable()[node.getSource()].getCurrentObject();
 		}

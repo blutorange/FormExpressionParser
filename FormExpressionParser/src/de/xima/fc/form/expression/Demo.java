@@ -60,7 +60,7 @@ public class Demo {
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
-	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forTemplate();
+	private static final IFormExpressionFactory EXPRESSION_FACTORY = FormExpressionFactory.forProgram();
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 

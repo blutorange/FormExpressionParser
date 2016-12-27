@@ -1,1 +1,71 @@
-`Two and two is ${2+2}.`;
+// ========================================
+// Alternative 1, keep reference to parent.
+// ========================================
+
+//bar = 0
+//foo = 1
+//bat = 2
+//w  =  3
+//x   = 4
+//y   = 5
+//z   = 6
+//a   = 7
+//r   = 8
+//q   = 9
+//
+// globalVariables  = {bar, foo, bat}
+// localVariables   = {0:{y}, 1:{}, 2:{}, 3:{}, 4:{q}}
+// closureInfo      = {0:{w,x,z}, 1:{a}, 2:{}, 3:{r}, 4:{}}
+//
+// environmentalMap = {bar, foo, bat, y, q} = {0,1,2,5,9}
+
+global scope{
+  var bar;
+}
+scope baz {
+  var bat;
+}
+function foo(var w) {      // id = 0   closure = {x:0, z:0}  parent = null  // create new table {x,z}
+  var x;              // x with source = 1 and parents = 0
+  var y;              
+  var z;              // x with source = 2 and parents = 0
+  return () => {      // id = 1   closure = {a:0}       parent = 0     // create new table {a}, set reference to parent table
+    var a;
+    a;                // a with source=0 and  parents=0
+    ()=>{             // id = 2   closure = {}          parent = 1     // create new table {}, set reference to parent table
+      a+x;            // x:source=1,parents=2, a:source=0,parents=1
+      w;              // w with source = 0 and parents = 2
+      () => {         // id = 3   closure = {r:0}       parent = 2     // create new table {r}, set reference to parent table
+        var r;
+        () => {       // id = 4   closure = {}          parent = 3     // create new table {}, set reference to parent table
+          var q;      // q is an environment variable with id 
+          r;          // r with source=0 and parents=1
+          z;          // z with source=1 and parents=4
+        };
+      };
+    };
+    return bar+z;
+  };
+}
+
+// ========================================
+// Alternative 2, copy and enlarge table.
+// ========================================
+/*
+function foo() {      // closure = {x, z}     used={x,z}     // create copy of {}, add x and z to get used = {x,z}
+  var x;
+  var y;
+  var z;
+  return () => {      // closure = {a:0}      used={x,z,a}   // create copy of {x,z}, add a to get used = {x,z,a}, 
+    var a;
+    ()=>{             // closure = {}         used={x,z,a}   // create copy of {x,z,a}, add nothing
+      a+x;
+      () => {         // closure = {r}        used={x,z,a,r} // create copy of {x,z,a}, add r to get used={x,z,a,r}
+        var r;
+        () => {r;};   // closure = {}         used={x,z,a,r} // create copy of {x,z,a,r}, add nothing
+      };
+    };
+    return bar+z;
+  };
+}
+*/

@@ -352,7 +352,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	private IVariableType getDeclaredType(@Nullable final String scope, final ISourceResolvable resolvable, final Node node) throws SemanticsException {
-		if (!resolvable.isResolved())
+		if (!resolvable.isSourceResolved())
 			throw new VariableNotResolvableException(scope, resolvable.getVariableName(), node);
 		final int source = resolvable.getSource();
 		if (source >= 0) {

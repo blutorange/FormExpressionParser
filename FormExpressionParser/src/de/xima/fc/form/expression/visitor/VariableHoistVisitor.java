@@ -24,6 +24,7 @@ import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
+import de.xima.fc.form.expression.util.Void;
 
 /**
  * Checks whether all variables are declared before using them in assignments.
@@ -31,7 +32,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author madgaksha
  */
 @ParametersAreNonnullByDefault
-public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
+public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void> {
 	private final IEvaluationContextContract<?> contractFactory;
 	private final ISeverityConfig config;
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
@@ -75,7 +76,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 	}
 
 	@Override
-	public void visit(final ASTLosNode node) throws ParseException {
+	public void visit(final ASTLosNode node, final Void object) throws ParseException {
 		// Check if all scopes needed by template code are available.
 		// When require scope aka "import" is missing, add them.
 		final String embedment = node.getEmbedment();
@@ -99,7 +100,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 	}
 
 	@Override
-	public void visit(final ASTAssignmentExpressionNode node) throws ParseException {
+	public void visit(final ASTAssignmentExpressionNode node, final Void object) throws ParseException {
 		// Check if variable was declared locally or globally.
 		// If not, throw an error when in strict mode.
 		// Otherwise, add it as a global variable.
@@ -107,7 +108,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 		// We need to visit nodes in reverse order. Consider eg.
 		// j = 0;
 		// k = i = (k = j);
-		node.jjtGetChild(node.jjtGetNumChildren() - 1).jjtAccept(this);
+		node.jjtGetChild(node.jjtGetNumChildren() - 1).jjtAccept(this, object);
 		for (int i = node.jjtGetNumChildren() - 1; i-- > 0;) {
 			switch (node.jjtGetChild(i).jjtGetNodeId()) {
 			case FormExpressionParserTreeConstants.JJTVARIABLENODE:
@@ -123,11 +124,11 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 						node.jjtGetChild(i));
 			}
 		}
-		visitChildren(node);
+		visitChildren(node, object);
 	}
 
 	@Override
-	protected Boolean getNewObjectToSet(final ISourceResolvable res) {
+	protected Boolean getNewObjectToSet(final ISourceResolvable res, final Node node, final Void object) {
 		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
@@ -135,8 +136,8 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean> {
 			final IEvaluationContextContract<?> contractFactory, final ISeverityConfig config)
 					throws ParseException {
 		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory, config);
-		v.bindScopeDefValues(scopeDefBuilder);
-		node.jjtAccept(v);
+		v.bindScopeDefValues(scopeDefBuilder, Void.NULL);
+		node.jjtAccept(v, Void.NULL);
 		v.binding.reset();
 	}
 }

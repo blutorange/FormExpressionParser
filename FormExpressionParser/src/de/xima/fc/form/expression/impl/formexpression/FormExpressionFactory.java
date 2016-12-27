@@ -36,9 +36,11 @@ import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.IToken;
+import de.xima.fc.form.expression.iface.parse.IVariableResolutionResult;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
+import de.xima.fc.form.expression.visitor.ClosureConvertVisitor;
 import de.xima.fc.form.expression.visitor.CompileTimeConstantCheckVisitor;
 import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
@@ -315,9 +317,13 @@ public final class FormExpressionFactory {
 		JumpCheckVisitor.check(node);
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, factory, severityConfig);
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, factory, severityConfig);
-		final int symbolTableSize = VariableResolveVisitor.resolve(node, scopeDefBuilder, factory,
+		final IVariableResolutionResult resolutionResult = VariableResolveVisitor.resolve(node, scopeDefBuilder, factory,
 				severityConfig);
+		// FIXME update VariableTypeCollectVisitor, VariableTypeCheckVisitor,
+		//  UnusedVariableCheckVisitor, EvaluateVisitor etc. for new global/local/closure variable scheme
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
+		ClosureConvertVisitor.convert(node, resolutionResult, scopeDefs);
+		final int symbolTableSize = resolutionResult.getEnvironmentalSize();
 		checkScopeDefsConstancy(scopeDefs);
 		if (severityConfig.hasOption(ESeverityOption.TREAT_UNMATCHING_VARIABLE_TYPES_AS_ERROR)) {
 			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);

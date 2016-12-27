@@ -8,7 +8,6 @@ import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
-import de.xima.fc.form.expression.impl.variable.GenericSourceResolvable;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("nls")
@@ -42,7 +41,6 @@ public final class CmnCnst {
 		public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
 		public static final IVariableReference[] EMPTY_SYMBOL_TABLE = new IVariableReference[0];
 		public static final String[] EMPTY_STRING_ARRAY = new String[0];
-		public static final GenericSourceResolvable[] EMPTY_GENERIC_SOURCE_RESOLVABLE_ARRAY = new GenericSourceResolvable[0];
 		public static final IVariableType[] EMPTY_VARIABLE_TYPE_ARRAY = new IVariableType[0];
 		public static final EVariableTypeFlag[] EMPTY_VARIABLE_TYPE_FLAG_ARRAY = new EVariableTypeFlag[0];
 	}
@@ -415,6 +413,7 @@ public final class CmnCnst {
 		public static final String STRING_INVALID_UNICODE_HEX = "Invalid hex digit encountered in string unicode escape: {0}";
 		public static final String STRING_UNFINISHED_UNICODE_ESCAPE = "String unicode escape must contain exactly four hex digits.";
 		public static final String NULL_TOKEN_IMAGE = "Token image must not be null. " + INTERNAL_ERROR;
+		public static final String CALL_ID_NOT_RESOLVED = "Call ID of function node {0} not resolved. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

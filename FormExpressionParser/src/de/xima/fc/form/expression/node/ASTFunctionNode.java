@@ -3,23 +3,24 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.iface.evaluate.IArgumentResolvableNode;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.iface.parse.IFunctionNode;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class ASTFunctionNode extends ANode implements IArgumentResolvableNode, IVariableTyped {
+public class ASTFunctionNode extends ANode implements IFunctionNode {
 	private static final long serialVersionUID = 1L;
 
 	private boolean hasVarArgs;
 	private boolean hasType;
+	private int callId = -1;
 
 	public ASTFunctionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -66,6 +67,7 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvableNode, I
 		return jjtGetNumChildren() - (hasType ? 2 : 1);
 	}
 
+	@Override
 	public Node getArgumentNode(final int i) {
 		return jjtGetChild(i);
 	}
@@ -96,9 +98,26 @@ public class ASTFunctionNode extends ANode implements IArgumentResolvableNode, I
 	public Node getTypeNode() {
 		return jjtGetChild(jjtGetNumChildren()-2);
 	}
-
+	
 	@Override
 	public void additionalToStringFields(final StringBuilder sb) {
 		sb.append(hasVarArgs).append(',');
+	}
+
+	@Override
+	public int getFunctionId() {
+		return callId;
+	}
+
+	@Override
+	public void resolveFunctionId(final int callId) {
+		if (callId < 0)
+			throw new FormExpressionException("Call ID must be non-negative, but it is " + callId);
+		this.callId = callId;
+	}
+
+	@Override
+	public boolean isFunctionIdResolved() {
+		return callId >= 0;
 	}
 }

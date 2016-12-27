@@ -4,24 +4,25 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
-import de.xima.fc.form.expression.iface.evaluate.IArgumentResolvableNode;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.IVariableTyped;
+import de.xima.fc.form.expression.iface.parse.IFunctionNode;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
-public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IArgumentResolvableNode, IVariableTyped {
+public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IFunctionNode {
 	private static final long serialVersionUID = 1L;
-
+	
 	private boolean hasVarArgs;
 	private boolean hasType;
+	private int callId = -1;
 
 	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -88,13 +89,14 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		return jjtGetNumChildren() - (hasType ? 3 : 2);
 	}
 
+	@Override
 	public Node getArgumentNode(final int i) {
 		return jjtGetChild(i + (hasType ? 2 : 1));
 	}
 
 	@Override
 	public final ASTFunctionArgumentNode getArgResolvable(final int i) {
-		return (ASTFunctionArgumentNode)jjtGetChild(i + (hasType ? 2 : 1));
+		return (ASTFunctionArgumentNode) jjtGetChild(i + (hasType ? 2 : 1));
 	}
 
 	@Nonnull
@@ -127,5 +129,22 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	public void additionalToStringFields(final StringBuilder sb) {
 		super.additionalToStringFields(sb);
 		sb.append(hasVarArgs).append(',');
+	}
+
+	@Override
+	public int getFunctionId() {
+		return callId;
+	}
+
+	@Override
+	public void resolveFunctionId(final int callId) {
+		if (callId < 0)
+			throw new FormExpressionException("Call ID must be non-negative, but it is " + callId);
+		this.callId = callId;
+	}
+
+	@Override
+	public boolean isFunctionIdResolved() {
+		return callId >= 0;
 	}
 }

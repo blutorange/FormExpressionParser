@@ -26,7 +26,8 @@ public class HeaderNodeImpl implements IHeaderNode {
 	@Nullable
 	private final Node typedNode;
 	private final boolean isFunction;
-	private int source = EVariableSource.ID_UNRESOLVED;
+	private int source = -1;
+	private EVariableSource sourceType = EVariableSource.UNRESOLVED;
 
 	public HeaderNodeImpl(final ASTVariableDeclarationClauseNode node) {
 		this.node = node.hasAssignment() ? node.getAssignmentNode() : new ASTNullNode(node);
@@ -78,10 +79,23 @@ public class HeaderNodeImpl implements IHeaderNode {
 	}
 
 	@Override
-	public void resolveSource(final int source) throws IllegalVariableSourceResolutionException {
-		if (this.source != EVariableSource.ID_UNRESOLVED && source != this.source)
+	public void resolveSource(final int source, final EVariableSource sourceType) throws IllegalVariableSourceResolutionException {
+		if (isSourceResolved())
 			throw new IllegalVariableSourceResolutionException(this, source);
 		this.source = source;
+		this.sourceType = sourceType;
+	}
+
+	@Override
+	public void remapSource(final int source) {
+		this.source = source;
+	}
+	
+	@Override
+	public void convertEnvironmentalToClosure() throws IllegalVariableSourceResolutionException {
+		if (sourceType != EVariableSource.ENVIRONMENTAL)
+			throw new IllegalVariableSourceResolutionException(this, sourceType.ordinal());
+		sourceType = EVariableSource.CLOSURE;
 	}
 
 	@Override
@@ -90,7 +104,12 @@ public class HeaderNodeImpl implements IHeaderNode {
 	}
 
 	@Override
-	public boolean isResolved() {
+	public EVariableSource getSourceType() {
+		return sourceType;
+	}
+
+	@Override
+	public boolean isSourceResolved() {
 		return source >= 0;
 	}
 

@@ -1,11 +1,12 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
-import de.xima.fc.form.expression.exception.parse.IllegalVariableResolutionException;
+import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 
+@ParametersAreNonnullByDefault
 public interface IScopedSourceResolvable extends ISourceResolvable {
 	/**
 	 * Does nothing when the variable is already resolved. Otherwise, it sets
@@ -13,11 +14,9 @@ public interface IScopedSourceResolvable extends ISourceResolvable {
 	 * 
 	 * @param scope
 	 *            Scope to set.
+	 * @throws IllegalVariableSourceResolutionException 
 	 */
-	public void resolveSource(@Nonnull EVariableSource source, @Nonnull String scope)
-			throws IllegalVariableResolutionException;
-
-	public void resolveSource(int source, @Nonnull String scope) throws IllegalVariableResolutionException;
+	public void resolveSource(int source, EVariableSource sourceType, String scope) throws IllegalVariableSourceResolutionException;
 
 	@Nullable
 	public String getScope();

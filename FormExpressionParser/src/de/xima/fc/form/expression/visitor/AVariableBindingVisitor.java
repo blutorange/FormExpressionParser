@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.exception.parse.VariableDeclaredTwiceException
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IBinding;
-import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
+import de.xima.fc.form.expression.iface.parse.IFunctionNode;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
@@ -41,18 +41,18 @@ import de.xima.fc.form.expression.util.NullUtil;
  *            Type of the objects of the binding.
  */
 @ParametersAreNonnullByDefault
-public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidVisitorAdapter<ParseException> {
+public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDataVisitorAdapter<D, ParseException> {
 	protected final IBinding<T> binding;
 
 	protected AVariableBindingVisitor() {
 		this.binding = new CloneBinding<>();
 	}
 
-	private void visitNested(final Node node) throws ParseException {
+	private void visitNested(final Node node, final D data) throws ParseException {
 		final int bookmark = binding.getBookmark();
 		binding.nest();
 		try {
-			node.jjtAccept(this);
+			node.jjtAccept(this, data);
 		}
 		finally {
 			binding.gotoBookmark(bookmark);
@@ -60,50 +60,50 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	}
 
 	@Override
-	public final void visit(final ASTVariableDeclarationClauseNode node) throws ParseException {
+	public final void visit(final ASTVariableDeclarationClauseNode node, final D data) throws ParseException {
 		// We need to visit the children first. Consider
 		//  var i = i;
 		// Here, i at the right hand side has not been initialized.
 		if (node.hasAssignment())
-			node.getAssignmentNode().jjtAccept(this);
-		visitSourceResolvable(node);
+			node.getAssignmentNode().jjtAccept(this, data);
+		visitSourceResolvable(node, data);
 	}
 
 	@Override
-	public final void visit(final ASTFunctionArgumentNode node) throws ParseException {
-		visitSourceResolvable(node);
+	public final void visit(final ASTFunctionArgumentNode node, final D data) throws ParseException {
+		visitSourceResolvable(node, data);
 	}
 
 	@Override
-	public final void visit(final ASTIfClauseNode node) throws ParseException {
-		node.getConditionNode().jjtAccept(this);
-		visitNested(node.getIfNode());
+	public final void visit(final ASTIfClauseNode node, final D data) throws ParseException {
+		node.getConditionNode().jjtAccept(this, data);
+		visitNested(node.getIfNode(), data);
 		if (node.hasElseNode())
-			visitNested(node.getElseNode());
+			visitNested(node.getElseNode(), data);
 	}
 
 	@Override
-	public final void visit(final ASTDoWhileLoopNode node) throws ParseException {
-		visitNested(node.getBodyNode());
-		node.getDoFooterNode().jjtAccept(this);
+	public final void visit(final ASTDoWhileLoopNode node, final D data) throws ParseException {
+		visitNested(node.getBodyNode(), data);
+		node.getDoFooterNode().jjtAccept(this, data);
 	}
 
 	@Override
-	public final void visit(final ASTWhileLoopNode node) throws ParseException {
-		node.getWhileHeaderNode().jjtAccept(this);
-		visitNested(node.getBodyNode());
+	public final void visit(final ASTWhileLoopNode node, final D data) throws ParseException {
+		node.getWhileHeaderNode().jjtAccept(this, data);
+		visitNested(node.getBodyNode(), data);
 	}
 
 	@Override
-	public final void visit(final ASTForLoopNode node) throws ParseException {
+	public final void visit(final ASTForLoopNode node, final D data) throws ParseException {
 		if (node.isEnhancedLoop()) {
 			final int bookmark = binding.getBookmark();
 			binding.nest();
 			try {
-				node.getEnhancedIteratorNode().jjtAccept(this);
-				final T object = getNewObjectToSet(node);
+				node.getEnhancedIteratorNode().jjtAccept(this, data);
+				final T object = getNewObjectToSet(node, node, data);
 				binding.defineVariable(node.getVariableName(), object);
-				node.getBodyNode().jjtAccept(this);
+				node.getBodyNode().jjtAccept(this, data);
 			}
 			finally {
 				binding.gotoBookmark(bookmark);
@@ -113,10 +113,10 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 			final int bookmark = binding.getBookmark();
 			binding.nest();
 			try {
-				node.getPlainInitializerNode().jjtAccept(this);
-				node.getPlainConditionNode().jjtAccept(this);
-				node.getBodyNode().jjtAccept(this);
-				node.getPlainIncrementNode().jjtAccept(this);
+				node.getPlainInitializerNode().jjtAccept(this, data);
+				node.getPlainConditionNode().jjtAccept(this, data);
+				node.getBodyNode().jjtAccept(this, data);
+				node.getPlainIncrementNode().jjtAccept(this, data);
 			}
 			finally {
 				binding.gotoBookmark(bookmark);
@@ -125,42 +125,49 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	}
 
 	@Override
-	public final void visit(final ASTFunctionNode node) throws ParseException {
-		visitFunctionNode(node);
+	public final void visit(final ASTFunctionNode node, final D data) throws ParseException {
+		visitFunctionNode(node, data, false);
 	}
 
 	@Override
-	public final void visit(final ASTFunctionClauseNode node) throws ParseException {
-		visitFunctionNode(node);
+	public final void visit(final ASTFunctionClauseNode node, final D data) throws ParseException {
+		visitFunctionNode(node, data, true);
 	}
 
-	private <S extends IArgumentResolvable & Node> void visitFunctionNode(final S node) throws ParseException {
+	private void visitFunctionNode(final IFunctionNode node, final D data, final boolean nestLocal) throws ParseException {
+		final D newData = beforeFunctionNode(node, data);
 		final int bookmark = binding.getBookmark();
-		binding.nestLocal();
-
+		if (nestLocal)
+			binding.nestLocal();
+		else
+			binding.nest();
 		try {
 			for (int i = 0; i < node.getArgumentCount(); ++i) {
 				final ISourceResolvable res = node.getArgResolvable(i);
 				if (binding.hasVariableAtCurrentLevel(res.getVariableName()))
 					throw new DuplicateFunctionArgumentException(res.getVariableName(), node);
-				binding.defineVariable(res.getVariableName(), getNewObjectToSet(res));
+				binding.defineVariable(res.getVariableName(), getNewObjectToSet(res, node.getArgumentNode(i), newData));
 			}
-			node.getBodyNode().jjtAccept(this);
+			node.getBodyNode().jjtAccept(this, newData);
 		}
 		finally {
 			binding.gotoBookmark(bookmark);
 		}
 	}
 
+	protected D beforeFunctionNode(final IFunctionNode node, final D data) {
+		return data;
+	}
+
 	@Override
-	public final void visit(final ASTTryClauseNode node) throws ParseException {
-		visitNested(node.getTryNode());
+	public final void visit(final ASTTryClauseNode node, final D data) throws ParseException {
+		visitNested(node.getTryNode(), data);
 		final int bookmark = binding.getBookmark();
 		binding.nest();
 		try {
-			final T object = getNewObjectToSet(node);
+			final T object = getNewObjectToSet(node, node, data);
 			binding.defineVariable(node.getVariableName(), object);
-			node.getCatchNode().jjtAccept(this);
+			node.getCatchNode().jjtAccept(this, data);
 		}
 		finally {
 			binding.gotoBookmark(bookmark);
@@ -168,8 +175,8 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	}
 
 	@Override
-	public final void visit(final ASTSwitchClauseNode node) throws ParseException {
-		node.getSwitchValueNode().jjtAccept(this);
+	public final void visit(final ASTSwitchClauseNode node, final D data) throws ParseException {
+		node.getSwitchValueNode().jjtAccept(this, data);
 		boolean nested = false;
 		int bookmark = 0;
 		try {
@@ -182,14 +189,14 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 						binding.nest();
 					}
 					while (i < node.getCaseCount() && node.getCaseType(i) == EMethod.SWITCHCLAUSE)
-						node.getCaseNode(i++).jjtAccept(this);
+						node.getCaseNode(i++).jjtAccept(this, data);
 					binding.gotoBookmark(bookmark);
 					nested = false;
 					break;
 				case SWITCHCASE:
 					bookmark = binding.getBookmark();
 					binding.nest();
-					node.getCaseNode(i).jjtAccept(this);
+					node.getCaseNode(i).jjtAccept(this, data);
 					nested = true;
 					++i;
 					break;
@@ -210,12 +217,12 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 		}
 	}
 
-	private final <S extends ISourceResolvable & Node> void visitSourceResolvable(final S node) throws ParseException {
+	private final <S extends ISourceResolvable & Node> void visitSourceResolvable(final S node, final D data) throws ParseException {
 		if (binding.isGlobal())
 			throw new IllegalVariableDeclarationAtGlobalScopeException(node);
 		if (binding.hasVariableAtCurrentLevel(node.getVariableName()))
 			throw new VariableDeclaredTwiceException(node);
-		binding.defineVariable(node.getVariableName(), getNewObjectToSet(node));
+		binding.defineVariable(node.getVariableName(), getNewObjectToSet(node, node, data));
 	}
 
 	/**
@@ -225,11 +232,11 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	 * @param scopeDefBuilder
 	 * @throws ParseException
 	 */
-	protected void bindScopeDefValues(final IScopeDefinitionsBuilder scopeDefBuilder) throws ParseException {
+	protected void bindScopeDefValues(final IScopeDefinitionsBuilder scopeDefBuilder, final D data) throws ParseException {
 		// Global scope.
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode hn = it.next().getValue();
-			hn.getNode().jjtAccept(this);
+			hn.getNode().jjtAccept(this, data);
 		}
 		// Manual scopes.
 		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
@@ -239,7 +246,7 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 				if (it2 != null) {
 					while (it2.hasNext()) {
 						final IHeaderNode hn = it2.next().getValue();
-						hn.getNode().jjtAccept(this);
+						hn.getNode().jjtAccept(this, data);
 					}
 				}
 			}
@@ -252,5 +259,5 @@ public abstract class AVariableBindingVisitor<T> extends FormExpressionVoidVoidV
 	 * @return The object to set.
 	 * @throws IllegalVariableSourceResolutionException
 	 */
-	protected abstract T getNewObjectToSet(ISourceResolvable res) throws IllegalVariableSourceResolutionException;
+	protected abstract T getNewObjectToSet(ISourceResolvable res, Node node, D data) throws ParseException;
 }

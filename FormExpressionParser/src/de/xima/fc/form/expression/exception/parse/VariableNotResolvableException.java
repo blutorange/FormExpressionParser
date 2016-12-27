@@ -27,6 +27,10 @@ public class VariableNotResolvableException extends SemanticsException {
 	public <T extends IScopedSourceResolvable & Node> VariableNotResolvableException(final T node) {
 		this(node.getScope(), node.getVariableName(), node);
 	}
+	
+	public VariableNotResolvableException(final ISourceResolvable resolvable, final Node node) {
+		this(null, resolvable.getVariableName(), node);
+	}
 
 	public <T extends ISourceResolvable & Node> VariableNotResolvableException(final T node) {
 		this(null, node.getVariableName(), node);

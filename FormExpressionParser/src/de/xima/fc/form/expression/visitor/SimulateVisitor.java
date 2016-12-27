@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -40,7 +39,7 @@ public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<Evalua
 	@Override
 	public void visit(final ASTVariableNode node) throws EvaluationException {
 		final String scope = node.getScope();
-		if (node.getSource() == EVariableSource.ID_EXTERNAL_CONTEXT && scope != null) {
+		if (node.getSourceType().isExternal() && scope != null) {
 			final IExternalContext ex = this.ex;
 			if (ex != null) {
 				ex.fetchScopedVariable(scope, node.getVariableName(), ec);
