@@ -234,6 +234,15 @@ TOKEN:
   < IdentifierAfterDot : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* > : CODE
 }
 
+< AFTER_DOT >
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
 < TEMPLATE_LITERAL >
 TOKEN:
 {
@@ -1889,12 +1898,12 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
 {
   boolean createNode = false;
 }
-  // An parenthesis ( can be the start of a parenthesized expression
-  //or the start of a lambda.
+  // A parenthesis ( can be the start of a parenthesized expression
+  // or the start of a lambda.
   //
   // The worst case scenario is 3 identical tokens:
   //
-  //   (foo)->
+  //   (foo)=>
   //
   // (foo) is a valid expression, only the arrow tells us it must be a lambda
 {

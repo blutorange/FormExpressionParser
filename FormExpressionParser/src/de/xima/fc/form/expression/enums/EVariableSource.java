@@ -31,7 +31,7 @@ public enum EVariableSource {
 	 * the graph upwards until a function contains the closure variable.
 	 * </p><p>
 	 * When the <code>source</code> is the value of {@link ISourceResolvable#getSource()},
-	 * <code>(source&0xFFFF0000)>>16</code> is the number of parents we need to go up, and 
+	 * <code>(source>>16)&0xFFFF0000</code> is the number of parents we need to go up, and 
 	 * <code>source&0x0000FFFF</code> is the position in the symbol table of that parent
 	 * containing the value of the variable.
 	 * </p>

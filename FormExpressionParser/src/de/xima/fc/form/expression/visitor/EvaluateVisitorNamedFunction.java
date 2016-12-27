@@ -5,13 +5,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.UnresolvedVariableSourceException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IArgumentResolvableNode;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.evaluate.IUnparsableFunction;
-import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.impl.config.UnparseConfig;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
@@ -69,7 +67,7 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 			// Set varArgs array.
 			if (node.hasVarArgs()) {
 				final ALangObject tmp = ArrayLangObject.create(args, normalArgCount);
-				set(ec, node.getArgResolvable(normalArgCount), tmp);
+				visitor.setVariable(node.getArgResolvable(normalArgCount), tmp);
 			}
 		}
 		else
@@ -79,7 +77,7 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 			// Need to check for null as java7 does not allow us to mark
 			// non-null arrays
 			final ALangObject tmp = args[i];
-			set(ec, node.getArgResolvable(i), tmp != null ? tmp : NullLangObject.getInstance());
+			visitor.setVariable(node.getArgResolvable(i), tmp != null ? tmp : NullLangObject.getInstance());
 		}
 		// Evaluate function.
 		return node.getBodyNode().jjtAccept(visitor);
@@ -98,12 +96,5 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 	@Override
 	public void unparseBody(final StringBuilder builder) {
 		builder.append(UnparseVisitor.unparse(node.getBodyNode(), UnparseConfig.getUnstyledWithoutCommentsConfig()));
-	}
-
-	private void set(final IEvaluationContext ec, final ISourceResolvable res, final ALangObject val)
-			throws UnresolvedVariableSourceException {
-		if (res.getSource() < 0)
-			throw new UnresolvedVariableSourceException(null, res.getVariableName(), ec);
-		ec.getSymbolTable()[res.getSource()].setCurrentObject(val);
 	}
 }

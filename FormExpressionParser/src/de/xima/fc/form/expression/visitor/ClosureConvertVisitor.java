@@ -24,16 +24,17 @@ import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<Integer, SemanticsException> {
-	private final IVariableResolutionResult result;
+	private final IVariableResolutionResult resolutionResult;
 
-	private ClosureConvertVisitor(final IVariableResolutionResult result) {
-		this.result = result;
+	private ClosureConvertVisitor(final IVariableResolutionResult resolutionResult) {
+		this.resolutionResult = resolutionResult;
 	}
 
 	@Override
 	public void visit(final ASTFunctionNode node, final Integer functionId) throws SemanticsException {
 		if (!node.isFunctionIdResolved())
 			throw new FunctionIdNotResolvedException(node);
+		node.resolveClosureTableSize(resolutionResult.getClosureSize(node.getFunctionId()));
 		visitChildren(node, node.getFunctionId());
 	}
 
@@ -41,8 +42,9 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 	public void visit(final ASTFunctionClauseNode node, final Integer functionId) throws SemanticsException {
 		if (!node.isFunctionIdResolved())
 			throw new FunctionIdNotResolvedException(node);
+		node.resolveClosureTableSize(resolutionResult.getClosureSize(node.getFunctionId()));
 		visitSourceResolvable(functionId, node, node);
-		for (int i=0; i<node.getArgumentCount(); ++i)
+		for (int i = 0; i < node.getArgumentCount(); ++i)
 			node.getArgumentNode(i).jjtAccept(this, node.getFunctionId());
 		node.getBodyNode().jjtAccept(this, node.getFunctionId());
 	}
@@ -80,21 +82,20 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 
 	private void visitSourceResolvable(final Integer functionId, final ISourceResolvable resolvable, final Node node)
 			throws SemanticsException {
-		final Integer source = resolvable.getSource();
+		final Integer source = resolvable.getBasicSource();
 		switch (resolvable.getSourceType()) {
 		case CLOSURE:
 		case ENVIRONMENTAL:
 			// Remap to consecutive ID.
-			Integer newSource = result.getMappedEnvironmental(source);
+			Integer newSource = resolutionResult.getMappedEnvironmental(source);
 			if (newSource == null) {
-				newSource = result.getMappedClosure(functionId, source);
+				newSource = resolutionResult.getMappedClosure(functionId, source);
 				if (newSource == null)
-					throw new SemanticsException(
-							NullUtil.messageFormat("No mapping for variable {0} with source {1}.",
-									resolvable.getVariableName(), source), node);
+					throw new SemanticsException(NullUtil.messageFormat("No mapping for variable {0} with source {1}.",
+							resolvable.getVariableName(), source), node);
 				resolvable.convertEnvironmentalToClosure();
 			}
-			resolvable.remapSource(newSource.intValue());
+			resolvable.resolveClosureSource(newSource.intValue());
 			break;
 		case EXTERNAL_CONTEXT:
 		case LIBRARY:
@@ -121,10 +122,11 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 		}
 	}
 
-	public static void convert(final Node node, final IVariableResolutionResult result,
+	public static int convert(final Node node, final IVariableResolutionResult resolutionResult,
 			final IScopeDefinitions scopeDefs) throws SemanticsException {
-		final ClosureConvertVisitor v = new ClosureConvertVisitor(result);
+		final ClosureConvertVisitor v = new ClosureConvertVisitor(resolutionResult);
 		v.resolveScopeDefs(scopeDefs);
 		node.jjtAccept(v, -1);
+		return resolutionResult.getEnvironmentalSize();
 	}
 }

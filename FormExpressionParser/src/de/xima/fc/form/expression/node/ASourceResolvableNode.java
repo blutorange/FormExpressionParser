@@ -22,6 +22,7 @@ public abstract class ASourceResolvableNode extends ANode implements ISourceReso
 	 * see {@link EVariableSource#getSourceId()}
 	 */
 	private int source = -1;
+	private int closureSource = -1;
 	private EVariableSource sourceType = EVariableSource.UNRESOLVED;
 
 	public ASourceResolvableNode(final FormExpressionParser parser, final int nodeId) {
@@ -33,18 +34,26 @@ public abstract class ASourceResolvableNode extends ANode implements ISourceReso
 	}
 
 	@Override
-	public final void resolveSource(final int source, final EVariableSource sourceType) throws IllegalVariableSourceResolutionException {
-		if (isSourceResolved())
+	public final void resolveSource(final int source, final EVariableSource sourceType)
+			throws IllegalVariableSourceResolutionException {
+		if (isBasicSourceResolved())
 			throw new IllegalVariableSourceResolutionException(this, this, source);
 		this.source = source;
 		this.sourceType = sourceType;
 	}
-	
+
 	@Override
-	public void remapSource(final int source) {
-		this.source = source;
+	public void resolveClosureSource(final int closureSource) throws IllegalVariableSourceResolutionException {
+		if (isClosureSourceResolved())
+			throw new IllegalVariableSourceResolutionException(this, this, closureSource);
+		this.closureSource = closureSource;
 	}
-	
+
+	@Override
+	public final int getClosureSource() {
+		return closureSource;
+	}
+
 	@Override
 	public void convertEnvironmentalToClosure() throws IllegalVariableSourceResolutionException {
 		if (sourceType != EVariableSource.ENVIRONMENTAL)
@@ -53,15 +62,20 @@ public abstract class ASourceResolvableNode extends ANode implements ISourceReso
 	}
 
 	@Override
-	public final boolean isSourceResolved() {
+	public final boolean isBasicSourceResolved() {
 		return sourceType.isResolved();
 	}
 
 	@Override
-	public final int getSource() {
+	public final boolean isClosureSourceResolved() {
+		return closureSource >= 0;
+	}
+
+	@Override
+	public final int getBasicSource() {
 		return source;
 	}
-	
+
 	@Override
 	public final EVariableSource getSourceType() {
 		return sourceType;

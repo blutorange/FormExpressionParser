@@ -1,10 +1,15 @@
 package de.xima.fc.form.expression.impl.formexpression;
 
+import java.util.Arrays;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IClosure;
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
@@ -13,9 +18,6 @@ import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
-import de.xima.fc.form.expression.iface.parse.IVariableReference;
-import de.xima.fc.form.expression.impl.variable.GenericVariableReference;
-import de.xima.fc.form.expression.util.CmnCnst;
 
 @ParametersAreNonnullByDefault
 public final class EvaluationContextImpl implements IEvaluationContext {
@@ -25,10 +27,16 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 	private final ITracer<Node> tracer;
 	private final ILibrary library;
 	private final IEmbedment embedment;
+	
 	@Nullable
 	private IExternalContext externalContext;
-	private IVariableReference[] symbolTable;
 
+	private IClosure[] closureStack;
+	private int closurePos;
+
+	private EJump jumpType;
+	@Nullable private String jumpLabel;
+	
 	/**
 	 * Creates a new evaluation context.
 	 *
@@ -42,7 +50,9 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 		this.tracer = ecFactory.makeTracer();
 		this.logger = ecFactory.getLoggerFactory().make(logName, logLevel);
 		this.embedment = ecFactory.getEmbedmentFactory().make();
-		this.symbolTable = CmnCnst.NonnullConstant.EMPTY_SYMBOL_TABLE;
+		this.closureStack =  new IClosure[16];
+		this.closurePos = -1;
+		this.jumpType = EJump.NONE;
 	}
 
 	@Override
@@ -58,11 +68,6 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 	@Override
 	public IEmbedment getEmbedment() {
 		return embedment;
-	}
-
-	@Override
-	public boolean variableNameEquals(final String name1, final String name2) {
-		return name1.equals(name2);
 	}
 
 	@Override
@@ -84,8 +89,11 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 		logger.reset();
 		if (externalContext != null)
 			externalContext.reset();
-		symbolTable = CmnCnst.NonnullConstant.EMPTY_SYMBOL_TABLE;
 		externalContext = null;
+		closureStack =  new IClosure[16];
+		closurePos = -1;
+		jumpType = EJump.NONE;
+		jumpLabel = null;
 	}
 
 	@Override
@@ -98,18 +106,64 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 	public IExternalContext getExternalContext() {
 		return externalContext;
 	}
-
+	
 	@Override
-	public void createSymbolTable(int symbolTableSize) {
-		symbolTableSize = symbolTableSize < 0 ? 0 : symbolTableSize;
-		if (symbolTable.length != symbolTableSize)
-			symbolTable = new IVariableReference[symbolTableSize];
-		for (int i = symbolTableSize; i-- > 0;)
-			symbolTable[i] = new GenericVariableReference();
+ 	@SuppressWarnings("null") // Arrays.copyOf does not return null.
+	public void closureStackPush(@Nonnull final IClosure closure) {
+		++closurePos;
+		if (closurePos >= closureStack.length)
+			closureStack = Arrays.copyOf(closureStack, closurePos*2);
+		closureStack[closurePos] = closure;
+	}
+ 	
+	@Override
+	public void closureStackPop() {
+		if (closurePos >= 0) {
+	 		closureStack[closurePos] = null;
+			--closurePos;
+		}
+	}
+	
+	@Nullable
+	@Override
+	public IClosure closureStackPeek() {
+		return closurePos >= 0 ? closureStack[closurePos] : null;
 	}
 
 	@Override
-	public IVariableReference[] getSymbolTable() {
-		return symbolTable;
+	public EJump getJumpType() {
+		return jumpType;
+	}
+
+	@Nullable
+	@Override
+	public String getJumpLabel() {
+		return jumpLabel;
+	}
+
+	@Override
+	public void unsetJump() {
+		jumpType = EJump.NONE;
+		jumpLabel = null;
+	}
+
+	@Override
+	public boolean hasJump() {
+		return jumpType != EJump.NONE;
+	}
+
+	@Override
+	public void setJump(final EJump jumpType, @Nullable final String jumpLabel) {
+		this.jumpType = jumpType;
+		this.jumpLabel = jumpType == EJump.RETURN ? null : jumpLabel;
+	}
+
+	@Override
+	public boolean matchesNamedJump(@Nullable final String label) {
+		//if (jumpType == EJump.NONE || jumpType == EJump.RETURN)
+		//	return false;
+		if (jumpLabel != null)
+			return jumpLabel.equals(label);
+		return true;
 	}
 }

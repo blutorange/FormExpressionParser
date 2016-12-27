@@ -319,17 +319,15 @@ public final class FormExpressionFactory {
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, factory, severityConfig);
 		final IVariableResolutionResult resolutionResult = VariableResolveVisitor.resolve(node, scopeDefBuilder, factory,
 				severityConfig);
-		// FIXME update VariableTypeCollectVisitor, VariableTypeCheckVisitor,
-		//  UnusedVariableCheckVisitor, EvaluateVisitor etc. for new global/local/closure variable scheme
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
-		ClosureConvertVisitor.convert(node, resolutionResult, scopeDefs);
-		final int symbolTableSize = resolutionResult.getEnvironmentalSize();
 		checkScopeDefsConstancy(scopeDefs);
 		if (severityConfig.hasOption(ESeverityOption.TREAT_UNMATCHING_VARIABLE_TYPES_AS_ERROR)) {
-			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node, symbolTableSize, scopeDefs);
+			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node,
+					resolutionResult.getInternalVariableCount(), scopeDefs);
 			VariableTypeCheckVisitor.check(node, symbolTypeTable, factory, severityConfig, scopeDefs);
 		}
-		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, factory, symbolTableSize);
+		final int environmentalSymbolTableSize = ClosureConvertVisitor.convert(node, resolutionResult, scopeDefs);
+		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, factory, environmentalSymbolTableSize);
 	}
 
 	private static void checkScopeDefsConstancy(final IScopeDefinitions scopeDef)

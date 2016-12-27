@@ -9,7 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.NoSuchEmbedmentException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
-import de.xima.fc.form.expression.exception.parse.SemanticsException;
+import de.xima.fc.form.expression.exception.parse.UnhandledNodeTypeException;
 import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclarationException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
@@ -23,7 +23,6 @@ import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTLosNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.util.Void;
 
 /**
@@ -118,10 +117,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void>
 			case FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE:
 				break;
 			default:
-				throw new SemanticsException(
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-								node.jjtGetChild(i).jjtGetNodeId(), node.getClass().getSimpleName()),
-						node.jjtGetChild(i));
+				throw new UnhandledNodeTypeException(node.jjtGetChild(i));
 			}
 		}
 		visitChildren(node, object);

@@ -17,19 +17,20 @@ import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
 import de.xima.fc.form.expression.exception.evaluation.CatchableEvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
-import de.xima.fc.form.expression.exception.evaluation.IllegalExternalScopeAssignmentException;
-import de.xima.fc.form.expression.exception.evaluation.IllegalNumberOfFunctionParametersException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalVariableAssignmentException;
 import de.xima.fc.form.expression.exception.evaluation.MissingExternalContextException;
 import de.xima.fc.form.expression.exception.evaluation.ReturnClauseException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.UnhandledEnumException;
+import de.xima.fc.form.expression.exception.evaluation.UnhandledNodeTypeException;
 import de.xima.fc.form.expression.exception.evaluation.UnresolvedVariableSourceException;
 import de.xima.fc.form.expression.grammar.Node;
+import de.xima.fc.form.expression.iface.evaluate.IClosure;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
-import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -91,45 +92,40 @@ import de.xima.fc.form.expression.util.NullUtil;
 @ParametersAreNonnullByDefault
 public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangObject, EvaluationException> {
 
-	private ALangObject currentResult = NullLangObject.getInstance();
 	private final IEvaluationContext ec;
-	private boolean mustJump;
-	@Nullable
-	private EJump jumpType;
-	@Nullable
-	private String jumpLabel;
+	private ALangObject currentResult = NullLangObject.getInstance();
 
-	private EvaluateVisitor(final IEvaluationContext ec)
-			throws EvaluationException {
-		reinit();
+	private final ALangObject[] symbolTable;
+	
+	private EvaluateVisitor(final IEvaluationContext ec, final int symbolTableSize) throws EvaluationException {
+		symbolTable = new ALangObject[symbolTableSize < 0 ? 0 : symbolTableSize];
 		this.ec = ec;
+		reinit();
 	}
 
 	private void reinit() throws EvaluationException {
 		currentResult = NullLangObject.getInstance();
-		mustJump = false;
-		jumpType = null;
-		jumpLabel = null;
+		for (int i = symbolTable.length; i --> 0;)
+			symbolTable[i] = NullLangObject.getInstance();
 	}
 
 	private void assertNoJumps() throws UncatchableEvaluationException {
-		if (mustJump && jumpType != null) {
-			switch (jumpType) {
-			case BREAK:
-				throw new BreakClauseException(jumpLabel, ec);
-			case CONTINUE:
-				throw new ContinueClauseException(jumpLabel, ec);
-			case RETURN:
-				throw new ReturnClauseException(ec);
-			default:
-				throw new UncatchableEvaluationException(ec,
-						NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
-			}
+		switch (ec.getJumpType()) {
+		case NONE:
+			return;
+		case BREAK:
+			throw new BreakClauseException(ec.getJumpLabel(), ec);
+		case CONTINUE:
+			throw new ContinueClauseException(ec.getJumpLabel(), ec);
+		case RETURN:
+			throw new ReturnClauseException(ec);
+		default:
+			throw new UncatchableEvaluationException(ec,
+					NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 		}
 	}
 
-	private ALangObject jjtAccept(final Node parentNode, @Nullable final Node node,
-			final IEvaluationContext ec) throws EvaluationException {
+	private ALangObject jjtAccept(final Node parentNode, @Nullable final Node node) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		ec.getTracer().setCurrentlyProcessed(node);
@@ -142,100 +138,87 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		}
 	}
 
-	private ALangObject setVariable(@Nullable final IScopedSourceResolvable node, final ALangObject val,
-			final IEvaluationContext ec) throws EvaluationException {
+	ALangObject setVariable(@Nullable final ISourceResolvable node, final ALangObject val) throws EvaluationException {
 		if (node == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
-		if (!node.getSourceType().isAssignable())
-			throw new IllegalExternalScopeAssignmentException(node.getScope(), node.getVariableName(), ec);
-		if (!node.getSourceType().isResolved())
-			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
-		ec.getSymbolTable()[node.getSource()].setCurrentObject(val);
-		return val;
-	}
-
-	private ALangObject setSimpleVariable(@Nullable final ISourceResolvable node, final ALangObject val,
-			final IEvaluationContext ec) throws EvaluationException {
-		if (node == null)
-			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_NODE_INTERNAL);
-		if (node.getSource() < 0)
+		switch (node.getSourceType()) {
+		case ENVIRONMENTAL:
+			symbolTable[node.getClosureSource()] = val;
+			break;
+		case CLOSURE:
+			final int source = node.getClosureSource();
+			getClosure(source).setObject(source&0x0000FFFF, val);
+			break;
+		case EXTERNAL_CONTEXT:
+		case LIBRARY:
+			throw new IllegalVariableAssignmentException(node.getSourceType(), node.getVariableName(), ec);
+		case UNRESOLVED:
 			throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
-		ec.getSymbolTable()[node.getSource()].setCurrentObject(val);
+		default:
+			throw new UnhandledEnumException(node.getSourceType(), ec);
+		}
 		return val;
 	}
 
-	private ALangObject[] evaluateChildren(final Node node, final IEvaluationContext ec)
+	private ALangObject[] evaluateChildren(final Node node)
 			throws EvaluationException {
 		final int len = node.jjtGetNumChildren();
 		final ALangObject[] res = new ALangObject[len];
 		for (int i = 0; i != len; ++i)
-			res[i] = jjtAccept(node, node.jjtGetChild(i), ec);
+			res[i] = jjtAccept(node, node.jjtGetChild(i));
 		return res;
 	}
 
-	private ALangObject evaluatePropertyExpression(final Node parentNode, final int indexOneAfterEnd,
-			final IEvaluationContext ec) throws EvaluationException {
+	private IClosure getClosure(final int source) throws EvaluationException {
+		IClosure closure = ec.closureStackPeek();
+		if (closure == null)
+			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(
+					"Variable with illegal source {0}.", source));
+		for (int parent = (source >>> 16); parent --> 0;)
+			if ((closure = closure.getParent()) == null)
+				throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(
+						"Variable with illegal source {0}.", source));
+		return closure;
+	}
+	
+	private ALangObject evaluatePropertyExpression(final Node parentNode, final int indexOneAfterEnd) throws EvaluationException {
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0), ec);
+		ALangObject res = jjtAccept(parentNode, parentNode.jjtGetChild(0));
 		for (int i = 1; i < indexOneAfterEnd; ++i) {
 			final Node n = parentNode.jjtGetChild(i);
 			switch (n.getSiblingMethod()) {
-			case DOT:
-				final String attrDot = jjtAccept(parentNode, n, ec).coerceString(ec).stringValue();
+			case DOT: {
+				final String attrDot = jjtAccept(parentNode, n).coerceString(ec).stringValue();
 				res = res.evaluateDotAccessor(attrDot, ec);
 				break;
-			case BRACKET:
-				final ALangObject attrBracket = jjtAccept(parentNode, n, ec);
+			}
+			case BRACKET: {
+				final ALangObject attrBracket = jjtAccept(parentNode, n);
 				res = res.evaluateBracketAccessor(attrBracket, ec);
 				break;
-			case PARENTHESIS:
+			}
+			case PARENTHESIS: {
 				// Get a function object.
 				final FunctionLangObject func = res.coerceFunction(ec);
 
 				// Evaluate function arguments
-				final ALangObject[] args = evaluateChildren(n, ec);
-
-				// Check argument count.
-				if (!func.hasVarArgs() && args.length != func.getDeclaredArgumentCount()
-						|| func.hasVarArgs() && args.length < func.getDeclaredArgumentCount() - 1)
-					throw new IllegalNumberOfFunctionParametersException(func, args.length, ec);
+				final ALangObject[] args = evaluateChildren(n);
 
 				// Evaluate function
-				ec.getTracer().descend(parentNode);
-				try {
-					res = func.evaluate(ec, args);
-				}
-				finally {
-					ec.getTracer().ascend();
-				}
-
-				// Check for disallowed break / continue clauses.
-				if (mustJump && jumpType != null) {
-					switch (jumpType) {
-					case RETURN:
-						mustJump = false;
-						break;
-					case BREAK:
-						throw new BreakClauseException(jumpLabel, ec);
-					case CONTINUE:
-						throw new ContinueClauseException(jumpLabel, ec);
-					default:
-						throw new EvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, jumpType));
-					}
-				}
+				res = func.evaluate(ec, args);
 				break;
-				// $CASES-OMITTED$
+			}
+			// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec,
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION, n.getSiblingMethod()));
+				throw new UnhandledEnumException(n.getSiblingMethod(), ec);
 			}
 		}
 		return res;
 	}
 
 	private ALangObject performAssignment(final Node node, @Nullable final Node child,
-			@Nullable final EMethod method, @Nullable ALangObject assignee, final IEvaluationContext ec)
+			@Nullable final EMethod method, @Nullable ALangObject assignee)
 					throws EvaluationException {
 		if (child == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
@@ -248,22 +231,19 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			// First we need to evaluate the variable (a),
 			// then the expression method (+).
 			if (method != EMethod.EQUAL)
-				assignee = jjtAccept(node, var, ec).evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
+				assignee = jjtAccept(node, var).evaluateExpressionMethod(method.equalMethod(ec), ec, assignee);
 			// Now we can set the variable to its new value.
 			if (assignee == null)
 				assignee = NullLangObject.getInstance();
-			setVariable(var, assignee, ec);
+			setVariable(var, assignee);
 			break;
 		case JJTPROPERTYEXPRESSIONNODE:
 			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode) child;
-			final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
-			final Node last = prop.getLastChildOrNull();
-			if (last == null)
-				throw new UncatchableEvaluationException(ec,
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
+			final ALangObject res = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1);
+			final Node last = prop.jjtGetChild(prop.jjtGetNumChildren()-1);
 			switch (last.getSiblingMethod()) {
 			case DOT:
-				final String attrDot = jjtAccept(prop, last, ec).coerceString(ec).stringValue();
+				final String attrDot = jjtAccept(prop, last).coerceString(ec).stringValue();
 				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c
 				// etc.
 				// First we need to evaluate the last attribute accessor (a.b),
@@ -278,7 +258,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				res.executeDotAssigner(attrDot, assignee, ec);
 				break;
 			case BRACKET:
-				final ALangObject attrBracket = jjtAccept(prop, last, ec);
+				final ALangObject attrBracket = jjtAccept(prop, last);
 				// Compound assignments (a[b]+=c etc.) are the same as
 				// a[b]=a[b]+c etc.
 				// First we need to evaluate the last attribute accessor (a[b]),
@@ -292,20 +272,18 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-						last.getSiblingMethod(), node.getClass().getSimpleName()));
+				throw new UnhandledEnumException(last.getSiblingMethod(), ec);
 			}
 			break;
 			// $CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-					child.jjtGetNodeId(), node.getClass().getSimpleName()));
+			throw new UnhandledNodeTypeException(child, ec);
 		}
 		return assignee;
 	}
 
 	private ALangObject performPostUnaryAssignment(final Node node, @Nullable final Node child,
-			final EMethod method, final IEvaluationContext ec) throws EvaluationException {
+			final EMethod method) throws EvaluationException {
 		if (child == null)
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		final ALangObject res, tmp;
@@ -315,20 +293,17 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			// Compound assignments (a+=b, etc.) are the same as a=a+b etc.
 			// First we need to evaluate the variable (a),
 			// then the expression method (+).
-			res = jjtAccept(node, var, ec);
+			res = jjtAccept(node, var);
 			// Now we can set the variable to its new value.
-			setVariable(var, res.evaluateExpressionMethod(method.equalMethod(ec), ec), ec);
+			setVariable(var, res.evaluateExpressionMethod(method.equalMethod(ec), ec));
 			break;
 		case JJTPROPERTYEXPRESSIONNODE:
 			final ASTPropertyExpressionNode prop = (ASTPropertyExpressionNode) child;
-			tmp = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1, ec);
-			final Node last = prop.getLastChildOrNull();
-			if (last == null)
-				throw new UncatchableEvaluationException(ec,
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT, null, node.getClass().getSimpleName()));
+			tmp = evaluatePropertyExpression(prop, prop.jjtGetNumChildren() - 1);
+			final Node last = prop.jjtGetChild(prop.jjtGetNumChildren()-1);
 			switch (last.getSiblingMethod()) {
 			case DOT:
-				final String attrDot = jjtAccept(prop, last, ec).coerceString(ec).stringValue();
+				final String attrDot = jjtAccept(prop, last).coerceString(ec).stringValue();
 				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c
 				// etc.
 				// First we need to evaluate the last attribute accessor (a.b),
@@ -339,7 +314,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				res.executeDotAssigner(attrDot, res.evaluateExpressionMethod(method.equalMethod(ec), ec), ec);
 				break;
 			case BRACKET:
-				final ALangObject attrBracket = jjtAccept(prop, last, ec);
+				final ALangObject attrBracket = jjtAccept(prop, last);
 				// Compound assignments (a[b]+=c etc.) are the same as
 				// a[b]=a[b]+c etc.
 				// First we need to evaluate the last attribute accessor (a[b]),
@@ -350,14 +325,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-						last.getSiblingMethod(), node.getClass().getSimpleName()));
+				throw new UnhandledEnumException(last.getSiblingMethod(), ec);
 			}
 			break;
 			// $CASES-OMITTED$
 		default:
-			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-					child.getSiblingMethod(), node.getClass().getSimpleName()));
+			throw new UnhandledEnumException(child.getSiblingMethod(), ec);
 		}
 		return res;
 	}
@@ -367,10 +340,10 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Child must be an expression and cannot be a break/continue/return
 		// node.
 		if (node.getUnaryMethod().isAssigning())
-			return performAssignment(node, node.getFirstChildOrNull(), node.getUnaryMethod(), null, ec);
+			return performAssignment(node, node.getFirstChildOrNull(), node.getUnaryMethod(), null);
 		if (node.getUnaryMethod() == EMethod.EXCLAMATION)
-			return jjtAccept(node, node.getFirstChildOrNull(), ec).coerceBoolean(ec).not();
-		return jjtAccept(node, node.getFirstChildOrNull(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
+			return jjtAccept(node, node.getFirstChildOrNull()).coerceBoolean(ec).not();
+		return jjtAccept(node, node.getFirstChildOrNull()).evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
 
 	@Override
@@ -378,8 +351,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Child must be an expression and cannot be a break/continue/return
 		// node.
 		if (node.getUnaryMethod().isAssigning())
-			return performPostUnaryAssignment(node, node.getFirstChildOrNull(), node.getUnaryMethod(), ec);
-		return jjtAccept(node, node.getFirstChildOrNull(), ec).evaluateExpressionMethod(node.getUnaryMethod(), ec);
+			return performPostUnaryAssignment(node, node.getFirstChildOrNull(), node.getUnaryMethod());
+		return jjtAccept(node, node.getFirstChildOrNull()).evaluateExpressionMethod(node.getUnaryMethod(), ec);
 	}
 
 	@Override
@@ -394,12 +367,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Binary expression node.
 		// Children are expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(node, node.getFirstChildOrNull(), ec);
+		ALangObject res = jjtAccept(node, node.getFirstChildOrNull());
 		for (int i = 1; i != node.jjtGetNumChildren(); ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
 			final Node arg = node.jjtGetChild(i);
-			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, jjtAccept(node, arg, ec));
+			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, jjtAccept(node, arg));
 		}
 
 		return res;
@@ -407,7 +380,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTPropertyExpressionNode node) throws EvaluationException {
-		return evaluatePropertyExpression(node, node.jjtGetNumChildren(), ec);
+		return evaluatePropertyExpression(node, node.jjtGetNumChildren());
 	}
 
 	@Override
@@ -419,13 +392,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTStringNode node) throws EvaluationException {
 		// Most common case is no inline expressions.
 		if (node.getStringNodeCount() == 1)
-			return node.getStringNode(0).jjtAccept(this).coerceString(ec);
+			return jjtAccept(node, node.getStringNode(0)).coerceString(ec);
 		// Join result of all children.
 		// Template literals can contain only expressions and therefore
 		//  no return, continue, or break clauses that would cause jumping.
 		final StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < node.getStringNodeCount(); ++i)
-			sb.append(node.getStringNode(i).jjtAccept(this).coerceString(ec).stringValue());
+			sb.append(jjtAccept(node, node.getStringNode(i)).coerceString(ec).stringValue());
 		return StringLangObject.create(sb.toString());
 	}
 
@@ -441,7 +414,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		for (int i = 0; i < len; ++i) {
 			// Children are expression and cannot be break/clause/return
 			// clauses.
-			list.add(jjtAccept(node, node.jjtGetChild(i), ec));
+			list.add(jjtAccept(node, node.jjtGetChild(i)));
 		}
 		return ArrayLangObject.create(list);
 	}
@@ -453,7 +426,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		for (int i = 0; i < len; ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
-			list.add(jjtAccept(node, node.jjtGetChild(i), ec));
+			list.add(jjtAccept(node, node.jjtGetChild(i)));
 		}
 		return HashLangObject.create(list);
 	}
@@ -472,22 +445,29 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTVariableNode node) throws EvaluationException {
 		final String scope = node.getScope();
 		switch (node.getSourceType()) {
-		case LIBRARY:
+		case ENVIRONMENTAL: {
+			return symbolTable[node.getClosureSource()];
+		}
+		case LIBRARY: {
 			if (scope == null)
 				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
 			return ec.getLibrary().getVariable(scope, node.getVariableName(), ec);
-		case EXTERNAL_CONTEXT:
+		}
+		case EXTERNAL_CONTEXT: {
 			final IExternalContext ex = ec.getExternalContext();
 			if (ex == null)
 				throw new MissingExternalContextException(ec);
 			if (scope == null)
 				throw new UnresolvedVariableSourceException(null, node.getVariableName(), ec);
 			return ex.fetchScopedVariable(scope, node.getVariableName(), ec);
+		}
+		case CLOSURE:
+			final int source = node.getClosureSource();
+			return getClosure(source).getObject(source&0x0000FFFF);
 		case UNRESOLVED:
 			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
-			//$CASES-OMITTED$
-		default:
-			return ec.getSymbolTable()[node.getSource()].getCurrentObject();
+		default:			
+			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat("Unhandled enum: {0}", node.getSourceType()));
 		}
 	}
 
@@ -495,8 +475,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTStatementListNode node) throws EvaluationException {
 		ALangObject res = NullLangObject.getInstance();
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
-			res = jjtAccept(node, node.jjtGetChild(i), ec);
-			if (mustJump)
+			res = jjtAccept(node, node.jjtGetChild(i));
+			if (ec.hasJump())
 				break;
 		}
 		return res;
@@ -506,12 +486,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTIfClauseNode node) throws EvaluationException {
 		// If branch, no explicit check for mustJump as it returns
 		// immediately anyway
-		if (jjtAccept(node, node.getConditionNode(), ec).coerceBoolean(ec).booleanValue())
-			return jjtAccept(node, node.getIfNode(), ec);
+		if (jjtAccept(node, node.getConditionNode()).coerceBoolean(ec).booleanValue())
+			return jjtAccept(node, node.getIfNode());
 		// Else branch, no explicit check for mustJump as it returns
 		// immediately anyway
 		else if (node.hasElseNode())
-			return jjtAccept(node, node.getElseNode(), ec);
+			return jjtAccept(node, node.getElseNode());
 		// No else
 		else
 			return NullLangObject.getInstance();
@@ -522,33 +502,57 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		ALangObject res = NullLangObject.getInstance();
 		if (node.isPlainLoop()) {
 			// Plain for loop
-			jjtAccept(node, node.getPlainInitializerNode(), ec);
-			whileloop: while (jjtAccept(node, node.getPlainConditionNode(), ec).coerceBoolean(ec).booleanValue()) {
-				res = jjtAccept(node, node.getBodyNode(), ec);
+			jjtAccept(node, node.getPlainInitializerNode());
+			whileloop: while (jjtAccept(node, node.getPlainConditionNode()).coerceBoolean(ec).booleanValue()) {
+				res = jjtAccept(node, node.getBodyNode());
 				// Handle break, continue, return.
-				if (mustJump) {
-					if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
+				switch (ec.getJumpType()) {
+				case NONE:
+					break;
+				case BREAK:
+					if (!ec.matchesNamedJump(node.getLabel()))
 						return res;
-					mustJump = false;
-					if (jumpType == EJump.BREAK)
-						break whileloop;
-				}
-				jjtAccept(node, node.getPlainIncrementNode(), ec);
+					ec.unsetJump();
+					break whileloop;
+				case CONTINUE:
+					if (!ec.matchesNamedJump(node.getLabel()))
+						return res;
+					ec.unsetJump();
+					break;
+				case RETURN:
+					return res;
+				default:
+					throw new UncatchableEvaluationException(ec,
+							NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
+				}				
+				jjtAccept(node, node.getPlainIncrementNode());
 			}
 		}
 		else {
 			// Iterating for loop
-			final INonNullIterator<ALangObject> it = jjtAccept(node, node.getEnhancedIteratorNode(), ec).getIterable(ec).iterator();
+			final INonNullIterator<ALangObject> it = jjtAccept(node, node.getEnhancedIteratorNode()).getIterable(ec).iterator();
 			forloop: while (it.hasNext()) {
-				setSimpleVariable(node, it.next(), ec);
-				res = jjtAccept(node, node.getBodyNode(), ec);
+				setVariable(node, it.next());
+				res = jjtAccept(node, node.getBodyNode());
 				// Handle break, continue, return.
-				if (mustJump) {
-					if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
+				switch (ec.getJumpType()) {
+				case NONE:
+					break;
+				case BREAK:
+					if (!ec.matchesNamedJump(node.getLabel()))
 						return res;
-					mustJump = false;
-					if (jumpType == EJump.BREAK)
-						break forloop;
+					ec.unsetJump();
+					break forloop;
+				case CONTINUE:
+					if (!ec.matchesNamedJump(node.getLabel()))
+						return res;
+					ec.unsetJump();
+					break;
+				case RETURN:
+					return res;
+				default:
+					throw new UncatchableEvaluationException(ec,
+							NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 				}
 			}
 		}
@@ -558,15 +562,27 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	@Override
 	public ALangObject visit(final ASTWhileLoopNode node) throws EvaluationException {
 		ALangObject res = NullLangObject.getInstance();
-		whileloop: while (jjtAccept(node, node.getWhileHeaderNode(), ec).coerceBoolean(ec).booleanValue()) {
-			res = jjtAccept(node, node.getBodyNode(), ec);
+		whileloop: while (jjtAccept(node, node.getWhileHeaderNode()).coerceBoolean(ec).booleanValue()) {
+			res = jjtAccept(node, node.getBodyNode());
 			// Handle break, continue, return.
-			if (mustJump) {
-				if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
+			switch (ec.getJumpType()) {
+			case NONE:
+				break;
+			case BREAK:
+				if (!ec.matchesNamedJump(node.getLabel()))
 					return res;
-				mustJump = false;
-				if (jumpType == EJump.BREAK)
-					break whileloop;
+				ec.unsetJump();
+				break whileloop;
+			case CONTINUE:
+				if (!ec.matchesNamedJump(node.getLabel()))
+					return res;
+				ec.unsetJump();
+				break;
+			case RETURN:
+				return res;
+			default:
+				throw new UncatchableEvaluationException(ec,
+						NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 			}
 		}
 		return res;
@@ -576,16 +592,28 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTDoWhileLoopNode node) throws EvaluationException {
 		ALangObject res = NullLangObject.getInstance();
 		doloop: do {
-			res = jjtAccept(node, node.getBodyNode(), ec);
+			res = jjtAccept(node, node.getBodyNode());
 			// Handle break, continue, return.
-			if (mustJump) {
-				if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
+			switch (ec.getJumpType()) {
+			case NONE:
+				break;
+			case BREAK:
+				if (!ec.matchesNamedJump(node.getLabel()))
 					return res;
-				mustJump = false;
-				if (jumpType == EJump.BREAK)
-					break doloop;
+				ec.unsetJump();
+				break doloop;
+			case CONTINUE:
+				if (!ec.matchesNamedJump(node.getLabel()))
+					return res;
+				ec.unsetJump();
+				break;
+			case RETURN:
+				return res;
+			default:
+				throw new UncatchableEvaluationException(ec,
+						NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 			}
-		} while (jjtAccept(node, node.getDoFooterNode(), ec).coerceBoolean(ec).booleanValue());
+		} while (jjtAccept(node, node.getDoFooterNode()).coerceBoolean(ec).booleanValue());
 		return res;
 	}
 
@@ -596,7 +624,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		try {
 			// Try branch, no explicit check for mustJump as it returns
 			// immediately anyway
-			res = jjtAccept(node, node.getTryNode(), ec);
+			res = jjtAccept(node, node.getTryNode());
 		}
 		catch (final CatchableEvaluationException e) {
 			exception = e;
@@ -604,10 +632,10 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// If mustJump is true, break/continue/return was the last statement
 		// evaluated and no exception could have been thrown.
 		if (exception != null) {
-			setSimpleVariable(node, ExceptionLangObject.create(exception, ec), ec);
+			setVariable(node, ExceptionLangObject.create(exception, ec));
 			// Catch branch, no explicit check for mustJump as it returns
 			// immediately anyway
-			res = jjtAccept(node, node.getCatchNode(), ec);
+			res = jjtAccept(node, node.getCatchNode());
 		}
 		return res;
 	}
@@ -617,44 +645,69 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		final Node[] children = node.getChildArray();
 		ALangObject res = NullLangObject.getInstance();
 		boolean matchingCase = false;
-		final ALangObject switchValue = jjtAccept(node, children[0], ec);
+		final ALangObject switchValue = jjtAccept(node, children[0]);
 		forloop: for (int i = 1; i < children.length; ++i) {
 			switch (children[i].getSiblingMethod()) {
 			case SWITCHCASE:
 				// Case contains an expression and may not contain break,
 				// continue, or throw clauses.
-				if (!matchingCase && switchValue.equals(jjtAccept(node, children[i], ec))) {
-					matchingCase = true;
-				}
+				// When there is a matching case already, we skip any further
+				// case statements.
+				if (!matchingCase)
+					if (switchValue.equals(jjtAccept(node, children[i])))
+							matchingCase = true;
 				break;
 			case SWITCHCLAUSE:
 				if (matchingCase) {
-					res = jjtAccept(node, children[i], ec);
+					res = jjtAccept(node, children[i]);
 					// Handle continue, break, return.
-					if (mustJump) {
-						if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
+					switch (ec.getJumpType()) {
+					case NONE:
+						break;
+					case BREAK:
+						if (!ec.matchesNamedJump(node.getLabel()))
 							return res;
-						mustJump = false;
-						if (jumpType == EJump.BREAK)
-							break forloop;
+						ec.unsetJump();
+						break forloop;
+					case CONTINUE:
+						if (!ec.matchesNamedJump(node.getLabel()))
+							return res;
+						ec.unsetJump();
+						break;
+					case RETURN:
+						return res;
+					default:
+						throw new UncatchableEvaluationException(ec,
+								NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 					}
 				}
 				break;
 			case SWITCHDEFAULT:
-				res = jjtAccept(node, children[i], ec);
+				res = jjtAccept(node, children[i]);
 				// Handle continue, break, return.
-				if (mustJump) {
-					if (jumpType == EJump.RETURN || (jumpLabel != null && !jumpLabel.equals(node.getLabel())))
+				switch (ec.getJumpType()) {
+				case NONE:
+					break;
+				case BREAK:
+					if (!ec.matchesNamedJump(node.getLabel()))
 						return res;
-					mustJump = false;
-					if (jumpType == EJump.BREAK)
-						break forloop;
+					ec.unsetJump();
+					break forloop;
+				case CONTINUE:
+					if (!ec.matchesNamedJump(node.getLabel()))
+						return res;
+					ec.unsetJump();
+					break;
+				case RETURN:
+					return res;
+				default:
+					throw new UncatchableEvaluationException(ec,
+							NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 				}
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec,
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, children[i].getSiblingMethod()));
+				throw new UnhandledEnumException(children[i].getSiblingMethod(), ec);
 			}
 		}
 		return res;
@@ -664,7 +717,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTExceptionNode node) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or
 		// return clause.
-		final StringLangObject message = jjtAccept(node, node.getErrorMessageNode(), ec).coerceString(ec);
+		final StringLangObject message = jjtAccept(node, node.getErrorMessageNode()).coerceString(ec);
 		return ExceptionLangObject.create(message.stringValue(), ec);
 	}
 
@@ -672,31 +725,25 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTThrowClauseNode node) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or
 		// return clause.
-		throw jjtAccept(node, node.getThrowNode(), ec).coerceException(ec).exceptionValue();
+		throw jjtAccept(node, node.getThrowNode()).coerceException(ec).exceptionValue();
 	}
 
 	@Override
 	public ALangObject visit(final ASTBreakClauseNode node) throws EvaluationException {
-		jumpLabel = node.getLabel();
-		jumpType = EJump.BREAK;
-		mustJump = true;
+		ec.setJump(EJump.BREAK, null);
 		return NullLangObject.getInstance();
 	}
 
 	@Override
 	public ALangObject visit(final ASTContinueClauseNode node) throws EvaluationException {
-		jumpLabel = node.getLabel();
-		jumpType = EJump.CONTINUE;
-		mustJump = true;
+		ec.setJump(EJump.CONTINUE, null);
 		return NullLangObject.getInstance();
 	}
 
 	@Override
 	public ALangObject visit(final ASTReturnClauseNode node) throws EvaluationException {
-		final ALangObject res = node.hasReturn() ? jjtAccept(node, node.getReturnNode(), ec) : NullLangObject.getInstance();
-		jumpLabel = null;
-		jumpType = EJump.RETURN;
-		mustJump = true;
+		final ALangObject res = node.hasReturn() ? jjtAccept(node, node.getReturnNode()) : NullLangObject.getInstance();
+		ec.setJump(EJump.RETURN, null);
 		return res;
 	}
 
@@ -704,21 +751,25 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTLogNode node) throws EvaluationException {
 		// Child must be an expression and cannot contain any break, continue,
 		// or return clause.
-		final StringLangObject message = jjtAccept(node, node.getLogMessageNode(), ec).coerceString(ec);
+		final StringLangObject message = jjtAccept(node, node.getLogMessageNode()).coerceString(ec);
 		node.getLogLevel().log(ec.getLogger(), message.stringValue());
 		return message;
 	}
 
 	@Override
 	public ALangObject visit(final ASTFunctionNode node) throws EvaluationException {
-		final FunctionLangObject func = FunctionLangObject.create(new EvaluateVisitorAnonymousFunction(this, node, ec));
+		final IClosure parentClosure = ec.closureStackPeek();
+		final FunctionLangObject func = FunctionLangObject.create(new EvaluateVisitorAnonymousFunction(this, node, ec),
+				parentClosure, node.getClosureTableSize());
 		func.bind(NullLangObject.getInstance(), ec);
 		return func;
 	}
-
+	
 	@Override
 	public ALangObject visit(final ASTFunctionClauseNode node) throws EvaluationException {
-		final FunctionLangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec));
+		final IClosure parentClosure = ec.closureStackPeek();
+		final FunctionLangObject func = FunctionLangObject.create(new EvaluateVisitorNamedFunction(this, node, ec),
+				parentClosure, node.getClosureTableSize());
 		func.bind(NullLangObject.getInstance(), ec);
 		return func;
 	}
@@ -732,7 +783,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTWithClauseNode node) throws EvaluationException {
 		// Need not do anything as variables are already resolved.
 		// Need not check for must jump as we return immediately anyway.
-		return jjtAccept(node, node.getBodyNode(), ec);
+		return jjtAccept(node, node.getBodyNode());
 	}
 
 	@Override
@@ -740,10 +791,10 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Iterate from the end of each assignment pair and assign the rvalue to
 		// the lvalue.
 		// Child must be an expression and cannot contain break/continue/return.
-		ALangObject assignee = jjtAccept(node, node.getAssignValueNode(), ec);
+		ALangObject assignee = jjtAccept(node, node.getAssignValueNode());
 		for (int i = node.getAssignableNodeCount(); i-- > 0;) {
 			final EMethod method = node.getAssignMethod(i);
-			assignee = performAssignment(node, node.getAssignableNode(i), method, assignee, ec);
+			assignee = performAssignment(node, node.getAssignableNode(i), method, assignee);
 		}
 		return assignee;
 	}
@@ -771,15 +822,15 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTTernaryExpressionNode node) throws EvaluationException {
-		if (jjtAccept(node, node.getConditionNode(), ec).coerceBoolean(ec).booleanValue()) {
-			return jjtAccept(node, node.getIfNode(), ec);
+		if (jjtAccept(node, node.getConditionNode()).coerceBoolean(ec).booleanValue()) {
+			return jjtAccept(node, node.getIfNode());
 		}
-		return jjtAccept(node, node.getElseNode(), ec);
+		return jjtAccept(node, node.getElseNode());
 	}
 
 	@Override
 	public ALangObject visit(final ASTParenthesisExpressionNode node) throws EvaluationException {
-		return jjtAccept(node, node.getFirstChildOrNull(), ec);
+		return jjtAccept(node, node.getFirstChildOrNull());
 	}
 
 	@Override
@@ -794,12 +845,12 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Binary expression node.
 		// Children are expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(node, node.getFirstChildOrNull(), ec);
+		ALangObject res = jjtAccept(node, node.getFirstChildOrNull());
 		for (int i = 1; i < node.jjtGetNumChildren(); ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
 			res = BooleanLangObject.create(node.jjtGetChild(i).getSiblingMethod()
-					.checkComparison(res.compareTo(jjtAccept(node, node.jjtGetChild(i), ec))));
+					.checkComparison(res.compareTo(jjtAccept(node, node.jjtGetChild(i)))));
 		}
 		return res;
 	}
@@ -817,36 +868,35 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Binary expression node.
 		// Children are expressions and cannot contain break/clause/return
 		// clauses.
-		ALangObject res = jjtAccept(node, childrenArray[0], ec);
+		ALangObject res = jjtAccept(node, childrenArray[0]);
 		for (int i = 1; i != childrenArray.length; ++i) {
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
 			// !~ =~ == === !== !=
 			switch (childrenArray[i].getSiblingMethod()) {
 			case DOUBLE_EQUAL:
-				res = BooleanLangObject.create(res.equals(jjtAccept(node, childrenArray[i], ec)));
+				res = BooleanLangObject.create(res.equals(jjtAccept(node, childrenArray[i])));
 				break;
 			case EXCLAMATION_EQUAL:
-				res = BooleanLangObject.create(!res.equals(jjtAccept(node, childrenArray[i], ec)));
+				res = BooleanLangObject.create(!res.equals(jjtAccept(node, childrenArray[i])));
 				break;
 			case TRIPLE_EQUAL:
-				res = BooleanLangObject.create(res.equalsSameObject(jjtAccept(node, childrenArray[i], ec)));
+				res = BooleanLangObject.create(res.equalsSameObject(jjtAccept(node, childrenArray[i])));
 				break;
 			case EXCLAMATION_DOUBLE_EQUAL:
-				res = BooleanLangObject.create(!res.equalsSameObject(jjtAccept(node, childrenArray[i], ec)));
+				res = BooleanLangObject.create(!res.equalsSameObject(jjtAccept(node, childrenArray[i])));
 				break;
 			case EQUAL_TILDE:
-				res = res.evaluateExpressionMethod(EMethod.EQUAL_TILDE, ec, jjtAccept(node, childrenArray[i], ec))
+				res = res.evaluateExpressionMethod(EMethod.EQUAL_TILDE, ec, jjtAccept(node, childrenArray[i]))
 				.coerceBoolean(ec);
 				break;
 			case EXCLAMATION_TILDE:
-				res = res.evaluateExpressionMethod(EMethod.EQUAL_TILDE, ec, jjtAccept(node, childrenArray[i], ec))
+				res = res.evaluateExpressionMethod(EMethod.EQUAL_TILDE, ec, jjtAccept(node, childrenArray[i]))
 				.coerceBoolean(ec).not();
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new UncatchableEvaluationException(ec,
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_EQUAL, childrenArray[i].getSiblingMethod()));
+				throw new UnhandledEnumException(childrenArray[i].getSiblingMethod(), ec);
 			}
 		}
 		return res;
@@ -855,7 +905,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	@Override
 	public ALangObject visit(final ASTVariableDeclarationClauseNode node) throws EvaluationException {
 		if (node.hasAssignment())
-			return setSimpleVariable(node, node.getAssignmentNode().jjtAccept(this), ec);
+			return setVariable(node, jjtAccept(node, node.getAssignmentNode()));
 		return NullLangObject.getInstance();
 	}
 
@@ -885,11 +935,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTFunctionArgumentNode node) throws EvaluationException {
-		//if (node.hasAssignment())
-		//	return setSimpleVariable(node, node.getAssignmentNode().jjtAccept(this), ec);
 		return NullLangObject.getInstance();
 	}
-
 
 	/**
 	 * Evaluates the given node as a complete program or template with the given
@@ -909,9 +956,9 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	 * @throws EvaluationException
 	 *             When the code cannot be evaluated.
 	 */
-	public static ALangObject evaluateCode(final Node node, final IScopeDefinitions scopeDefs,
+	public static ALangObject evaluateCode(final Node node, final IScopeDefinitions scopeDefs, final int symbolTableSize,
 			final IEvaluationContext ec) throws EvaluationException {
-		final EvaluateVisitor v = new EvaluateVisitor(ec);
+		final EvaluateVisitor v = new EvaluateVisitor(ec, symbolTableSize);
 		final ALangObject res;
 		final IExternalContext ex = ec.getExternalContext();
 		if (ex != null)
@@ -937,8 +984,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	}
 
 	private void applyAll(final Collection<IHeaderNode> coll) throws EvaluationException {
-		for (final IHeaderNode header : coll) {
-			ec.getSymbolTable()[header.getSource()].setCurrentObject(header.getNode().jjtAccept(this));
-		}
+		for (final IHeaderNode header : coll)
+			setVariable(header, header.getNode().jjtAccept(this));
 	}
 }

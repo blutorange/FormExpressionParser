@@ -11,23 +11,29 @@ public interface ISourceResolvable {
 	 * Does nothing when the variable is already resolved.
 	 * Otherwise, sets the source on the symbol table.
 	 * @param scope Scope to set.
-	 * @throws IllegalVariableSourceResolutionException 
+	 * @throws IllegalVariableSourceResolutionException When the source has already been resolved.
 	 */
 	public void resolveSource(int source, EVariableSource type) throws IllegalVariableSourceResolutionException;
 
-	/** @param source The new source. */
-	public void remapSource(int source);
+	/**
+	 * @param source The new source.
+	 * @throws IllegalVariableSourceResolutionException When the source has already been resolved.
+	 */
+	public void resolveClosureSource(int source) throws IllegalVariableSourceResolutionException;
 	
 	/**
 	 * @param ec Current evaluation context for throwing exceptions.
 	 * @return The resolved source.
 	 */
-	public int getSource();
+	public int getBasicSource();
+	public int getClosureSource();
 	
 	public EVariableSource getSourceType();
 
 	/** @return Whether the variable was resolved. */
-	public boolean isSourceResolved();
+	public boolean isBasicSourceResolved();
+	public boolean isClosureSourceResolved();
+
 	
 	/** @return The name of the variable to which this resolvable refers. */
 	public String getVariableName();

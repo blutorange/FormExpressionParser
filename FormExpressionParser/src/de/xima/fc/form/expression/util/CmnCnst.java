@@ -6,8 +6,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.object.ALangObject;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("nls")
@@ -39,7 +39,7 @@ public final class CmnCnst {
 		public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 		public static final int[] EMPTY_INT_ARRAY = new int[0];
 		public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
-		public static final IVariableReference[] EMPTY_SYMBOL_TABLE = new IVariableReference[0];
+		public static final ALangObject[] EMPTY_SYMBOL_TABLE = new ALangObject[0];
 		public static final String[] EMPTY_STRING_ARRAY = new String[0];
 		public static final IVariableType[] EMPTY_VARIABLE_TYPE_ARRAY = new IVariableType[0];
 		public static final EVariableTypeFlag[] EMPTY_VARIABLE_TYPE_FLAG_ARRAY = new EVariableTypeFlag[0];
@@ -282,11 +282,6 @@ public final class CmnCnst {
 		public static final String NULL_EXTERNAL_CONTEXT_OBJECT = "Object for the external context must not be null";
 		public static final String TOKEN_ITERATOR_DOES_NOT_SUPPORT_REMOVAL = "Token iterator does not support removal.";
 		public static final String INVALID_JUMP_TYPE = "Invalid jump type {0}. " + INTERNAL_ERROR;
-		public static final String ILLEGAL_ENUM_PROPERTY_EXPRESSION = "Illegal enum constant {0} at ASTPropertyExpressionNode. " + INTERNAL_ERROR;
-		public static final String ILLEGAL_ENUM_ASSIGNMENT = "Illegal enum constant {0} at {1}. " + INTERNAL_ERROR;
-		public static final String ILLEGAL_ENUM_SWITCH = "Illegal enum for switch : {0}. " + INTERNAL_ERROR;
-		public static final String ILLEGAL_ENUM_EQUAL = "Unexptected enum for equal expression: {0}. " + INTERNAL_ERROR;
-		public static final String ILLEGAL_ENUM_COMMENT = "Unexptected enum for comment: {0}. " + INTERNAL_ERROR;
 		public static final String CANNOT_EVALUATE_VARIABLE_TYPE_NODE = "ASTVariableTypeDeclarationNode cannot be evaluated. " + INTERNAL_ERROR;
 		public static final String NULL_WRITER = "Writer must not be null";
 		public static final String TODO = "TODO - not yet implemented. " + INTERNAL_ERROR;
@@ -335,10 +330,10 @@ public final class CmnCnst {
 		public static final String MISSING_EXTERNAL_CONTEXT = "Evaluation context is missing external context, but it is required. " + INTERNAL_ERROR;
 		public static final String SCOPED_VARIABLE_NOT_RESOLVED = "Variable {0}::{1} is not resolved. " + INTERNAL_ERROR;
 		public static final String UNSCOPED_VARIABLE_NOT_RESOLVED = "Variable {0} is not resolved. " + INTERNAL_ERROR;
-		public static final String ASSIGNMENT_OF_EXTERNALLY_SCOPED_VARIABLE = "Variable {0}::{1} belongs to an external scope and cannot be assigned to.";
+		public static final String ASSIGNMENT_OF_UNASSIGNABLE_VARIABLE = "Variable {0} of type {1} cannot be assigned to, most likely because it is a variable from an external scope.";
 		public static final String DUPLICATE_REQUIRE_SCOPE = "External scope {0} was already required previously.";
 		public static final String MANUAL_SCOPE_ALREADY_REQUIRED = "Cannot define manual scope {0}, it was already required previously.";
-		public static final String VARIABLE_SOURCE_ALREADY_RESOLVED = "Illegal attempt to resolve variable {0} to {1}; it was already resolved to {2}. " + INTERNAL_ERROR;
+		public static final String VARIABLE_SOURCE_ALREADY_RESOLVED = "Illegal attempt to resolve variable {0} to {1}; it was already resolved. " + INTERNAL_ERROR;
 		public static final String VARIABLE_SCOPE_ALREADY_RESOLVED = "Illegal attempt to resolve the scope of variable {0}, it was already resolved to scope {1}. " + INTERNAL_ERROR;
 		public static final String DUPLICATE_LABEL = "Duplicate label {0} is already in scope.";
 		public static final String HEADER_ASSIGNMENT_NOT_COMPILE_TIME_CONSTANT = "Illegal assignment for {0}. Assignment in header definitions must be compile-time constant.";
@@ -414,6 +409,8 @@ public final class CmnCnst {
 		public static final String STRING_UNFINISHED_UNICODE_ESCAPE = "String unicode escape must contain exactly four hex digits.";
 		public static final String NULL_TOKEN_IMAGE = "Token image must not be null. " + INTERNAL_ERROR;
 		public static final String CALL_ID_NOT_RESOLVED = "Call ID of function node {0} not resolved. " + INTERNAL_ERROR;
+		public static final String UNHANDLED_ENUM = "Unhandled enum: {0}. " + INTERNAL_ERROR;
+		public static final String UNHANDLED_NODE_TYPE = "Unhandled node type with id {0} and class {1}. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

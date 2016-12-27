@@ -7,4 +7,7 @@ public interface ICallResolvable {
 	public void resolveFunctionId(int functionId);
 	/** @return Whether the call ID was already resolved. */
 	public boolean isFunctionIdResolved();
+	public void resolveClosureTableSize(int closureTableSize);
+	public int getClosureTableSize();
+	public boolean isClosureTableSizeResolved();
 }

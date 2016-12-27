@@ -5,21 +5,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class GenericTracer implements ITracer<Node> {
-	@Nullable
-	private Node processed;
-	@Nonnull
+	private @Nullable Node processed;
 	private Node[] stackTrace;
-	@Nullable
-	private List<IEvaluationWarning> warnList;
+	private @Nullable List<IEvaluationWarning> warnList;
 	private int pos;
 	private final int initialSize;
 	private boolean warningsEnabled;
@@ -41,6 +39,7 @@ public class GenericTracer implements ITracer<Node> {
 		processed = object;
 	}
 
+	@Nullable
 	@Override
 	public Node getCurrentlyProcessed() {
 		return processed;
@@ -48,10 +47,10 @@ public class GenericTracer implements ITracer<Node> {
 
 	@SuppressWarnings("null")
 	@Override
-	public void descend(final Node node) {
+	public void descend() {
 		if (pos >= stackTrace.length - 1)
 			stackTrace = Arrays.copyOf(stackTrace, pos * 2);
-		stackTrace[++pos] = node;
+		stackTrace[++pos] = processed;
 	}
 
 	@Override

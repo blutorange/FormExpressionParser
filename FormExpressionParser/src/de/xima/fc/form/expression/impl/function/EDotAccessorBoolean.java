@@ -30,15 +30,15 @@ public enum EDotAccessorBoolean implements IDotAccessorFunction<BooleanLangObjec
 
 	private EDotAccessorBoolean(final Impl impl) {
 		this.impl = impl;
-		func = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs ? null : FunctionLangObject.create(impl);
+		func = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs ? null : FunctionLangObject.createWithoutClosure(impl);
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
 		if (func != null)
-			return func.bind(thisContext, ec).evaluate(ec, args);
-		return FunctionLangObject.create(impl).bind(thisContext, ec);
+			return func.bind(thisContext, ec).evaluate(ec);
+		return FunctionLangObject.createWithoutClosure(impl).bind(thisContext, ec);
 	}
 
 

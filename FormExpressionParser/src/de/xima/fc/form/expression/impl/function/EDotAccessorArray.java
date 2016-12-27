@@ -77,15 +77,15 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 
 	private EDotAccessorArray(final Impl impl) {
 		this.impl = impl;
-		func = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs ? null : FunctionLangObject.create(impl);
+		func = impl.getDeclaredArgumentCount() != 0 || impl.hasVarArgs ? null : FunctionLangObject.createWithoutClosure(impl);
 	}
 
 	@Override
 	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 			final ALangObject... args) throws EvaluationException {
 		if (func != null)
-			return func.bind(thisContext, ec).evaluate(ec, args);
-		return FunctionLangObject.create(impl).bind(thisContext, ec);
+			return func.bind(thisContext, ec).evaluate(ec);
+		return FunctionLangObject.createWithoutClosure(impl).bind(thisContext, ec);
 	}
 
 	@SuppressWarnings("null")
@@ -359,7 +359,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		}
 	}
 
-	private static ALangObject map(final ArrayLangObject list, final ALangObject mapper, final IEvaluationContext ec)
+	protected static ALangObject map(final ArrayLangObject list, final ALangObject mapper, final IEvaluationContext ec)
 			throws EvaluationException {
 		final FunctionLangObject mapperFunc = mapper.coerceFunction(ec);
 		final List<ALangObject> mapped = new ArrayList<>(list.length());

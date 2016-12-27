@@ -151,6 +151,12 @@ public class StringLangObject extends ALangObject {
 		if (value == null) return StringLangObject.getEmptyInstance();
 		return new StringLangObject(value);
 	}
+	
+	@Nonnull
+	public static StringLangObject create(final Object object) {
+		if (object == null) return StringLangObject.getEmptyInstance();
+		return new StringLangObject(NullUtil.toString(object));
+	}
 
 	@Nonnull
 	public static StringLangObject create(final char value) {
@@ -161,6 +167,11 @@ public class StringLangObject extends ALangObject {
 	@Nonnull
 	public static StringLangObject create(final BigDecimal value) {
 		return StringLangObject.create(value.toPlainString());
+	}
+
+	@Nonnull
+	public static StringLangObject create(final Number value) {
+		return StringLangObject.create(NumberLangObject.NUMBER_FORMAT.get().format(value.doubleValue()));
 	}
 
 	@Nonnull

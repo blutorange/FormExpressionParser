@@ -28,7 +28,7 @@ public enum DummyTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public void descend(final Node position) {
+	public void descend() {
 	}
 
 	@Override

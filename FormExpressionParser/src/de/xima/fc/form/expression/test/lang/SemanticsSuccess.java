@@ -81,9 +81,45 @@ enum SemanticsSuccess implements ITestCase {
 	TEMPLIT003("`${}`;", StringLangObject.create("")),
 	
 	//Attribute accessors
-	PROP001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
-	PROP002("h={'f':()=>{42;}};h.f();", Tests.N42), // can call methods from hashes
+	PROPSTRING001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
+	PROPSTRING002("'123'.matches(#^\\d+$#);", Tests.TRUE),
+	PROPSTRING003("'a123'.matches(#^\\d+$#);", Tests.FALSE),
 
+	PROPOBJECT001("4.2.toString;", StringLangObject.create("4.2")),
+	PROPOBJECT002("'42'.toString;", StringLangObject.create("42")),
+	PROPOBJECT003("true.toString;", StringLangObject.create("true")),
+	PROPOBJECT004("false.toString;", StringLangObject.create("false")),
+	PROPOBJECT005("null.toString;", StringLangObject.create("")),
+	PROPOBJECT006("[1,2,3].toString;", StringLangObject.create("[1,2,3]")),
+	PROPOBJECT007("{0:1}.toString;", StringLangObject.create("{0:1}")),
+	PROPOBJECT008("exception('foo').toString;", StringLangObject.create("Custom Exception: foo")),
+	PROPOBJECT009("( x ) => { x ; }.toString;", StringLangObject.create("(x)=>{x;}")),
+
+	PROPHASH001("h={'f':()=>{42;}};h.f();", Tests.N42), // can call methods from hashes
+
+	CLOSURE001("function f(x){(i)=>{var a=x+i;(j)=>{a*j+x;};};}m1=f(0);n1=m1(5);m2=f(11);n3=m2(15);n2=m1(10);n4=m2(20);[n1(2),n2(2),n3(2),n4(2),n1(4),n2(4),n3(4),n4(4)];", ArrayLangObject.create(
+			NumberLangObject.create(10),
+			NumberLangObject.create(20),
+			NumberLangObject.create(63),
+			NumberLangObject.create(73),
+			NumberLangObject.create(20),
+			NumberLangObject.create(40),
+			NumberLangObject.create(115),
+			NumberLangObject.create(135))),
+	CLOSURE002("f=(x)=>{(i)=>{var a=x+i;(j)=>{a*j+x;};};};m1=f(0);n1=m1(5);m2=f(11);n3=m2(15);n2=m1(10);n4=m2(20);[n1(2),n2(2),n3(2),n4(2),n1(4),n2(4),n3(4),n4(4)];", ArrayLangObject.create(
+			NumberLangObject.create(10),
+			NumberLangObject.create(20),
+			NumberLangObject.create(63),
+			NumberLangObject.create(73),
+			NumberLangObject.create(20),
+			NumberLangObject.create(40),
+			NumberLangObject.create(115),
+			NumberLangObject.create(135))),
+	CLOSURE003("f=(t)=>{(s)=>{for(r=s,i=1;i<t;++i)r+=s;};};m1=f(3);m2=f(5);[['foo','bar'].map(m2),['foo','bar'].map(m1)];",
+			ArrayLangObject.create(
+					ArrayLangObject.create(StringLangObject.create("foofoofoofoofoo"),StringLangObject.create("barbarbarbarbar")),
+					ArrayLangObject.create(StringLangObject.create("foofoofoo"),StringLangObject.create("barbarbar")))),
+	
 	// Attribute assigners
 	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
 	ATTRASS002("a=[1,2,3,4];a.length=2;a.length;", NumberLangObject.create(2)),
@@ -104,34 +140,72 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODUN012("a=42;a++;", Tests.N42),
 	EMETHODUN013("a=41;a++;a;", Tests.N42),
 	EMETHODUN014("40+ +2;", Tests.N42),
-	EMETHODBIN001("40+2;", Tests.N42),
-	EMETHODBIN002("50-8;", Tests.N42),
-	EMETHODBIN003("2*21;", Tests.N42),
-	EMETHODBIN004("168/4;", Tests.N42),
-	EMETHODBIN005("42==42.0;", Tests.TRUE),
-	EMETHODBIN006("[1,2]==[1,2];", Tests.TRUE),
-	EMETHODBIN007("[1,2]===[1,2];", Tests.FALSE),
-	EMETHODBIN008("a=[1,2]; a===a;", Tests.TRUE),
-	EMETHODBIN009("48%7;;", NumberLangObject.create(6)),
-	EMETHODBIN010("-50%7;;", NumberLangObject.create(6)),
-	EMETHODBIN011("1==1;", Tests.TRUE),
-	EMETHODBIN012("1===1;", Tests.TRUE),
-	EMETHODBIN013("1<2;", Tests.TRUE),
-	EMETHODBIN014("2<1;", Tests.FALSE),
-	EMETHODBIN015("1<=1;", Tests.TRUE),
-	EMETHODBIN016("1>=1;", Tests.TRUE),
-	EMETHODBIN017("1!=1;", Tests.FALSE),
-	EMETHODBIN018("1!==1;", Tests.FALSE),
-	EMETHODBIN019("'1'=='1';", Tests.TRUE),
-	EMETHODBIN020("'1'==='1';", Tests.FALSE),
-	EMETHODBIN021("'1'<'2';", Tests.TRUE),
-	EMETHODBIN022("'2'<'1';", Tests.FALSE),
-	EMETHODBIN023("'1'<='1';", Tests.TRUE),
-	EMETHODBIN024("'1'>='1';", Tests.TRUE),
-	EMETHODBIN025("'1'!='1';", Tests.FALSE),
-	EMETHODBIN026("'1'!=='1';", Tests.TRUE),
-	EMETHODBIN027("1<'1';", Tests.TRUE),
+	EMETHODNUMBER001("40+2;", Tests.N42),
+	EMETHODNUMBER002("50-8;", Tests.N42),
+	EMETHODNUMBER003("2*21;", Tests.N42),
+	EMETHODNUMBER004("168/4;", Tests.N42),
+	EMETHODNUMBER005("42==42.0;", Tests.TRUE),
+	EMETHODNUMBER009("48%7;;", NumberLangObject.create(6)),
+	EMETHODNUMBER010("-50%7;;", NumberLangObject.create(6)),
+	EMETHODNUMBER011("1==1;", Tests.TRUE),
+	EMETHODNUMBER012("1===1;", Tests.TRUE),
+	EMETHODNUMBER013("1<2;", Tests.TRUE),
+	EMETHODNUMBER014("2<1;", Tests.FALSE),
+	EMETHODNUMBER015("1<=1;", Tests.TRUE),
+	EMETHODNUMBER016("1>=1;", Tests.TRUE),
+	EMETHODNUMBER017("1!=1;", Tests.FALSE),
+	EMETHODNUMBER018("1!==1;", Tests.FALSE),
+	EMETHODNUMBER027("1<'1';", Tests.TRUE),
+	
+	EMETHODBOOLEAN001("false&&false;", Tests.FALSE),
+	EMETHODBOOLEAN002("true&&false;", Tests.FALSE),
+	EMETHODBOOLEAN003("false&&true;", Tests.FALSE),
+	EMETHODBOOLEAN004("true&&true;", Tests.TRUE),
+	EMETHODBOOLEAN005("false||false;", Tests.FALSE),
+	EMETHODBOOLEAN006("true||false;", Tests.TRUE),
+	EMETHODBOOLEAN007("false||true;", Tests.TRUE),
+	EMETHODBOOLEAN008("true||true;", Tests.TRUE),
+	EMETHODBOOLEAN009("false^false;", Tests.FALSE),
+	EMETHODBOOLEAN010("true^false;", Tests.TRUE),
+	EMETHODBOOLEAN011("false^true;", Tests.TRUE),
+	EMETHODBOOLEAN012("true^true;", Tests.FALSE),
+	EMETHODBOOLEAN013("!true;", Tests.FALSE),
+	EMETHODBOOLEAN014("!false;", Tests.TRUE),
 
+	EMETHODARRAY001("[1,2]==[1,2];", Tests.TRUE),
+	EMETHODARRAY002("[1,2]===[1,2];", Tests.FALSE),
+	EMETHODARRAY003("a=[1,2]; a===a;", Tests.TRUE),
+	EMETHODARRAY004("[1,3]+[2,4];", ArrayLangObject.create(
+			NumberLangObject.create(1),
+			NumberLangObject.create(3),
+			NumberLangObject.create(2),
+			NumberLangObject.create(4))),
+	EMETHODARRAY005("[1,3]-[2,3];", ArrayLangObject.create(
+			NumberLangObject.create(1))),
+	EMETHODARRAY006("[1,3]-[];", ArrayLangObject.create(
+			NumberLangObject.create(1),
+			NumberLangObject.create(3))),
+	EMETHODARRAY007("[]-[1,3];", ArrayLangObject.create()),
+
+	EMETHODHASH001("{0:42}+{1:42};", HashLangObject.create(
+			NumberLangObject.create(0), Tests.N42,
+			NumberLangObject.create(1), Tests.N42)),
+	EMETHODHASH002("{0:40}+{0:42};", HashLangObject.create(NumberLangObject.create(0), Tests.N42)),
+
+	EMETHODREGEX001("#^\\d+$# =~ '123';", Tests.TRUE),
+	EMETHODREGEX002("#^\\d+$# =~ 'a123';", Tests.FALSE),
+	
+	EMETHODSTRING001("'1'=='1';", Tests.TRUE),
+	EMETHODSTRING002("'1'==='1';", Tests.FALSE),
+	EMETHODSTRING003("'1'<'2';", Tests.TRUE),
+	EMETHODSTRING004("'2'<'1';", Tests.FALSE),
+	EMETHODSTRING005("'1'<='1';", Tests.TRUE),
+	EMETHODSTRING006("'1'>='1';", Tests.TRUE),
+	EMETHODSTRING007("'1'!='1';", Tests.FALSE),
+	EMETHODSTRING008("'1'!=='1';", Tests.TRUE),
+	EMETHODSTRING009("'foo'+'bar';", StringLangObject.create("foobar")),
+	EMETHODSTRING010("'123' =~ #^\\d+$#;", Tests.TRUE),
+	EMETHODSTRING011("'a123' =~ #^\\d+$#;", Tests.FALSE),
 
 	// Document commands
 	DOC001(new Cfg("<p><p>[%%doc::unwrap('p')%]</p></p>").res(StringLangObject.create("<p></p>")).template().fc()),
@@ -175,6 +249,18 @@ enum SemanticsSuccess implements ITestCase {
 	FUNCTION013("(((((m)=>{(m(42));}))))((x)=>{((x));});", Tests.N42),
 	FUNCTION014("(string a,string b)=>string{return a+\" \"+b;}(\"foo\",\"bar\");", StringLangObject.create("foo bar")),
 	
+	CONTROL001("if(false)41;else 42;", Tests.N42),
+	CONTROL002("i=0;while(++i<42);i;", Tests.N42),
+	CONTROL003("i=0;do{}while(++i<42);i;", Tests.N42),
+	CONTROL004("j=10;for(i in 32)++j;j;", Tests.N42),
+	CONTROL005("j=0;for(i=0;i<42;++i)++j;j;", Tests.N42),
+	CONTROL006("switch(20+22){case 40+2: 42;}", Tests.N42),
+	CONTROL007("i=0;switch(2){case (++i): case(++i): ++i;break;};i;", NumberLangObject.create(3)),
+	CONTROL008("i=0;switch(1){case (++i): case(++i): ++i;break;};i;", NumberLangObject.create(2)),
+	CONTROL009("i=0;switch(1){case (i++): case(i++): ++i;break;};i;", NumberLangObject.create(3)),
+	CONTROL010("i=0;switch<lbl>(1){case (++i): break lbl; case(++i): ++i;};i;", NumberLangObject.create(1)),
+	CONTROL011("(true ? 20 : 0) + (false ? 0 : 22);", Tests.N42),
+	
 	//General
 	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
@@ -183,7 +269,8 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL005("42;;;;;", Tests.N42), // Empty node is through-pass.
 	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // Should not take too long
 	GENERAL007("loginfo('42');", StringLangObject.create("42")), // Log node return
-
+	GENERAL008("a=42;switch(0){default:a;}", Tests.N42), // Resolving variables in switch default case.
+	
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),
 	;

@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
-import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.IllegalVariableAssignmentException;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
 import de.xima.fc.form.expression.exception.parse.ScopeMissingVariableException;
@@ -35,6 +35,7 @@ import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor.IdPair;
 
 @ParametersAreNonnullByDefault
@@ -68,11 +69,11 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		if (scopeDefBuilder.hasManual(scope)) {
 			final IHeaderNode header = scopeDefBuilder.getManual(scope, name);
 			if (header != null) {
-				if (!header.isSourceResolved())
+				if (!header.isBasicSourceResolved())
 					// Should not happen as these variables are resolved
 					// earlier.
 					throw new VariableNotResolvableException(node);
-				node.resolveSource(header.getSource(), EVariableSource.ENVIRONMENTAL, scope);
+				node.resolveSource(header.getBasicSource(), EVariableSource.ENVIRONMENTAL, scope);
 				return true;
 			}
 			if (doThrow)
@@ -135,7 +136,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 			final IHeaderNode header = it.next().getValue();
 			header.resolveSource(getNewObjectToSet(-1, header.getNode()), EVariableSource.ENVIRONMENTAL);
 			if (header.isFunction())
-				((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getSource(), EVariableSource.ENVIRONMENTAL);
+				((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getBasicSource(), EVariableSource.ENVIRONMENTAL);
 		}
 		// Manual scopes.
 		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
@@ -147,7 +148,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 						final IHeaderNode header = it2.next().getValue();
 						header.resolveSource(getNewObjectToSet(-1, header.getNode()), EVariableSource.ENVIRONMENTAL);
 						if (header.isFunction())
-							((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getSource(), EVariableSource.ENVIRONMENTAL);
+							((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getBasicSource(), EVariableSource.ENVIRONMENTAL);
 					}
 				}
 			}
@@ -199,9 +200,9 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		// Check if variable exists globally.
 		final IHeaderNode header = scopeDefBuilder.getGlobal(name);
 		if (header != null) {
-			if (!header.isSourceResolved())
+			if (!header.isBasicSourceResolved())
 				throw new VariableNotResolvableException(node);
-			node.resolveSource(header.getSource(), EVariableSource.ENVIRONMENTAL);
+			node.resolveSource(header.getBasicSource(), EVariableSource.ENVIRONMENTAL);
 			return;
 		}
 
@@ -249,7 +250,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 			final ASTVariableNode var = node.getAssignableNode(i).getAsOrNull(ASTVariableNode.class);
 			if (var != null) {
 				if (!var.getSourceType().isAssignable()) {
-					throw new IllegalExternalScopeAssignmentException(var);
+					throw new IllegalVariableAssignmentException(var);
 				}
 				
 			}
@@ -285,16 +286,16 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		v.bindScopeDefValues(scopeDefBuilder, -1);
 		node.jjtAccept(v, -1);
 		v.binding.reset();
-		return v.new ResImpl();
+		return v.new ResImpl(node);
 	}
 	
 	protected class ResImpl implements IVariableResolutionResult {
 		private final Map<Integer, Integer> environmentalMap;
 
-		public ResImpl() {
+		public ResImpl(final Node node) throws SemanticsException {
 			environmentalMap = new HashMap<>();
 			mapEnvironmental();
-			mapClosure();
+			mapClosure(node);
 		}
 		
 		@Override
@@ -310,7 +311,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 
 		@Nullable
 		@Override
-		public Integer getMappedClosure(final Integer functionId, final Integer source) {
+		public Integer getMappedClosure(final Integer functionId, final Integer source) throws IllegalArgumentException {
 			@Nullable Integer id = functionId;
 			int parent = 0;
 			while (id != null) {
@@ -318,9 +319,8 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 				if (info == null)
 					return null;
 				final Integer newId = info.closureVariables.get(source);
-				if (newId != null) {
+				if (newId != null)
 					return Integer.valueOf((parent << 16) | newId.intValue());
-				}
 				id = info.parent;
 				++parent;
 			}
@@ -332,15 +332,23 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 			final FunctionInfo info = functionInfoMap.get(functionId);
 			return info != null ? info.closureVariables.size() : 0;
 		}
-		
-		private void mapClosure() {
-			for (final FunctionInfo info : functionInfoMap.values()) {
-				int id = 0;
-				for (final Entry<Integer,Integer> entryClosure : info.closureVariables.entrySet())
-					entryClosure.setValue(id++);
-			}
+
+		@Override
+		public int getInternalVariableCount() {
+			return variableIdProvider;
 		}
 		
+		private void mapClosure(final Node node) throws SemanticsException {
+			for (final FunctionInfo info : functionInfoMap.values()) {
+				int id = 0;
+				for (final Entry<Integer, Integer> entryClosure : info.closureVariables.entrySet())
+					entryClosure.setValue(id++);
+				if (id > 0xFFFF)
+					throw new SemanticsException(
+							NullUtil.messageFormat("Closure variable count limit exceeded: {0}", id), node);
+			}
+		}
+				
 		private void mapEnvironmental() {
 			int id = 0;
 			for (final Integer oldId : globalVariables)
@@ -361,6 +369,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 	}
 	
 	protected static class FunctionInfo {
+		public int parentCount = -1;
 		@Nullable
 		public final Integer parent;
 		// Purely local variables. 

@@ -48,6 +48,7 @@ import de.xima.fc.form.expression.exception.parse.NoSuchScopeException;
 import de.xima.fc.form.expression.exception.parse.NotAFunctionException;
 import de.xima.fc.form.expression.exception.parse.ScopeMissingVariableException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
+import de.xima.fc.form.expression.exception.parse.UnhandledEnumException;
 import de.xima.fc.form.expression.exception.parse.UnreachableCodeException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -352,9 +353,9 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	}
 
 	private IVariableType getDeclaredType(@Nullable final String scope, final ISourceResolvable resolvable, final Node node) throws SemanticsException {
-		if (!resolvable.isSourceResolved())
+		if (!resolvable.isBasicSourceResolved())
 			throw new VariableNotResolvableException(scope, resolvable.getVariableName(), node);
-		final int source = resolvable.getSource();
+		final int source = resolvable.getBasicSource();
 		if (source >= 0) {
 			final IVariableType type = table[source];
 			return type != null ? type : SimpleVariableType.OBJECT;
@@ -402,18 +403,17 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 * @throws SemanticsException
 	 *             When there is a semantic error.
 	 */
-	private int visitSwitchClause(final ASTSwitchClauseNode node, final int startIndex, final NodeInfo info)
+	private int visitSwitchClause(final ASTSwitchClauseNode node, final EMethod type, final int startIndex, final NodeInfo info)
 			throws SemanticsException {
 		info.unifiyImplicitType(SimpleVariableType.NULL);
 		int i;
-		for (i = startIndex; i < node.getCaseCount() && node.getCaseType(i) == EMethod.SWITCHCLAUSE; ++i) {
+		for (i = startIndex; i < node.getCaseCount() && node.getCaseType(i) == type; ++i) {
 			final NodeInfo infoClause = node.getCaseNode(i).jjtAccept(this);
 			if (infoClause.hasImplicitType())
 				info.replaceImplicitType(infoClause.getImplicitType());
-			else if (i < node.getCaseCount() - 1 && node.getCaseType(i + 1) == EMethod.SWITCHCLAUSE)
+			else if (i < node.getCaseCount() - 1 && node.getCaseType(i + 1) == type)
 				// Unreachable code when this node does not complete normally
-				// and the next
-				// node is not a case or default declaration.
+				// and the next node is not a case or default declaration.
 				throw new UnreachableCodeException(node.jjtGetChild(i + 1));
 			else
 				info.clearImplicitType();
@@ -575,9 +575,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			}
 			// $CASES-OMITTED$
 			default:
-				throw new SemanticsException(
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION, node.getPropertyType(i)),
-						node.getPropertyNode(i));
+				throw new UnhandledEnumException(node.getPropertyType(i), node.getPropertyNode(i));
 			}
 		}
 		return infoRes;
@@ -699,9 +697,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			}
 			// $CASES-OMITTED$
 			default:
-				throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_ASSIGNMENT,
-						nodeProperty.getPropertyType(nodeProperty.getPropertyNodeCount() - 1),
-						nodeProperty.getClass().getSimpleName()), nodeProperty);
+				throw new UnhandledEnumException(nodeProperty.getPropertyType(nodeProperty.getPropertyNodeCount() - 1),
+						nodeProperty);
 			}
 			break;
 		}
@@ -1073,7 +1070,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		int i = 0;
 		while (i < node.getCaseCount()) {
 			switch (node.getCaseType(i)) {
-			case SWITCHCASE:
+			case SWITCHCASE: {
 				final NodeInfo infoCase = node.getCaseNode(i).jjtAccept(this);
 				if (infoCase.hasLabel())
 					throw new IllegalJumpClauseException(EJump.BREAK, infoCase.getAnyLabel(), node.getCaseNode(i));
@@ -1088,21 +1085,28 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				infoResult.unifyError(infoCase);
 				++i;
 				break;
-			case SWITCHDEFAULT:
-				++i;
-				break;
-			case SWITCHCLAUSE:
+			}
+			case SWITCHDEFAULT: {
 				final NodeInfo infoClause = new NodeInfo();
-				i = visitSwitchClause(node, i, infoClause);
+				i = visitSwitchClause(node, EMethod.SWITCHDEFAULT, i, infoClause);
+				if (infoClause.removeLabel(node.getLabel()))
+					infoClause.unifiyImplicitType(SimpleVariableType.NULL);
+				if (!infoClause.hasImplicitType() && i < node.getCaseCount() - 1)
+					throw new UnreachableCodeException(node.getCaseNode(i+1));
+				infoResult.unify(infoClause);
+				break;
+			}
+			case SWITCHCLAUSE: {
+				final NodeInfo infoClause = new NodeInfo();
+				i = visitSwitchClause(node, EMethod.SWITCHCLAUSE, i, infoClause);
 				if (infoClause.removeLabel(node.getLabel()))
 					infoClause.unifiyImplicitType(SimpleVariableType.NULL);
 				infoResult.unify(infoClause);
 				break;
+			}
 			// $CASES-OMITTED$
 			default:
-				throw new SemanticsException(
-						NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.getCaseType(i)),
-						node.getCaseNode(i));
+				throw new UnhandledEnumException(node.getCaseType(i), node.getCaseNode(i));
 			}
 		}
 		// Switch may return null when there is no default case

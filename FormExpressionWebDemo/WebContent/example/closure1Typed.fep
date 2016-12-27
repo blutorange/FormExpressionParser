@@ -1,0 +1,31 @@
+global scope {
+  method<method<number,number>,number> m1;
+  method<method<number,number>,number> m2;
+  method<number,number> n1;
+  method<number,number> n2;
+  method<number,number> n3;
+  method<number,number> n4;
+  array<string> result;
+}
+
+function method<method<number,number>,number> foo(number x) {
+  return (number i) => method<number, number> {
+    number a = x+i;
+    return (number j) => number {
+      return a*j+x;
+    };
+  };
+}
+
+m1 = foo(0);
+n1 = m1(5);
+m2 = foo(11);
+n3 = m2(15);
+n2 = m1(10);
+n4 = m2(20);
+
+result = [n1(2),n2(2),n3(2),n4(2),n1(4),n2(4),n3(4),n4(4)].mapString((number x) => {
+  return x.toString;
+});
+
+result;

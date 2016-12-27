@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
-import de.xima.fc.form.expression.exception.parse.IllegalExternalScopeAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
+import de.xima.fc.form.expression.exception.parse.IllegalVariableAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleExpressionMethodTypeException;
 import de.xima.fc.form.expression.exception.parse.IncompatibleFunctionParameterTypeException;
@@ -59,7 +59,7 @@ enum SyntaxFailure implements ITestCase {
 	TEST025(new Cfg("global scope {var i=0;var j=i;}j;").err("Error during parsing at line 1, column 29: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
 	TEST026(new Cfg("scope myscope{var j=''.lower();}myscope::j;").err("Error during parsing at line 1, column 21: Illegal assignment for j. Assignment in header definitions must be compile-time constant.").err(HeaderAssignmentNotCompileTimeConstantException.class)),
 	TEST027(new Cfg("if(true){var i=0;}else{var j=i+3;}").err("Error during parsing at line 1, column 30: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
-	TEST028(new Cfg("require scope math;math::pi=9;").err("Error during parsing at line 1, column 20: Variable math::pi belongs to an external scope and cannot be assigned to.").err(IllegalExternalScopeAssignmentException.class)),
+	TEST028(new Cfg("require scope math;math::pi=9;").err("Error during parsing at line 1, column 20: Variable pi of type LIBRARY cannot be assigned to, most likely because it is a variable from an external scope.").err(IllegalVariableAssignmentException.class)),
 	TEST029(new Cfg("break;").err("Error during parsing at line 1, column 1: Break without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
 	TEST030(new Cfg("continue;").err("Error during parsing at line 1, column 1: Continue without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
 	TEST031(new Cfg("return;").err("Error during parsing at line 1, column 1: Return clause used outside a function.").err(IllegalJumpClauseException.class)),
@@ -70,8 +70,7 @@ enum SyntaxFailure implements ITestCase {
 	TEST036(new Cfg("for<foo>(i in 10)continue;").err("Error during parsing at line 1, column 18: Continue without label used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
 	TEST037(new Cfg("switch<foo>(true){};while(true)continue foo;").err("Error during parsing at line 1, column 32: Continue foo used outside of loop or switch, or label does not match any loop or switch.").err(IllegalJumpClauseException.class)),
 	TEST038(new Cfg("if(true)var i = i;").err("Error during parsing at line 1, column 17: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
-	// Closures not supported currently.
-	TEST039(new Cfg("function foo(){var i = 10;()=>{i;};}foo();").err("Error during parsing at line 1, column 32: Variable i cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
+	TEST039(new Cfg("function bar(){var baz;};function foo(){baz;}").err("Error during parsing at line 1, column 41: Variable baz cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	TEST040(new Cfg("function foo(){arguments.length;}foo(1,2,3);").err("Error during parsing at line 1, column 16: Variable arguments cannot be resolved to a defined variable.").err(VariableNotResolvableException.class)),
 	TEST041(new Cfg("\"foo\\\";").err(TokenMgrError.class).err("Lexical error at line 1, column 8. Encountered <EOF> after \"\"foo\\\";\"")),
 	TEST042(new Cfg("#(\\d#;").err(ParseException.class).err("Error during parsing at line 1, column 1: Encountered invalid regex: Unclosed group near index 3")),
@@ -88,7 +87,8 @@ enum SyntaxFailure implements ITestCase {
 	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),
 	STRICT003(new Cfg("math::pi;").err("Error during parsing at line 1, column 1: Scope math is provided by the context, but require scope statement is missing. Strict mode requires importing scopes explicitly.").err(MissingRequireScopeStatementException.class).strict()),
-
+	STRICT004(new Cfg("global scope {number x;}switch(0){case 1:x=22;default:x='33';}").err("Error during parsing at line 1, column 55: Found incompatible variable type STRING but expected NUMBER: Variable x cannot be assigned to this type.").err(IncompatibleVariableAssignmentTypeException.class).strict()),
+	
 	VOID001(new Cfg("global scope{method<void> m;method<string,string> m2;}m2(m());").err("Error during parsing at line 1, column 58: Found incompatible variable type VOID but expected STRING: Function parameter type not compatible.").err(IncompatibleFunctionParameterTypeException.class).strict()),
 	VOID002(new Cfg("global scope{method<void> m;}m()+0;").err("Error during parsing at line 1, column 34: No such expression method PLUS(+) for type VOID.").err(NoSuchExpressionMethodException.class).strict()),
 	VOID003(new Cfg("global scope{method<void> m;}0+m();").err("Error during parsing at line 1, column 32: Found incompatible variable type VOID but expected NUMBER: Expression method PLUS(+) for NUMBER does not accept this type on the right hand side.").err(IncompatibleExpressionMethodTypeException.class).strict()),

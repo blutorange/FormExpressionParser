@@ -189,7 +189,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				writer.write(prefix);
 			break;
 		default:
-			throw new IOException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_COMMENT, ct.getCommentType()));
+			throw new IOException(NullUtil.messageFormat(CmnCnst.Error.UNHANDLED_ENUM, ct.getCommentType()));
 		}
 		// Get the next comment
 		++commentPos;
@@ -599,7 +599,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new IOException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.jjtGetChild(i).getSiblingMethod()));
+				throw new IOException(NullUtil.messageFormat(CmnCnst.Error.UNHANDLED_ENUM, node.jjtGetChild(i).getSiblingMethod()));
 			}
 		}
 		// footer }
@@ -765,7 +765,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 				break;
 				// $CASES-OMITTED$
 			default:
-				throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_PROPERTY_EXPRESSION,
+				throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.UNHANDLED_ENUM,
 						node.jjtGetChild(i).getSiblingMethod()));
 			}
 		}

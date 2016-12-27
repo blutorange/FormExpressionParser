@@ -28,7 +28,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 	private final boolean hasVarArgs;
 
 	private EDotAssignerArray(final Impl impl) {
-		this.func = FunctionLangObject.create(impl);
+		this.func = FunctionLangObject.createWithoutClosure(impl);
 		this.impl = impl;
 		hasVarArgs = impl.hasVarArgs();
 	}
@@ -37,7 +37,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 	public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 			throws EvaluationException {
 		func.bind(thisContext, ec);
-		return func.evaluate(ec, args);
+		return func.evaluate(ec, args[1]);
 	}
 
 	@SuppressWarnings("null")
@@ -82,7 +82,7 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				final int len = args[1].coerceNumber(ec).intValue(ec);
+				final int len = args[0].coerceNumber(ec).intValue(ec);
 				thisContext.setLength(len);
 				return thisContext;
 			}

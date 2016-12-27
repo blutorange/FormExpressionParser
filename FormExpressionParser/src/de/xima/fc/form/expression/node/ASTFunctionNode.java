@@ -21,6 +21,7 @@ public class ASTFunctionNode extends ANode implements IFunctionNode {
 	private boolean hasVarArgs;
 	private boolean hasType;
 	private int callId = -1;
+	private int closureTableSize = -1;
 
 	public ASTFunctionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -119,5 +120,20 @@ public class ASTFunctionNode extends ANode implements IFunctionNode {
 	@Override
 	public boolean isFunctionIdResolved() {
 		return callId >= 0;
+	}
+
+	@Override
+	public void resolveClosureTableSize(final int closureTableSize) {
+		this.closureTableSize = closureTableSize;
+	}
+
+	@Override
+	public int getClosureTableSize() {
+		return closureTableSize ;
+	}
+
+	@Override
+	public boolean isClosureTableSizeResolved() {
+		return closureTableSize >= 0;
 	}
 }

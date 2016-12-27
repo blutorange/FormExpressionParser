@@ -84,6 +84,7 @@ enum SyntaxSuccess implements ITestCase {
 	TEST070("'\"`$\\'\\\\';"),
 	TEST071("\"'`$\\\"\\\\\";"),
 	TEST072("`\"'\\$\\`\\\\`;"),
+	TEST073("function foo(){var i = 10;()=>{i;};}foo();"),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

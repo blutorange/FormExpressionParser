@@ -39,7 +39,7 @@ public abstract class SimpleFunctionVariableProvider<R extends ALangObject>
 
 	@Override
 	public final FunctionLangObject make() {
-		return FunctionLangObject.createNull(this);
+		return FunctionLangObject.createForNullThisContextWithoutClosure(this);
 	}
 
 	@Override

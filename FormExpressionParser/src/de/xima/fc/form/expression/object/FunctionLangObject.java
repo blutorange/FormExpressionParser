@@ -1,13 +1,19 @@
 package de.xima.fc.form.expression.object;
 
+import java.util.Arrays;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
+import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
+import de.xima.fc.form.expression.exception.evaluation.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.evaluation.IllegalThisContextException;
 import de.xima.fc.form.expression.exception.evaluation.UnboundFunctionCallException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
+import de.xima.fc.form.expression.iface.evaluate.IClosure;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
@@ -20,16 +26,20 @@ import de.xima.fc.form.expression.util.NullUtil;
 @ParametersAreNonnullByDefault
 public class FunctionLangObject extends ALangObject {
 	private final IFunction<ALangObject> value;
-	@Nullable
-	private ALangObject thisContext;
+	@Nullable private ALangObject thisContext;
+	@Nullable private final IClosure parentClosure;
+	private final int closureSymbolTableSize;
 
-	private FunctionLangObject(final IFunction<ALangObject> value) {
+	private FunctionLangObject(final IFunction<ALangObject> value, @Nullable final IClosure parentClosure, final int closureSymbolTableSize) {
 		super();
 		this.value = value;
+		this.parentClosure = parentClosure;
+		this.closureSymbolTableSize = closureSymbolTableSize;
 	}
 
-	private FunctionLangObject(final IFunction<ALangObject> value, @Nullable final ALangObject thisContext) {
-		this(value);
+	private FunctionLangObject(final IFunction<ALangObject> value, @Nullable final ALangObject thisContext,
+			@Nullable final IClosure parentClosure, final int closureSymbolTableSize) {
+		this(value, parentClosure, closureSymbolTableSize);
 		this.thisContext = thisContext;
 	}
 
@@ -38,20 +48,54 @@ public class FunctionLangObject extends ALangObject {
 		return ELangObjectClass.FUNCTION;
 	}
 
-	public ALangObject evaluate(final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
-		if (thisContext != null)
-			return value.evaluate(ec, thisContext, args);
-		throw new UnboundFunctionCallException(value, ec);
+	public final ALangObject evaluate(final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {		
+		// Check argument count.
+		if (value.hasVarArgs() ? args.length < value.getDeclaredArgumentCount() - 1
+				: args.length != value.getDeclaredArgumentCount())
+			throw new IllegalNumberOfFunctionParametersException(this, args.length, ec);
+		
+		// Evaluate function
+		final ALangObject thisContext = this.thisContext;
+		final ALangObject result;
+		if (thisContext == null)
+			throw new UnboundFunctionCallException(value, ec);
+		ec.closureStackPush(new ClosureImpl(closureSymbolTableSize, parentClosure));
+		ec.getTracer().descend();
+		try {
+			result = value.evaluate(ec, thisContext, args);
+		}
+		finally {
+			ec.getTracer().ascend();
+			ec.closureStackPop();
+		}
+		
+		// Check for disallowed break / continue clauses.
+		switch (ec.getJumpType()) {
+		case RETURN:
+			ec.unsetJump();
+			break;
+		case NONE:
+			break;
+		case BREAK:
+			throw new BreakClauseException(ec.getJumpLabel(), ec);
+		case CONTINUE:
+			throw new ContinueClauseException(ec.getJumpLabel(), ec);
+		default:
+			throw new UncatchableEvaluationException(ec,
+				NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
+		}
+		
+		return result;
 	}
 
 	@Override
 	public ALangObject shallowClone() {
-		return new FunctionLangObject(value, thisContext);
+		return new FunctionLangObject(value, thisContext, parentClosure, closureSymbolTableSize);
 	}
 
 	@Override
 	public ALangObject deepClone() {
-		return shallowClone();
+		return new FunctionLangObject(value, thisContext, parentClosure != null ? parentClosure.copy() : null, closureSymbolTableSize);
 	}
 
 	@Override
@@ -61,7 +105,7 @@ public class FunctionLangObject extends ALangObject {
 		for (int i = 0; i < value.getDeclaredArgumentCount(); ++i)
 			builder.append(value.getDeclaredArgument(i)).append(Syntax.COMMA);
 		// Remove final comma
-		if (builder.length() > 3)
+		if (value.getDeclaredArgumentCount() > 0)
 			builder.setLength(builder.length() - 1);
 		// Add triple dot for varargs.
 		if (hasVarArgs())
@@ -74,7 +118,7 @@ public class FunctionLangObject extends ALangObject {
 			((IUnparsableFunction<?>)value).unparseBody(builder);
 		else
 			builder.append(Syntax.NATIVE_CODE).append(CmnCnst.Syntax.SEMI_COLON);
-		builder.append(Syntax.BRACE_CLOSE).append(Syntax.SEMI_COLON);
+		builder.append(Syntax.BRACE_CLOSE);
 	}
 
 	@Override
@@ -112,7 +156,9 @@ public class FunctionLangObject extends ALangObject {
 	@Nonnull
 	@Override
 	public StringLangObject coerceString(final IEvaluationContext ec) {
-		return StringLangObject.create(value.getDeclaredName());
+		final StringBuilder sb = new StringBuilder();
+		toExpression(sb);
+		return StringLangObject.create(sb);
 	}
 
 	@Nonnull
@@ -120,7 +166,7 @@ public class FunctionLangObject extends ALangObject {
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
 		return this;
 	}
-
+	
 	public static FunctionLangObject getNoOpNull() {
 		return new FunctionLangObject(new IFunction<ALangObject>() {
 			@Override
@@ -153,18 +199,31 @@ public class FunctionLangObject extends ALangObject {
 			public boolean hasVarArgs() {
 				return false;
 			}
-		}, NullLangObject.getInstance());
+		}, NullLangObject.getInstance(), null, 0);
 	}
 
-	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling the function.
-	public static FunctionLangObject create(final IFunction<? extends ALangObject> value) {
-		return new FunctionLangObject((IFunction<ALangObject>) value);
+	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before
+									// calling the function.
+	public static FunctionLangObject create(final IFunction<? extends ALangObject> value,
+			@Nullable final IClosure closure, final int closureSymbolTableSize) {
+		return new FunctionLangObject((IFunction<ALangObject>) value, closure, closureSymbolTableSize);
 	}
-
-	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before calling the function.
-	public static FunctionLangObject createNull(final IFunction<NullLangObject> value) {
+	
+	public static FunctionLangObject createWithoutClosure(final IFunction<? extends ALangObject> value) {
+		return create(value, null, 0);
+	}
+	
+	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before
+									// calling the function.
+	public static FunctionLangObject createForNullThisContext(final IFunction<NullLangObject> value,
+			@Nullable final IClosure closure, final int closureSymbolTableSize) {
 		final IFunction<?> f = value;
-		return new FunctionLangObject((IFunction<ALangObject>) f, NullLangObject.getInstance());
+		return new FunctionLangObject((IFunction<ALangObject>) f, NullLangObject.getInstance(), closure,
+				closureSymbolTableSize);
+	}
+	
+	public static FunctionLangObject createForNullThisContextWithoutClosure(final IFunction<NullLangObject> value) {
+		return createForNullThisContext(value, null, 0);
 	}
 
 	public boolean hasVarArgs() {
@@ -184,5 +243,39 @@ public class FunctionLangObject extends ALangObject {
 
 	public String getDeclaredName() {
 		return value.getDeclaredName();
+	}
+	
+	private static class ClosureImpl implements IClosure {
+		private final ALangObject[] symbolTable;
+		@Nullable public final IClosure parent;
+		public ClosureImpl(final int symbolTableSize, @Nullable final IClosure parent) {
+			this.symbolTable = new ALangObject[symbolTableSize];
+			this.parent = parent;
+		}
+		private ClosureImpl(final ALangObject[] symbolTable, @Nullable final IClosure parent, final boolean makeCopy) {
+			this.symbolTable = makeCopy ? NullUtil.checkNotNull(Arrays.copyOf(symbolTable, symbolTable.length)) : symbolTable;
+			this.parent = parent;
+		}
+		@Nullable
+		@Override
+		public IClosure getParent() {
+			return parent;
+		}
+		@Override
+		public IClosure copy() {
+			return new ClosureImpl(symbolTable, parent, true);
+		}
+		// Cannot be null: setObject(...) does not accepts nulls, table is
+		// filled with non-nulls during initialization.
+		@SuppressWarnings("null")
+		@Override
+		public ALangObject getObject(final int source) {
+			return source < symbolTable.length ? symbolTable[source] : NullLangObject.getInstance();
+		}
+		@Override
+		public void setObject(final int source, final ALangObject object) {
+			if (source < symbolTable.length)
+				symbolTable[source] = object;
+		}
 	}
 }

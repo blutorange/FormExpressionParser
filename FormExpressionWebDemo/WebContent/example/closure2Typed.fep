@@ -1,0 +1,21 @@
+global scope {
+  method<string, string> mapper1;
+  method<string, string> mapper2;
+}
+
+function method<string, string> getDupMapper(number times) {
+  return (string s) => {
+    string result = s;
+    for (i in times - 1)
+      result += s;
+    return result;
+  };
+}
+
+mapper1 = getDupMapper(3);
+mapper2 = getDupMapper(5);
+
+{
+  run1: ["foo", "bar"].map(mapper1),
+  run2: ["foo", "bar"].map(mapper2)
+};

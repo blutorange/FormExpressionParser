@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import java.util.Collection;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
@@ -19,10 +19,11 @@ import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@ParametersAreNonnullByDefault
 public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Boolean, FormExpressionException> {
-	@Nonnull private final ISourceResolvable[] resolvableTable;
-	@Nonnull private final Node[] nodeTable;
-	@Nonnull private final boolean[] booleanTable;
+	private final ISourceResolvable[] resolvableTable;
+	private final Node[] nodeTable;
+	private final boolean[] booleanTable;
 
 	private UnusedVariableCheckVisitor(final int symbolTableSize) {
 		resolvableTable = new ISourceResolvable[symbolTableSize];
@@ -30,8 +31,8 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 		booleanTable = new boolean[symbolTableSize];
 	}
 
-	private void addToNodeTable(@Nonnull final ISourceResolvable resolvable, @Nonnull final Node node) {
-		final int source = resolvable.getSource();
+	private void addToNodeTable(final ISourceResolvable resolvable, final Node node) {
+		final int source = resolvable.getBasicSource();
 		if (source >= 0 && source < resolvableTable.length && nodeTable[source] == null) {
 			resolvableTable[source] = resolvable;
 			nodeTable[source] = node;
@@ -43,7 +44,7 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 			booleanTable[source] = true;
 	}
 
-	private void addWarnings(@Nonnull final IEvaluationContext ec) {
+	private void addWarnings(final IEvaluationContext ec) {
 		for (int i = resolvableTable.length; i-- > 0;) {
 			if (!booleanTable[i]) {
 				final ISourceResolvable resolvable = resolvableTable[i];
@@ -62,7 +63,7 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 
 	@Override
 	public void visit(final ASTVariableNode node, final Boolean assignment) {
-		final int source = node.getSource();
+		final int source = node.getBasicSource();
 		if (source >= 0) {
 			if (assignment)
 				addToNodeTable(node, node);
@@ -113,8 +114,8 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 			}
 	}
 
-	public static void check(@Nonnull final Node node, @Nonnull final IScopeDefinitions scopeDefs,
-			final int symbolTableSize, @Nonnull final IEvaluationContext ec) {
+	public static void check(final Node node, final IScopeDefinitions scopeDefs,
+			final int symbolTableSize, final IEvaluationContext ec) {
 		final UnusedVariableCheckVisitor v = new UnusedVariableCheckVisitor(symbolTableSize);
 		v.defineScopeDefs(scopeDefs);
 		node.jjtAccept(v, CmnCnst.NonnullConstant.BOOLEAN_FALSE);

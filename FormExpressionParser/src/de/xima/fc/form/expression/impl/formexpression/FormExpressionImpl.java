@@ -54,8 +54,7 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	public IEvaluationResult evaluate(@Nonnull final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
-		ec.createSymbolTable(symbolTableSize);
-		final ALangObject result = EvaluateVisitor.evaluateCode(node, scopeDefs, ec);
+		final ALangObject result = EvaluateVisitor.evaluateCode(node, scopeDefs, symbolTableSize, ec);
 		final List<IEvaluationWarning> warnings = ec.getTracer().buildWarnings();
 		ec.reset();
 		return new ResImpl(result, warnings);

@@ -3,9 +3,10 @@ package de.xima.fc.form.expression.iface.evaluate;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import de.xima.fc.form.expression.enums.EJump;
+import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.IReset;
-import de.xima.fc.form.expression.iface.parse.IVariableReference;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 
 /**
@@ -30,20 +31,36 @@ public interface IEvaluationContext extends IReset {
 	public ILogger getLogger();
 	public ITracer<Node> getTracer();
 	public IEmbedment getEmbedment();
-
 	@Nullable public IExternalContext getExternalContext();
 	public void setExternalContext(@Nullable IExternalContext externalContext);
+	
+	public void closureStackPush(final IClosure closure);
+	public void closureStackPop() throws EvaluationException;
 
 	/**
-	 * Must be an equivalence relation.
-	 * @param name1
-	 *            Name of one variable.
-	 * @param name2
-	 *            Name of another variable.
-	 * @return Whether two variable names are equivalent and refer to the same
-	 *         variable. Default could be {@link String#equals(Object)}
+	 * @return The element on the top, or <code>null</code> when there is no element at the top.
 	 */
-	public boolean variableNameEquals(String name1, String name2);
-	public void createSymbolTable(int symbolTableSize);
-	public IVariableReference[] getSymbolTable();
+	@Nullable
+	public IClosure closureStackPeek();
+	/**
+	 * @return The jump type, or {@link EJump#NONE} when there is no jump.
+	 */
+	public EJump getJumpType();
+	/**
+	 * @return The jump label if {@link #getJumpType()} is {@link EJump#CONTINUE}
+	 * or {@link EJump#BREAK}, or the empty string otherwise.
+	 */
+	@Nullable
+	public String getJumpLabel();
+	public void unsetJump();
+	public boolean hasJump();
+	public void setJump(EJump jumpType, @Nullable String lable);
+	/**
+	 * @param label Label to check.
+	 * @return <code>true</code> iff {@link #getJumpType()} is {@link EJump#CONTINUE}
+	 * or {@link EJump#BREAK}; and {@link #getJumpLabel()} is either <code>null</code>
+	 * or this label matches the given label.
+	 */
+	public boolean matchesNamedJump(@Nullable String label);
+	//!(jumpLabel != null && !jumpLabel.equals(label))
 }

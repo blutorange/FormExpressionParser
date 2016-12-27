@@ -27,6 +27,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 	private final Node typedNode;
 	private final boolean isFunction;
 	private int source = -1;
+	private int closureSource = -1;
 	private EVariableSource sourceType = EVariableSource.UNRESOLVED;
 
 	public HeaderNodeImpl(final ASTVariableDeclarationClauseNode node) {
@@ -80,15 +81,17 @@ public class HeaderNodeImpl implements IHeaderNode {
 
 	@Override
 	public void resolveSource(final int source, final EVariableSource sourceType) throws IllegalVariableSourceResolutionException {
-		if (isSourceResolved())
+		if (isBasicSourceResolved())
 			throw new IllegalVariableSourceResolutionException(this, source);
 		this.source = source;
 		this.sourceType = sourceType;
 	}
 
 	@Override
-	public void remapSource(final int source) {
-		this.source = source;
+	public void resolveClosureSource(final int closureSource) throws IllegalVariableSourceResolutionException {
+		if (isClosureSourceResolved())
+			throw new IllegalVariableSourceResolutionException(this, closureSource);
+		this.closureSource = closureSource;
 	}
 	
 	@Override
@@ -99,8 +102,13 @@ public class HeaderNodeImpl implements IHeaderNode {
 	}
 
 	@Override
-	public int getSource() {
+	public int getBasicSource() {
 		return source;
+	}
+
+	@Override
+	public int getClosureSource() {
+		return closureSource;
 	}
 
 	@Override
@@ -109,9 +117,14 @@ public class HeaderNodeImpl implements IHeaderNode {
 	}
 
 	@Override
-	public boolean isSourceResolved() {
+	public boolean isBasicSourceResolved() {
 		return source >= 0;
 	}
+	
+	@Override
+	public boolean isClosureSourceResolved() {
+		return closureSource >= 0;
+	}	
 
 	@Override
 	public String getVariableName() {

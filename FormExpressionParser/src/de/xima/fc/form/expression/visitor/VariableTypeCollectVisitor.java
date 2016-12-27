@@ -114,8 +114,9 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 		node.getBodyNode().jjtAccept(this, builder);
 	}
 
-	private <T extends IArgumentResolvable & Node> IVariableType varArgParam(final T node, final int i) throws SemanticsException, IllegalVariableTypeException {
-		IVariableType type = table[node.getArgResolvable(i).getSource()];
+	private <T extends IArgumentResolvable & Node> IVariableType varArgParam(final T node, final int i)
+			throws SemanticsException, IllegalVariableTypeException {
+		IVariableType type = table[node.getArgResolvable(i).getBasicSource()];
 		type = type != null ? type : SimpleVariableType.OBJECT;
 		final IVariableType wrapped = GenericVariableType.forArray(type);
 		resolveTypedNode(node.getArgResolvable(i), node, wrapped);
@@ -153,7 +154,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	private IVariableType resolveTypedNode(final ISourceResolvable resolvable, final Node node,
 			final IVariableType type) throws SemanticsException {
-		final int source = resolvable.getSource();
+		final int source = resolvable.getBasicSource();
 		if (source < 0)
 			throw new SemanticsException(CmnCnst.Error.EXTERNAL_SOURCE_FOR_MANUAL_VARIABLE, node);
 		return table[source] = type;

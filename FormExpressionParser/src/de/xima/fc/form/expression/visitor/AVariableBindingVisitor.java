@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableDeclarationAtGlobalScopeException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
-import de.xima.fc.form.expression.exception.parse.SemanticsException;
+import de.xima.fc.form.expression.exception.parse.UnhandledEnumException;
 import de.xima.fc.form.expression.exception.parse.VariableDeclaredTwiceException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -29,8 +29,6 @@ import de.xima.fc.form.expression.node.ASTSwitchClauseNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
-import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 
 /**
  * For preparing the binding so we know which variables are in scope at which
@@ -174,46 +172,66 @@ public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDat
 		}
 	}
 
+	/**
+	 * var x;
+	 * ...
+	 * switch(...)
+	 *   case (var x=9):
+	 *     ...
+	 *   case (x):
+	 *     ...
+	 */
+	
 	@Override
 	public final void visit(final ASTSwitchClauseNode node, final D data) throws ParseException {
 		node.getSwitchValueNode().jjtAccept(this, data);
-		boolean nested = false;
-		int bookmark = 0;
-		try {
-			int i = 0;
-			while (i < node.getCaseCount()) {
-				switch (node.getCaseType(i)) {
-				case SWITCHCLAUSE:
-					if (!nested) {
-						bookmark = binding.getBookmark();
-						binding.nest();
-					}
-					while (i < node.getCaseCount() && node.getCaseType(i) == EMethod.SWITCHCLAUSE)
+		final int caseCount = node.getCaseCount();
+		int i = 0;
+		while (i < caseCount) {
+			switch (node.getCaseType(i)) {
+			case SWITCHCLAUSE: {
+				final int bookmark = binding.getBookmark();
+				binding.nest();
+				try {
+					do {
 						node.getCaseNode(i++).jjtAccept(this, data);
-					binding.gotoBookmark(bookmark);
-					nested = false;
-					break;
-				case SWITCHCASE:
-					bookmark = binding.getBookmark();
-					binding.nest();
-					node.getCaseNode(i).jjtAccept(this, data);
-					nested = true;
-					++i;
-					break;
-				case SWITCHDEFAULT:
-					++i;
-					break;
-					//$CASES-OMITTED$
-				default:
-					throw new SemanticsException(
-							NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ENUM_SWITCH, node.getCaseNode(i).getSiblingMethod()),
-							node.jjtGetChild(i));
+					} while (i < caseCount && node.getCaseType(i) == EMethod.SWITCHCLAUSE);
 				}
+				finally {
+					binding.gotoBookmark(bookmark);
+				}
+				break;
 			}
-		}
-		finally {
-			if (nested)
+			case SWITCHCASE: {
+				final int bookmark = binding.getBookmark();
+				binding.nest();
+				try {
+					node.getCaseNode(i).jjtAccept(this, data);
+				}
+				finally {
+					binding.gotoBookmark(bookmark);
+				}
 				binding.gotoBookmark(bookmark);
+				++i;
+				break;
+			}
+			case SWITCHDEFAULT: {
+				final int bookmark = binding.getBookmark();
+				binding.nest();
+				try {
+					do {
+						node.getCaseNode(i++).jjtAccept(this, data);
+					} while (i < caseCount && node.getCaseType(i) == EMethod.SWITCHDEFAULT);
+				}
+				finally {
+					binding.gotoBookmark(bookmark);
+				}
+				break;
+			}
+			// $CASES-OMITTED$
+			default:
+				throw new UnhandledEnumException(node.getCaseNode(i).getSiblingMethod(), node.jjtGetChild(i));
+			}
 		}
 	}
 

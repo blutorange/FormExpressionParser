@@ -16,4 +16,5 @@ public interface IVariableResolutionResult {
 	@Nullable
 	public Integer getMappedClosure(Integer functionId, Integer source);
 	public int getClosureSize(Integer functionId);
+	public int getInternalVariableCount();
 }
