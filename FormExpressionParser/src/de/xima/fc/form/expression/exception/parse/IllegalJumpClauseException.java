@@ -35,6 +35,7 @@ public class IllegalJumpClauseException extends SemanticsException {
 			return NullUtil.messageFormat(CmnCnst.Error.CONTINUE_CLAUSE, NullUtil.or(label, CmnCnst.Name.EMPTY_LABEL));
 		case RETURN:
 			return CmnCnst.Error.RETURN_CLAUSE;
+		case NONE:
 		default:
 			return CmnCnst.Error.JUMP_WITHOUT_MATCHING_LABEL_OR_FUNCTION;
 		}

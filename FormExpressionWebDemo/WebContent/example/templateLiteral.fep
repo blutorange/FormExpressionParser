@@ -7,7 +7,7 @@ function div(a, b) {
 }
 %]
 <section>
-  Let us add some numbers:
+Let us add some numbers:
   <ul>
     <li> [% add(5,10) %] </li>
     <li> [% add(-2,2) %] </li>
@@ -21,4 +21,5 @@ function div(a, b) {
     <li> [% div(-7,-4) %] </li>
     <li> [% div(10,0) %] </li>
   </ul>
+  [%%doc::write(`<p><b>3+4=${3+4}!</b></p>`)%]
 </section>

@@ -61,6 +61,7 @@ $(function(){
 	var controlType = $("#type")
 	var controlContext = $("#context")
 	var controlStrict = $("#strict")
+	var controlHtml = $("#asHtml")
 	var controlHeight = $("#height")
 	
 	var lastChange = 0;
@@ -88,7 +89,7 @@ $(function(){
 	myCodeMirror.on("change", function(){
 		localStorage.code=myCodeMirror.getValue()
 	})
-
+    
 	// Set theme selection
     $.each(["3024-day", "3024-night", "abcdef", "ambiance", "ambiance-mobile", "base16-dark", "base16-light", "bespin", "blackboard", "cobalt", "colorforth", "dracula", "eclipse", "elegant", "erlang-dark", "hopscotch", "icecoder", "isotope", "lesser-dark", "liquibyte", "material", "mbo", "mdn-like", "midnight", "monokai", "neat", "neo", "night", "panda-syntax", "paraiso-dark", "paraiso-light", "pastel-on-dark", "railscasts", "rubyblue", "seti", "solarized", "the-matrix", "tomorrow-night-bright", "tomorrow-night-eighties", "ttcn", "twilight", "vibrant-ink", "xq-dark", "xq-light", "yeti", "zenburn"], function(idx, val) {
     	selectTheme.append($("<option></option>").text(val).attr("value",val))
@@ -105,20 +106,27 @@ $(function(){
     		myCodeMirror.setOption("mode", "formexpression-template")
 		myCodeMirror.getOption("lint").type = $(this).val()
 		myCodeMirror.performLint()
+        localStorage.type = $(this).val();
     })
     
     controlContext.on("change", function() {
     	myCodeMirror.getOption("lint").context = $(this).val()
     	myCodeMirror.performLint()
+        localStorage.context = $(this).val();
     })
     
     controlStrict.on("change", function() {
     	myCodeMirror.getOption("lint").strict = $(this).prop("checked")
     	myCodeMirror.performLint()
+        localStorage.strict = $(this).prop("checked");
     })
     
     controlHeight.on("change input", function() {
     	myCodeMirror.setSize("auto", $(this).val())
+    })
+
+    controlHtml.on("change", function() {
+        localStorage.html = $(this).prop("checked");
     })
     
     // Action buttons
@@ -246,4 +254,10 @@ $(function(){
 	})
 	
 	setTheme("erlang-dark")
+
+    // Restore options.
+    setType(localStorage.type || "program")
+    setContext(localStorage.context || "generic")
+    setStrict(localStorage.strict==="true")
+    setHtml(localStorage.html==="true")
 })

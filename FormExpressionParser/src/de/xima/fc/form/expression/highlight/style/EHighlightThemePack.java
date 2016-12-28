@@ -11,11 +11,11 @@ import de.xima.fc.form.expression.highlight.Weight;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 
 @ParametersAreNonnullByDefault
-public enum HighlightThemeEclipse implements IFormExpressionHighlightTheme {
+public enum EHighlightThemePack implements IFormExpressionHighlightTheme {
 	ECLIPSE(new EclipseImpl());
 	private final IFormExpressionHighlightTheme impl;
 
-	private HighlightThemeEclipse(final IFormExpressionHighlightTheme impl) {
+	private EHighlightThemePack(final IFormExpressionHighlightTheme impl) {
 		this.impl = impl;
 	}
 

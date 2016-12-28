@@ -46,9 +46,9 @@ CodeMirror.defineSimpleMode("formexpression-template", {
   ],
   // The template literal state.
   templateliteral: [
-    {regex: /`/, token: "string", next: "start"},
-    {regex: /\$\{/, token: "string", indent: true, push: "start"},
-    {regex: /./, token: "string"}
+    {regex: /`/, token: "string", next: "code"},
+    {regex: /(\$)(\{)/, token: ["string", null] , indent: true, push: "code"},
+    {regex: /./, token: "string"},
     {regex: /[^]*/, token: "string"}
   ],
   // The meta property contains global information about the mode. It

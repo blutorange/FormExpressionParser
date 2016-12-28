@@ -182,9 +182,9 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 	@Nonnull
 	protected static String getIndent(final HttpServletRequest request) {
 		if (request == null)
-			return " ";
+			return "  ";
 		final String indent= request.getParameter(CmnCnst.URL_PARAM_KEY_INDENT);
-		return indent != null ? indent : " ";
+		return indent != null ? indent : "  ";
 	}
 
 	@Nonnull

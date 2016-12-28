@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.ABasicHighlightTheme;
 import de.xima.fc.form.expression.highlight.highlighter.HtmlHighlighter;
-import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
+import de.xima.fc.form.expression.highlight.style.EHighlightThemePack;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlighter;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
@@ -71,7 +71,7 @@ public interface IFormExpressionFactory {
 	 * @throws IOException When the highlighter fails to write the output.
 	 * @see HtmlHighlighter
 	 * @see ABasicHighlightTheme
-	 * @see HighlightThemeEclipse
+	 * @see EHighlightThemePack
 	 */
 	public void highlight(String code, IFormExpressionHighlighter highlighter, IFormExpressionHighlightTheme theme)
 			throws ParseException, TokenMgrError, IOException;

@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.TokenMgrError;
 import de.xima.fc.form.expression.highlight.highlighter.HtmlHighlighter;
-import de.xima.fc.form.expression.highlight.style.HighlightThemeEclipse;
+import de.xima.fc.form.expression.highlight.style.EHighlightThemePack;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
@@ -41,8 +41,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
- * - check for absolute error even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
- * - support closures for lambda expressions (=> for each function call, get a unique callID, create a separate set of values for each closure variable)
+ * - check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
  * - add some type inference
  *    a = 9;   // a must be a number
  *    a = 2+3; // a must be a number
@@ -186,7 +185,7 @@ public class Demo {
 		System.out.println("===Syntax highlighted HTML==="); //$NON-NLS-1$
 		try {
 			final HtmlHighlighter highlighter = HtmlHighlighter.create();
-			EXPRESSION_FACTORY.highlight(code, highlighter, HighlightThemeEclipse.ECLIPSE);
+			EXPRESSION_FACTORY.highlight(code, highlighter, EHighlightThemePack.ECLIPSE);
 			System.out.println(highlighter.getHtmlWithInlinedCss());
 		}
 		catch (final ParseException e) {
