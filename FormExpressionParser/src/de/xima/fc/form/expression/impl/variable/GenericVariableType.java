@@ -6,8 +6,9 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
@@ -22,7 +23,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class GenericVariableType implements IVariableType {
 	private static final long serialVersionUID = 1L;
 	private final ILangObjectClass clazz;
@@ -77,7 +78,7 @@ public class GenericVariableType implements IVariableType {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(clazz.toString());
+		sb.append(clazz.getSyntacticalTypeName());
 		if (list.length > 0) {
 			sb.append('<');
 			for (int i = 0; i < list.length; ++i)

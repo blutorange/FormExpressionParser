@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
@@ -153,7 +153,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author mad_gaksha
  *
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class ALangObject implements INonNullIterable<ALangObject>, Comparable<ALangObject> {
 	private static AtomicLong ID_COUNTER = new AtomicLong();
 

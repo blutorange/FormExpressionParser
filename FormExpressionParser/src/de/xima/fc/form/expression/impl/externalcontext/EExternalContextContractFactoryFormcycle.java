@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.impl.library.ELibraryScopeContractFactoryFormcycle;
 import de.xima.fc.form.expression.object.ALangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EExternalContextContractFactoryFormcycle implements IExternalContextContractFactory<Formcycle> {
 	INSTANCE(ELibraryScopeContractFactoryFormcycle.values());
 

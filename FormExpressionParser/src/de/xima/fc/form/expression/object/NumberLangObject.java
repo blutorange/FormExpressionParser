@@ -7,7 +7,8 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.exception.evaluation.MathDivisionByZeroException;
@@ -32,7 +33,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class NumberLangObject extends ALangObject {
 	protected final double value;
 
@@ -123,7 +124,7 @@ public class NumberLangObject extends ALangObject {
 	@Nonnull
 	@Override
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
-		return RegexLangObject.createForString(NumberLangObject.toExpression(value));
+		return RegexLangObject.createForString(NumberLangObject.toExpression(value), ec);
 	}
 
 	@Override

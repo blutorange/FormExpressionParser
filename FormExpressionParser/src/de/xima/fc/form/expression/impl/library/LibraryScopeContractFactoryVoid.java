@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -22,7 +23,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.Void;
 
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class LibraryScopeContractFactoryVoid implements ILibraryScopeContractFactory<Void> {
 	private static final long serialVersionUID = 1L;
 
@@ -34,7 +35,6 @@ public final class LibraryScopeContractFactoryVoid implements ILibraryScopeContr
 		this.map = map;
 	}
 
-	@SuppressWarnings({ "null" })
 	@Nullable
 	@Override
 	public IVariableType getVariableType(final String variableName) {

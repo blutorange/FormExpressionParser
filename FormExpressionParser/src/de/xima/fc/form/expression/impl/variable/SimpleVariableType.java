@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.variable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
@@ -13,7 +14,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum SimpleVariableType implements IVariableType {
 	OBJECT(ELangObjectClass.OBJECT),
 	NULL(ELangObjectClass.NULL),
@@ -51,10 +52,9 @@ public enum SimpleVariableType implements IVariableType {
 		throw new ArrayIndexOutOfBoundsException(i);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String toString() {
-		return clazz.toString();
+		return clazz.getSyntacticalTypeName();
 	}
 
 	@Override

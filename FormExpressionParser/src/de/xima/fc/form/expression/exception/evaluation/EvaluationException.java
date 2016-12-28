@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class EvaluationException extends Exception implements IPositionedError {
 	private static final long serialVersionUID = 1L;
 

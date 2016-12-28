@@ -2,10 +2,10 @@ package de.xima.fc.form.expression.webdemo;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @SuppressWarnings("nls")
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class CmnCnst {
 	private CmnCnst() {}
 	public final static int TIMEOUT = 20000;

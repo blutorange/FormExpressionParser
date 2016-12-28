@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.visitor;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
@@ -38,7 +38,7 @@ import de.xima.fc.form.expression.node.ASTWhileLoopNode;
  * @param <T>
  *            Type of the objects of the binding.
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDataVisitorAdapter<D, ParseException> {
 	protected final IBinding<T> binding;
 

@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -17,7 +17,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class HeaderNodeImpl implements IHeaderNode {
 	private static final long serialVersionUID = 1L;
 

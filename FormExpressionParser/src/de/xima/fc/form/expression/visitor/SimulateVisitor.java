@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.visitor;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.grammar.Node;
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.impl.warning.EmptyStatementWarning;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<EvaluationException> {
 	private final IEvaluationContext ec;
 	@Nullable

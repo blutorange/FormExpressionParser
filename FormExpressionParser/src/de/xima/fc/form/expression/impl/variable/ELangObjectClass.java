@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 
@@ -31,7 +32,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author madgaksha
  *
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum ELangObjectClass implements ILangObjectClass {
 	OBJECT(0, false, ALangObject.class, CmnCnst.Syntax.VAR, false, true) {
 		@Override
@@ -436,5 +437,10 @@ public enum ELangObjectClass implements ILangObjectClass {
 			if (equalsClass(clazz))
 				return true;
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return getSyntacticalTypeName();
 	}
 }

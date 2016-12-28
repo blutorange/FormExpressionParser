@@ -1,8 +1,8 @@
 package de.xima.fc.form.expression.impl.embedment;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IEmbedmentHandlerNamed extends IEmbedmentHandler {
 	public String getEmbedmentName();
 }

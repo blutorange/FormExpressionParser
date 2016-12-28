@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class ASourceResolvableNode extends ANode implements ISourceResolvable {
 	private static final long serialVersionUID = 1L;
 	private String name = CmnCnst.NonnullConstant.STRING_EMPTY;

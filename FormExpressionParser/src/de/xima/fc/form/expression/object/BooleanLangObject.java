@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.object;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class BooleanLangObject extends ALangObject {
 	private final boolean value;
 

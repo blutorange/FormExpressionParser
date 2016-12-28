@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.IReset;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.iface.IReset;
  * <b>Must be immutable.</b>
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface INamespace extends IReset{
 	/**
 	 * Expression method for the given object type. For example

@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.iface.parse;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableList;
 
@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IFormExpression<T> extends Serializable {
 	/**
 	 * Evaluates (executes) this program and returns the result. You must supply the

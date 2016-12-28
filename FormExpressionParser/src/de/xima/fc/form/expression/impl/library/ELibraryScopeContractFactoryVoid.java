@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.library;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -18,7 +18,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.Void;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum ELibraryScopeContractFactoryVoid implements ILibraryScopeContractFactory<Void> {
 	EMPTY(new LibraryScopeContractFactoryVoid.Builder(CmnCnst.NonnullConstant.STRING_EMPTY).build()),
 	MATH(new LibraryScopeContractFactoryVoid.Builder(CmnCnst.CustomScope.MATH)

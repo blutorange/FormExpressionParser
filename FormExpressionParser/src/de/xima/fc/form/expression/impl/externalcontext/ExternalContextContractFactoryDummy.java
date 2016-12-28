@@ -1,13 +1,13 @@
 package de.xima.fc.form.expression.impl.externalcontext;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContextCommand;
 import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class ExternalContextContractFactoryDummy<T> extends AGenericExternalContextFactory<T> {
 	private static final long serialVersionUID = 1L;
 

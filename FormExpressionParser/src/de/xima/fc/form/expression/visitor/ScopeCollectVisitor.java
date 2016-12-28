@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -38,7 +38,7 @@ import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class ScopeCollectVisitor
 		extends FormExpressionVoidDataVisitorAdapter<Optional<Map<String, IHeaderNode>>, SemanticsException>
 		implements IScopeDefinitionsBuilder {

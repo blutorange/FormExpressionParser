@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.variable.provider;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.parse.IVariableProvider;
@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class DynamicArrayVariableProvider<V extends ALangObject> extends AVariableProvider<ArrayLangObject> {
 	private static final long serialVersionUID = 1L;
 	private final IVariableType innerType;

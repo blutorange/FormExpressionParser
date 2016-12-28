@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Preconditions;
 
@@ -50,7 +50,7 @@ import de.xima.fc.form.expression.visitor.VariableResolveVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor;
 import de.xima.fc.form.expression.visitor.VariableTypeCollectVisitor;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class FormExpressionFactory {
 	private FormExpressionFactory() {
 	}

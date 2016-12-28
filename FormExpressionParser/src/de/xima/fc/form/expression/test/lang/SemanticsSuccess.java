@@ -79,7 +79,7 @@ enum SemanticsSuccess implements ITestCase {
 	TEMPLIT001("a=20;b=22;`0${{res:`1${`2${`3${`4--${a+b}--4`}3`}2`}1`}}0`;",StringLangObject.create("0{\"res\":\"1234--42--4321\"}0")),
 	TEMPLIT002("`${20+22}`;", StringLangObject.create("42")),
 	TEMPLIT003("`${}`;", StringLangObject.create("")),
-	
+
 	//Attribute accessors
 	PROPSTRING001("'Ab3'.toUpperCase.toLowerCase;", StringLangObject.create("ab3")),
 	PROPSTRING002("'123'.matches(#^\\d+$#);", Tests.TRUE),
@@ -119,7 +119,9 @@ enum SemanticsSuccess implements ITestCase {
 			ArrayLangObject.create(
 					ArrayLangObject.create(StringLangObject.create("foofoofoofoofoo"),StringLangObject.create("barbarbarbarbar")),
 					ArrayLangObject.create(StringLangObject.create("foofoofoo"),StringLangObject.create("barbarbar")))),
-	
+	CLOSURE004("()=>{arr=[];for(i in 3){arr.push(()=>{return 21*i;});}arr;}().mapNumber((m)=>{m();});", ArrayLangObject.create(
+			Tests.N42,Tests.N42,Tests.N42)),
+
 	// Attribute assigners
 	ATTRASS001("a=[];a.length=8;a.length;", NumberLangObject.create(8)),
 	ATTRASS002("a=[1,2,3,4];a.length=2;a.length;", NumberLangObject.create(2)),
@@ -156,7 +158,7 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODNUMBER017("1!=1;", Tests.FALSE),
 	EMETHODNUMBER018("1!==1;", Tests.FALSE),
 	EMETHODNUMBER027("1<'1';", Tests.TRUE),
-	
+
 	EMETHODBOOLEAN001("false&&false;", Tests.FALSE),
 	EMETHODBOOLEAN002("true&&false;", Tests.FALSE),
 	EMETHODBOOLEAN003("false&&true;", Tests.FALSE),
@@ -194,7 +196,7 @@ enum SemanticsSuccess implements ITestCase {
 
 	EMETHODREGEX001("#^\\d+$# =~ '123';", Tests.TRUE),
 	EMETHODREGEX002("#^\\d+$# =~ 'a123';", Tests.FALSE),
-	
+
 	EMETHODSTRING001("'1'=='1';", Tests.TRUE),
 	EMETHODSTRING002("'1'==='1';", Tests.FALSE),
 	EMETHODSTRING003("'1'<'2';", Tests.TRUE),
@@ -248,7 +250,7 @@ enum SemanticsSuccess implements ITestCase {
 	FUNCTION012("a=[20,22];a.length;h={bar:a.get};h.bar(0)+h.bar(1);", Tests.N42),
 	FUNCTION013("(((((m)=>{(m(42));}))))((x)=>{((x));});", Tests.N42),
 	FUNCTION014("(string a,string b)=>string{return a+\" \"+b;}(\"foo\",\"bar\");", StringLangObject.create("foo bar")),
-	
+
 	CONTROL001("if(false)41;else 42;", Tests.N42),
 	CONTROL002("i=0;while(++i<42);i;", Tests.N42),
 	CONTROL003("i=0;do{}while(++i<42);i;", Tests.N42),
@@ -260,7 +262,8 @@ enum SemanticsSuccess implements ITestCase {
 	CONTROL009("i=0;switch(1){case (i++): case(i++): ++i;break;};i;", NumberLangObject.create(3)),
 	CONTROL010("i=0;switch<lbl>(1){case (++i): break lbl; case(++i): ++i;};i;", NumberLangObject.create(1)),
 	CONTROL011("(true ? 20 : 0) + (false ? 0 : 22);", Tests.N42),
-	
+	CONTROL012("while<outer>(true){for<inner>(i in 10){if(i>5) break outer;continue inner;}}", NullLangObject.getInstance()),
+
 	//General
 	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci
 	GENERAL002("false ? 0 : 42;", Tests.N42), // Ternary
@@ -270,7 +273,7 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // Should not take too long
 	GENERAL007("loginfo('42');", StringLangObject.create("42")), // Log node return
 	GENERAL008("a=42;switch(0){default:a;}", Tests.N42), // Resolving variables in switch default case.
-	
+
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),
 	;
@@ -340,5 +343,4 @@ enum SemanticsSuccess implements ITestCase {
 	public ISeverityConfig getSeverityConfig() {
 		return SeverityConfig.getLooseConfig();
 	}
-
 }

@@ -2,14 +2,14 @@ package de.xima.fc.form.expression.util;
 
 import java.util.regex.Pattern;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 @SuppressWarnings("nls")
 public final class CmnCnst {
 	private CmnCnst() {}
@@ -35,6 +35,8 @@ public final class CmnCnst {
 		public static final String STRING_EMPTY = "";
 		public static final String STRING_SPACE = " ";
 		public static final String STRING_LF = "\n";
+		public static final String STRING_CR = "\r";
+		public static final String STRING_TAB = "\t";
 		public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(STRING_EMPTY));
 		public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 		public static final int[] EMPTY_INT_ARRAY = new int[0];
@@ -102,7 +104,6 @@ public final class CmnCnst {
 		public static final String HASH = "hash";
 		public static final String VALUE = "value";
 		public static final String EMPTY_LABEL = "without label";
-		public static final String VOID_TYPE = "VOID";
 		public static final String DEFAULT_LOGGER_NAME = "Logger.%08X";
 	}
 
@@ -231,6 +232,9 @@ public final class CmnCnst {
 		public static final String VOID = "void";
 		public static final String INLNE_EXPRESSION_OPEN = "${";
 		public static final String INLNE_EXPRESSION_CLOSE = "}";
+		public static final Object ESCAPE_LINEFEED = "\\n";
+		public static final Object ESCAPE_CARRIAGE_RETURN = "\\r";
+		public static final Object ESCAPE_TAB = "\\t";
 	}
 
 	public static final class Error {

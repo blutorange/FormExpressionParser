@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> {
 	PLUS(EMethod.PLUS, Impl.UNION),
 	DASH(EMethod.DASH, Impl.DIFFERENCE),
@@ -116,7 +116,6 @@ public enum EExpressionMethodArray implements IMethod2Function<ArrayLangObject> 
 			return hasVarArgs;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

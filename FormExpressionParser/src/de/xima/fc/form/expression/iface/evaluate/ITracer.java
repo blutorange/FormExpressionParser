@@ -3,11 +3,11 @@ package de.xima.fc.form.expression.iface.evaluate;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.IReset;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface ITracer<T extends ITraceElement> extends IReset {
 
 	public void appendWarning(IEvaluationWarning warning);

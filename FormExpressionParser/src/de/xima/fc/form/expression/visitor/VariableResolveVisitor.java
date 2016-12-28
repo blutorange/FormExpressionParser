@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableAssignmentException;
@@ -38,7 +38,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.VariableResolveVisitor.IdPair;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Integer> {
 	protected final Set<Integer> globalVariables;
 	protected final Map<Integer, FunctionInfo> functionInfoMap;

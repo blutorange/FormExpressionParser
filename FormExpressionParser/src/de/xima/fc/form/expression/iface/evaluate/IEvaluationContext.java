@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -24,7 +24,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
  * @formatter:on
  * @author mad_gaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IEvaluationContext extends IReset {
 	public ILibrary getLibrary();
 	public INamespace getNamespace();

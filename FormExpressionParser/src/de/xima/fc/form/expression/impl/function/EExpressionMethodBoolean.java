@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObject> {
 	DOUBLE_BAR(EMethod.DOUBLE_BAR, Impl.OR),
 	DOUBLE_AMPERSAND(EMethod.DOUBLE_AMPERSAND, Impl.AND),
@@ -164,7 +164,6 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			return hasVarArgs;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

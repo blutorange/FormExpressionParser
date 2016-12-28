@@ -1,8 +1,8 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface ICallResolvable {
 	/** @return The resolved call ID: Valid IDs must be >=0.*/
 	public Integer getFunctionId();

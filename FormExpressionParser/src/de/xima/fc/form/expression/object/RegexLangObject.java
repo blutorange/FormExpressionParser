@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.object;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,9 +19,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 
 public class RegexLangObject extends ALangObject {
 	private final static class InstanceHolder {
-		@SuppressWarnings("null")
 		@Nonnull public final static RegexLangObject UNMATCHABLE = new RegexLangObject(Pattern.compile("(?!)")); //$NON-NLS-1$
-		@SuppressWarnings("null")
 		@Nonnull public final static RegexLangObject ALL_MATCHING = new RegexLangObject(Pattern.compile("")); //$NON-NLS-1$
 	}
 
@@ -138,10 +137,16 @@ public class RegexLangObject extends ALangObject {
 	 * @return A regex that matches the literal characters of the given string, at any position.
 	 */
 	@Nonnull
-	public static RegexLangObject createForString(@Nullable String string) {
+	public static RegexLangObject createForString(@Nullable String string, final IEvaluationContext ec) {
 		if (string == null) string = StringUtils.EMPTY;
 		final Pattern p = Pattern.compile(Pattern.quote(string));
-		return p != null ? new RegexLangObject(p) : getAllMatchingInstance();
+		try {
+			return new RegexLangObject(p);
+		}
+		catch (final PatternSyntaxException e) {
+			ec.getLogger().error(null, e);
+			return RegexLangObject.getUnmatchableInstance();
+		}
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.variable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSortedSet;
@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum VoidType implements IVariableType {
 	INSTANCE;
 
@@ -78,6 +78,6 @@ public enum VoidType implements IVariableType {
 
 	@Override
 	public String toString() {
-		return CmnCnst.Name.VOID_TYPE;
+		return getBasicLangClass().getSyntacticalTypeName();
 	}
 }

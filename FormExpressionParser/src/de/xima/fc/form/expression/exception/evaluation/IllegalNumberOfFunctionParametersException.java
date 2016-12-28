@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.parse.IArgumentResolvable;
@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class IllegalNumberOfFunctionParametersException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 

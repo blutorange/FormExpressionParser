@@ -29,6 +29,7 @@ import de.xima.fc.form.expression.impl.logger.ELoggerContractFactory;
 import de.xima.fc.form.expression.impl.namespace.ENamespaceContractFactory;
 import de.xima.fc.form.expression.impl.tracer.DummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @SuppressWarnings("nls")
 public class HtmlDocumentCommandTest {
@@ -173,9 +174,8 @@ public class HtmlDocumentCommandTest {
 				if (stuff instanceof IExternalContextCommand)
 					hec.process((IExternalContextCommand) stuff, ec);
 				else {
-					@SuppressWarnings("null")
 					@Nonnull
-					final String s = String.valueOf(stuff);
+					final String s = NullUtil.toString(stuff);
 					hec.write(s);
 				}
 			}

@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -18,7 +18,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ASTStringCharactersNode extends ANode {
 	private static final long serialVersionUID = 1L;
 

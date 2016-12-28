@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.ec;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.impl.externalcontext.EExternalContextContractF
 import de.xima.fc.form.expression.impl.externalcontext.Formcycle;
 import de.xima.fc.form.expression.impl.library.ELibraryContractFactory;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EEvaluationContextContractFormcycle implements IEvaluationContextContract<Formcycle> {
 	INSTANCE(new EvaluationContextContract.Builder<Formcycle>()
 			.setEmbedment(EEmbedmentContractFactory.FORMCYCLE)

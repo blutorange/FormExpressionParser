@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.iface.parse;
 
 import java.io.Serializable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory;
  * @param <T>
  *            Type of the required object for the external context.
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IEvaluationContextContract<T> extends Serializable {
 	/**
 	 * Returns an embedment factory for creating embedments and providing

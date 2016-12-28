@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 /**
  * This exception is thrown by a throw block .
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class CustomRuntimeException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;

@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class VariableTypeBuilder implements IVariableTypeBuilder {
 	@Nullable
 	private ILangObjectClass type;

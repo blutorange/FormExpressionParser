@@ -1,12 +1,12 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IVariableTypeBuilder {
 	IVariableTypeBuilder append(IVariableType type);
 	/**

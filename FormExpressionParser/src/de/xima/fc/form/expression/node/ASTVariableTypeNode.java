@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
@@ -22,7 +22,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ASTVariableTypeNode extends ANode {
 
 	private static final long serialVersionUID = 1L;

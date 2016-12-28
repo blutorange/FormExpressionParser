@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.exception.parse;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Node;
@@ -8,7 +8,7 @@ import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class SemanticsException extends ParseException {
 	private static final long serialVersionUID = 1L;
 

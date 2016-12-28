@@ -85,6 +85,8 @@ enum SyntaxSuccess implements ITestCase {
 	TEST071("\"'`$\\\"\\\\\";"),
 	TEST072("`\"'\\$\\`\\\\`;"),
 	TEST073("function foo(){var i = 10;()=>{i;};}foo();"),
+	TEST074(new Cfg("function method<number,number>f(){method<number,number>h=(number x)=>{return 21*x;};return h;}f()(2);").strict()),
+	TEST075(new Cfg("function void foo(string a,number b,boolean c){}foo('',2,false);").strict()),
 	;
 	@Nonnull private final String code;
 	@Nonnull private final ETestType type;

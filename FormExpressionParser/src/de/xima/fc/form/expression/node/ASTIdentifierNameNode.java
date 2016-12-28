@@ -3,8 +3,6 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.base.Preconditions;
-
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
@@ -47,9 +45,9 @@ public class ASTIdentifierNameNode extends ANode {
 	public void init(@Nullable final EMethod method, @Nonnull final String name) throws ParseException {
 		assertChildrenExactly(0);
 		super.init(method);
-		this.name = Preconditions.checkNotNull(name);
+		this.name = assertNonNull(name, CmnCnst.Error.NULL_TOKEN_IMAGE);
 	}
-	
+
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.highlight.highlighter.HtmlHighlighter.HtmlHigh
 import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 @SuppressWarnings("nls")
 public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 	private final StringBuilder html, css;

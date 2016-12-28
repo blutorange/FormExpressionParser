@@ -1,9 +1,9 @@
 package de.xima.fc.form.expression.iface.parse;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IVariableResolutionResult {
 	/**
 	 * Maps between the old variable ID and a consecutive new ID.

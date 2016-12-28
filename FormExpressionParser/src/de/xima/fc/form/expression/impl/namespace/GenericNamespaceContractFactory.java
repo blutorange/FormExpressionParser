@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -64,7 +64,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author madgaksha
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class GenericNamespaceContractFactory implements INamespaceContractFactory, INamespace {
 	private static final long serialVersionUID = 1L;
 

@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.formexpression;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -25,7 +25,7 @@ import de.xima.fc.form.expression.visitor.EvaluateVisitor;
 import de.xima.fc.form.expression.visitor.SimulateVisitor;
 import de.xima.fc.form.expression.visitor.UnusedVariableCheckVisitor;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 class FormExpressionImpl<T> implements IFormExpression<T> {
 	private static final long serialVersionUID = 1L;
 

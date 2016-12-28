@@ -33,7 +33,7 @@ import java.io.Writer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableList;
 
@@ -98,7 +98,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IOException> {
 	private final Writer writer;
 	private final IUnparseConfig config;

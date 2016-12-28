@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -19,6 +20,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILibraryScope;
 import de.xima.fc.form.expression.iface.factory.ILibraryContractFactory;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.util.Void;
 
 /**
@@ -34,7 +36,7 @@ import de.xima.fc.form.expression.util.Void;
  * @author madgaksha
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class LibraryContractFactoryVoid implements ILibraryContractFactory {
 	private static final long serialVersionUID = 1L;
 	protected final ImmutableMap<String, ILibraryScopeContractFactory<Void>> library;
@@ -104,10 +106,9 @@ public final class LibraryContractFactoryVoid implements ILibraryContractFactory
 				s.reset();
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public Collection<String> getProvidedScopes() {
-			return map.keySet();
+			return NullUtil.checkNotNull(map.keySet());
 		}
 	}
 }

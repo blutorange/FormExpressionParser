@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import java.util.Collection;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Boolean, FormExpressionException> {
 	private final ISourceResolvable[] resolvableTable;
 	private final Node[] nodeTable;

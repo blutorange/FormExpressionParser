@@ -1,12 +1,12 @@
 package de.xima.fc.form.expression.enums;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum ELogLevel {
 	ERROR(1) {
 		@Override

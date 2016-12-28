@@ -4,7 +4,7 @@ import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_DEC
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_SCOPE_DECLARATION_AS_ERROR;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
 import de.xima.fc.form.expression.exception.parse.NoSuchEmbedmentException;
@@ -30,7 +30,7 @@ import de.xima.fc.form.expression.util.Void;
  *
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void> {
 	private final IEvaluationContextContract<?> contractFactory;
 	private final ISeverityConfig config;

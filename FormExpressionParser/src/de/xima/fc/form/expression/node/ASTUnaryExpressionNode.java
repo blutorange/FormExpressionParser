@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ASTUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
 

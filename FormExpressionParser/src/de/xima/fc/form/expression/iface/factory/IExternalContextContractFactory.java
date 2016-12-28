@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.iface.factory;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IExternalContextContractFactory<T> extends IParamContractFactory<IExternalContext, T> {
 	public boolean isProvidingScope(String scope);
 	@Nullable

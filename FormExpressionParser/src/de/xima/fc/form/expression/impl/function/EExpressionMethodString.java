@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EExpressionMethodString implements IMethod2Function<StringLangObject> {
 	/**
 	 * @param stringToJoin <code>string</code> The string to be concatenated to this string.
@@ -116,7 +116,6 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 			return hasVarArgs;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

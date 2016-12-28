@@ -2,12 +2,12 @@ package de.xima.fc.form.expression.iface.parse;
 
 import java.io.Serializable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IHeaderNode extends ISourceResolvable, Serializable, IVariableTyped {
 	/**
 	 * @return The node with the value. Must not be an

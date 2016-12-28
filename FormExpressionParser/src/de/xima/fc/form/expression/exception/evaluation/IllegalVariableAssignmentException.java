@@ -1,13 +1,13 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class IllegalVariableAssignmentException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 

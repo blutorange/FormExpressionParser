@@ -1,14 +1,14 @@
 package de.xima.fc.form.expression.exception.parse;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class DuplicateScopedVariableDeclarationException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 

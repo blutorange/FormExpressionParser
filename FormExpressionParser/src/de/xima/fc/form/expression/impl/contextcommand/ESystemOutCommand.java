@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.contextcommand;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -16,7 +16,7 @@ public enum ESystemOutCommand implements IExternalContextCommand {
 	@SuppressWarnings("unchecked")
 	@Override
 	@Nonnull
-	@ParametersAreNonnullByDefault
+	@NonNullByDefault
 	public <T extends IExternalContextCommand> Optional<T> castTo(@Nonnull final Class<T> clazz) {
 		checkNotNull(clazz);
 		if (getClass().isAssignableFrom(clazz))

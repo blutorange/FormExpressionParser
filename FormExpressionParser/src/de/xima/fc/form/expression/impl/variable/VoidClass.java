@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 
@@ -16,7 +17,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum VoidClass implements ILangObjectClass {
 	INSTANCE;
 	private final static Integer ID = Integer.valueOf(255);
@@ -86,7 +87,7 @@ public enum VoidClass implements ILangObjectClass {
 
 	@Override
 	public String toString() {
-		return CmnCnst.Name.VOID_TYPE;
+		return CmnCnst.Syntax.VOID;
 	}
 
 	@Override

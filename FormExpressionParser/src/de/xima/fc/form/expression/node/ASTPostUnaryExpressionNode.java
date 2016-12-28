@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ASTPostUnaryExpressionNode extends ANode {
 	private static final long serialVersionUID = 1L;
 	private EMethod unaryMethod = EMethod.PLUS_UNARY;

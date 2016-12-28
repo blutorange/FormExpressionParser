@@ -1,13 +1,13 @@
 package de.xima.fc.form.expression.iface.factory;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface INamespaceContractFactory extends IContractFactory<INamespace> {
 	@Nullable
 	public IValueReturn getExpressionMethodInfo(IVariableType thisContext, EMethod method);

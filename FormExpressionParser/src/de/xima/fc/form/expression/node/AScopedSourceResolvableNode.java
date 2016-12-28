@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class AScopedSourceResolvableNode extends ASourceResolvableNode implements IScopedSourceResolvable {
 	private static final long serialVersionUID = 1L;
 	@Nullable

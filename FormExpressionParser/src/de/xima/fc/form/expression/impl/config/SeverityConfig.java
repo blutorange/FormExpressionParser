@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.config;
 import java.util.Collections;
 import java.util.EnumSet;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Preconditions;
 
@@ -17,7 +17,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * It offers several options to change how FormExpression code will be formatted.
  * @author mad_gaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class SeverityConfig implements ISeverityConfig {
 	private final EnumSet<ESeverityOption> options;
 

@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject> {
 	/**
 	 * @return {@link NumberLangObject} This number.
@@ -318,7 +318,6 @@ public enum EExpressionMethodNumber implements IMethod2Function<NumberLangObject
 			return hasVarArgs;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

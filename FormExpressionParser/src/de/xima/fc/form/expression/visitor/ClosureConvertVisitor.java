@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import java.util.Collection;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.FunctionIdNotResolvedException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<Integer, SemanticsException> {
 	private final IVariableResolutionResult resolutionResult;
 

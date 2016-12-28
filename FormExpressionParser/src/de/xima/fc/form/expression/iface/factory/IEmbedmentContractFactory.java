@@ -1,12 +1,12 @@
 package de.xima.fc.form.expression.iface.factory;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 @Immutable
 public interface IEmbedmentContractFactory extends IContractFactory<IEmbedment> {
 	/**

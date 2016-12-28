@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.FormExpressionException;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IFunctionNode {
 	private static final long serialVersionUID = 1L;
 

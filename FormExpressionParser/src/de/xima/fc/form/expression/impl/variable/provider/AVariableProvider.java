@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.variable.provider;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.parse.IVariableProvider;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * @param <T>
  *            Class of the {@link ALangObject}.
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class AVariableProvider<T extends ALangObject> implements IVariableProvider<T> {
 	private static final long serialVersionUID = 1L;
 

@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
@@ -16,7 +17,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject> {
 	/**
 	 * @return {@link NumberLangObject}. The sine of this number.
@@ -52,7 +53,6 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 		return FunctionLangObject.createWithoutClosure(impl).bind(thisContext, ec);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -185,7 +185,6 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 			return argList.length;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

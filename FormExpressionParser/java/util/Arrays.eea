@@ -1,0 +1,4 @@
+class java/util/Arrays
+copyOf
+ <T:Ljava/lang/Object;>([TT;I)[TT;
+ <T:Ljava/lang/Object;>([TT;I)[1TT;

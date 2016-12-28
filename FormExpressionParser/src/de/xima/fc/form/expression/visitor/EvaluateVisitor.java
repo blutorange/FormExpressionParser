@@ -9,7 +9,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
@@ -89,7 +90,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangObject, EvaluationException> {
 
 	private final IEvaluationContext ec;
@@ -730,13 +731,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	@Override
 	public ALangObject visit(final ASTBreakClauseNode node) throws EvaluationException {
-		ec.setJump(EJump.BREAK, null);
+		ec.setJump(EJump.BREAK, node.getLabel());
 		return NullLangObject.getInstance();
 	}
 
 	@Override
 	public ALangObject visit(final ASTContinueClauseNode node) throws EvaluationException {
-		ec.setJump(EJump.CONTINUE, null);
+		ec.setJump(EJump.CONTINUE, node.getLabel());
 		return NullLangObject.getInstance();
 	}
 

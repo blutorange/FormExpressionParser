@@ -75,6 +75,9 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 			json = new JSONObject();
 			json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_UNKNOWN, getErrorMessage(e)));
 		}
+		finally {
+			executor.shutdown();
+		}
 		response.setStatus(200);
 		response.getWriter().append(json.toJSONString());
 	}

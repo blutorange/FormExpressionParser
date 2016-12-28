@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.impl.externalcontext;
 
 import java.io.PrintStream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.impl.warning.GenericWarning;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class ExternalContextContractFactoryPrintStream extends AGenericExternalContextFactory<PrintStream> {
 	private static final long serialVersionUID = 1L;
 

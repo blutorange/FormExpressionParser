@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.iface.config;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.impl.config.UnparseConfig;
  * @see UnparseConfig.Builder Builder for creating configurations.
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IUnparseConfig {
 	/**
 	 * @return The prefix for indentation, may consists of spaces and tabs.

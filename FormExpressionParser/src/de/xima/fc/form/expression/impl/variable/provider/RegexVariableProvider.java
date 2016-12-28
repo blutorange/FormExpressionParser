@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.impl.variable.provider;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.RegexLangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class RegexVariableProvider extends AVariableProvider<RegexLangObject> {
 	private static final long serialVersionUID = 1L;
 	private RegexVariableProvider() {

@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
@@ -33,7 +33,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  *
  * @param <T> Type of the language object for the bracket accessor.
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class GenericDotAccessor<T extends ALangObject> implements IGenericDotAccessorFunction<T> {
 	private static final long serialVersionUID = 1L;
 

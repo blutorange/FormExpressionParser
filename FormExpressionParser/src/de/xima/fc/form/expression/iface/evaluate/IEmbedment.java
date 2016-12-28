@@ -1,13 +1,13 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.InvalidTemplateDataException;
 import de.xima.fc.form.expression.iface.IReset;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IEmbedment extends IReset {
 	/**
 	 * Sets the name of the current embedment. For code templates, code is

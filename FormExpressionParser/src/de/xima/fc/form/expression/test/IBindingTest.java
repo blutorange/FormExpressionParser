@@ -10,6 +10,9 @@ import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
+import javax.annotation.Nullable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,8 +24,8 @@ import de.xima.fc.form.expression.exception.parse.NestingLevelException;
 import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 import de.xima.fc.form.expression.iface.evaluate.IBinding;
 
-@SuppressWarnings("null")
 @RunWith(Parameterized.class)
+@NonNullByDefault
 public class IBindingTest extends IFaceTest<IBinding<Object>> {
 
 	private final static Object OBJECT_1 = new Object();
@@ -30,7 +33,57 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 	private final static Object OBJECT_3 = new Object();
 
 	public IBindingTest(final IImplFactory<IBinding<Object>> factory) {
-		super(factory);
+		super(factory, new IBinding<Object>() {
+			@Override
+			public void reset() {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Nullable
+			@Override
+			public Object getVariable(final String name) {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public boolean hasVariableAtCurrentLevel(final String name) {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public void defineVariable(final String name, final Object object) {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public void nest() throws NestingLevelTooDeepException {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public void nestLocal() throws NestingLevelTooDeepException {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public void unnest() throws CannotUnnestGlobalNestingException {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public int getNestingLimit() {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public boolean isAtMaximumNestingLimit() {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public boolean isGlobal() {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public int getBookmark() {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+			@Override
+			public void gotoBookmark(final int bookmark) throws NestingLevelException {
+				throw new RuntimeException("Do not test the dummy."); //$NON-NLS-1$
+			}
+		});
 	}
 
 	@Parameterized.Parameters

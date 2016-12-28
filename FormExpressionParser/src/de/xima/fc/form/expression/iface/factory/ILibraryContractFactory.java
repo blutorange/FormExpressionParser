@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.iface.factory;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILibrary;
@@ -12,7 +12,7 @@ import de.xima.fc.form.expression.util.Void;
  * @author madgaksha
  *
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface ILibraryContractFactory extends IContractFactory<ILibrary> {
 	/**
 	 * Provides information on whether all {@link ILibrary} created by this

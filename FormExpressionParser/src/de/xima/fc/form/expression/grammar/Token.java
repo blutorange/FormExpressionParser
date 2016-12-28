@@ -2,8 +2,8 @@ package de.xima.fc.form.expression.grammar;
 
 import java.io.Serializable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.iface.parse.IToken;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -12,7 +12,6 @@ import de.xima.fc.form.expression.util.CmnCnst;
  * Describes the input token stream.
  */
 
-@ParametersAreNonnullByDefault
 public class Token implements Serializable, IToken  {
 
 	/**
@@ -109,7 +108,8 @@ public class Token implements Serializable, IToken  {
 	public String toString() {
 		return image;
 	}
-    
+
+    @Nonnull
     public String getNonnullImage() throws ParseException {
     	if (image != null)
     		return image;
@@ -128,6 +128,7 @@ public class Token implements Serializable, IToken  {
 	 * to the following switch statement. Then you can cast matchedToken
 	 * variable to the appropriate type and use sit in your lexical actions.
 	 */
+    @Nonnull
 	public static Token newToken(final int ofKind, @Nullable final String image) {
 		switch (ofKind) {
 		default:
@@ -135,11 +136,13 @@ public class Token implements Serializable, IToken  {
 		}
 	}
 
+    @Nonnull
 	public static Token newToken(final int ofKind) {
 		return newToken(ofKind, null);
 	}
-	
-	public static Token newToken(final int kind, final String image, final int beginLine, final int beginColumn,
+
+    @Nonnull
+	public static Token newToken(final int kind, @Nonnull final String image, final int beginLine, final int beginColumn,
 			final int endLine, final int endColumn) {
 		final Token token = new Token(kind, image);
 		token.beginColumn = beginColumn;
@@ -169,6 +172,7 @@ public class Token implements Serializable, IToken  {
 		return endLine;
 	}
 
+	@Nonnull
 	@Override
 	public String getImage() {
 		return image != null ? image : CmnCnst.NonnullConstant.STRING_EMPTY;

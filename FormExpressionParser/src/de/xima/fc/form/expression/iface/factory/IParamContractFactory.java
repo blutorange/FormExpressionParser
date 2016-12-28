@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.iface.factory;
 
 import java.io.Serializable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -10,7 +10,7 @@ import javax.annotation.concurrent.Immutable;
  * @author madgaksha
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IParamContractFactory<T,S> extends Serializable {
 	/**
 	 * @param level

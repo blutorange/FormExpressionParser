@@ -122,7 +122,7 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public RegexLangObject coerceRegex(final IEvaluationContext ec) throws CoercionException {
-		return RegexLangObject.createForString(value);
+		return RegexLangObject.createForString(value, ec);
 	}
 
 	@Override
@@ -285,6 +285,15 @@ public class StringLangObject extends ALangObject {
 			case '\\':
 				sb.append('\\').append('\\');
 				break;
+			case '\n':
+				sb.append(CmnCnst.Syntax.ESCAPE_LINEFEED);
+				break;
+			case '\r':
+				sb.append(CmnCnst.Syntax.ESCAPE_CARRIAGE_RETURN);
+				break;
+			case '\t':
+				sb.append(CmnCnst.Syntax.ESCAPE_TAB);
+				break;
 			case '$':
 				// template literal
 				if (delimiter == '`')
@@ -344,6 +353,15 @@ public class StringLangObject extends ALangObject {
 						sb.append(buffer[1]);
 					break;
 				}
+				case 'n':
+					sb.append(CmnCnst.NonnullConstant.STRING_LF);
+					break;
+				case 't':
+					sb.append(CmnCnst.NonnullConstant.STRING_TAB);
+					break;
+				case 'r':
+					sb.append(CmnCnst.NonnullConstant.STRING_CR);
+					break;
 				default:
 					sb.append(c2);
 				}

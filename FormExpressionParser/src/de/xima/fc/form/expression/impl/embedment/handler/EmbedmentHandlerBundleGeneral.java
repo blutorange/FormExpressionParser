@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EmbedmentHandlerBundleGeneral implements IEmbedmentHandlerNamed {
 	SILENT(CmnCnst.CustomScope.GENERAL_NO_OUTPUT, false),
 	VERBOSE(CmnCnst.CustomScope.GENERAL_YES_OUTPUT, true),

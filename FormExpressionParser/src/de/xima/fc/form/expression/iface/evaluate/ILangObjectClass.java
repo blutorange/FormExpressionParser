@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.iface.evaluate;
 import java.io.Serializable;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 
@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.exception.evaluation.CoercionException;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface ILangObjectClass extends Serializable {
 
 	public Integer getClassId();

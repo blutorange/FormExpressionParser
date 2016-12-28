@@ -1,14 +1,14 @@
 package de.xima.fc.form.expression.impl.library;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.ILibrary;
 import de.xima.fc.form.expression.iface.factory.ILibraryContractFactory;
 import de.xima.fc.form.expression.iface.factory.ILibraryScopeContractFactory;
 import de.xima.fc.form.expression.util.Void;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum ELibraryContractFactory implements ILibraryContractFactory {
 	/** An empty library, acting as a dummy. */
 	EMPTY(LibraryContractFactoryVoid.buildWith()),

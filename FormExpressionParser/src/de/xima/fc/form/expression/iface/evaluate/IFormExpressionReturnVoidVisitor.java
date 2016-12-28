@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
@@ -46,7 +46,7 @@ import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IFormExpressionReturnVoidVisitor<R,E extends Throwable>
 {
 	public R visit(ASTExpressionNode node) throws E;

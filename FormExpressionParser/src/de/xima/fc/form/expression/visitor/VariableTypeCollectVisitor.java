@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.visitor;
 
 import java.util.Collection;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
@@ -33,7 +33,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * Creates a symbol table and fills it with the type of each variable.
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class VariableTypeCollectVisitor
 extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsException> {
 
@@ -67,6 +67,8 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	public void visit(final ASTVariableDeclarationClauseNode node, final IVariableTypeBuilder builder)
 			throws SemanticsException {
 		visitTypedNode(node);
+		if (node.hasAssignment())
+			node.getAssignmentNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
 	}
 
 	@Override
@@ -91,7 +93,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	public void visit(final ASTFunctionClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
 		builder.setBasicType(ELangObjectClass.FUNCTION);
 		builder.append(getType(node));
-		for (int i = node.getArgumentCount(); i-->0;) {
+		for (int i = 0; i < node.getArgumentCount(); ++i) {
 			IVariableType type = visitTypedNode(node.getArgResolvable(i));
 			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
 				builder.setFlag(EVariableTypeFlag.VARARG);
@@ -104,7 +106,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTFunctionNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		for (int i = node.getArgumentCount(); i-->0;) {
+		for (int i = 0; i < node.getArgumentCount(); ++i) {
 			visitTypedNode(node.getArgResolvable(i));
 			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
 				builder.setFlag(EVariableTypeFlag.VARARG);

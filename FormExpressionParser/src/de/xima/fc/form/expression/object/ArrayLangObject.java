@@ -19,6 +19,7 @@ import de.xima.fc.form.expression.iface.parse.IVariableProvider;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public class ArrayLangObject extends ALangObject {
 	@Nonnull protected final List<ALangObject> value;
@@ -222,6 +223,10 @@ public class ArrayLangObject extends ALangObject {
 	}
 
 	public void setLength(final int len) {
+		setLength(len, NullLangObject.getInstance());
+	}
+
+	public void setLength(final int len, final ALangObject filler) {
 		if (len == value.size()) return;
 		if (len < 0) {
 			value.clear();
@@ -229,11 +234,12 @@ public class ArrayLangObject extends ALangObject {
 		}
 		if (len > value.size())
 			for (int i = len - value.size(); i-->0;)
-				value.add(NullLangObject.getInstance());
+				value.add(filler);
 		else
 			for (int i = value.size(); i-->len;)
 				value.remove(i);
 	}
+
 
 	/** Sorts the array according to the natural ordering of {@link ALangObject */
 	public void sort() {
@@ -244,10 +250,9 @@ public class ArrayLangObject extends ALangObject {
 		Collections.sort(value, comparator);
 	}
 
-	@SuppressWarnings("null")
 	@Nonnull
 	public ALangObject[] toArray() {
-		return value.toArray(new ALangObject[value.size()]);
+		return NullUtil.checkNotNull(value.toArray(new ALangObject[value.size()]));
 	}
 
 	@Override

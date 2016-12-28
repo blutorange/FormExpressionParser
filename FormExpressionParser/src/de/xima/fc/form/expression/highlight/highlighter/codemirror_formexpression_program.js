@@ -39,7 +39,7 @@ CodeMirror.defineSimpleMode("formexpression-program", {
   ],
   templateliteral: [
     {regex: /`/, token: "string", next: "start"},
-    {regex: /(\$)(\{)/, token: ["string", null] , indent: true, push: "start"},
+    {regex: /(\$)(\{)/, token: [null, null] , indent: true, push: "start"},
     {regex: /./, token: "string"},
     {regex: /[^]*/, token: "string"}
   ],

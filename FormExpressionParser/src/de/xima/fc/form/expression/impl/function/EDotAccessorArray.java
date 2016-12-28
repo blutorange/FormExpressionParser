@@ -1,11 +1,14 @@
 package de.xima.fc.form.expression.impl.function;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.ArrayIndexOutOfBoundsException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -27,7 +30,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * Dot accessors for objects of type array&lt;T&gt;.
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	/**
 	 * @return number The length of this array.
@@ -60,7 +63,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	sort(Impl.sort),
 	/**
 	 * Sorts the items of this array according to the given order.
-	 * @param comparator function<number, T, T> A comparator that must takes two argument and
+	 * @param comparator <code>method<number, T, T></code> A comparator that must takes two argument and
 	 * return a negative number when the first argument is to be sorted before the second
 	 * argument, a positive number when it is to be sorted after the second argument, and
 	 * zero when both arguments are equal.
@@ -70,6 +73,28 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	map(Impl.map),
 	mapString(Impl.mapString),
 	mapNumber(Impl.mapNumber),
+	/**
+	 * Resizes the array to the given length and fills it with the
+	 * given object. All array entries then point to the same object.
+	 * @param fillerValue <code>T</code> Object to fill the array with.
+	 * @param newLength <code>number</code> The new length of the array.
+	 */
+	fill(Impl.fill),
+	/**
+	 * Resizes the array to the given length and fills it with the objects
+	 * returned by the given producer. The producer is a function that is given
+	 * the current index and returns the new element to be set.
+	 *
+	 * @param producer
+	 *            <code>method&lt;T, number&gt;</code> A function that takes the
+	 *            current index and returns the element to be set.
+	 * @param newLength
+	 *            <code>boolean</code> The new length.
+	 * @return this <code>array&lt;T&gt;</code> For chaining.
+	 */
+	fillWith(Impl.fillWith),
+	copy(Impl.copy),
+	deepCopy(Impl.deepCopy),
 	;
 
 	@Nullable private FunctionLangObject func;
@@ -88,7 +113,6 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		return FunctionLangObject.createWithoutClosure(impl).bind(thisContext, ec);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -235,7 +259,6 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 		},
 		map(false, "mapper") { //$NON-NLS-1$
-			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -254,7 +277,6 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 		},
 		mapString(false, "mapper") { //$NON-NLS-1$
-			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -271,7 +293,6 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 		},
 		mapNumber(false, "mapper") { //$NON-NLS-1$
-			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -285,6 +306,91 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+		},
+		fill(false, "fillerValue", "newLength") { //$NON-NLS-1$ //$NON-NLS-2$
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final ALangObject filler = args.length > 0 ? args[0] : NullLangObject.getInstance();
+				final int newLength = args.length > 1 ? args[1].coerceNumber(ec).intValue(ec) : thisContext.length();
+				if (newLength > thisContext.length()) {
+					Collections.fill(thisContext.listValue(), filler);
+					thisContext.setLength(newLength, filler);
+				}
+				else {
+					thisContext.setLength(newLength, filler);
+					Collections.fill(thisContext.listValue(), filler);
+				}
+				return thisContext;
+			}
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(thisContext, thisContext.getGeneric(0), SimpleVariableType.NUMBER);
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.FUNCTION;
+			}
+		},
+		fillWith(false, "producer", "newLength") { //$NON-NLS-1$ //$NON-NLS-2$
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final FunctionLangObject filler = args.length > 0 ? args[0].coerceFunction(ec) : FunctionLangObject.getNoOpNull();
+				final int newLength = args.length > 1 ? args[1].coerceNumber(ec).intValue(ec) : thisContext.length();
+				thisContext.setLength(newLength, filler);
+				final ListIterator<ALangObject> it = thisContext.listValue().listIterator();
+				int i = -1;
+				while (it.hasNext()) {
+					it.next();
+					it.set(filler.evaluate(ec, NumberLangObject.create(++i)));
+				}
+				return thisContext;
+			}
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forSimpleFunction(thisContext,
+						GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), SimpleVariableType.NUMBER),
+						SimpleVariableType.NUMBER);
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.FUNCTION;
+			}
+		},
+		copy(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return thisContext.shallowClone();
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forArray(thisContext.getGeneric(0));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.ARRAY;
+			}
+		},
+		deepCopy(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return thisContext.deepClone();
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return GenericVariableType.forArray(thisContext.getGeneric(0));
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.ARRAY;
 			}
 		}
 		;
@@ -314,7 +420,6 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			return argList.length;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();
@@ -359,8 +464,10 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		}
 	}
 
-	protected static ALangObject map(final ArrayLangObject list, final ALangObject mapper, final IEvaluationContext ec)
+	protected static ALangObject map(final ArrayLangObject list, @Nullable final ALangObject mapper, final IEvaluationContext ec)
 			throws EvaluationException {
+		if (mapper == null)
+			return list.shallowClone();
 		final FunctionLangObject mapperFunc = mapper.coerceFunction(ec);
 		final List<ALangObject> mapped = new ArrayList<>(list.length());
 		for (final ALangObject item : list.listValue())

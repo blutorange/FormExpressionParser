@@ -2,11 +2,11 @@ package de.xima.fc.form.expression.iface.evaluate;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.object.ALangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IEvaluationResult {
 	public ALangObject getObject();
 	public List<IEvaluationWarning> getWarnings();

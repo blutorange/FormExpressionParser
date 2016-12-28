@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.CustomScope;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum ELibraryScopeContractFactoryFormcycle implements ILibraryScopeContractFactory<Formcycle> {
 	FORM_FIELD(FetchImpl.FORM_FIELD) {
 		// Restrict to valid form field names, letters and underscores.

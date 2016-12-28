@@ -3,14 +3,14 @@ package de.xima.fc.form.expression.impl.logger;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.impl.logger.SystemLogger.Level;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class JavaLogger implements ILogger {
 	private final Logger logger;
 	private final ELogLevel level;

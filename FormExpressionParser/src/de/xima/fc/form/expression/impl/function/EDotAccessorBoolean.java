@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
@@ -16,7 +17,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EDotAccessorBoolean implements IDotAccessorFunction<BooleanLangObject> {
 	/**
 	 * @return {@link NumberLangObject}. <code>0</code>, when this is false, <code>1</code> when this is true.
@@ -42,7 +43,6 @@ public enum EDotAccessorBoolean implements IDotAccessorFunction<BooleanLangObjec
 	}
 
 
-	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -124,7 +124,6 @@ public enum EDotAccessorBoolean implements IDotAccessorFunction<BooleanLangObjec
 			return argList.length;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
@@ -17,7 +17,7 @@ import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlighter;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class AHighlighter<T extends HighlighterState> implements IFormExpressionHighlighter {
 	private final static Pattern SPLITTER = NullUtil.checkNotNull(Pattern.compile("(\\r)?\\n")); //$NON-NLS-1$
 

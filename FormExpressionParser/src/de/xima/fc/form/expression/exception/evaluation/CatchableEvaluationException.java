@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.iface.evaluate.IExternalContext;
  * An evaluation exception that can be caught by the program itself via try-catch-clauses.
  * @author awa
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class CatchableEvaluationException extends EvaluationException {
 	private static final long serialVersionUID = 1L;
 

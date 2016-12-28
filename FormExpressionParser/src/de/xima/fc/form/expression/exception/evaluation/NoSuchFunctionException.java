@@ -1,14 +1,15 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class NoSuchFunctionException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 
@@ -18,7 +19,7 @@ public class NoSuchFunctionException extends CatchableEvaluationException {
 				NullUtil.messageFormat(
 						thisContext.isNull() ? CmnCnst.Error.NO_SUCH_FUNCTION_WITH_NULL
 								: CmnCnst.Error.NO_SUCH_FUNCTION_WITH_THIS,
-						type, name, thisContext.inspect()));
+						type, name, thisContext.toString(), thisContext.getClass()));
 		this.name = name;
 		this.thisContext = thisContext;
 	}

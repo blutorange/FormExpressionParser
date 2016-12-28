@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.BreakClauseException;
 import de.xima.fc.form.expression.exception.evaluation.ContinueClauseException;
@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class FunctionLangObject extends ALangObject {
 	private final IFunction<ALangObject> value;
 	@Nullable private ALangObject thisContext;

@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
@@ -15,7 +16,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 	/**
 	 * @return <code>number</code>. <code>0</code>, when this is false, <code>1</code> when this is true.
@@ -24,7 +25,9 @@ public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 	/**
 	 * @return <code>number</code> The id of this object. This may change between consecutive executions of the same program.
 	 */
-	id(Impl.id)
+	id(Impl.id),
+	copy(Impl.copy),
+	deepCopy(Impl.deepCopy),
 	;
 
 	@Nullable private FunctionLangObject func;
@@ -43,7 +46,6 @@ public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 		return FunctionLangObject.createWithoutClosure(impl).bind(thisContext, ec);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -114,6 +116,40 @@ public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.NUMBER;
 			}
+		},
+		copy(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return thisContext.shallowClone();
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.OBJECT;
+			}
+		},
+		deepCopy(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				return thisContext.deepClone();
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.OBJECT;
+			}
 		}
 		;
 
@@ -142,7 +178,6 @@ public enum EDotAccessorObject implements IDotAccessorFunction<ALangObject> {
 			return argList.length;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

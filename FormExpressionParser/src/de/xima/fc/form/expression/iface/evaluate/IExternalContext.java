@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EmbedmentOutputException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.impl.contextcommand.DocumentCommand;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IExternalContext extends IReset {
 	/**
 	 * Called once before evaluation begins.

@@ -1,0 +1,54 @@
+[%%
+	global scope {
+	  array<array<number>> matA;
+	  array<array<number>> matB;
+	  array<array<number>> matC;
+	}
+	
+	function array<array<number>> getMatrix(number size, number value) {
+	  array<array<number>> res = [];  
+	  return  res.fillWith((number i) => {
+	    array<number> row = [];
+	    return row.fill(value++, size);
+	  }, size);
+	}
+	
+	// Assumes that both m1 and m2 are square matrices of the same dimensions.
+	function array<array<number>> multiply(array<array<number>> m1, array<array<number>> m2) {
+	  number size = m1.length;
+	  array<array<number>> res = [];
+	  res.length = size;
+	  for (number i in size) {
+	    array<number> tmp = [];
+	    res[i] = tmp.fill(0, size);
+	    for (number j in size) {
+	      res[i][j] = 0;
+	      for (number k in size) {     
+	        res[i][j] += m1[i][k]*m2[k][j];
+	      }
+	    }
+	  }
+	  return res;
+	}
+	
+	function string matToString(array<array<number>> m) {
+	  string res = "";
+	  for (array<number> n in m) {
+	    res += n.toString;
+	    res += "\n";
+	  }
+	  return res;
+	}
+	
+	matA = getMatrix(5,2);//[[0,1],[2,3]];
+	matB = getMatrix(5,5);//[[0,1],[2,3]];
+	matC = multiply(matA,matB);
+%]
+
+[%%= matToString(matA) %]
+  x
+  
+[%%= matToString(matB) %]
+  =
+  
+[%%= matToString(matC) %]

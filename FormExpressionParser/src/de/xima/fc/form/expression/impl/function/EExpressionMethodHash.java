@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * Expression methods for <code>hash&lt;K,V&gt;</code>.
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 	/**
 	 * Merges the values from the right hash into the left hash.
@@ -91,7 +91,6 @@ public enum EExpressionMethodHash implements IMethod2Function<HashLangObject> {
 			return hasVarArgs;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

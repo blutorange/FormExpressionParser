@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.ELogLevel;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class EvaluationContextImpl implements IEvaluationContext {
 
 	private final INamespace namespace;

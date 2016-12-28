@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.highlight.style;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.highlight.ABasicHighlightTheme;
@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.highlight.Style;
 import de.xima.fc.form.expression.highlight.Weight;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EHighlightThemePack implements IFormExpressionHighlightTheme {
 	ECLIPSE(new EclipseImpl());
 	private final IFormExpressionHighlightTheme impl;

@@ -3,11 +3,11 @@ package de.xima.fc.form.expression.iface;
 import java.io.IOException;
 import java.util.Iterator;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Token;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IFormExpressionHighlighter {
 	public void process(final Iterator<Token> tokenStream, IFormExpressionHighlightTheme theme) throws IOException;
 }

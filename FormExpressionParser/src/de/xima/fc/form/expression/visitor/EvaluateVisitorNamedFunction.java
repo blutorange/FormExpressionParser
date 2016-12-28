@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.visitor;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.exception.evaluation.UncatchableEvaluationException;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject> {
 	private final EvaluateVisitor visitor;
 	private final IArgumentResolvableNode node;

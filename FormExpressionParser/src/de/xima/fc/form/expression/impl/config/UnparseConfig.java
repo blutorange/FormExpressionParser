@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.config;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
  * It offers several options to change how FormExpression code will be formatted.
  * @author mad_gaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class UnparseConfig implements IUnparseConfig {
 	private final String indentPrefix;
 	private final String linefeed;

@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.impl.ec;
 
 import java.io.PrintStream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.impl.embedment.EEmbedmentContractFactory;
 import de.xima.fc.form.expression.impl.externalcontext.ExternalContextContractFactoryPrintStream;
 import de.xima.fc.form.expression.impl.logger.ELoggerContractFactory;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EEvaluationContextContractPrintStream implements IEvaluationContextContract<PrintStream> {
 	INSTANCE(new EvaluationContextContract.Builder<PrintStream>()
 			.setEmbedment(EEmbedmentContractFactory.GENERAL)

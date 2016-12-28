@@ -1,10 +1,10 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IArgumentResolvable {
 	public int getArgumentCount();
 	public ISourceResolvable getArgResolvable(int i);

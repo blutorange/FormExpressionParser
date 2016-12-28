@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.function;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAssignerFunction;
@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 	/**
 	 * @param newLength The new length of the array. Padded with {@link NullLangObject} as necessary.
@@ -40,7 +40,6 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 		return func.evaluate(ec, args[1]);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -124,7 +123,6 @@ public enum EDotAssignerArray implements IDotAssignerFunction<ArrayLangObject> {
 			return argList.length;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

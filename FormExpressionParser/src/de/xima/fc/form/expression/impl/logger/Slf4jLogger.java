@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.impl.logger;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.impl.logger.SystemLogger.Level;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class Slf4jLogger implements ILogger {
 	private final Logger logger;
 	private final ELogLevel level;

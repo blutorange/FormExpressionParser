@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.object.ALangObject;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IClosure {
 	@Nullable
 	public IClosure getParent();

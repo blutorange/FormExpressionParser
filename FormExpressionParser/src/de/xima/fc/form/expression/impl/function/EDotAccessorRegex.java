@@ -1,7 +1,8 @@
 package de.xima.fc.form.expression.impl.function;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.evaluate.IDotAccessorFunction;
@@ -19,7 +20,7 @@ import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 	/**
 	 * @param string {@link StringLangObject} String to match. When not given, defaults to the empty string.
@@ -44,7 +45,6 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 		return FunctionLangObject.createWithoutClosure(impl).bind(thisContext, ec);
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public String getDeclaredName() {
 		return toString();
@@ -128,7 +128,6 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 			return argList.length;
 		}
 
-		@SuppressWarnings("null")
 		@Override
 		public String getDeclaredName() {
 			return toString();

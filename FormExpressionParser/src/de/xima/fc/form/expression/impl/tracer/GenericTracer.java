@@ -6,14 +6,15 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class GenericTracer implements ITracer<Node> {
 	private @Nullable Node processed;
 	private Node[] stackTrace;
@@ -45,7 +46,6 @@ public class GenericTracer implements ITracer<Node> {
 		return processed;
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public void descend() {
 		if (pos >= stackTrace.length - 1)

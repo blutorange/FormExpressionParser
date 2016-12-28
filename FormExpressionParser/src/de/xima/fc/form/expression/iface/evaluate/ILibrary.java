@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.iface.evaluate;
 
 import java.util.Collection;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.IReset;
@@ -32,7 +32,7 @@ import de.xima.fc.form.expression.object.ALangObject;
  * @see LibraryImpl.Builder
  * @author madgaksha
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface ILibrary extends IReset {
 	/**
 	 * Retrieves a variable with the given scope and name.

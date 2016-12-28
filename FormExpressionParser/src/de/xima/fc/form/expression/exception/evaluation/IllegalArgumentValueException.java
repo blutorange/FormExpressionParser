@@ -3,7 +3,7 @@
 package de.xima.fc.form.expression.exception.evaluation;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IFunction;
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * not with a certain operand.
  *
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class IllegalArgumentValueException extends CatchableEvaluationException {
 
 	private static final long serialVersionUID = 1L;

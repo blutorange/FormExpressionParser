@@ -1,13 +1,13 @@
 package de.xima.fc.form.expression.iface;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.highlight.Color;
 import de.xima.fc.form.expression.highlight.Style;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IFormExpressionHighlightTheme {
 	/**
 	 * Returns the token for the given token type. See {@link FormExpressionParserConstants}

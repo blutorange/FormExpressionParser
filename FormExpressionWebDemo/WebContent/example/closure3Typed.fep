@@ -1,0 +1,57 @@
+[%%
+  function array<method<number>> wrongWay() {
+    array<method<number>> arr = [];
+    for (number i in 3) {
+      arr.push(() => {
+        return 21*i;
+      });
+    }
+    return arr;
+  }
+
+  function array<method<number>> rightWay() {
+    method<method<number>, number> helper = (number x) => {
+      return () => {
+        return 21*x;
+      };
+    }; 
+    array<method<number>> arr = [];
+    for (number i in 3)
+      arr.push(helper(i));
+    return arr;
+  }
+%]
+
+<h1>The wrong way</h1>
+<section>
+  <p>
+    We create many anonymous functions, but they all capture the
+    same variable <em>i</em>. When we call each function, they
+    retrieve the current value of <em>i</em> and all return the
+    same result.
+  </p>
+  <pre>
+    [%%=
+      wrongWay().mapNumber((method<number> m) => {
+        return m();
+      });
+    %]
+  </pre>
+</section>
+
+<h1>The right way</h1>
+<section>
+  <p>
+    We make a local copy of the variable <em>i</em> each time we
+    create a new anonymous function. This way, each function
+    gets access to the value of the variable <em>i</em> at the
+    time the function was created.
+  </p>
+  <pre>
+    [%%=
+      rightWay().mapNumber((method<number> m) => {
+        return m();
+      });
+    %]
+  </pre>
+</section>

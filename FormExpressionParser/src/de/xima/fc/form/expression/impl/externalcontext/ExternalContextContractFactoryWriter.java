@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.impl.externalcontext;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -18,7 +18,7 @@ import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ExternalContextContractFactoryWriter extends AGenericExternalContextFactory<Writer> {
 	private static final long serialVersionUID = 1L;
 

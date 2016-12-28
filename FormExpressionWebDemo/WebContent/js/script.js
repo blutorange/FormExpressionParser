@@ -228,7 +228,9 @@ $(function(){
 	// Code samples.
 	$(".codeExample").on("click", function() {
 		var me = this
-		$.get("./example/" + me.getAttribute("data-file") + ".fep", null, null, "text").done(function(data){
+		var dataFile = me.getAttribute("data-file")
+		window.location.hash = dataFile
+		$.get("./example/" + dataFile + ".fep", null, null, "text").done(function(data){
 			myCodeMirror.setValue(data)
 			
 			if (me.hasAttribute("data-program")) setType("program")
@@ -249,7 +251,9 @@ $(function(){
 			
 			if (me.hasAttribute("data-format")) buttonFmt.trigger("click")
 			if (me.hasAttribute("data-evaluate")) buttonEval.trigger("click")
-			if (me.hasAttribute("data-highlight")) buttonHlgt.trigger("click")			
+			if (me.hasAttribute("data-highlight")) buttonHlgt.trigger("click")
+			
+			buttonEval.click()
 		})
 	})
 	
@@ -260,4 +264,7 @@ $(function(){
     setContext(localStorage.context || "generic")
     setStrict(localStorage.strict==="true")
     setHtml(localStorage.html==="true")
+    
+    // Open example corresponding to url hash.
+    $("[data-file='" + window.location.hash.substring(1) + "']").click()
 })

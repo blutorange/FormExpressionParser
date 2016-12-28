@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -19,15 +22,18 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 
 import de.xima.fc.form.expression.iface.IReset;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @RunWith(Parameterized.class)
+@NonNullByDefault
 public abstract class IFaceTest<T> {
 
 	protected final IImplFactory<T> implFactory;
 	protected T impl;
 
-	public IFaceTest(final IImplFactory<T> implFactory) {
+	public IFaceTest(final IImplFactory<T> implFactory, final T dummy) {
 		this.implFactory = implFactory;
+		impl = dummy;
 	}
 
 	@Before
@@ -35,27 +41,29 @@ public abstract class IFaceTest<T> {
 		assertNotNull("Implementation factory must not be null", implFactory); //$NON-NLS-1$
 		impl = implFactory.makeImpl();
 		assertNotNull("Implementation must not be null", impl); //$NON-NLS-1$
-		System.out.println("Testing impl" + impl.getClass().getCanonicalName() + " " + impl.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+		System.out.println("Testing impl" + impl.getClass().getCanonicalName() + " " + NullUtil.toString(impl)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@After
 	public final void tearDown() throws Exception {
-		if (impl != null && impl instanceof IReset)
+		if (impl instanceof IReset)
 			((IReset) impl).reset();
 	}
 
-	protected final static <T> Collection<Object[]> getInstancesToTest(final Class<T> iface, @SuppressWarnings("unchecked") final T... moreTestInstances) {
+	protected final static <T> Collection<Object[]> getInstancesToTest(final Class<T> iface, @Nullable @SuppressWarnings("unchecked") final T... moreTestInstances) {
 		final Reflections r = new Reflections("de.xima.fc.form.expression", new TypeAnnotationsScanner(), //$NON-NLS-1$
 				new SubTypesScanner());
 		final List<Object[]> list = new ArrayList<>();
 		if (moreTestInstances != null)
-			for (final T t : moreTestInstances)
+			for (final T t : moreTestInstances) {
+				final T t2 = NullUtil.checkNotNull(t);
 				list.add(new IImplFactory[]{new IImplFactory<T>(){
 					@Override
 					public T makeImpl() {
-						return t;
+						return t2;
 					}
 				}});
+			}
 		if (!iface.isInterface())
 			fail(iface + " is not an interface."); //$NON-NLS-1$
 		for (final Class<?> c : r.getSubTypesOf(iface)) {
@@ -73,11 +81,12 @@ public abstract class IFaceTest<T> {
 					}
 					if (cb.isEnum()) {
 						for (final T e: cb.getEnumConstants()) {
-								System.out.println("Loading " + iface.getSimpleName() + " implementation enum " + cb.getCanonicalName() + "." + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								final T e2 = NullUtil.checkNotNull(e);
+								System.out.println("Loading " + iface.getSimpleName() + " implementation enum " + cb.getCanonicalName() + "." + e2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								list.add(new IImplFactory[]{ new IImplFactory<T>(){
 									@Override
 									public T makeImpl() {
-										return e;
+										return e2;
 									}
 								}});
 						}
@@ -89,7 +98,7 @@ public abstract class IFaceTest<T> {
 							@Override
 							public T makeImpl() {
 								try {
-									return fNoArgConstr.newInstance();
+									return NullUtil.checkNotNull(fNoArgConstr.newInstance());
 								}
 								catch (final InstantiationException e) {
 									fail("Failed to instantiate implementation" + e.getMessage()); //$NON-NLS-1$
@@ -100,7 +109,8 @@ public abstract class IFaceTest<T> {
 								catch (final InvocationTargetException e) {
 									fail("Failed to instantiate implementation. " + e.getMessage()); //$NON-NLS-1$
 								}
-								return null;
+								fail();
+								throw new RuntimeException();
 							}
 						}});
 					}

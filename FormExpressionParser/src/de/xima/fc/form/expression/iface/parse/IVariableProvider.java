@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.iface.factory.IContractFactory;
@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.object.ArrayLangObject;
  * @param <T>
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IVariableProvider<T extends ALangObject> extends IContractFactory<T> {
 	public IVariableType getType();
 }

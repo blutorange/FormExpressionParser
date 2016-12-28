@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,7 +13,7 @@ import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.iface.evaluate.ILogger;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class SystemLogger implements ILogger {
 
 	private final Level level;

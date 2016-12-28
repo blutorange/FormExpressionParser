@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.variable.provider;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
@@ -17,7 +17,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public abstract class SimpleFunctionVariableProvider<R extends ALangObject>
 		extends AVariableProvider<FunctionLangObject> implements IFunction<NullLangObject> {
 	private static final long serialVersionUID = 1L;

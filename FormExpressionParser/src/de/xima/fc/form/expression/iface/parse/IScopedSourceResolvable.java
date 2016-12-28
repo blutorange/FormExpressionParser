@@ -1,12 +1,12 @@
 package de.xima.fc.form.expression.iface.parse;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IScopedSourceResolvable extends ISourceResolvable {
 	/**
 	 * Does nothing when the variable is already resolved. Otherwise, it sets

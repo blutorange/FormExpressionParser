@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.impl.ec;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.ITracer;
@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.impl.library.ELibraryContractFactory;
 import de.xima.fc.form.expression.impl.logger.ELoggerContractFactory;
 import de.xima.fc.form.expression.util.Void;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EEvaluationContextContractVoid implements IEvaluationContextContract<Void> {
 	DUMMY(new EvaluationContextContract.Builder<Void>()
 			.setEmbedment(EEmbedmentContractFactory.EMPTY)

@@ -1,4 +1,4 @@
-function var max(var arg, var args...) {
+function var max(var arg, var... args) {
   for (var item in args)
     if (item > max)
       arg = item;

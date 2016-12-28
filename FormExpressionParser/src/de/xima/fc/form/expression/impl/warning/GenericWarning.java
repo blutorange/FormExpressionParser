@@ -1,12 +1,12 @@
 package de.xima.fc.form.expression.impl.warning;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class GenericWarning implements IEvaluationWarning {
 	private final String message;
 	private final int startLine, startColumn;

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import com.google.common.collect.ImmutableCollection;
@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IVariableType extends Serializable {
 	public boolean equalsType(IVariableType other);
 

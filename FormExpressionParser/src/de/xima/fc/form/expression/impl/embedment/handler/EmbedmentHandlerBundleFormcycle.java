@@ -1,14 +1,14 @@
 package de.xima.fc.form.expression.impl.embedment.handler;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import de.xima.fc.form.expression.impl.embedment.IEmbedmentHandlerNamed;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public enum EmbedmentHandlerBundleFormcycle implements IEmbedmentHandlerNamed {
 	FORM_FIELD_SILENT(CmnCnst.CustomScope.PREFIX_FORM_FIELD_SILENT, false, CmnCnst.CustomScope.FORM_FIELD),
 	SYSTEM_SILENT(CmnCnst.CustomScope.PREFIX_FC_SYSTEM_SILENT, false, CmnCnst.CustomScope.FC_SYSTEM),

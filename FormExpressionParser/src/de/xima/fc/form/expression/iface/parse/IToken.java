@@ -1,9 +1,9 @@
 package de.xima.fc.form.expression.iface.parse;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IToken {
 	public int getBeginColumn();
 	public int getBeginLine();

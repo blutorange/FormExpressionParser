@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.iface.IPositionedError;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -18,7 +18,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * You can modify this class to customize your error reporting mechanisms so
  * long as you retain the public fields.
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class ParseException extends Exception implements IPositionedError {
 
 	/**

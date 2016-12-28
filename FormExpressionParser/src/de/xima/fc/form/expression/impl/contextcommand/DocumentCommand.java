@@ -2,7 +2,7 @@ package de.xima.fc.form.expression.impl.contextcommand;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class DocumentCommand extends AExternalContextCommand {
 	private final EDocumentCommandType type;
 	private final String[] data;

@@ -3,7 +3,7 @@ package de.xima.fc.form.expression.iface.factory;
 import java.io.IOException;
 import java.util.Iterator;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -19,7 +19,7 @@ import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
 import de.xima.fc.form.expression.iface.parse.IToken;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface IFormExpressionFactory {
 	/**
 	 * Parses the given string and returns an object with methods to

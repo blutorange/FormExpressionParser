@@ -1,7 +1,7 @@
 package de.xima.fc.form.expression.iface.factory;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -36,7 +36,7 @@ import de.xima.fc.form.expression.object.NullLangObject;
  * @author madgaksha
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public interface ILibraryScopeContractFactory<T> extends IContractFactory<ILibraryScope<T>> {
 	/**
 	 * Indicates whether the library scope either always

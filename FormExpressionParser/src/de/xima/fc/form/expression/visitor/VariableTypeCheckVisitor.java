@@ -13,7 +13,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 
@@ -304,7 +305,7 @@ import de.xima.fc.form.expression.visitor.VariableTypeCheckVisitor.NodeInfo;
  * <code>raiseError</code>, and is thus illegal.
  * </p>
  */
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoidVisitor<NodeInfo, SemanticsException> {
 
 	private final IVariableType[] table;

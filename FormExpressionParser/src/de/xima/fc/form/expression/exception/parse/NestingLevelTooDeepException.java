@@ -1,11 +1,11 @@
 package de.xima.fc.form.expression.exception.parse;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class NestingLevelTooDeepException extends NestingLevelException {
 	private static final long serialVersionUID = 1L;
 

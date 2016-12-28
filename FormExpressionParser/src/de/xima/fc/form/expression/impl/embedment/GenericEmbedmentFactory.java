@@ -1,8 +1,9 @@
 package de.xima.fc.form.expression.impl.embedment;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -26,13 +27,13 @@ import de.xima.fc.form.expression.util.CmnCnst;
  *            {@link IEmbedmentHandler#output(String, Object)}.
  */
 @Immutable
-@ParametersAreNonnullByDefault
+@NonNullByDefault
 public class GenericEmbedmentFactory implements IEmbedmentContractFactory {
 	private static final long serialVersionUID = 1L;
 
 	private final ImmutableMap<String, IEmbedmentHandler> map;
 
-	private GenericEmbedmentFactory(final ImmutableMap<String, IEmbedmentHandler> map) {
+	protected GenericEmbedmentFactory(final ImmutableMap<String, IEmbedmentHandler> map) {
 		this.map = map;
 	}
 
@@ -103,7 +104,6 @@ public class GenericEmbedmentFactory implements IEmbedmentContractFactory {
 			return handler != null ? handler.getScopeList() : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 		}
 
-		@SuppressWarnings("null")
 		@Nullable
 		@Override
 		public String[] getScopeList(final String embedment) {
