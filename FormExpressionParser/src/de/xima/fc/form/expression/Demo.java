@@ -41,14 +41,22 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
- * - check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
+ * - Allow parametrized dot accessors:
+ *    array<boolean> arr;
+ *    array<hash<string,string> mapped;
+ *    method<hash<string,string>,boolean> mapper;
+ *    method<array<hash<string,string>>,method<hash<string,string>,boolean>> m = arr.<hash<string,string>>map;
+ *    mapped = m(mapper);
+ *  => Effectively, this is simply adding additional constraints.
+ * - Definitely assigned visitor.
+ * - Check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
  * - add some type inference
  *    a = 9;   // a must be a number
  *    a = 2+3; // a must be a number
  *    method<string,string> m;
  *    m(a);    // a must be a string
  *    3 + b;   // b must be a number
- * - A range object (0..9) [0..9] (0..9] [0..9)
+ * - A range object like (0..9) [0..9] (0..9] [0..9). Syntax?
  * - Special modes for outputting text html-escaped for HTML templates.
  * - replace logger with tracer ?
  * - unparse: los nicer
