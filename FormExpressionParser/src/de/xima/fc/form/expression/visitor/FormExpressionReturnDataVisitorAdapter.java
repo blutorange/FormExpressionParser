@@ -83,7 +83,9 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 		}
 		@Override
 		public boolean equals(final Object obj) {
-			return node.equals(obj);
+			if (obj instanceof WrappedNode)
+				return node.equals(((WrappedNode)obj).node);
+			return false;
 		}
 	}
 

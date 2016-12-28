@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
@@ -27,7 +28,7 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 	private final ITracer<Node> tracer;
 	private final ILibrary library;
 	private final IEmbedment embedment;
-	
+
 	@Nullable
 	private IExternalContext externalContext;
 
@@ -36,7 +37,7 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 
 	private EJump jumpType;
 	@Nullable private String jumpLabel;
-	
+
 	/**
 	 * Creates a new evaluation context.
 	 *
@@ -106,16 +107,15 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 	public IExternalContext getExternalContext() {
 		return externalContext;
 	}
-	
+
 	@Override
- 	@SuppressWarnings("null") // Arrays.copyOf does not return null.
 	public void closureStackPush(@Nonnull final IClosure closure) {
 		++closurePos;
 		if (closurePos >= closureStack.length)
 			closureStack = Arrays.copyOf(closureStack, closurePos*2);
 		closureStack[closurePos] = closure;
 	}
- 	
+
 	@Override
 	public void closureStackPop() {
 		if (closurePos >= 0) {
@@ -123,7 +123,7 @@ public final class EvaluationContextImpl implements IEvaluationContext {
 			--closurePos;
 		}
 	}
-	
+
 	@Nullable
 	@Override
 	public IClosure closureStackPeek() {
