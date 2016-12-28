@@ -58,7 +58,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.ELogLevel;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.iface.parse.IComment;
-import de.xima.fc.form.expression.util.CommentFactory;
+import de.xima.fc.form.expression.grammar.comment.CommentFactory;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.node.*;
@@ -1223,6 +1223,9 @@ void ForLoop(EMethod method) #ForLoopNode :
   (
     < For > [ < AngleOpen > label = < Identifier > < AngleClose > ] < ParenOpen >
     (
+      // When we encounter the "in" keyword, we know it must
+      // be an enhanced loop, as it is used only here.
+      // Otherwise, it must be a plain loop.
       LOOKAHEAD([ VariableType(null) ] < Identifier > < In >)
       (
         [ VariableType(null) { hasType = true; } ]
@@ -1232,7 +1235,11 @@ void ForLoop(EMethod method) #ForLoopNode :
       )
     |
       (
-        ExpressionOrVariableDeclarationListCommaSeparated(null) < SemiColon > ExpressionListCommaSeparated(null) < SemiColon > ExpressionListCommaSeparated(null)
+        ExpressionOrVariableDeclarationListCommaSeparated(null)
+        < SemiColon >
+        ExpressionListCommaSeparated(null)
+        < SemiColon >
+        ExpressionListCommaSeparated(null)
       )
     )
     < ParenClose > 
@@ -1246,9 +1253,11 @@ void ForLoop(EMethod method) #ForLoopNode :
   }
 }
 
+// A dangling else binds to the closest if, which
+// is what the default algorithm with a lookahead
+// of 1 does.
 void IfClause(EMethod method) #IfClauseNode :
-{
-  
+{  
 }
 {
   (
@@ -1263,10 +1272,18 @@ void IfClause(EMethod method) #IfClauseNode :
   )
   {
     jjtThis.init(method);
-    
   }
 }
 
+// An opening brace might indicate either the begining of a
+// block or the beginning of a hash. In order to avoid too
+// much lookahead, the parser commits to it being a block
+// when it sees an opening brace. If you want a hash literal,
+// put it inside a block like this:
+//    if (true) {
+//        { foo: "bar" };
+//    }
+//
 void BlockOrClause(EMethod method) #void :
 {
 }
@@ -1898,12 +1915,13 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
 {
   boolean createNode = false;
 }
-  // A parenthesis ( can be the start of a parenthesized expression
-  // or the start of a lambda.
+  // An opening parenthesis ( can be the start of a parenthesized
+  // expression or the start of a lambda.
   //
-  // The worst case scenario is 3 identical tokens:
+  // The worst case scenario is 3 identical tokens. Thus we need
+  // a lookahead of at least 4.
   //
-  //   (foo)=>
+  //   (foo) =>
   //
   // (foo) is a valid expression, only the arrow tells us it must be a lambda
 {

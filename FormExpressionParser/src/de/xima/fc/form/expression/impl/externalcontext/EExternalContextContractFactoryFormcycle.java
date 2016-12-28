@@ -25,7 +25,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 public enum EExternalContextContractFactoryFormcycle implements IExternalContextContractFactory<Formcycle> {
 	INSTANCE(ELibraryScopeContractFactoryFormcycle.values());
 
-	private ImmutableMap<String, ILibraryScopeContractFactory<Formcycle>> library;
+	protected ImmutableMap<String, ILibraryScopeContractFactory<Formcycle>> library;
 
 	@SafeVarargs
 	private EExternalContextContractFactoryFormcycle(final ILibraryScopeContractFactory<Formcycle>... factories) {

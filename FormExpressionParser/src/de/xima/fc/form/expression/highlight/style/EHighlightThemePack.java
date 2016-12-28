@@ -21,7 +21,7 @@ public enum EHighlightThemePack implements IFormExpressionHighlightTheme {
 
 	@Immutable
 	private static final class EclipseImpl extends ABasicHighlightTheme {
-		private EclipseImpl() {
+		protected EclipseImpl() {
 		}
 
 		@Override

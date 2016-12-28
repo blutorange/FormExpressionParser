@@ -43,12 +43,12 @@ public class ParseException extends Exception implements IPositionedError {
 
 	public ParseException(final String msg, final Token currentTokenVal, @Nullable final int[][] expectedTokenSequencesVal,
 			final String[] tokenImageVal) {
-		super(initialise(currentTokenVal, expectedTokenSequencesVal, tokenImageVal) + ": " + msg);
+		super(initialise(currentTokenVal, expectedTokenSequencesVal, tokenImageVal) + ": " + msg); //$NON-NLS-1$
 		currentToken = currentTokenVal;
 		expectedTokenSequences = expectedTokenSequencesVal;
 		tokenImage = tokenImageVal;
 	}
-	
+
 	/**
 	 * The following constructors are for use by you for whatever purpose you
 	 * can think of. Constructing the exception in this manner makes the
@@ -73,16 +73,18 @@ public class ParseException extends Exception implements IPositionedError {
 	/** Constructor with message and token. */
 	public ParseException(final String message, @Nullable final Token currentToken) {
 		super(NullUtil.messageFormat(CmnCnst.Error.SEMANTIC_PARSE_EXCEPTION,
-				currentToken != null ? currentToken.beginLine : 0, currentToken != null ? currentToken.beginColumn : 0,
-				message));
+				Integer.valueOf(currentToken != null ? currentToken.beginLine : 0),
+				Integer.valueOf(currentToken != null ? currentToken.beginColumn : 0),				message));
 		this.currentToken = currentToken;
 		this.expectedTokenSequences = null;
 		this.tokenImage = null;
 	}
 
 	public ParseException(final String message, final int beginLine, final int beginColumn, final int endLine, final int endColumn) {
-		super(NullUtil.messageFormat(CmnCnst.Error.SEMANTIC_PARSE_EXCEPTION, beginLine, beginColumn, message));
-		this.currentToken = Token.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn);
+		super(NullUtil.messageFormat(CmnCnst.Error.SEMANTIC_PARSE_EXCEPTION, Integer.valueOf(beginLine),
+				Integer.valueOf(beginColumn), message));
+		this.currentToken = Token.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, //$NON-NLS-1$
+				endColumn);
 		this.expectedTokenSequences = null;
 		this.tokenImage = null;
 	}
@@ -119,7 +121,7 @@ public class ParseException extends Exception implements IPositionedError {
 	 */
 	private static String initialise(final Token currentToken, @Nullable final int[][] expectedTokenSequences,
 			final String[] tokenImage) {
-		final String eol = System.getProperty("line.separator", "\n");
+		final String eol = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		final StringBuffer expected = new StringBuffer();
 		int maxSize = 0;
 
@@ -133,43 +135,43 @@ public class ParseException extends Exception implements IPositionedError {
 					expected.append(tokenImage[expectedTokenSequences[i][j]]).append(' ');
 				}
 				if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-					expected.append("...");
+					expected.append("..."); //$NON-NLS-1$
 				}
 				expectedSet.add(expected.toString());
 				expected.setLength(0);
 			}
 			for (final String s : expectedSet)
-				expected.append(s).append(eol).append("    ");
+				expected.append(s).append(eol).append("    "); //$NON-NLS-1$
 		}
 
-		String retval = "Encountered ";
+		String retval = "Encountered "; //$NON-NLS-1$
 		Token tok = currentToken.next;
 		maxSize = maxSize == 0 && tok != null ? 1 : maxSize;
 		for (int i = 0; i < maxSize && tok != null; i++) {
 			if (i != 0)
-				retval += ", ";
+				retval += ", "; //$NON-NLS-1$
 			if (tok.kind == 0) {
 				retval += tokenImage[0];
 				break;
 			}
 			retval += tokenImage[tok.kind];
-			final String img = "\"" + add_escapes(tok.image) + "\"";
+			final String img = "\"" + add_escapes(tok.image) + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 			if (tokenImage[tok.kind] == null || !tokenImage[tok.kind].equals(img)) {
-				retval += " ";
+				retval += " "; //$NON-NLS-1$
 				retval += img;
 			}
 			tok = tok.next;
 		}
 		final Token next = currentToken.next;
 		if (next != null)
-			retval += " at line " + next.beginLine + ", column " + next.beginColumn;
-		retval += "." + eol;
+			retval += " at line " + next.beginLine + ", column " + next.beginColumn; //$NON-NLS-1$ //$NON-NLS-2$
+		retval += "." + eol; //$NON-NLS-1$
 		if (expectedTokenSequences != null) {
 			if (expectedTokenSequences.length == 1) {
-				retval += "Was expecting:" + eol + "    ";
+				retval += "Was expecting:" + eol + "    "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
-				retval += "Was expecting one of:" + eol + "    ";
+				retval += "Was expecting one of:" + eol + "    "; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		retval += expected.toString();
@@ -179,14 +181,14 @@ public class ParseException extends Exception implements IPositionedError {
 	/**
 	 * The end of line string for this machine.
 	 */
-	protected final String eol = NullUtil.or(System.getProperty("line.separator", "\n"), "\n");
+	protected final String eol = NullUtil.or(System.getProperty("line.separator", "\n"), "\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 	/**
 	 * Used to convert raw characters to their escaped version when these raw
 	 * version cannot be used as part of an ASCII string literal.
 	 */
 	static String add_escapes(@Nullable String str) {
-		str = NullUtil.or(str, "");
+		str = NullUtil.or(str, ""); //$NON-NLS-1$
 		final StringBuffer retval = new StringBuffer();
 		char ch;
 		for (int i = 0; i < str.length(); i++) {
@@ -194,33 +196,33 @@ public class ParseException extends Exception implements IPositionedError {
 			case 0:
 				continue;
 			case '\b':
-				retval.append("\\b");
+				retval.append("\\b"); //$NON-NLS-1$
 				continue;
 			case '\t':
-				retval.append("\\t");
+				retval.append("\\t"); //$NON-NLS-1$
 				continue;
 			case '\n':
-				retval.append("\\n");
+				retval.append("\\n"); //$NON-NLS-1$
 				continue;
 			case '\f':
-				retval.append("\\f");
+				retval.append("\\f"); //$NON-NLS-1$
 				continue;
 			case '\r':
-				retval.append("\\r");
+				retval.append("\\r"); //$NON-NLS-1$
 				continue;
 			case '\"':
-				retval.append("\\\"");
+				retval.append("\\\""); //$NON-NLS-1$
 				continue;
 			case '\'':
-				retval.append("\\\'");
+				retval.append("\\\'"); //$NON-NLS-1$
 				continue;
 			case '\\':
-				retval.append("\\\\");
+				retval.append("\\\\"); //$NON-NLS-1$
 				continue;
 			default:
 				if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-					final String s = "0000" + Integer.toString(ch, 16);
-					retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+					final String s = "0000" + Integer.toString(ch, 16); //$NON-NLS-1$
+					retval.append("\\u" + s.substring(s.length() - 4, s.length())); //$NON-NLS-1$
 				}
 				else {
 					retval.append(ch);

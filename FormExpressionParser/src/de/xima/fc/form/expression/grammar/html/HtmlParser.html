@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>BNF for HtmlParser.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for HtmlParser.jj</H1>
+<H2 ALIGN=CENTER>TOKENS</H2>
+<TABLE>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;htmlCommentBegin: "&lt;!--"&gt; : HTMLCOMMENT
+| &lt;htmlConditionalCommentBegin: "&lt;!["&gt; : HTMLCONDITIONALCOMMENT
+| &lt;xmlDeclaration: "&lt;?xml"&gt; : XMLDECLARATION
+| &lt;cdataBegin: "&lt;![CDATA["&gt; : CDATA
+| &lt;dtdBegin: "&lt;!"&gt; : DTD
+| &lt;scripletQBegin: "&lt;?"&gt; : SCRIPLETQ
+| &lt;scripletPBegin: "&lt;%"&gt; : SCRIPLETP
+| &lt;seaWs: ([" ","\t","\r","\n"])+&gt;
+| &lt;scriptBegin: "&lt;script" (~["&gt;"])* "&gt;"&gt; : SCRIPT
+| &lt;styleBegin: "&lt;style" (~["&gt;"])* "&gt;"&gt; : STYLE
+| &lt;tagBegin: "&lt;"&gt; : TAG
+| &lt;htmlText: (~["&lt;"," ","\t","\r","\n"])+&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;TAG&gt; TOKEN : {
+&lt;tagEnd: "&gt;"&gt; : DEFAULT
+| &lt;tagSlash: "/"&gt;
+| &lt;tagWs: ([" ","\r","\t","\n"])+&gt;
+| &lt;tagName: &lt;tagNameCharStart&gt; (&lt;tagNameChar&gt;)*&gt;
+| &lt;tagEquals: "="&gt; : ATTVALUE
+| &lt;#tagNameCharStart: ["a"-"z","A"-"Z"] | ["\u2070"-"\u218f"] | ["\u2c00"-"\u2fef"] | ["\u3001"-"\ud7ff"] | ["\uf900"-"\ufdcf"] | ["\ufdf0"-"\ufffd"]&gt;
+| &lt;#tagNameChar: &lt;tagNameCharStart&gt; | &lt;tagDigit&gt; | ["-","_","."] | "\u00b7" | ["\u0300"-"\u036f"] | ["\u203f"-"\u2040"]&gt;
+| &lt;#tagDigit: ["0"-"9"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;ATTVALUE&gt; TOKEN : {
+&lt;attvWs: (" ")+&gt;
+| &lt;attvAttribute: &lt;attvDoubleString&gt; | &lt;attvSingleString&gt; | &lt;attvChars&gt; (["\"","\'"])* | &lt;attvHexChars&gt; (["\"","\'"])* | &lt;attvDecChars&gt; (["\"","\'"])*&gt; : TAG
+| &lt;#attvChar: ["-","_",".","/","+",",","?","=",":",";","#","0"-"9","a"-"z","A"-"Z"]&gt;
+| &lt;#attvHexChars: "#" (["0"-"9","a"-"f","A"-"F"])+&gt;
+| &lt;#attvDecChars: "#" (["0"-"9"])+ ("%")?&gt;
+| &lt;#attvChars: (&lt;attvChar&gt;)+ (" ")?&gt;
+| &lt;#attvDoubleString: "\"" (~["&lt;","\""])* "\""&gt;
+| &lt;#attvSingleString: "\'" (~["&lt;","\'"])* "\'"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;STYLE&gt; MORE : {
+&lt;styleChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;STYLE&gt; TOKEN : {
+&lt;styleEndShort: "&lt;/&gt;"&gt; : DEFAULT
+| &lt;styleEnd: "&lt;/style&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;SCRIPT&gt; MORE : {
+&lt;scriptChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;SCRIPT&gt; TOKEN : {
+&lt;scriptEndShort: "&lt;/&gt;"&gt; : DEFAULT
+| &lt;scriptEnd: "&lt;/script&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;SCRIPLETQ&gt; MORE : {
+&lt;scripletQChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;SCRIPLETQ&gt; TOKEN : {
+&lt;scripletQEnd: "?&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;SCRIPLETP&gt; MORE : {
+&lt;scripletPChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;SCRIPLETP&gt; TOKEN : {
+&lt;scripletPEnd: "%&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DTD&gt; MORE : {
+&lt;dtdChar: ~["&gt;"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DTD&gt; TOKEN : {
+&lt;dtdEnd: "&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;CDATA&gt; MORE : {
+&lt;cdataChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;CDATA&gt; TOKEN : {
+&lt;cdataEnd: "]]&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;XMLDECLARATION&gt; MORE : {
+&lt;xmlDeclarationChar: ~["&gt;"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;XMLDECLARATION&gt; TOKEN : {
+&lt;xmlDeclarationEnd: "&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;HTMLCOMMENT&gt; MORE : {
+&lt;htmlCommentChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;HTMLCOMMENT&gt; TOKEN : {
+&lt;htmlCommentEnd: "--&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;HTMLCONDITIONALCOMMENT&gt; MORE : {
+&lt;htmlConditionalCommentChar: ~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;HTMLCONDITIONALCOMMENT&gt; TOKEN : {
+&lt;htmlConditionalCommentEnd: "]&gt;"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+</TABLE>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<TABLE>
+</TABLE>
+</BODY>
+</HTML>

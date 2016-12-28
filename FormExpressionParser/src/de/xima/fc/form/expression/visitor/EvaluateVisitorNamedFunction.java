@@ -37,7 +37,7 @@ class EvaluateVisitorNamedFunction implements IUnparsableFunction<NullLangObject
 			throw new UncatchableEvaluationException(ec, CmnCnst.Error.NULL_CHILD_NODE);
 		if (node.jjtGetNumChildren() == 0)
 			throw new UncatchableEvaluationException(ec,
-					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_AT_LEAST, 1, 0));
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_AT_LEAST, Integer.valueOf(1), Integer.valueOf(0)));
 		this.visitor = visitor;
 		this.name = name;
 		this.node = node;

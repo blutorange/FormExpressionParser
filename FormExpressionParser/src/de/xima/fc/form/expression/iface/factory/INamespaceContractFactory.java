@@ -20,7 +20,7 @@ public interface INamespaceContractFactory extends IContractFactory<INamespace> 
 	@Nullable
 	public IReturn getDotAccessorInfo(IVariableType thisContext, String property);
 
-	public static interface IValueReturn  extends IValue, IReturn {}
+	public static interface IValueReturn extends IValue, IReturn {}
 	public static interface IPropertyValue extends IProperty, IValue {}
 	public static interface IPropertyReturn extends IProperty, IReturn {}
 	public static interface IProperty {

@@ -9,16 +9,19 @@ import de.xima.fc.form.expression.impl.variable.GenericVariableType;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public abstract class DynamicArrayVariableProvider<V extends ALangObject>
-extends AVariableProvider<ArrayLangObject> {
+public abstract class DynamicArrayVariableProvider<V extends ALangObject> extends AVariableProvider<ArrayLangObject> {
 	private static final long serialVersionUID = 1L;
 	private final IVariableType innerType;
+
 	protected DynamicArrayVariableProvider(final IVariableType innerType) {
 		super(GenericVariableType.forArray(innerType));
 		this.innerType = innerType;
 	}
+
 	private static <V extends ALangObject> IVariableType getInnerType(final IVariableProvider<V>[] items) {
 		IVariableType innerType = SimpleVariableType.NULL;
 		for (final IVariableProvider<V> i : items) {
@@ -29,12 +32,13 @@ extends AVariableProvider<ArrayLangObject> {
 		}
 		return GenericVariableType.forArray(innerType);
 	}
+
 	@Override
 	public final ArrayLangObject make() {
 		final IVariableProvider<V>[] items = getItems();
 		if (getInnerType(items) != innerType)
-			throw new IllegalVariableTypeException(String.format(
-					"Actual inner type %s does not match declared inner type %s.", getInnerType(items), innerType));
+			throw new IllegalVariableTypeException(
+					NullUtil.messageFormat(CmnCnst.Error.INNER_TYPE_NOT_MATCHING, getInnerType(items), innerType));
 		return ArrayLangObject.create(getItems(), 0);
 	}
 

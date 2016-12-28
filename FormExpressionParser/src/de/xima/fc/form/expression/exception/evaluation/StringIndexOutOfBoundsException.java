@@ -11,7 +11,7 @@ public class StringIndexOutOfBoundsException extends CatchableEvaluationExceptio
 	private static final long serialVersionUID = 1L;
 
 	public StringIndexOutOfBoundsException(final String string, final int index, final IEvaluationContext ec) {
-		super(ec, NullUtil.messageFormat(CmnCnst.Error.STRING_INDEX_OUT_OF_BOUNDS, new Integer(index), string));
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.STRING_INDEX_OUT_OF_BOUNDS, Integer.valueOf(index), string));
 		this.string = string;
 		this.index = index;
 	}

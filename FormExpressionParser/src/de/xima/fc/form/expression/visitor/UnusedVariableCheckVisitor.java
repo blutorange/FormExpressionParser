@@ -65,7 +65,7 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 	public void visit(final ASTVariableNode node, final Boolean assignment) {
 		final int source = node.getBasicSource();
 		if (source >= 0) {
-			if (assignment)
+			if (assignment.booleanValue())
 				addToNodeTable(node, node);
 			else
 				addToBooleanTable(source);
@@ -88,7 +88,7 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 
 	@Override
 	public void visit(final ASTAssignmentExpressionNode node, final Boolean assignment) {
-		Boolean a = assignment;
+		boolean a = assignment.booleanValue();
 		for (int i = node.getAssignableNodeCount(); i-- > 0;) {
 			// For ASTVariableNodes, we add it to the list of unused variables.
 			// For ASTPropertyExpressionNodes, we need to mark every

@@ -103,6 +103,7 @@ public final class CmnCnst {
 		public static final String VALUE = "value";
 		public static final String EMPTY_LABEL = "without label";
 		public static final String VOID_TYPE = "VOID";
+		public static final String DEFAULT_LOGGER_NAME = "Logger.%08X";
 	}
 
 	public final static class ExpressionMethod {
@@ -360,7 +361,6 @@ public final class CmnCnst {
 		public static final String UNREACHABLE_CODE = "Unreachable code, previous code never completes normally.";
 		public static final String ILLEGAL_NODE_DURING_TYPECHECKING = "Illegal node during variable type checking: {0}. " + INTERNAL_ERROR;
 		public static final String INCOMPATIBLE_TYPE_IN_FOR_HEADER = "Iterable value cannot be assigned to the iteration variable.";
-		public static final String TYPE_NOT_ITERABLE = "Variable type {0} is not iterable.";
 		public static final String INCOMPATIBLE_SWITCH_CASE_TYPE = "Switch case type must be compatible with the value switched on in strict mode.";
 		public static final String JUMP_WITHOUT_MATCHING_LABEL_OR_FUNCTION = "Jump clause used without label or enclosing function.";
 		public static final String TRACER_KNOWN_POSITION = "at {0} (line {1}, column {2})";
@@ -411,6 +411,18 @@ public final class CmnCnst {
 		public static final String CALL_ID_NOT_RESOLVED = "Call ID of function node {0} not resolved. " + INTERNAL_ERROR;
 		public static final String UNHANDLED_ENUM = "Unhandled enum: {0}. " + INTERNAL_ERROR;
 		public static final String UNHANDLED_NODE_TYPE = "Unhandled node type with id {0} and class {1}. " + INTERNAL_ERROR;
+		public static final String NEGATIVE_CLASS_ID = "Class id {0} for {1} is negative.";
+		public static final String METHOD_ALREADY_SET = "Method {0} already set for {1}.";
+		public static final String CLASS_NOT_ITERABLE = "Class {0} is not iterable.";
+		public static final String TYPE_NOT_ITERABLE = "Variable type {0} is not iterable.";
+		public static final String INNER_TYPE_NOT_MATCHING = "Actual inner type {0} does not match declared inner type {1}.";
+		public static final String RETURN_TYPE_NOT_MATCHING = "Basic variable type {0} does not match return type {1}.";
+		public static final String NEGATIVE_CALL_ID = "Call ID must be non-negative, but it is {0}.";
+		public static final String NO_MAPPING_FOUND = "No mapping for variable {0} with source {1}.";
+		public static final String VARIABLE_WITH_ILLEGAL_SOURCE = "Variable with illegal source {0}. " + INTERNAL_ERROR;
+		public static final String FUNCTION_INFO_NOT_SET = "Function info not set yet for {0}. " + INTERNAL_ERROR;
+		public static final String NO_MAPPING_FROM_LOCAL_TO_CLOSURE = "No such mapping of local to closure source for variable {0}. " + INTERNAL_ERROR;
+		public static final String CLOSURE_VARIABLE_LIMIT_EXCEEDED = "Closure variable count limit exceeded: {0}";
 	}
 
 	public static final class ToString {
@@ -432,6 +444,8 @@ public final class CmnCnst {
 		public static final String DOCUMENT_COMMAND = "%s(%s)";
 		public static final String POSITIONED_DOCUMENT_COMMAND = "%s@%s(%s)";
 		public static final String E_METHOD = "%s(%s)";
+		public static final String HEADER_NODE_IMPL = "HeaderNodeImpl({0},source={1})";
+		public static final String NODE_INFO = "(return:{0},implicit:{1},throws:{2},labels:{3})";
 	}
 
 	public static final class Html {

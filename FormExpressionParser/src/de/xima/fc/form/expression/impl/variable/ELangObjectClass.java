@@ -381,9 +381,9 @@ public enum ELangObjectClass implements ILangObjectClass {
 	private final Class<? extends ALangObject> clazz;
 	private final String syntacticalTypeName;
 
-	private ELangObjectClass(final Integer id, final boolean isImmutable, final Class<? extends ALangObject> clazz,
+	private ELangObjectClass(final int id, final boolean isImmutable, final Class<? extends ALangObject> clazz,
 			final String syntacticalTypeName, final boolean isIterable, final boolean supportsCoercion) {
-		this.id = id;
+		this.id = Integer.valueOf(id);
 		this.clazz = clazz;
 		this.syntacticalTypeName = syntacticalTypeName;
 		this.isIterable = isIterable;

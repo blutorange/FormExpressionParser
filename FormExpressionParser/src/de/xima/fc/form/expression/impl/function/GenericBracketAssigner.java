@@ -135,7 +135,7 @@ public abstract class GenericBracketAssigner<T extends ALangObject> implements I
 		}
 	};
 
-	private GenericBracketAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
+	protected GenericBracketAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
 			final boolean hasVarArgs, @Nonnull final String... argList) {
 		NullUtil.checkItemsNotNull(argList);
 		this.type = type;

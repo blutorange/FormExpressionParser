@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.util;
+package de.xima.fc.form.expression.grammar.comment;
 
 import javax.annotation.Nonnull;
 

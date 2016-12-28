@@ -23,7 +23,7 @@ public final class UnparseConfig implements IUnparseConfig {
 	private final String requiredSpace;
 	private final boolean keepComments;
 
-	private UnparseConfig(final String indentPrefix, final String linefeed,
+	protected UnparseConfig(final String indentPrefix, final String linefeed,
 			final String optionalSpace, final String requiredSpace,
 			final boolean keepComments) {
 		this.indentPrefix = indentPrefix;

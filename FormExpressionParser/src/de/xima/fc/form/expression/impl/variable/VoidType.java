@@ -10,6 +10,7 @@ import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 public enum VoidType implements IVariableType {
@@ -52,7 +53,7 @@ public enum VoidType implements IVariableType {
 
 	@Override
 	public IVariableType getIterableItemType() {
-		throw new FormExpressionException("not iterable");
+		throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.TYPE_NOT_ITERABLE, toString()));
 	}
 
 	@Override
@@ -69,12 +70,12 @@ public enum VoidType implements IVariableType {
 	public ImmutableCollection<EVariableTypeFlag> getFlags() {
 		return ImmutableSortedSet.of();
 	}
-	
+
 	@Override
 	public IVariableType upconvert(final ILangObjectClass superClass) {
 		return VoidType.INSTANCE;
 	}
-	
+
 	@Override
 	public String toString() {
 		return CmnCnst.Name.VOID_TYPE;

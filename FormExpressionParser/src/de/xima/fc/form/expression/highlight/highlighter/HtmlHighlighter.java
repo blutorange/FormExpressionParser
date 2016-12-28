@@ -20,7 +20,6 @@ import de.xima.fc.form.expression.highlight.Weight;
 import de.xima.fc.form.expression.highlight.highlighter.HtmlHighlighter.HtmlHighlighterState;
 import de.xima.fc.form.expression.iface.IFormExpressionHighlightTheme;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("nls")
@@ -28,7 +27,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 	private final StringBuilder html, css;
 	private final String cssClassPrefix;
 	private final boolean applyBasicStyling;
-	
+
 	private HtmlHighlighter(final boolean basicStyling, @Nullable final String cssClassPrefix) throws FormExpressionException {
 		super();
 		this.cssClassPrefix = sanitizeCssClassPrefix(cssClassPrefix);
@@ -79,7 +78,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 	protected HtmlHighlighterState createState(final IFormExpressionHighlightTheme theme) {
 		return new HtmlHighlighterState(theme);
 	}
-	
+
 	@Override
 	protected void prepareProcessing(final Color backgroundColor, final HtmlHighlighterState state) throws IOException {
 		cssGeneral(backgroundColor);
@@ -103,8 +102,8 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		}
 		html.append("</div>");
 	}
-	
-	private void styleCssClasses(final Style style, final HtmlHighlighterState state) throws IOException {
+
+	private void styleCssClasses(final Style style, final HtmlHighlighterState state) {
 		// Color
 		state.colorSet.add(style.color);
 		state.activeLine.append(cssClassPrefix);
@@ -133,7 +132,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		}
 	}
 
-	private void cssWeight() throws IOException {
+	private void cssWeight() {
 		for (final Weight weight : Weight.values()) {
 			css.append(".");
 			css.append(cssClassPrefix);
@@ -163,7 +162,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		}
 	}
 
-	private void cssSize() throws IOException {
+	private void cssSize() {
 		for (final Size size : Size.values()) {
 			css.append(".");
 			css.append(cssClassPrefix);
@@ -193,7 +192,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		}
 	}
 
-	private void cssFeature() throws IOException {
+	private void cssFeature() {
 		for (final Feature feature : Feature.values()) {
 			css.append(".");
 			css.append(cssClassPrefix);
@@ -217,7 +216,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		}
 	}
 
-	private void cssColor(final Set<Color> colorSet) throws IOException {
+	private void cssColor(final Set<Color> colorSet) {
 		for (final Color color : colorSet) {
 			final String hexString = color.getHexStringRgb();
 			css.append(".");
@@ -233,8 +232,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		}
 	}
 
-	private void cssColor(final Color color, final String attribute)
-			throws IOException {
+	private void cssColor(final Color color, final String attribute) {
 		css.append(attribute);
 		css.append(":rgb(");
 		css.append(Integer.toString(color.getByteR(), 10));
@@ -255,7 +253,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		css.append(");");
 	}
 
-	private void cssGeneral(final Color backgroundColor) throws IOException {
+	private void cssGeneral(final Color backgroundColor) {
 		if (!backgroundColor.isFullyTransparent()) {
 			css.append("div.");
 			css.append(cssClassPrefix);
@@ -287,11 +285,11 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 	protected static class HtmlHighlighterState extends de.xima.fc.form.expression.highlight.AHighlighter.HighlighterState {
 		protected final Set<Color> colorSet;
 		protected  StringBuilder activeLine;
-		private HtmlHighlighterState(final IFormExpressionHighlightTheme theme) {
+		protected HtmlHighlighterState(final IFormExpressionHighlightTheme theme) {
 			super(theme);
 			colorSet = new HashSet<>();
 			activeLine = new StringBuilder();
-		}		
+		}
 		@Override
 		protected void clear() {
 			super.clear();
@@ -299,7 +297,7 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 			activeLine.setLength(0);
 		}
 	}
-	
+
 	public static HtmlHighlighter create() {
 		return create(null, true);
 	}
@@ -309,11 +307,11 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 	}
 
 	public String getHtml() {
-		return NullUtil.toString(html);
+		return html.toString();
 	}
 
 	public String getCss() {
-		return NullUtil.toString(css);
+		return css.toString();
 	}
 
 	public String getHtmlWithInlinedCss() {
@@ -330,6 +328,6 @@ public class HtmlHighlighter extends AHighlighter<HtmlHighlighterState>{
 		builder.append(css);
 		builder.append("</style>"); //$NON-NLS-1$
 		builder.append("</section>"); //$NON-NLS-1$
-		return NullUtil.toString(builder);
+		return builder.toString();
 	}
 }

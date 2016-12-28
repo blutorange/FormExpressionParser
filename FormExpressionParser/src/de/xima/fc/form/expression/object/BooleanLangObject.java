@@ -10,13 +10,12 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
-import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 public class BooleanLangObject extends ALangObject {
 	private final boolean value;
 
-	private BooleanLangObject(final boolean value) {
+	protected BooleanLangObject(final boolean value) {
 		super();
 		this.value = value;
 	}
@@ -27,8 +26,8 @@ public class BooleanLangObject extends ALangObject {
 	}
 
 	private static class InstanceHolder {
-		private static BooleanLangObject TRUE = new BooleanLangObject(true);
-		private static BooleanLangObject FALSE = new BooleanLangObject(false);
+		protected static BooleanLangObject TRUE = new BooleanLangObject(true);
+		protected static BooleanLangObject FALSE = new BooleanLangObject(false);
 	}
 
 	public boolean booleanValue() {
@@ -116,8 +115,8 @@ public class BooleanLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_BOOLEAN_LANG_OBJECT).append('(')
-				.append(value).append(')'));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_BOOLEAN_LANG_OBJECT).append('(')
+				.append(value).append(')').toString();
 	}
 
 	@Override

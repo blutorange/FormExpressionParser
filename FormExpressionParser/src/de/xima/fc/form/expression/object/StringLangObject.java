@@ -18,16 +18,24 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 public class StringLangObject extends ALangObject {
-	@Nonnull private final String value;
+	@Nonnull
+	protected final String value;
 
 	private static class InstanceHolder {
-		@Nonnull public final static StringLangObject EMPTY = StringLangObject.create(StringUtils.EMPTY);
-		@Nonnull public final static StringLangObject SPACE = StringLangObject.create(StringUtils.SPACE);
-		@Nonnull public final static StringLangObject LF = StringLangObject.create(StringUtils.LF);
-		@Nonnull public final static StringLangObject CR = StringLangObject.create(StringUtils.CR);
-		@Nonnull public final static StringLangObject TRUE = StringLangObject.create(Syntax.TRUE);
-		@Nonnull public final static StringLangObject FALSE = StringLangObject.create(Syntax.FALSE);
-		@Nonnull public final static StringLangObject NULL = StringLangObject.create(Syntax.NULL);
+		@Nonnull
+		public final static StringLangObject EMPTY = StringLangObject.create(StringUtils.EMPTY);
+		@Nonnull
+		public final static StringLangObject SPACE = StringLangObject.create(StringUtils.SPACE);
+		@Nonnull
+		public final static StringLangObject LF = StringLangObject.create(StringUtils.LF);
+		@Nonnull
+		public final static StringLangObject CR = StringLangObject.create(StringUtils.CR);
+		@Nonnull
+		public final static StringLangObject TRUE = StringLangObject.create(Syntax.TRUE);
+		@Nonnull
+		public final static StringLangObject FALSE = StringLangObject.create(Syntax.FALSE);
+		@Nonnull
+		public final static StringLangObject NULL = StringLangObject.create(Syntax.NULL);
 	}
 
 	private StringLangObject(@Nonnull final String value) {
@@ -67,20 +75,21 @@ public class StringLangObject extends ALangObject {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (!(o instanceof StringLangObject)) return false;
-		final StringLangObject other = (StringLangObject)o;
+		if (!(o instanceof StringLangObject))
+			return false;
+		final StringLangObject other = (StringLangObject) o;
 		return value.equals(other.value);
 	}
 
 	@Override
 	public int compareToSameType(final ALangObject o) {
-		return value.compareTo(((StringLangObject)o).value);
+		return value.compareTo(((StringLangObject) o).value);
 	}
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_STRING_LANG_OBJECT).append('(')
-				.append(value).append(')'));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_STRING_LANG_OBJECT).append('(')
+				.append(value).append(')').toString();
 	}
 
 	@Override
@@ -103,7 +112,7 @@ public class StringLangObject extends ALangObject {
 	// Coercion
 	@Override
 	public NumberLangObject coerceNumber(final IEvaluationContext ec) throws CoercionException {
-		return NumberLangObject.create(value);
+		return NumberLangObject.create(value, ec);
 	}
 
 	@Override
@@ -143,18 +152,23 @@ public class StringLangObject extends ALangObject {
 
 	/**
 	 * Factory method for creating instances.
-	 * @param value String, the data.
-	 * @return {@link ALangObject} representing the parameter string best, may not be an instance of {@link StringLangObject}.
+	 *
+	 * @param value
+	 *            String, the data.
+	 * @return {@link ALangObject} representing the parameter string best, may
+	 *         not be an instance of {@link StringLangObject}.
 	 */
 	@Nonnull
 	public static StringLangObject create(final String value) {
-		if (value == null) return StringLangObject.getEmptyInstance();
+		if (value == null)
+			return StringLangObject.getEmptyInstance();
 		return new StringLangObject(value);
 	}
-	
+
 	@Nonnull
 	public static StringLangObject create(final Object object) {
-		if (object == null) return StringLangObject.getEmptyInstance();
+		if (object == null)
+			return StringLangObject.getEmptyInstance();
 		return new StringLangObject(NullUtil.toString(object));
 	}
 
@@ -228,25 +242,27 @@ public class StringLangObject extends ALangObject {
 		return value.length();
 	}
 
-	private class Itr implements INonNullIterator<ALangObject> {
+	protected class Itr implements INonNullIterator<ALangObject> {
 		private int i = 0;
+
 		@Override
 		public boolean hasNext() {
 			return i < value.length();
 		}
+
 		@Override
 		public ALangObject next() {
 			final ALangObject res = StringLangObject.create(value.charAt(i));
 			++i;
 			return res;
 		}
+
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(CmnCnst.Error.STRING_ITERATOR_DOES_NOT_SUPPORT_REMOVAL);
 		}
 	}
 
-	@SuppressWarnings("null")
 	@Nonnull
 	public static String escape(final String value, final char delimiter) {
 		final StringBuilder sb = new StringBuilder(value.length());
@@ -254,10 +270,9 @@ public class StringLangObject extends ALangObject {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("null")
 	@Nonnull
 	public static String unescape(final CharSequence value, final char delimiter) throws IllegalArgumentException {
-		final StringBuilder sb = new StringBuilder(2*value.length());
+		final StringBuilder sb = new StringBuilder(2 * value.length());
 		unescape(value, delimiter, sb);
 		return sb.toString();
 	}
@@ -265,7 +280,7 @@ public class StringLangObject extends ALangObject {
 	public static void escape(final String value, final char delimiter, final StringBuilder sb) {
 		final int len = value.length();
 		char c;
-		for (int i = 0; i< len; ++i) {
+		for (int i = 0; i < len; ++i) {
 			switch (c = value.charAt(i)) {
 			case '\\':
 				sb.append('\\').append('\\');
@@ -279,25 +294,26 @@ public class StringLangObject extends ALangObject {
 			default:
 				if (c < 32 | c >= 127) {
 					sb.append('\\').append('u');
-					sb.append(escapeHex(sb, (c & 0b1111000000000000) >> 12));
-					sb.append(escapeHex(sb, (c & 0b0000111100000000) >> 8));
-					sb.append(escapeHex(sb, (c & 0b0000000011110000) >> 4));
-					sb.append(escapeHex(sb, c & 0b0000000000001111));
+					sb.append(escapeHex(c & 0b1111000000000000) >> 12);
+					sb.append(escapeHex(c & 0b0000111100000000) >> 8);
+					sb.append(escapeHex(c & 0b0000000011110000) >> 4);
+					sb.append(escapeHex(c & 0b0000000000001111));
 				}
 				else if (c == delimiter)
 					sb.append('\\').append(c);
 				else
 					sb.append(c);
 			}
-		}		
+		}
 	}
 
-	public static void unescape(final CharSequence value, final char delimiter, final StringBuilder sb) throws IllegalArgumentException {
+	public static void unescape(final CharSequence value, final char delimiter, final StringBuilder sb)
+			throws IllegalArgumentException {
 		final int len = value.length();
 		final char[] buffer = new char[2];
 		int i = 0;
 		char c, c2;
-		while (i< len) {
+		while (i < len) {
 			switch (c = value.charAt(i)) {
 			case '\\':
 				if (i >= len - 1)
@@ -305,24 +321,27 @@ public class StringLangObject extends ALangObject {
 				switch (c2 = value.charAt(++i)) {
 				case 'u':
 				case 'U': {
-					if (i+4>=len)
-						throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_UNFINISHED_UNICODE_ESCAPE));
-					final int hex = (unescapeHex(value.charAt(++i))<<12)|(unescapeHex(value.charAt(++i))<<8)|(unescapeHex(value.charAt(++i))<<4)|unescapeHex(value.charAt(++i));
-					sb.append((char)hex);
+					if (i + 4 >= len)
+						throw new IllegalArgumentException(
+								NullUtil.messageFormat(CmnCnst.Error.STRING_UNFINISHED_UNICODE_ESCAPE));
+					final int hex = (unescapeHex(value.charAt(++i)) << 12) | (unescapeHex(value.charAt(++i)) << 8)
+							| (unescapeHex(value.charAt(++i)) << 4) | unescapeHex(value.charAt(++i));
+					sb.append((char) hex);
 					break;
 				}
 				case 's':
 				case 'S': {
-					if (i+8>=len)
-						throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_UNFINISHED_UNICODE_ESCAPE));
+					if (i + 8 >= len)
+						throw new IllegalArgumentException(
+								NullUtil.messageFormat(CmnCnst.Error.STRING_UNFINISHED_UNICODE_ESCAPE));
 					final int hex = (unescapeHex(value.charAt(++i)) << 12) | (unescapeHex(value.charAt(++i)) << 24)
 							| (unescapeHex(value.charAt(++i)) << 20) | (unescapeHex(value.charAt(++i)) << 16)
 							| (unescapeHex(value.charAt(++i)) << 12) | (unescapeHex(value.charAt(++i)) << 8)
 							| (unescapeHex(value.charAt(++i)) << 4) | unescapeHex(value.charAt(++i));
 					Character.toChars(hex, buffer, 0);
 					sb.append(buffer[0]);
-					if (buffer.length>1)
-							sb.append(buffer[1]);
+					if (buffer.length > 1)
+						sb.append(buffer[1]);
 					break;
 				}
 				default:
@@ -330,25 +349,25 @@ public class StringLangObject extends ALangObject {
 				}
 				break;
 			case '$':
-			if (delimiter == '`')
-				throw new IllegalArgumentException(
-						NullUtil.messageFormat(CmnCnst.Error.TEMPLATE_LITERAL_CONTAINS_DOLLAR, i));
+				if (delimiter == '`')
+					throw new IllegalArgumentException(
+							NullUtil.messageFormat(CmnCnst.Error.TEMPLATE_LITERAL_CONTAINS_DOLLAR, Integer.valueOf(i)));
 				sb.append('$');
 				break;
 			default:
 				if (c == delimiter)
-					throw new IllegalArgumentException(
-							NullUtil.messageFormat(CmnCnst.Error.STRING_CONTAINS_DELIMITER, delimiter, i));
+					throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_CONTAINS_DELIMITER,
+							Integer.valueOf(delimiter), Integer.valueOf(i)));
 				sb.append(c);
 			}
 			++i;
 		}
 	}
 
-	private static char escapeHex(final StringBuilder sb, final int i) {
-		if (i<10)
-			return (char)('0'+i);
-		return (char)('a'+i-10);
+	private static char escapeHex(final int i) {
+		if (i < 10)
+			return (char) ('0' + i);
+		return (char) ('a' + i - 10);
 	}
 
 	private static int unescapeHex(final char charAt) {
@@ -358,6 +377,7 @@ public class StringLangObject extends ALangObject {
 			return charAt - 'A' + 10;
 		if (charAt >= 'a' && charAt <= 'f')
 			return charAt - 'a' + 10;
-		throw new IllegalArgumentException(NullUtil.messageFormat(CmnCnst.Error.STRING_INVALID_UNICODE_HEX, charAt));
+		throw new IllegalArgumentException(
+				NullUtil.messageFormat(CmnCnst.Error.STRING_INVALID_UNICODE_HEX, Character.valueOf(charAt)));
 	}
 }

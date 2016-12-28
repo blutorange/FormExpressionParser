@@ -34,7 +34,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @ParametersAreNonnullByDefault
 public class NumberLangObject extends ALangObject {
-	private final double value;
+	protected final double value;
 
 	final static ThreadLocal<NumberFormat> NUMBER_FORMAT = new ThreadLocal<NumberFormat>(){
 		@Override protected NumberFormat initialValue() {
@@ -105,10 +105,11 @@ public class NumberLangObject extends ALangObject {
 	 * @return A number lang object for this value. <code>0</code> when
 	 * the value is not parsable as a number.
 	 */
-	public static NumberLangObject create(final String value) {
+	public static NumberLangObject create(final String value, final IEvaluationContext ec) {
 		try {
 			return new NumberLangObject(Double.parseDouble(value));
 		} catch (final NumberFormatException e) {
+			ec.getLogger().error(null, e);
 			return NumberLangObject.getZeroInstance();
 		}
 	}
@@ -162,8 +163,8 @@ public class NumberLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('(')
-				.append(value).append(')'));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_NUMBER_LANG_OBJECT).append('(')
+				.append(value).append(')').toString();
 	}
 
 	@Override
@@ -269,19 +270,19 @@ public class NumberLangObject extends ALangObject {
 		return NumberLangObject.create(value % other.value);
 	}
 
-	public NumberLangObject pow(final NumberLangObject operand) throws MathException {
+	public NumberLangObject pow(final NumberLangObject operand) {
 		return NumberLangObject.create(Math.pow(value, operand.value));
 	}
 
-	public NumberLangObject log() throws MathException {
+	public NumberLangObject log() {
 		return NumberLangObject.create(Math.log(value));
 	}
 
-	public NumberLangObject sin() throws MathException {
+	public NumberLangObject sin() {
 		return NumberLangObject.create(Math.sin(value));
 	}
 
-	public NumberLangObject cos() throws MathException {
+	public NumberLangObject cos() {
 		return NumberLangObject.create(Math.cos(value));
 	}
 
@@ -305,7 +306,7 @@ public class NumberLangObject extends ALangObject {
 		return InstanceHolder.E;
 	}
 
-	private class Itr implements INonNullIterator<ALangObject> {
+	protected class Itr implements INonNullIterator<ALangObject> {
 		private double i = 0.0;
 		@Override
 		public boolean hasNext() {

@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.FormExpressionException;
@@ -16,16 +17,18 @@ import de.xima.fc.form.expression.iface.parse.IFunctionNode;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IFunctionNode {
 	private static final long serialVersionUID = 1L;
-	
+
 	private boolean hasVarArgs;
 	private boolean hasType;
-	private int callId = -1;
+	private Integer callId = Integer.valueOf(-1);
 	private int closureTableSize = -1;
 
-	public ASTFunctionClauseNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTFunctionClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -41,6 +44,7 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		this.hasType = hasType;
 	}
 
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (i == (hasType ? 1 : 0))
@@ -58,7 +62,6 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		return jjtGetChild(jjtGetNumChildren() - 1);
 	}
 
-	@Nonnull
 	public String getCanonicalName() {
 		return getScope() != null ? getScope() + Syntax.SCOPE_SEPARATOR + getVariableName() : getVariableName();
 	}
@@ -100,7 +103,6 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		return (ASTFunctionArgumentNode) jjtGetChild(i + (hasType ? 2 : 1));
 	}
 
-	@Nonnull
 	public ASTVariableNode getVariableNode() {
 		return (ASTVariableNode) jjtGetChild(hasType ? 1 : 0);
 	}
@@ -133,22 +135,23 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	}
 
 	@Override
-	public int getFunctionId() {
+	public Integer getFunctionId() {
 		return callId;
 	}
 
 	@Override
-	public void resolveFunctionId(final int callId) {
-		if (callId < 0)
-			throw new FormExpressionException("Call ID must be non-negative, but it is " + callId);
+	public void resolveFunctionId(final Integer callId) {
+		if (callId.intValue() < 0)
+			throw new FormExpressionException(
+					NullUtil.messageFormat(CmnCnst.Error.NEGATIVE_CALL_ID, callId));
 		this.callId = callId;
 	}
 
 	@Override
 	public boolean isFunctionIdResolved() {
-		return callId >= 0;
+		return callId.intValue() >= 0;
 	}
-	
+
 	@Override
 	public void resolveClosureTableSize(final int closureTableSize) {
 		this.closureTableSize = closureTableSize;

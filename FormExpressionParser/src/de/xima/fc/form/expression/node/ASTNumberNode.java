@@ -32,7 +32,8 @@ public class ASTNumberNode extends ANode {
 			doubleValue = Double.parseDouble(string);
 		}
 		catch (final NumberFormatException e) {
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_NUMBER, string, new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_NUMBER, string,
+					Integer.valueOf(getBeginLine()), Integer.valueOf(getBeginColumn()), e.getMessage()));
 		}
 		super.init(method);
 	}

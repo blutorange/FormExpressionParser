@@ -58,33 +58,33 @@ public class TokenMgrError extends Error implements IPositionedError {
 			case 0:
 				continue;
 			case '\b':
-				retval.append("\\b");
+				retval.append("\\b"); //$NON-NLS-1$
 				continue;
 			case '\t':
-				retval.append("\\t");
+				retval.append("\\t"); //$NON-NLS-1$
 				continue;
 			case '\n':
-				retval.append("\\n");
+				retval.append("\\n"); //$NON-NLS-1$
 				continue;
 			case '\f':
-				retval.append("\\f");
+				retval.append("\\f"); //$NON-NLS-1$
 				continue;
 			case '\r':
-				retval.append("\\r");
+				retval.append("\\r"); //$NON-NLS-1$
 				continue;
 			case '\"':
-				retval.append("\\\"");
+				retval.append("\\\""); //$NON-NLS-1$
 				continue;
 			case '\'':
-				retval.append("\\\'");
+				retval.append("\\\'"); //$NON-NLS-1$
 				continue;
 			case '\\':
-				retval.append("\\\\");
+				retval.append("\\\\"); //$NON-NLS-1$
 				continue;
 			default:
 				if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-					final String s = "0000" + Integer.toString(ch, 16);
-					retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+					final String s = "0000" + Integer.toString(ch, 16); //$NON-NLS-1$
+					retval.append("\\u" + s.substring(s.length() - 4, s.length())); //$NON-NLS-1$
 				}
 				else {
 					retval.append(ch);
@@ -110,8 +110,9 @@ public class TokenMgrError extends Error implements IPositionedError {
 	 */
 	protected static String LexicalError(final boolean EOFSeen, final int lexState, final int errorLine,
 			final int errorColumn, final String errorAfter, final char curChar) {
-		final String encountered = EOFSeen ? "<EOF>" : ("\"" + String.valueOf(curChar)+ "\"");
-		return NullUtil.messageFormat(CmnCnst.Error.TOKEN_MGR_ERROR, errorLine, errorColumn, encountered, errorAfter);
+		final String encountered = EOFSeen ? "<EOF>" : ("\"" + String.valueOf(curChar) + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return NullUtil.messageFormat(CmnCnst.Error.TOKEN_MGR_ERROR, Integer.valueOf(errorLine),
+				Integer.valueOf(errorColumn), encountered, errorAfter);
 	}
 
 	/**

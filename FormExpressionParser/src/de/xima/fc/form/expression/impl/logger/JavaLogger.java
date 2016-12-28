@@ -31,26 +31,27 @@ public class JavaLogger implements ILogger {
 		level = logLevel;
 	}
 	@Override
-	public void error(@Nullable final String message) {
+	public void error(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.ERROR.numeric)
-			logger.severe(message);
+			logger.severe(SystemLogger.buildMessage(message, cause));
 	}
+
 	@Override
-	public void warn(@Nullable final String message) {
+	public void warn(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.WARN.numeric)
-			logger.warning(message);
+			logger.warning(SystemLogger.buildMessage(message, cause));
 	}
 	@Override
-	public void info(@Nullable final String message) {
+	public void info(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.INFO.numeric)
-			logger.info(message);
+			logger.info(SystemLogger.buildMessage(message, cause));
 	}
 	@Override
-	public void debug(@Nullable final String message) {
+	public void debug(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.DEBUG.numeric)
-			logger.fine(message);
+			logger.fine(SystemLogger.buildMessage(message, cause));
 	}
 	@Override
-	public void reset() {		
+	public void reset() {
 	}
 }

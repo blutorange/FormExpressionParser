@@ -18,10 +18,10 @@ import de.xima.fc.form.expression.exception.parse.NestingLevelTooDeepException;
 public class OnDemandLookUpBinding<T> extends LookUpBinding<T> {
 
 	/** Subject to change. Do not rely on this being set to a certain value. */
-	public final static int DEFAULT_NESTING_DEPTH = 512;
+	public final static int DEFAULT_NESTING_DEPTH_SUBCLASS = 512;
 
 	public OnDemandLookUpBinding() {
-		this(DEFAULT_NESTING_DEPTH);
+		this(DEFAULT_NESTING_DEPTH_SUBCLASS);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -30,7 +30,7 @@ public class OnDemandLookUpBinding<T> extends LookUpBinding<T> {
 			nestingDepth = 1;
 		breakpointArray = new boolean[nestingDepth];
 		mapArray = new Map[nestingDepth];
-		mapArray[0] = new HashMap<String, T>();
+		mapArray[0] = new HashMap<>();
 		currentDepth = 0;
 	}
 
@@ -47,6 +47,6 @@ public class OnDemandLookUpBinding<T> extends LookUpBinding<T> {
 	public void nest() throws NestingLevelTooDeepException {
 		if (currentDepth >= mapArray.length - 1) throw new NestingLevelTooDeepException(currentDepth+1);
 		++currentDepth;
-		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<String, T>();
+		if (mapArray[currentDepth] == null) mapArray[currentDepth] = new HashMap<>();
 	}
 }

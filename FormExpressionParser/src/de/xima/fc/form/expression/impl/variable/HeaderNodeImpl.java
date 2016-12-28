@@ -93,7 +93,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 			throw new IllegalVariableSourceResolutionException(this, closureSource);
 		this.closureSource = closureSource;
 	}
-	
+
 	@Override
 	public void convertEnvironmentalToClosure() throws IllegalVariableSourceResolutionException {
 		if (sourceType != EVariableSource.ENVIRONMENTAL)
@@ -120,11 +120,11 @@ public class HeaderNodeImpl implements IHeaderNode {
 	public boolean isBasicSourceResolved() {
 		return source >= 0;
 	}
-	
+
 	@Override
 	public boolean isClosureSourceResolved() {
 		return closureSource >= 0;
-	}	
+	}
 
 	@Override
 	public String getVariableName() {
@@ -133,7 +133,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 
 	@Override
 	public String toString() {
-		return NullUtil.messageFormat("HeaderNodeImpl({0},source={1})", variableName, source);
+		return NullUtil.messageFormat(CmnCnst.ToString.HEADER_NODE_IMPL, variableName, Integer.valueOf(source));
 	}
 
 	@Override

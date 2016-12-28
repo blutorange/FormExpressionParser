@@ -95,13 +95,13 @@ public interface IVariableType extends Serializable {
 	public boolean hasFlag(EVariableTypeFlag flag);
 
 	public ImmutableCollection<EVariableTypeFlag> getFlags();
-	
+
 	/**
 	 * @param superClass Super class to convert this type to.
 	 * @return This type in terms of the super class.
 	 */
 	public IVariableType upconvert(ILangObjectClass superClass);
-	
+
 	/**
 	 * A comparator for objects of {@link IVariableType}, supporting <code>null</code>.
 	 * <code>null</code> is sorted first. Sorts similar to string, with the
@@ -118,8 +118,8 @@ public interface IVariableType extends Serializable {
 				return -1;
 			if (o2 == null)
 				return 1;
-			final int l1 = o1.getBasicLangClass().getClassId();
-			final int l2 = o2.getBasicLangClass().getClassId();
+			final int l1 = o1.getBasicLangClass().getClassId().intValue();
+			final int l2 = o2.getBasicLangClass().getClassId().intValue();
 			if (l1 != l2)
 				return l1 - l2;
 			final int s = Math.min(o1.getGenericCount(), o2.getGenericCount());

@@ -11,7 +11,7 @@ public class NumberTooLongForLongException extends MathException {
 	private static final long serialVersionUID = 1L;
 
 	public NumberTooLongForLongException(final double number, final IEvaluationContext ec)  {
-		super(NullUtil.messageFormat(CmnCnst.Error.NUMBER_TOO_LONG_FOR_LONG, number), ec);
+		super(NullUtil.messageFormat(CmnCnst.Error.NUMBER_TOO_LONG_FOR_LONG, Double.valueOf(number)), ec);
 		this.number = number;
 	}
 

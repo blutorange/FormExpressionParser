@@ -6,6 +6,7 @@ import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.grammar.Token;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 @ParametersAreNonnullByDefault
 public class SemanticsException extends ParseException {
@@ -17,7 +18,8 @@ public class SemanticsException extends ParseException {
 
 	public SemanticsException(final String message, final int beginLine, final int beginColumn, final int endLine,
 			final int endColumn) {
-		super(message, Token.newToken(FormExpressionParserConstants.EOF, "", beginLine, beginColumn, endLine, endColumn));
+		super(message, Token.newToken(FormExpressionParserConstants.EOF, CmnCnst.NonnullConstant.STRING_EMPTY,
+				beginLine, beginColumn, endLine, endColumn));
 		this.beginColumn = beginColumn;
 		this.beginLine = beginLine;
 		this.endLine = endLine;

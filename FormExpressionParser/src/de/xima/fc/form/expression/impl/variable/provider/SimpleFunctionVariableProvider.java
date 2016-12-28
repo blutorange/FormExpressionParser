@@ -14,6 +14,7 @@ import de.xima.fc.form.expression.impl.variable.VoidType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
@@ -27,8 +28,8 @@ public abstract class SimpleFunctionVariableProvider<R extends ALangObject>
 			final Arg... args) {
 		super(GenericVariableType.forSimpleFunction(returnType, unwrap(args)));
 		if (returnType.getBasicLangClass().getLangObjectClass() != clazz)
-			throw new FormExpressionException(NullUtil.messageFormat(
-					"Basic variable type {0} does not match return type {1}.", returnType.getBasicLangClass(), clazz));
+			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.RETURN_TYPE_NOT_MATCHING,
+					returnType.getBasicLangClass(), clazz));
 		this.name = name;
 		this.args = new String[args.length];
 		for (int i = args.length; i-- > 0;)

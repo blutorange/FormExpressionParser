@@ -50,27 +50,31 @@ public class SystemLogger implements ILogger {
 	}
 
 	@Override
-	public void error(@Nullable final String message) {
+	public void error(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.ERROR.numeric)
-			System.err.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.ERROR, getCurrentDate(), prefix, message));
+			System.err.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.ERROR, getCurrentDate(), prefix,
+					buildMessage(message, cause)));
 	}
 
 	@Override
-	public void warn(@Nullable final String message) {
+	public void warn(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.WARN.numeric)
-			System.err.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.WARN, getCurrentDate(), prefix, message));
+			System.err.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.WARN, getCurrentDate(), prefix,
+					buildMessage(message, cause)));
 	}
 
 	@Override
-	public void info(@Nullable final String message) {
+	public void info(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.INFO.numeric)
-			System.out.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.INFO, getCurrentDate(), prefix, message));
+			System.out.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.INFO, getCurrentDate(), prefix,
+					buildMessage(message, cause)));
 	}
 
 	@Override
-	public void debug(@Nullable final String message) {
+	public void debug(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.DEBUG.numeric)
-			System.out.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.DEBUG, getCurrentDate(), prefix, message));
+			System.out.println(String.format(CmnCnst.SYSTEM_LOGGER_FORMAT, Level.DEBUG, getCurrentDate(), prefix,
+					buildMessage(message, cause)));
 	}
 
 	public static ILogger get(final ELogLevel level) {
@@ -110,5 +114,29 @@ public class SystemLogger implements ILogger {
 
 	@Override
 	public void reset() {
+	}
+
+	public static String buildMessage(@Nullable final String message, @Nullable final Throwable cause) {
+		final StringBuilder sb = new StringBuilder();
+		if (message != null)
+			sb.append(message).append(System.lineSeparator());
+		appendAll(sb, cause);
+		return sb.toString();
+	}
+
+	public static void appendStackTrace(final StringBuilder sb, @Nullable final Throwable cause) {
+		if (cause != null)
+			for (final StackTraceElement el : cause.getStackTrace())
+				sb.append(el.toString()).append(System.lineSeparator());
+	}
+
+	public static void appendAll(final StringBuilder sb, @Nullable final Throwable cause) {
+		for (Throwable c = cause; c != null; c = c.getCause()) {
+			if (c != cause)
+				sb.append("caused by:").append(System.lineSeparator()); //$NON-NLS-1$
+			sb.append(c.getClass().getCanonicalName()).append(": ").append(c.getMessage()) //$NON-NLS-1$
+					.append(System.lineSeparator());
+			appendStackTrace(sb, c);
+		}
 	}
 }

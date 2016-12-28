@@ -62,7 +62,7 @@ public enum ELibraryScopeContractFactoryFormcycle implements ILibraryScopeContra
 	},
 	;
 
-	private final FetchImpl impl;
+	protected final FetchImpl impl;
 
 	private ELibraryScopeContractFactoryFormcycle(final FetchImpl impl) {
 		this.impl = impl;
@@ -104,8 +104,9 @@ public enum ELibraryScopeContractFactoryFormcycle implements ILibraryScopeContra
 				throws EvaluationException;
 	}
 
-	private class LibImpl implements ILibraryScope<Formcycle> {
+	private final class LibImpl implements ILibraryScope<Formcycle> {
 		private final Map<String, ALangObject> map = new HashMap<>();
+		protected LibImpl() {}
 		@Override
 		public void reset() {
 			map.clear();

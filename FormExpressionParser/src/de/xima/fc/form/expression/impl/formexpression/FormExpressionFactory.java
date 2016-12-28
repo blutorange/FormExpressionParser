@@ -152,7 +152,7 @@ public final class FormExpressionFactory {
 		private FormExpressionParserTokenManager asTokenManager(final Reader reader) {
 			return tokenManagerForState(reader, FormExpressionParserTokenManager.CODE);
 		}
-		
+
 		@Override
 		public void highlight(final String code, final IFormExpressionHighlighter highlighter,
 				final IFormExpressionHighlightTheme theme) throws IOException, ParseException {
@@ -240,13 +240,13 @@ public final class FormExpressionFactory {
 				return NullUtil.iterator(tokenManagerToList(asTokenManager(reader)));
 			}
 		}
-		
+
 	}
 
-	private static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
+	protected static FormExpressionParserTokenManager asTokenManager(final Reader reader) {
 		return tokenManagerForState(reader, FormExpressionParserTokenManager.LOS);
 	}
-	
+
 	private final static class TokenIterator implements Iterator<Token> {
 		private boolean hasNext = true;
 		private final FormExpressionParserTokenManager tm;
@@ -274,19 +274,19 @@ public final class FormExpressionFactory {
 		}
 	}
 
-	private static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state)
+	protected static FormExpressionParserTokenManager tokenManagerForState(final Reader reader, final int state)
 			throws TokenMgrError {
 		final SimpleCharStream stream = new SimpleCharStream(reader);
 		return new FormExpressionParserTokenManager(null, stream, state);
 	}
 
-	private static FormExpressionParser asParser(final FormExpressionParserTokenManager tm) {
+	protected static FormExpressionParser asParser(final FormExpressionParserTokenManager tm) {
 		final FormExpressionParser parser = new FormExpressionParser(tm);
 		tm.parser = parser;
 		return parser;
 	}
 
-	private static List<IToken> tokenManagerToList(final FormExpressionParserTokenManager tm)
+	protected static List<IToken> tokenManagerToList(final FormExpressionParserTokenManager tm)
 			throws TokenMgrError {
 		final List<IToken> list = new ArrayList<>();
 		for (Token token = tm.getNextToken(); token.kind != FormExpressionParserConstants.EOF; token = tm
@@ -310,7 +310,7 @@ public final class FormExpressionFactory {
 	 * @return
 	 * @throws ParseException
 	 */
-	private static <T> IFormExpression<T> postProcess(final Node node,
+	protected static <T> IFormExpression<T> postProcess(final Node node,
 			final FormExpressionParser parser,
 			final IEvaluationContextContract<T> factory,
 			final ISeverityConfig severityConfig) throws ParseException {
@@ -344,7 +344,7 @@ public final class FormExpressionFactory {
 		if (collection == null)
 			return;
 		for (final IHeaderNode hn : collection)
-			if (!hn.getNode().jjtAccept(visitor))
+			if (!hn.getNode().jjtAccept(visitor).booleanValue())
 				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getNode());
 	}
 }

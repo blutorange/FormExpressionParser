@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
-public class DocumentCommand extends AExternalContextCommand {
+public final class DocumentCommand extends AExternalContextCommand {
 	private final EDocumentCommandType type;
 	private final String[] data;
 
@@ -24,7 +24,7 @@ public class DocumentCommand extends AExternalContextCommand {
 	 *             When type is <code>null</code>, or the number of String
 	 *             arguments does not match {@link EDocumentCommandType#argc}.
 	 */
-	private DocumentCommand(final EDocumentCommandType type, @Nullable final String... data)
+	protected DocumentCommand(final EDocumentCommandType type, @Nullable final String... data)
 			throws FormExpressionException {
 		final String[] dataArray = data != null ? data : CmnCnst.NonnullConstant.EMPTY_STRING_ARRAY;
 		assertArguments(type, dataArray);
@@ -37,7 +37,7 @@ public class DocumentCommand extends AExternalContextCommand {
 			throw new FormExpressionException(CmnCnst.Error.NULL_TYPE);
 		if (data.length != type.argc)
 			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENTS_FOR_DOCUMENT_COMMAND, type,
-					new Integer(type.argc), new Integer(data.length), StringUtils.join(data, ',')));
+					Integer.valueOf(type.argc), Integer.valueOf(data.length), StringUtils.join(data, ',')));
 	}
 
 	@Nonnull

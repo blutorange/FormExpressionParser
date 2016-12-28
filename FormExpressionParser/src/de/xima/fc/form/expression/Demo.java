@@ -63,7 +63,7 @@ public class Demo {
 	@Nonnull
 	private static final UnparseConfig UNPARSE_CONFIG = UnparseConfig.getStyledWithCommentsConfig();
 
-	public static void main(final String args[]) throws ParseException, TokenMgrError, EvaluationException {
+	public static void main(final String args[]) throws TokenMgrError {
 		final String code = readArgs(args);
 		if (code == null)
 			throw new FormExpressionException("Code must not be null."); //$NON-NLS-1$
@@ -71,7 +71,7 @@ public class Demo {
 		showInputCode(code);
 
 		showTokenStream(code);
-		
+
 		showHighlighting(code);
 
 		IFormExpression<Formcycle> expression = parseCode(code);
@@ -95,15 +95,15 @@ public class Demo {
 
 	@Nonnull
 	private static IFormExpression<Formcycle> showSerialization(@Nonnull final IFormExpression<Formcycle> ex) {
-		System.out.println("===Serialization===");
+		System.out.println("===Serialization==="); //$NON-NLS-1$
 		final byte[] bytes = SerializationUtils.serialize(ex);
 		SerializationUtils.deserialize(bytes);
 		final long t1 = System.nanoTime();
 		final IFormExpression<Formcycle> dex = SerializationUtils.deserialize(bytes);
 		final long t2 = System.nanoTime();
-		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms");
+		System.out.println("Deserialization took " + (t2-t1)/1000000 + "ms"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (dex == null)
-			throw new FormExpressionException("Deseialized expression is null.");
+			throw new FormExpressionException("Deseialized expression is null."); //$NON-NLS-1$
 		return dex;
 	}
 
@@ -114,8 +114,9 @@ public class Demo {
 					expression.analyze(new Formcycle()));
 			Collections.sort(warningList, IEvaluationWarning.COMPARATOR);
 			for (final IEvaluationWarning warning : warningList) {
-				System.out.println(String.format("Warning from line %d, column %d: %s", warning.getBeginLine(),
-						warning.getBeginColumn(), warning.getMessage()));
+				System.out.println(
+						String.format("Warning from line %d, column %d: %s", Integer.valueOf(warning.getBeginLine()), //$NON-NLS-1$
+								Integer.valueOf(warning.getBeginColumn()), warning.getMessage()));
 				System.out.println();
 			}
 		}
@@ -166,7 +167,7 @@ public class Demo {
 		for (final IToken token : IteratorUtils.asIterable(tokenStream)) {
 			final String s;
 			if (token.getKind() == FormExpressionParserConstants.TemplateLiteralChars)
-				s = token.getImage() + " ";
+				s = token.getImage() + " "; //$NON-NLS-1$
 			else
 				s = token.getImage().replaceAll("[ \n\r\t]", "") + " "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			System.out.print(s);
@@ -217,10 +218,10 @@ public class Demo {
 			throws ParseException, TokenMgrError, IllegalArgumentException {
 		final Method method;
 		try {
-			method = factory.getClass().getDeclaredMethod("asNode", String.class);
+			method = factory.getClass().getDeclaredMethod("asNode", String.class); //$NON-NLS-1$
 			final Class<?> clazz = method.getReturnType();
 			if (!Node.class.isAssignableFrom(clazz))
-				throw new IllegalArgumentException("return type not a node, but " + clazz);
+				throw new IllegalArgumentException("return type not a node, but " + clazz); //$NON-NLS-1$
 			method.setAccessible(true);
 			return (Node) method.invoke(factory, code);
 		}
@@ -249,7 +250,7 @@ public class Demo {
 			throw new IllegalArgumentException(e);
 		}
 	}
-	
+
 	private static Node showParseTree(@Nonnull final String code) {
 		final Node node;
 		try {
@@ -296,7 +297,7 @@ public class Demo {
 	}
 
 	private static void showEvaluatedResult(@Nonnull final IFormExpression<Formcycle> ex) {
-		System.out.println("===Evaluation===");
+		System.out.println("===Evaluation==="); //$NON-NLS-1$
 		final IEvaluationResult result;
 		try {
 			// Do it once so we don't measure setup times.

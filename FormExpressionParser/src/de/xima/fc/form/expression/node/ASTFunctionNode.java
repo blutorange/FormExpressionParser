@@ -1,6 +1,8 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.FormExpressionException;
@@ -14,16 +16,18 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IFunctionNode;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
+@ParametersAreNonnullByDefault
 public class ASTFunctionNode extends ANode implements IFunctionNode {
 	private static final long serialVersionUID = 1L;
 
 	private boolean hasVarArgs;
 	private boolean hasType;
-	private int callId = -1;
+	private Integer callId = Integer.valueOf(-1);
 	private int closureTableSize = -1;
 
-	public ASTFunctionNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTFunctionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
 
@@ -36,6 +40,7 @@ public class ASTFunctionNode extends ANode implements IFunctionNode {
 		this.hasType = hasType;
 	}
 
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		if (hasType && i == 0)
@@ -99,27 +104,28 @@ public class ASTFunctionNode extends ANode implements IFunctionNode {
 	public Node getTypeNode() {
 		return jjtGetChild(jjtGetNumChildren()-2);
 	}
-	
+
 	@Override
 	public void additionalToStringFields(final StringBuilder sb) {
 		sb.append(hasVarArgs).append(',');
 	}
 
 	@Override
-	public int getFunctionId() {
+	public Integer getFunctionId() {
 		return callId;
 	}
 
 	@Override
-	public void resolveFunctionId(final int callId) {
-		if (callId < 0)
-			throw new FormExpressionException("Call ID must be non-negative, but it is " + callId);
+	public void resolveFunctionId(final Integer callId) {
+		if (callId.intValue() < 0)
+			throw new FormExpressionException(
+					NullUtil.messageFormat(CmnCnst.Error.NEGATIVE_CALL_ID, callId));
 		this.callId = callId;
 	}
 
 	@Override
 	public boolean isFunctionIdResolved() {
-		return callId >= 0;
+		return callId.intValue() >= 0;
 	}
 
 	@Override

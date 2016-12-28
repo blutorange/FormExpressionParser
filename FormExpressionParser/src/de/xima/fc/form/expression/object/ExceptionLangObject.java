@@ -12,7 +12,6 @@ import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
-import de.xima.fc.form.expression.util.NullUtil;
 
 public class ExceptionLangObject extends ALangObject {
 	@Nonnull
@@ -47,8 +46,8 @@ public class ExceptionLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_EXCEPTION_LANG_OBJECT).append('(')
-				.append(value.getMessage()).append(')'));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_EXCEPTION_LANG_OBJECT).append('(')
+				.append(value.getMessage()).append(')').toString();
 	}
 
 	@Override

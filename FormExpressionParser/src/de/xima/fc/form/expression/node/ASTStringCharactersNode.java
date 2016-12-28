@@ -44,13 +44,15 @@ public class ASTStringCharactersNode extends ANode {
 		assertChildrenExactly(0);
 		assertNonNull(value, CmnCnst.Error.NODE_NULL_STRING);
 		if (delimiter != '"' && delimiter != '\'' && delimiter != '`')
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.INVALID_STRING_DELIMITER, delimiter));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.INVALID_STRING_DELIMITER, Integer.valueOf(delimiter)));
 		final String s;
 		try {
 			s = StringLangObject.unescape(value, delimiter);
 		}
 		catch (final IllegalArgumentException e) {
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING, e.getMessage()), getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
+			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING, e.getMessage()),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 		}
 		super.init(method);
 		this.delimiter = delimiter;
@@ -92,7 +94,7 @@ public class ASTStringCharactersNode extends ANode {
 		sb.append('"').append(StringEscapeUtils.escapeJava(stringValue)).append('"').append(',').append(delimiter)
 				.append(',');
 	}
-	
+
 	public char getDelimiter() {
 		return delimiter;
 	}

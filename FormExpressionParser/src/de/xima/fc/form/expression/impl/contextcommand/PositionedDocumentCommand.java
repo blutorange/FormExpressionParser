@@ -43,6 +43,6 @@ public class PositionedDocumentCommand implements Comparable<PositionedDocumentC
 
 	@Override
 	public String toString() {
-		return String.format(CmnCnst.ToString.POSITIONED_DOCUMENT_COMMAND, command, new Integer(position), token);
+		return String.format(CmnCnst.ToString.POSITIONED_DOCUMENT_COMMAND, command, Integer.valueOf(position), token);
 	}
 }

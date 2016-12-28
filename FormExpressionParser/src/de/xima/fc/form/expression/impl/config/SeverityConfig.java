@@ -21,7 +21,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public final class SeverityConfig implements ISeverityConfig {
 	private final EnumSet<ESeverityOption> options;
 
-	private SeverityConfig(final EnumSet<ESeverityOption> options) {
+	protected SeverityConfig(final EnumSet<ESeverityOption> options) {
 		this.options = NullUtil.checkNotNull(EnumSet.copyOf(options));
 	}
 

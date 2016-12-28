@@ -14,7 +14,7 @@ public final class SystemWriter extends Writer {
 
 	private final PrintStream printStream;
 
-	private SystemWriter(final PrintStream printStream) {
+	protected SystemWriter(final PrintStream printStream) {
 		this.printStream = printStream;
 	}
 	@Override

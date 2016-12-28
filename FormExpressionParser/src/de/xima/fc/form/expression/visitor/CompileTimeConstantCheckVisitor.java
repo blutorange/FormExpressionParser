@@ -68,7 +68,7 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	@Nonnull
 	private Boolean visitChildren(@Nonnull final Node node) {
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
-			if (!node.jjtGetChild(i).jjtAccept(this))
+			if (!node.jjtGetChild(i).jjtAccept(this).booleanValue())
 				return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 		}
 		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
@@ -208,7 +208,7 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	public Boolean visit(final ASTUnaryExpressionNode node) {
 		// i++ is definitely not compile-time constant because it involved assignment
 		// i++ => i = i + 1
-		return !node.getUnaryMethod().isAssigning() && visitChildren(node);
+		return Boolean.valueOf(!node.getUnaryMethod().isAssigning() && visitChildren(node).booleanValue());
 	}
 
 	@Override
@@ -266,7 +266,7 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	public Boolean visit(final ASTPostUnaryExpressionNode node) {
 		// i++ is definitely not compile-time constant because it involved assignment
 		// i++ => i = i + 1
-		return !node.getUnaryMethod().isAssigning();
+		return Boolean.valueOf(!node.getUnaryMethod().isAssigning());
 	}
 
 	@Override

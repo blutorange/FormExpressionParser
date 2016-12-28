@@ -153,6 +153,11 @@ public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDat
 		}
 	}
 
+	/**
+	 * No-op, may be override. Called before an {@link ASTFunctionClauseNode} and {@link ASTFunctionNode}.
+	 * @param node The node, either an {@link ASTFunctionClauseNode} or {@link ASTFunctionNode}.
+	 * @param data Custom data.
+	 */
 	protected D beforeFunctionNode(final IFunctionNode node, final D data) {
 		return data;
 	}
@@ -181,7 +186,7 @@ public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDat
 	 *   case (x):
 	 *     ...
 	 */
-	
+
 	@Override
 	public final void visit(final ASTSwitchClauseNode node, final D data) throws ParseException {
 		node.getSwitchValueNode().jjtAccept(this, data);

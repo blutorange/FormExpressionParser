@@ -236,7 +236,7 @@ public final class TestUtil {
 			}
 		}
 		final Date t2 = new Date();
-		System.out.println(String.format("Evaluation took %s ms.", t2.getTime() - t1.getTime()));
+		System.out.println(String.format("Evaluation took %s ms.", Long.valueOf(t2.getTime() - t1.getTime())));
 		return res;
 	}
 
@@ -257,7 +257,7 @@ public final class TestUtil {
 			throw new FormExpressionException("Unkown enum: " + type);
 		}
 		final Date t2 = new Date();
-		System.out.println(String.format("Evaluation took %s ms.", t2.getTime() - t1.getTime()));
+		System.out.println(String.format("Evaluation took %s ms.", Long.valueOf(t2.getTime() - t1.getTime())));
 		return res;
 	}
 
@@ -278,7 +278,7 @@ public final class TestUtil {
 			throw new ParseException("Unkown enum: " + type);
 		}
 		final Date t2 = new Date();
-		System.out.println(String.format("Parsing took %s ms.", t2.getTime() - t1.getTime()));
+		System.out.println(String.format("Parsing took %s ms.", Long.valueOf(t2.getTime() - t1.getTime())));
 		return res;
 	}
 }

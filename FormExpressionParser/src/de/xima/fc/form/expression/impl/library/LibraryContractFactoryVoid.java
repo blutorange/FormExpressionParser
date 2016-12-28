@@ -35,9 +35,9 @@ import de.xima.fc.form.expression.util.Void;
  */
 @Immutable
 @ParametersAreNonnullByDefault
-public class LibraryContractFactoryVoid implements ILibraryContractFactory {
+public final class LibraryContractFactoryVoid implements ILibraryContractFactory {
 	private static final long serialVersionUID = 1L;
-	private final ImmutableMap<String, ILibraryScopeContractFactory<Void>> library;
+	protected final ImmutableMap<String, ILibraryScopeContractFactory<Void>> library;
 
 	@SafeVarargs
 	private LibraryContractFactoryVoid(final ILibraryScopeContractFactory<Void>... libraryScopeList) {
@@ -81,7 +81,7 @@ public class LibraryContractFactoryVoid implements ILibraryContractFactory {
 	private class LibImpl implements ILibrary {
 		private final Map<String, ILibraryScope<Void>> map;
 
-		private LibImpl() {
+		protected LibImpl() {
 			map = new HashMap<>(library.size());
 			for (final ILibraryScopeContractFactory<Void> lib : library.values()) {
 				final ILibraryScope<Void> scope = lib.make();

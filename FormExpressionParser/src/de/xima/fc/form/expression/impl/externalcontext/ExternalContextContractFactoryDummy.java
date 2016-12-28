@@ -11,7 +11,7 @@ import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 public final class ExternalContextContractFactoryDummy<T> extends AGenericExternalContextFactory<T> {
 	private static final long serialVersionUID = 1L;
 
-	private ExternalContextContractFactoryDummy() {}
+	protected ExternalContextContractFactoryDummy() {}
 
 	@Override
 	public AGenericExternalContext make(final T object) {
@@ -24,7 +24,8 @@ public final class ExternalContextContractFactoryDummy<T> extends AGenericExtern
 		return (IExternalContextContractFactory<T>)InstanceHolder.FACTORY;
 	}
 
-	private static class DummyImpl extends AGenericExternalContext implements IExternalContext {
+	private final static class DummyImpl extends AGenericExternalContext implements IExternalContext {
+		protected DummyImpl() {}
 		@Override
 		public void finishWriting() {
 		}

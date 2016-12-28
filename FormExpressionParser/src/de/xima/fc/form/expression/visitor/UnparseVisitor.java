@@ -141,11 +141,10 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			final ImmutableList<IComment> comments, final IUnparseConfig config) {
 		try (final Writer writer = new StringBuilderWriter()) {
 			unparse(writer, node, comments, config);
-			final String s = writer.toString();
-			return s != null ? s : CmnCnst.NonnullConstant.STRING_EMPTY;
+			return NullUtil.orEmpty(writer.toString());
 		}
 		// StringBuilderWriter does not throw.
-		catch (final IOException e) {
+		catch (@SuppressWarnings("unused") final IOException e) {
 			return CmnCnst.NonnullConstant.STRING_EMPTY;
 		}
 	}
@@ -382,7 +381,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	public void visit(@Nonnull final ASTStringCharactersNode node, @Nonnull final String prefix) throws IOException {
 		writer.write(StringLangObject.escape(node.getStringValue(), node.getDelimiter()));
 	}
-	
+
 	@Override
 	public void visit(@Nonnull final ASTStatementListNode node, @Nonnull final String prefix) throws IOException {
 		final int len = node.jjtGetNumChildren();

@@ -27,6 +27,7 @@ import de.xima.fc.form.expression.iface.evaluate.INamespace;
 import de.xima.fc.form.expression.iface.factory.INamespaceContractFactory;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 /**
@@ -64,7 +65,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  */
 @Immutable
 @ParametersAreNonnullByDefault
-public class GenericNamespaceContractFactory implements INamespaceContractFactory, INamespace {
+public final class GenericNamespaceContractFactory implements INamespaceContractFactory, INamespace {
 	private static final long serialVersionUID = 1L;
 
 	private final EnumMap<EMethod, IExpressionFunction<?>>[] expressionMethodMap;
@@ -82,7 +83,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	private final IGenericBracketAssignerFunction<?>[] genericBracketAssignerMap;
 
 	@SuppressWarnings("unchecked")
-	private GenericNamespaceContractFactory(
+	protected GenericNamespaceContractFactory(
 			final Map<Integer, EnumMap<EMethod, IExpressionFunction<?>>> expressionMethodMap,
 			final Map<Integer, Map<String, IDotAccessorFunction<?>>> dotAccessorMap,
 			final Map<Integer, Map<String, IDotAssignerFunction<?>>> dotAssignerMap,
@@ -100,13 +101,13 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	}
 
 	private static <T> T[] toArray(final Map<Integer, T> map, final T[] array) {
-		Integer max = 0;
+		int max = 0;
 		for (final Integer i : map.keySet())
-			if (i > max)
-				max = i;
+			if (i.intValue() > max)
+				max = i.intValue();
 		final T[] arr = NullUtil.checkNotNull(Arrays.copyOf(array, max + 1));
 		for (final Entry<Integer, T> entry : map.entrySet())
-			arr[entry.getKey()] = entry.getValue();
+			arr[entry.getKey().intValue()] = entry.getValue();
 		return arr;
 	}
 
@@ -114,7 +115,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	@Override
 	public IExpressionFunction<?> expressionMethod(final ILangObjectClass thisContext, final EMethod method) {
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < expressionMethodMap.length && expressionMethodMap[classId] != null) {
 				final IExpressionFunction<?> func = expressionMethodMap[classId].get(method);
 					return func;
@@ -127,7 +128,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	@Override
 	public IGenericBracketAccessorFunction<?> bracketAccessor(final ILangObjectClass thisContext) {
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < genericBracketAccessorMap.length && genericBracketAccessorMap[classId] != null)
 				return genericBracketAccessorMap[classId];
 		}
@@ -138,7 +139,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	@Nullable
 	public IGenericBracketAssignerFunction<?> bracketAssigner(final ILangObjectClass thisContext) {
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < genericBracketAssignerMap.length && genericBracketAssignerMap[classId] != null)
 				return genericBracketAssignerMap[classId];
 		}
@@ -150,7 +151,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	public IFunction<?> dotAccessor(final ILangObjectClass thisContext, final String property) {
 		// Named accessor
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < dotAccessorMap.length && dotAccessorMap[classId] != null) {
 				final IDotAccessorFunction<?> accessor = dotAccessorMap[classId].get(property);
 				if (accessor != null)
@@ -159,7 +160,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		}
 		// Generic accessor
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < genericDotAccessorMap.length && genericDotAccessorMap[classId] != null)
 				if (genericDotAccessorMap[classId].isHandlingProperty(property))
 					return genericDotAccessorMap[classId];
@@ -172,7 +173,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	public IFunction<?> dotAssigner(final ILangObjectClass thisContext, final String property) {
 		// Named assigner
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < dotAssignerMap.length && dotAssignerMap[classId] != null) {
 				final IDotAssignerFunction<?> assigner = dotAssignerMap[classId].get(property);
 				if (assigner != null)
@@ -181,7 +182,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 		}
 		// Generic assigner
 		for (ILangObjectClass clazz = thisContext; clazz != null; clazz = clazz.getSuperClass()) {
-			final int classId = clazz.getClassId();
+			final int classId = clazz.getClassId().intValue();
 			if (classId < genericDotAssignerMap.length && genericDotAssignerMap[classId] != null)
 				if (genericDotAssignerMap[classId].isHandlingProperty(property))
 					return genericDotAssignerMap[classId];
@@ -193,7 +194,7 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 	public INamespace make() {
 		return this;
 	}
-	
+
 	@Override
 	public void reset() {
 		// nothing to reset, we are immutable
@@ -303,14 +304,14 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 				if (f == null)
 					throw new FormExpressionException();
 				final Integer classId = f.getFunction().getThisContextType().getClassId();
-				if (classId < 0)
-					throw new FormExpressionException(String.format("Class id %d for %s is negative.", classId,
+				if (classId.intValue() < 0)
+					throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.NEGATIVE_CLASS_ID, classId,
 							f.getFunction().getThisContextType()));
 				EnumMap<EMethod, IExpressionFunction<?>> map = getExpressionMethodMap().get(classId);
 				if (map == null)
 					getExpressionMethodMap().put(classId, map = new EnumMap<>(EMethod.class));
 				if (map.containsKey(f.getMethod()))
-					throw new FormExpressionException(NullUtil.messageFormat("Method {0} already set for {1}",
+					throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.METHOD_ALREADY_SET,
 							f.getMethod(), f.getFunction().getThisContextType()));
 				getClassPathMap().put(classId, f.getFunction().getThisContextType());
 				map.put(f.getMethod(), f.getFunction());
@@ -416,27 +417,27 @@ public class GenericNamespaceContractFactory implements INamespaceContractFactor
 
 		private <T extends IFunction<?>> void putFunctionGeneric(final T f, final Map<Integer, T> map) {
 			final Integer classId = f.getThisContextType().getClassId();
-			if (classId < 0)
+			if (classId.intValue() < 0)
 				throw new FormExpressionException(
-						String.format("Class id %d for %s is negative.", classId, f.getThisContextType()));
+						NullUtil.messageFormat(CmnCnst.Error.NEGATIVE_CLASS_ID, classId, f.getThisContextType()));
 			if (map.containsKey(classId))
 				throw new FormExpressionException(
-						NullUtil.messageFormat("Method {0} already set for {1}", f, f.getThisContextType()));
+						NullUtil.messageFormat(CmnCnst.Error.METHOD_ALREADY_SET, f, f.getThisContextType()));
 			getClassPathMap().put(classId, f.getThisContextType());
 			map.put(classId, f);
 		}
 
 		private <T extends IFunction<?>> void putFunctionSingle(final T f, final Map<Integer, Map<String, T>> map) {
 			final Integer classId = f.getThisContextType().getClassId();
-			if (classId < 0)
+			if (classId.intValue() < 0)
 				throw new FormExpressionException(
-						String.format("Class id %d for %s is negative.", classId, f.getThisContextType()));
+						NullUtil.messageFormat(CmnCnst.Error.NEGATIVE_CLASS_ID, classId, f.getThisContextType()));
 			Map<String, T> m = map.get(classId);
 			if (m == null)
 				map.put(classId, m = new HashMap<>());
 			if (m.containsKey(f.getDeclaredName()))
 				throw new FormExpressionException(
-						NullUtil.messageFormat("Method {0} already set for {1}", f.getDeclaredName(), f.getThisContextType()));
+						NullUtil.messageFormat(CmnCnst.Error.METHOD_ALREADY_SET, f.getDeclaredName(), f.getThisContextType()));
 			getClassPathMap().put(classId, f.getThisContextType());
 			m.put(f.getDeclaredName(), f);
 		}

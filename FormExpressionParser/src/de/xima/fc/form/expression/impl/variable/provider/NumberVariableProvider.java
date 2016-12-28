@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.object.NumberLangObject;
 @ParametersAreNonnullByDefault
 public abstract class NumberVariableProvider extends AVariableProvider<NumberLangObject> {
 	private static final long serialVersionUID = 1L;
-	private NumberVariableProvider() {
+	protected NumberVariableProvider() {
 		super(SimpleVariableType.NUMBER);
 	}
 	@Override

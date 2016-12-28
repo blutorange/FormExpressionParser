@@ -19,10 +19,9 @@ import de.xima.fc.form.expression.iface.parse.IVariableProvider;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
-import de.xima.fc.form.expression.util.NullUtil;
 
 public class ArrayLangObject extends ALangObject {
-	@Nonnull private final List<ALangObject> value;
+	@Nonnull protected final List<ALangObject> value;
 	private ArrayLangObject(@Nonnull final List<ALangObject> value) {
 		super();
 		this.value = value;
@@ -118,7 +117,7 @@ public class ArrayLangObject extends ALangObject {
 		for (final ALangObject o : value) sb.append(o.inspect()).append(',');
 		if (sb.length() > 16) sb.setLength(sb.length()-1);
 		sb.append(']');
-		return NullUtil.toString(sb);
+		return sb.toString();
 	}
 
 	@Override
@@ -259,6 +258,7 @@ public class ArrayLangObject extends ALangObject {
 	private class Itr implements INonNullIterator<ALangObject> {
 		private int cursor;       // index of next element to return
 		private int lastRet = -1; // index of last element returned; -1 if no such
+		protected Itr(){}
 		@Override
 		public boolean hasNext() {
 			return cursor != value.size();
@@ -282,7 +282,7 @@ public class ArrayLangObject extends ALangObject {
 				cursor = lastRet;
 				lastRet = -1;
 			} catch (final IndexOutOfBoundsException ex) {
-				throw new ConcurrentModificationException();
+				throw new ConcurrentModificationException(ex);
 			}
 		}
 	}

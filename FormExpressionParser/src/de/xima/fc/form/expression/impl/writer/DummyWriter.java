@@ -10,7 +10,7 @@ public class DummyWriter extends Writer {
 	private final static class InstanceHolder {
 		@Nonnull public final static DummyWriter INSTANCE = new DummyWriter();
 	}
-	private DummyWriter(){}
+	protected DummyWriter(){}
 	@Override
 	public void close() throws IOException {
 	}

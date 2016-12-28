@@ -48,11 +48,6 @@ public class NullUtil {
 		return value != null ? value : orValue;
 	}
 
-	public static void main(final String[] args) {
-		final char c = '3';
-		System.out.println(toString(c));
-	}
-
 	/**
 	 * Same as {@link MessageFormat#format(String, Object...)}, but never returns <code>null</code>.
 	 * @param pattern Pattern for formatting.
@@ -67,7 +62,7 @@ public class NullUtil {
 			return fmt;
 		throw new NullPointerException();
 	}
-	
+
 	@Nonnull
 	public static <T> Iterator<T> iterator(final Iterable<T> iterable) {
 		final Iterator<T> it = iterable.iterator();

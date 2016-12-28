@@ -48,12 +48,12 @@ public class FunctionLangObject extends ALangObject {
 		return ELangObjectClass.FUNCTION;
 	}
 
-	public final ALangObject evaluate(final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {		
+	public final ALangObject evaluate(final IEvaluationContext ec, final ALangObject... args) throws EvaluationException {
 		// Check argument count.
 		if (value.hasVarArgs() ? args.length < value.getDeclaredArgumentCount() - 1
 				: args.length != value.getDeclaredArgumentCount())
 			throw new IllegalNumberOfFunctionParametersException(this, args.length, ec);
-		
+
 		// Evaluate function
 		final ALangObject thisContext = this.thisContext;
 		final ALangObject result;
@@ -68,7 +68,7 @@ public class FunctionLangObject extends ALangObject {
 			ec.getTracer().ascend();
 			ec.closureStackPop();
 		}
-		
+
 		// Check for disallowed break / continue clauses.
 		switch (ec.getJumpType()) {
 		case RETURN:
@@ -84,7 +84,7 @@ public class FunctionLangObject extends ALangObject {
 			throw new UncatchableEvaluationException(ec,
 				NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
 		}
-		
+
 		return result;
 	}
 
@@ -123,8 +123,8 @@ public class FunctionLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_FUNCTION_LANG_OBJECT).append('(')
-				.append(value.getDeclaredName()).append(')'));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_FUNCTION_LANG_OBJECT).append('(')
+				.append(value.getDeclaredName()).append(')').toString();
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class FunctionLangObject extends ALangObject {
 	public FunctionLangObject coerceFunction(final IEvaluationContext ec) {
 		return this;
 	}
-	
+
 	public static FunctionLangObject getNoOpNull() {
 		return new FunctionLangObject(new IFunction<ALangObject>() {
 			@Override
@@ -208,11 +208,11 @@ public class FunctionLangObject extends ALangObject {
 			@Nullable final IClosure closure, final int closureSymbolTableSize) {
 		return new FunctionLangObject((IFunction<ALangObject>) value, closure, closureSymbolTableSize);
 	}
-	
+
 	public static FunctionLangObject createWithoutClosure(final IFunction<? extends ALangObject> value) {
 		return create(value, null, 0);
 	}
-	
+
 	@SuppressWarnings("unchecked") // Evaluate visitor checks the type before
 									// calling the function.
 	public static FunctionLangObject createForNullThisContext(final IFunction<NullLangObject> value,
@@ -221,7 +221,7 @@ public class FunctionLangObject extends ALangObject {
 		return new FunctionLangObject((IFunction<ALangObject>) f, NullLangObject.getInstance(), closure,
 				closureSymbolTableSize);
 	}
-	
+
 	public static FunctionLangObject createForNullThisContextWithoutClosure(final IFunction<NullLangObject> value) {
 		return createForNullThisContext(value, null, 0);
 	}
@@ -244,7 +244,7 @@ public class FunctionLangObject extends ALangObject {
 	public String getDeclaredName() {
 		return value.getDeclaredName();
 	}
-	
+
 	private static class ClosureImpl implements IClosure {
 		private final ALangObject[] symbolTable;
 		@Nullable public final IClosure parent;

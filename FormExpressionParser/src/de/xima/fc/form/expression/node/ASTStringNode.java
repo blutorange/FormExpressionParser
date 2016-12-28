@@ -22,7 +22,7 @@ public class ASTStringNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
 	private char delimiter = '"';
-	
+
 	public ASTStringNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
 	}
@@ -37,7 +37,8 @@ public class ASTStringNode extends ANode {
 	 */
 	public void init(@Nullable final EMethod method, final char delimiter) throws ParseException {
 		if (delimiter != '"' && delimiter != '\'' && delimiter != '`')
-			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.INVALID_STRING_DELIMITER, delimiter));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.INVALID_STRING_DELIMITER, Integer.valueOf(delimiter)));
 		assertDelimiterChildrenEquals(delimiter);
 		super.init(method);
 		this.delimiter = delimiter;
@@ -48,7 +49,8 @@ public class ASTStringNode extends ANode {
 			if (children[i].jjtGetNodeId() == FormExpressionParserTreeConstants.JJTSTRINGCHARACTERSNODE) {
 				if (((ASTStringCharactersNode) children[i]).getDelimiter() != delimiter)
 					throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.UNMATCHING_STRING_DELIMITER,
-							((ASTStringCharactersNode) children[i]).getDelimiter(), delimiter));
+							Character.valueOf(((ASTStringCharactersNode) children[i]).getDelimiter()),
+							Integer.valueOf(delimiter)));
 			}
 		}
 	}
@@ -67,12 +69,13 @@ public class ASTStringNode extends ANode {
 		}
 		catch (final IllegalArgumentException e) {
 			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INVALID_STRING,
-					new Integer(getBeginLine()), new Integer(getBeginColumn()), e.getMessage()));
+					Integer.valueOf(getBeginLine()), Integer.valueOf(getBeginColumn()), e.getMessage()));
 		}
 	}
 
 	@Override
-	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
+	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor,
+			final T data) throws E {
 		return visitor.visit(this, data);
 	}
 
@@ -82,7 +85,8 @@ public class ASTStringNode extends ANode {
 	}
 
 	@Override
-	public <T, E extends Throwable> void jjtAccept(final IFormExpressionVoidDataVisitor<T, E> visitor, final T data) throws E {
+	public <T, E extends Throwable> void jjtAccept(final IFormExpressionVoidDataVisitor<T, E> visitor, final T data)
+			throws E {
 		visitor.visit(this, data);
 	}
 
@@ -103,7 +107,7 @@ public class ASTStringNode extends ANode {
 	public boolean isInlineExpressionNode(final int i) {
 		return jjtGetChild(i).jjtGetNodeId() != FormExpressionParserTreeConstants.JJTSTRINGCHARACTERSNODE;
 	}
-	
+
 	public Node getStringNode(final int i) {
 		return jjtGetChild(i);
 	}

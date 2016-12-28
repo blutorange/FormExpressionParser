@@ -72,7 +72,7 @@ public enum EExpressionMethodString implements IMethod2Function<StringLangObject
 				return ELangObjectClass.STRING;
 			}
 		},
-		MATCHES(false, "patternToCheck") {
+		MATCHES(false, "patternToCheck") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {

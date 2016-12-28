@@ -65,7 +65,8 @@ public class ASTWithClauseNode extends ANode {
 	public Node getScopeNode(final int i) throws ArrayIndexOutOfBoundsException {
 		if (i >= getScopeCount())
 			throw new ArrayIndexOutOfBoundsException(
-					NullUtil.messageFormat(CmnCnst.Error.WITH_CLAUSE_NODE_SCOPE_OUT_OF_BOUNDS, i, getScopeCount()));
+					NullUtil.messageFormat(CmnCnst.Error.WITH_CLAUSE_NODE_SCOPE_OUT_OF_BOUNDS, Integer.valueOf(i),
+							Integer.valueOf(getScopeCount())));
 		return jjtGetChild(i);
 	}
 

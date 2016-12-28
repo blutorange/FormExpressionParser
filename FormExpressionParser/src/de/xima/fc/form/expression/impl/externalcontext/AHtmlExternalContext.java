@@ -42,7 +42,6 @@ public abstract class AHtmlExternalContext implements IExternalContext {
 
 	@Override
 	public final void finishWriting() throws EmbedmentOutputException, InvalidTemplateDataException {
-		@SuppressWarnings("null")
 		@Nonnull
 		final String html = builder.toString();
 		if (docCommandList != null) {

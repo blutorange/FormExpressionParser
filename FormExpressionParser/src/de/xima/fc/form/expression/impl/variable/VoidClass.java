@@ -14,11 +14,12 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
 public enum VoidClass implements ILangObjectClass {
 	INSTANCE;
-	private final static Integer ID = new Integer(255);
+	private final static Integer ID = Integer.valueOf(255);
 
 	@Override
 	public Integer getClassId() {
@@ -60,7 +61,7 @@ public enum VoidClass implements ILangObjectClass {
 	@Override
 	public IVariableType getIterableItemType(final IVariableType[] generics)
 			throws IllegalVariableTypeException, ArrayIndexOutOfBoundsException {
-		throw new IllegalVariableTypeException("not iterable");
+		throw new IllegalVariableTypeException(NullUtil.messageFormat(CmnCnst.Error.CLASS_NOT_ITERABLE, toString()));
 	}
 
 	@Override

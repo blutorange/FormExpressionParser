@@ -11,7 +11,8 @@ public class IllegalNumberOfFunctionParametersException extends SemanticsExcepti
 	private static final long serialVersionUID = 1L;
 
 	public IllegalNumberOfFunctionParametersException(final int shouldCount, final int isCount, final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_COUNT, shouldCount, isCount), node);
+		super(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_ARGUMENT_COUNT, Integer.valueOf(shouldCount),
+				Integer.valueOf(isCount)), node);
 		this.shouldCount = shouldCount;
 		this.isCount = isCount;
 	}

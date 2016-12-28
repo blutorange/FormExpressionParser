@@ -80,7 +80,7 @@ public abstract class GenericDotAccessor<T extends ALangObject> implements IGene
 	private final boolean hasVarArgs;
 	private final ILangObjectClass type;
 
-	private GenericDotAccessor(final ILangObjectClass type, final String name, final boolean hasVarArgs,
+	protected GenericDotAccessor(final ILangObjectClass type, final String name, final boolean hasVarArgs,
 			final String... argList) {
 		NullUtil.checkItemsNotNull(argList);
 		this.type = type;

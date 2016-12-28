@@ -54,8 +54,8 @@ public class VariableTypeTest {
 		final IVariableType funcObject = new VariableTypeBuilder().setBasicType(FUNCTION).append(OBJECT).append(OBJECT).build();
 		try {
 			new VariableTypeBuilder().setBasicType(FUNCTION).build();
-			fail("Function type needs exactly 1-... generics.");
-		} catch (final IllegalVariableTypeException e) {}
+			fail("Function type needs exactly 1-... generics."); //$NON-NLS-1$
+		} catch (@SuppressWarnings("unused") final IllegalVariableTypeException e) {}
 		new VariableTypeBuilder().setBasicType(FUNCTION).append(STRING).build();
 		for (final Tuple t : getSimpleTypes()) {
 			final IVariableType funcType = new VariableTypeBuilder().setBasicType(FUNCTION).append(t.var).append(t.var).build();
@@ -91,16 +91,16 @@ public class VariableTypeTest {
 		final IVariableType funcType = new VariableTypeBuilder().setBasicType(FUNCTION).append(STRING).build();
 		try {
 			new VariableTypeBuilder().setBasicType(HASH).build();
-			fail("Hash type needs exactly 2 generics.");
-		} catch (final IllegalVariableTypeException e) {}
+			fail("Hash type needs exactly 2 generics."); //$NON-NLS-1$
+		} catch (@SuppressWarnings("unused") final IllegalVariableTypeException e) {}
 		try {
 			new VariableTypeBuilder().setBasicType(HASH).append(STRING).build();
-			fail("Hash type needs exactly 2 generics.");
-		} catch (final IllegalVariableTypeException e) {}
+			fail("Hash type needs exactly 2 generics."); //$NON-NLS-1$
+		} catch (@SuppressWarnings("unused") final IllegalVariableTypeException e) {}
 		try {
 			new VariableTypeBuilder().setBasicType(HASH).append(STRING).append(STRING).append(STRING).build();
-			fail("Hash type needs exactly 2 generics.");
-		} catch (final IllegalVariableTypeException e) {}
+			fail("Hash type needs exactly 2 generics."); //$NON-NLS-1$
+		} catch (@SuppressWarnings("unused") final IllegalVariableTypeException e) {}
 		for (final Tuple t : getSimpleTypes()) {
 			final IVariableType hashType = new VariableTypeBuilder().setBasicType(HASH).append(t.var).append(t.var).build();
 			final IVariableType hashObject = new VariableTypeBuilder().setBasicType(HASH).append(OBJECT).append(OBJECT).build();
@@ -138,12 +138,12 @@ public class VariableTypeTest {
 		final IVariableType funcType = new VariableTypeBuilder().setBasicType(FUNCTION).append(STRING).build();
 		try {
 			new VariableTypeBuilder().setBasicType(ARRAY).build();
-			fail("Array type needs exactly 1 generics.");
-		} catch (final IllegalVariableTypeException e) {}
+			fail("Array type needs exactly 1 generics."); //$NON-NLS-1$
+		} catch (@SuppressWarnings("unused") final IllegalVariableTypeException e) {}
 		try {
 			new VariableTypeBuilder().setBasicType(ARRAY).append(STRING).append(STRING).build();
-			fail("Array type needs exactly 1 generics.");
-		} catch (final IllegalVariableTypeException e) {}
+			fail("Array type needs exactly 1 generics."); //$NON-NLS-1$
+		} catch (@SuppressWarnings("unused") final IllegalVariableTypeException e) {}
 		for (final Tuple t : getSimpleTypes()) {
 			final IVariableType arrayObject = new VariableTypeBuilder().setBasicType(ARRAY).append(OBJECT).build();
 			final IVariableType arrayType = new VariableTypeBuilder().setBasicType(ARRAY).append(t.var).build();

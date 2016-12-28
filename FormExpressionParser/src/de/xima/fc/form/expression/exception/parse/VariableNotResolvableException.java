@@ -27,7 +27,7 @@ public class VariableNotResolvableException extends SemanticsException {
 	public <T extends IScopedSourceResolvable & Node> VariableNotResolvableException(final T node) {
 		this(node.getScope(), node.getVariableName(), node);
 	}
-	
+
 	public VariableNotResolvableException(final ISourceResolvable resolvable, final Node node) {
 		this(null, resolvable.getVariableName(), node);
 	}
@@ -38,7 +38,7 @@ public class VariableNotResolvableException extends SemanticsException {
 
 	private static String varToString(@Nullable final String scope, final String name) {
 		if (scope != null)
-			return scope + "::" + name;
+			return scope + CmnCnst.Syntax.SCOPE_SEPARATOR + name;
 		return name;
 	}
 

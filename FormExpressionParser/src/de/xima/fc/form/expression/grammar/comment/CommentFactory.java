@@ -1,4 +1,4 @@
-package de.xima.fc.form.expression.util;
+package de.xima.fc.form.expression.grammar.comment;
 
 import javax.annotation.Nonnull;
 
@@ -7,9 +7,12 @@ import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
 import de.xima.fc.form.expression.grammar.Token;
 import de.xima.fc.form.expression.iface.parse.IComment;
+import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
 
 public final class CommentFactory {
-	private CommentFactory() {}
+	private CommentFactory() {
+	}
 
 	@Nonnull
 	public static IComment fromToken(@Nonnull final Token token) {
@@ -20,7 +23,8 @@ public final class CommentFactory {
 		case FormExpressionParserConstants.TypeSingleLineComment:
 			break;
 		default:
-			throw new FormExpressionException(NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMMENT_TOKEN, token.kind));
+			throw new FormExpressionException(
+					NullUtil.messageFormat(CmnCnst.Error.NOT_A_COMMENT_TOKEN, Integer.valueOf(token.kind)));
 		}
 		final Token t = NullUtil.checkNotNull(token);
 		final String img = t.getImage();
@@ -31,7 +35,7 @@ public final class CommentFactory {
 		switch (type) {
 		case MULTI_LINE:
 			if (img.length() >= 4)
-				text = NullUtil.checkNotNull(img.substring(2, t.getImage().length()-2));
+				text = NullUtil.checkNotNull(img.substring(2, t.getImage().length() - 2));
 			else
 				text = CmnCnst.NonnullConstant.STRING_EMPTY;
 			break;

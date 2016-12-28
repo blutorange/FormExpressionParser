@@ -148,7 +148,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return ELangObjectClass.FUNCTION;
 			}
 		},
-		push(true, "anObjectToAdd", "moreObjectsToAdd") { //$NON-NLS-1$
+		push(true, "anObjectToAdd", "moreObjectsToAdd") { //$NON-NLS-1$ //$NON-NLS-2$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -204,7 +204,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return ELangObjectClass.ARRAY;
 			}
 		},
-		sortBy(false, "comparator") {
+		sortBy(false, "comparator") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext,
 					final ALangObject... args) throws EvaluationException {
@@ -234,7 +234,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return ELangObjectClass.FUNCTION;
 			}
 		},
-		map(false, "mapper") {
+		map(false, "mapper") { //$NON-NLS-1$
 			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
@@ -253,7 +253,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return ELangObjectClass.FUNCTION;
 			}
 		},
-		mapString(false, "mapper") {
+		mapString(false, "mapper") { //$NON-NLS-1$
 			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
@@ -270,7 +270,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return ELangObjectClass.FUNCTION;
 			}
 		},
-		mapNumber(false, "mapper") {
+		mapNumber(false, "mapper") { //$NON-NLS-1$
 			@SuppressWarnings("null")
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
@@ -289,8 +289,8 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		}
 		;
 
-		private String[] argList;
-		private boolean hasVarArgs;
+		protected String[] argList;
+		protected boolean hasVarArgs;
 
 		private Impl(final boolean hasVarArgs, final String... argList) {
 			NullUtil.checkItemsNotNull(argList);
@@ -334,7 +334,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 		private final FunctionLangObject comparator;
 		private final IEvaluationContext ec;
 
-		private Comp(final FunctionLangObject comparator, final IEvaluationContext ec) {
+		protected Comp(final FunctionLangObject comparator, final IEvaluationContext ec) {
 			this.comparator = comparator;
 			this.ec = ec;
 		}

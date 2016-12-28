@@ -57,7 +57,8 @@ public class VisualizeTreeGraphviz {
 				try {
 					bytes = graphviz.getBytes(charset);
 				} catch (final UnsupportedEncodingException e) {
-					System.out.println("No such charset " + charset + "; using system default"); //$NON-NLS-1$ //$NON-NLS-2$
+					System.out.println("No such charset " + charset + "; using system default."); //$NON-NLS-1$ //$NON-NLS-2$
+					e.printStackTrace(System.err);
 					bytes = graphviz.getBytes();
 				}
 				fos.write(bytes);

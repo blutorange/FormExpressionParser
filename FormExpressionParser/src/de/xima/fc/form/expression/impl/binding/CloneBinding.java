@@ -23,7 +23,7 @@ public class CloneBinding<T> implements IBinding<T> {
 	private int level = 0;
 
 	public CloneBinding() {
-		impl = new Impl<T>();
+		impl = new Impl<>();
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class CloneBinding<T> implements IBinding<T> {
 				unnest();
 		}
 	}
-	
+
 	private static class Impl<T> {
 		private final Map<String, T> map;
 		@Nullable private final Impl<T> parent;
@@ -126,8 +126,8 @@ public class CloneBinding<T> implements IBinding<T> {
 		}
 
 		@Nonnull
-		public final Impl<T> nest() throws NestingLevelTooDeepException {
-			return new Impl<T>(this, false);
+		public final Impl<T> nest() {
+			return new Impl<>(this, false);
 		}
 
 		@Nonnull
@@ -147,7 +147,7 @@ public class CloneBinding<T> implements IBinding<T> {
 
 		@Nonnull
 		public Impl<T> nestLocal() {
-			return new Impl<T>(this, true);
+			return new Impl<>(this, true);
 		}
 
 		public boolean isGlobal() {

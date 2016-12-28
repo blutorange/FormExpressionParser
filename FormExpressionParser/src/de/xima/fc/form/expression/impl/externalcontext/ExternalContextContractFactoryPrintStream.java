@@ -20,7 +20,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public final class ExternalContextContractFactoryPrintStream extends AGenericExternalContextFactory<PrintStream> {
 	private static final long serialVersionUID = 1L;
 
-	private ExternalContextContractFactoryPrintStream() {
+	protected ExternalContextContractFactoryPrintStream() {
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public final class ExternalContextContractFactoryPrintStream extends AGenericExt
 		private final PrintStream printStream;
 		protected boolean outputDisabled = false;
 
-		private ExImpl(final PrintStream printStream) {
+		protected ExImpl(final PrintStream printStream) {
 			this.printStream = printStream;
 		}
 
@@ -75,7 +75,7 @@ public final class ExternalContextContractFactoryPrintStream extends AGenericExt
 				}
 			}
 			else {
-				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
+				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command), null);
 			}
 		}
 

@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 @ParametersAreNonnullByDefault
 public abstract class BooleanVariableProvider extends AVariableProvider<BooleanLangObject> {
 	private static final long serialVersionUID = 1L;
-	private BooleanVariableProvider() {
+	protected BooleanVariableProvider() {
 		super(SimpleVariableType.BOOLEAN);
 	}
 	@Override

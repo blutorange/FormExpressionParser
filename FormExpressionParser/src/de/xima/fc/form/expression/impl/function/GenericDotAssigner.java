@@ -85,7 +85,7 @@ public abstract class GenericDotAssigner<T extends ALangObject> implements IGene
 		}
 	};
 
-	private GenericDotAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
+	protected GenericDotAssigner(@Nonnull final ILangObjectClass type, @Nonnull final String name,
 			final boolean hasVarArgs, @Nonnull final String... argList) {
 		NullUtil.checkItemsNotNull(argList);
 		this.type = type;

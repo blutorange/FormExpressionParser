@@ -207,7 +207,7 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 				return ELangObjectClass.NUMBER;
 			}
 		},
-		matches(false, "patternToCheck") {
+		matches(false, "patternToCheck") { //$NON-NLS-1$
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
@@ -223,12 +223,12 @@ public enum EDotAccessorString implements IDotAccessorFunction<StringLangObject>
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
-			}			
+			}
 		}
 		;
 
-		private String[] argList;
-		private boolean hasVarArgs;
+		protected String[] argList;
+		protected boolean hasVarArgs;
 
 		private Impl(final boolean hasVarArgs, final String... argList) {
 			NullUtil.checkItemsNotNull(argList);

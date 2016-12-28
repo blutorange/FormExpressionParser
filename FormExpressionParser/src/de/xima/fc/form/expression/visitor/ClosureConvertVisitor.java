@@ -4,9 +4,9 @@ import java.util.Collection;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.parse.FunctionIdNotResolvedException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
+import de.xima.fc.form.expression.exception.parse.UnhandledEnumException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
@@ -20,6 +20,7 @@ import de.xima.fc.form.expression.node.ASTFunctionNode;
 import de.xima.fc.form.expression.node.ASTTryClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
+import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @ParametersAreNonnullByDefault
@@ -82,7 +83,7 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 
 	private void visitSourceResolvable(final Integer functionId, final ISourceResolvable resolvable, final Node node)
 			throws SemanticsException {
-		final Integer source = resolvable.getBasicSource();
+		final Integer source = Integer.valueOf(resolvable.getBasicSource());
 		switch (resolvable.getSourceType()) {
 		case CLOSURE:
 		case ENVIRONMENTAL:
@@ -91,7 +92,7 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 			if (newSource == null) {
 				newSource = resolutionResult.getMappedClosure(functionId, source);
 				if (newSource == null)
-					throw new SemanticsException(NullUtil.messageFormat("No mapping for variable {0} with source {1}.",
+					throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.NO_MAPPING_FOUND,
 							resolvable.getVariableName(), source), node);
 				resolvable.convertEnvironmentalToClosure();
 			}
@@ -103,21 +104,21 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 		case UNRESOLVED:
 			throw new VariableNotResolvableException(resolvable, node);
 		default:
-			throw new FormExpressionException("Unknown enum: " + resolvable.getSourceType());
+			throw new UnhandledEnumException(resolvable.getSourceType(), node);
 		}
 	}
 
 	private void resolveScopeDefs(final IScopeDefinitions scopeDefs) throws SemanticsException {
 		// Global.
 		for (final IHeaderNode header : scopeDefs.getGlobal()) {
-			visitSourceResolvable(-1, header, header.getNode());
-			header.getNode().jjtAccept(this, -1);
+			visitSourceResolvable(Integer.valueOf(-1), header, header.getNode());
+			header.getNode().jjtAccept(this, Integer.valueOf(-1));
 		}
 		// Manual scopes.
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values()) {
 			for (final IHeaderNode header : coll) {
-				visitSourceResolvable(-1, header, header.getNode());
-				header.getNode().jjtAccept(this, -1);
+				visitSourceResolvable(Integer.valueOf(-1), header, header.getNode());
+				header.getNode().jjtAccept(this, Integer.valueOf(-1));
 			}
 		}
 	}
@@ -126,7 +127,7 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 			final IScopeDefinitions scopeDefs) throws SemanticsException {
 		final ClosureConvertVisitor v = new ClosureConvertVisitor(resolutionResult);
 		v.resolveScopeDefs(scopeDefs);
-		node.jjtAccept(v, -1);
+		node.jjtAccept(v, Integer.valueOf(-1));
 		return resolutionResult.getEnvironmentalSize();
 	}
 }

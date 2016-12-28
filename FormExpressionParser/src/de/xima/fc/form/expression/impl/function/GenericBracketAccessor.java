@@ -177,7 +177,7 @@ public abstract class GenericBracketAccessor<T extends ALangObject> implements I
 	private final boolean hasVarArgs;
 	private final ILangObjectClass type;
 
-	private GenericBracketAccessor(final ILangObjectClass type, final String name, final boolean hasVarArgs,
+	protected GenericBracketAccessor(final ILangObjectClass type, final String name, final boolean hasVarArgs,
 			final String... argList) {
 		NullUtil.checkItemsNotNull(argList);
 		this.type = type;

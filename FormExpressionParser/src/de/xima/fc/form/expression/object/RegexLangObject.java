@@ -15,7 +15,6 @@ import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
-import de.xima.fc.form.expression.util.NullUtil;
 
 public class RegexLangObject extends ALangObject {
 	private final static class InstanceHolder {
@@ -27,7 +26,7 @@ public class RegexLangObject extends ALangObject {
 
 	@Nonnull private final Pattern value;
 
-	private RegexLangObject(@Nonnull final Pattern value) {
+	protected RegexLangObject(@Nonnull final Pattern value) {
 		super();
 		this.value = value;
 	}
@@ -87,8 +86,8 @@ public class RegexLangObject extends ALangObject {
 
 	@Override
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_REGEX_LANG_OBJECT).append('(')
-				.append(value).append(')'));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_REGEX_LANG_OBJECT).append('(')
+				.append(value).append(')').toString();
 	}
 
 	@Override
@@ -165,6 +164,7 @@ public class RegexLangObject extends ALangObject {
 			pattern = Pattern.compile(value, flags);
 		}
 		catch (final IllegalArgumentException e) {
+			ec.getLogger().debug(null, e);
 			throw new InvalidRegexPatternException(value, flags, ec);
 		}
 		if (pattern == null)

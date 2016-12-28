@@ -11,7 +11,8 @@ public class IllegalNumberOfVarArgFunctionParametersException extends SemanticsE
 	private static final long serialVersionUID = 1L;
 
 	public IllegalNumberOfVarArgFunctionParametersException(final int shouldCount, final int isCount, final Node node) {
-		super(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_VARARG_ARGUMENT_COUNT, shouldCount-1, isCount), node);
+		super(NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_VARARG_ARGUMENT_COUNT, Integer.valueOf(shouldCount - 1),
+				Integer.valueOf(isCount)), node);
 		this.shouldCount = shouldCount;
 		this.isCount = isCount;
 	}

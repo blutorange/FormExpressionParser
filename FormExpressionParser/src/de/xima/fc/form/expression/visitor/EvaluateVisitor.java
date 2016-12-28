@@ -96,14 +96,14 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	private ALangObject currentResult = NullLangObject.getInstance();
 
 	private final ALangObject[] symbolTable;
-	
-	private EvaluateVisitor(final IEvaluationContext ec, final int symbolTableSize) throws EvaluationException {
+
+	private EvaluateVisitor(final IEvaluationContext ec, final int symbolTableSize) {
 		symbolTable = new ALangObject[symbolTableSize < 0 ? 0 : symbolTableSize];
 		this.ec = ec;
 		reinit();
 	}
 
-	private void reinit() throws EvaluationException {
+	private void reinit() {
 		currentResult = NullLangObject.getInstance();
 		for (int i = symbolTable.length; i --> 0;)
 			symbolTable[i] = NullLangObject.getInstance();
@@ -173,14 +173,14 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		IClosure closure = ec.closureStackPeek();
 		if (closure == null)
 			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(
-					"Variable with illegal source {0}.", source));
+					CmnCnst.Error.VARIABLE_WITH_ILLEGAL_SOURCE, Integer.valueOf(source)));
 		for (int parent = (source >>> 16); parent --> 0;)
 			if ((closure = closure.getParent()) == null)
 				throw new UncatchableEvaluationException(ec, NullUtil.messageFormat(
-						"Variable with illegal source {0}.", source));
+						CmnCnst.Error.VARIABLE_WITH_ILLEGAL_SOURCE, Integer.valueOf(source)));
 		return closure;
 	}
-	
+
 	private ALangObject evaluatePropertyExpression(final Node parentNode, final int indexOneAfterEnd) throws EvaluationException {
 		// Child is an expressions and cannot contain break/clause/return
 		// clauses.
@@ -406,7 +406,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTStringCharactersNode node) throws EvaluationException {
 		return StringLangObject.create(node.getStringValue());
 	}
-	
+
 	@Override
 	public ALangObject visit(final ASTArrayNode node) throws EvaluationException {
 		final int len = node.jjtGetNumChildren();
@@ -466,8 +466,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			return getClosure(source).getObject(source&0x0000FFFF);
 		case UNRESOLVED:
 			throw new UnresolvedVariableSourceException(node.getScope(), node.getVariableName(), ec);
-		default:			
-			throw new UncatchableEvaluationException(ec, NullUtil.messageFormat("Unhandled enum: {0}", node.getSourceType()));
+		default:
+			throw new UnhandledEnumException(node.getSourceType(), ec);
 		}
 	}
 
@@ -524,7 +524,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 				default:
 					throw new UncatchableEvaluationException(ec,
 							NullUtil.messageFormat(CmnCnst.Error.INVALID_JUMP_TYPE, ec.getJumpType()));
-				}				
+				}
 				jjtAccept(node, node.getPlainIncrementNode());
 			}
 		}
@@ -752,7 +752,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Child must be an expression and cannot contain any break, continue,
 		// or return clause.
 		final StringLangObject message = jjtAccept(node, node.getLogMessageNode()).coerceString(ec);
-		node.getLogLevel().log(ec.getLogger(), message.stringValue());
+		node.getLogLevel().log(ec.getLogger(), message.stringValue(), null);
 		return message;
 	}
 
@@ -764,7 +764,7 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		func.bind(NullLangObject.getInstance(), ec);
 		return func;
 	}
-	
+
 	@Override
 	public ALangObject visit(final ASTFunctionClauseNode node) throws EvaluationException {
 		final IClosure parentClosure = ec.closureStackPeek();

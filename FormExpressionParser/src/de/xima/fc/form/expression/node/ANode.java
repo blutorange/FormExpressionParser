@@ -271,7 +271,7 @@ public abstract class ANode implements Node {
 		if (children.length < atLeast || children.length > atMost)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_BETWEEN,
-					new Integer(atLeast), new Integer(atMost), new Integer(children.length)));
+					Integer.valueOf(atLeast), Integer.valueOf(atMost), Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -279,7 +279,7 @@ public abstract class ANode implements Node {
 		if (children.length != count)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_EXACTLY,
-					new Integer(count), new Integer(children.length)));
+					Integer.valueOf(count), Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -287,7 +287,7 @@ public abstract class ANode implements Node {
 		if (children.length != count1 && children.length != count2)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_EXACTLY_ONE_OF,
-					new Integer(count1), new Integer(count2), new Integer(children.length)));
+					Integer.valueOf(count1), Integer.valueOf(count2), Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -295,7 +295,7 @@ public abstract class ANode implements Node {
 		if (children.length < count)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_AT_LEAST,
-					new Integer(count), new Integer(children.length)));
+					Integer.valueOf(count), Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -303,7 +303,7 @@ public abstract class ANode implements Node {
 		if (children.length > count)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_AT_MOST,
-					new Integer(count), new Integer(children.length)));
+					Integer.valueOf(count), Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -311,7 +311,7 @@ public abstract class ANode implements Node {
 		if ((children.length & 1) != 0)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_NOT_EVEN,
-					new Integer(children.length)));
+					Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -319,7 +319,7 @@ public abstract class ANode implements Node {
 		if ((children.length & 1) != 1)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_NOT_ODD,
-					new Integer(children.length)));
+					Integer.valueOf(children.length)));
 	}
 
 	@Override
@@ -416,6 +416,10 @@ public abstract class ANode implements Node {
 		}
 	}
 
+	/**
+	 * @param The method for this node, eg. plus, minus etc.
+	 * @throws ParseException When the node is passed illegal arguments or contains illegal children.
+	 */
 	@OverridingMethodsMustInvokeSuper
 	public void init(@Nullable final EMethod method) throws ParseException {
 		if (method != null)

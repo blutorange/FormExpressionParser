@@ -46,7 +46,7 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 		this.scopeDefs = scopeDefs;
 		this.symbolTableSize = heapSize;
 		this.logLevel = ELogLevel.WARN;
-		this.logName = NullUtil.stringFormat("Logger.%08X", hashCode());
+		this.logName = NullUtil.stringFormat(CmnCnst.Name.DEFAULT_LOGGER_NAME, Integer.valueOf(hashCode()));
 	}
 
 	@Override
@@ -54,9 +54,15 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	public IEvaluationResult evaluate(@Nonnull final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
-		final ALangObject result = EvaluateVisitor.evaluateCode(node, scopeDefs, symbolTableSize, ec);
-		final List<IEvaluationWarning> warnings = ec.getTracer().buildWarnings();
-		ec.reset();
+		@Nonnull final List<IEvaluationWarning> warnings;
+		final ALangObject result;
+		try {
+			result = EvaluateVisitor.evaluateCode(node, scopeDefs, symbolTableSize, ec);
+			warnings = ec.getTracer().buildWarnings();
+		}
+		finally {
+			ec.reset();
+		}
 		return new ResImpl(result, warnings);
 	}
 
@@ -74,7 +80,7 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	public List<IEvaluationWarning> analyze(final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
-		final List<IEvaluationWarning> result;
+		@Nonnull final List<IEvaluationWarning> result;
 		try {
 			SimulateVisitor.simulate(node, scopeDefs, ec);
 			UnusedVariableCheckVisitor.check(node, scopeDefs, symbolTableSize, ec);

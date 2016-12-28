@@ -28,7 +28,7 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 	private final static Object OBJECT_1 = new Object();
 	private final static Object OBJECT_2 = new Object();
 	private final static Object OBJECT_3 = new Object();
-	
+
 	public IBindingTest(final IImplFactory<IBinding<Object>> factory) {
 		super(factory);
 	}
@@ -52,51 +52,51 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		try {
 			impl.unnest();
 		}
-		catch (final CannotUnnestGlobalNestingException e) {
+		catch (@SuppressWarnings("unused") final CannotUnnestGlobalNestingException e) {
 			return;
 		}
-		fail("Failed to throw an error when attempting to unnest global scope");
+		fail("Failed to throw an error when attempting to unnest global scope"); //$NON-NLS-1$
 	}
 
 	@Test
-	public final void testDefiningVariable() throws NestingLevelException {
+	public final void testDefiningVariable() {
 		assertTrue(impl.isGlobal());
-		impl.defineVariable("foo", OBJECT_1);
-		assertVariableEquals("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
 	}
 
 	@Test
 	public final void testNestingLocallyDoesNotLookupInHigherLevels() throws NestingLevelException {
 		assertTrue(impl.isGlobal());
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_2);
+		impl.defineVariable("foo", OBJECT_2); //$NON-NLS-1$
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_3);
+		impl.defineVariable("foo", OBJECT_3); //$NON-NLS-1$
 		impl.nestLocal();
-		assertNull(impl.getVariable("foo"));
+		assertNull(impl.getVariable("foo")); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public final void testHasVariableAtCurrentLevel() throws NestingLevelException {
 		assertTrue(impl.isGlobal());
-		impl.defineVariable("foo", OBJECT_1);
-		assertTrue(impl.hasVariableAtCurrentLevel("foo"));
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
+		assertTrue(impl.hasVariableAtCurrentLevel("foo")); //$NON-NLS-1$
 		impl.nest();
-		assertFalse(impl.hasVariableAtCurrentLevel("foo"));
+		assertFalse(impl.hasVariableAtCurrentLevel("foo")); //$NON-NLS-1$
 		impl.unnest();
-		assertTrue(impl.hasVariableAtCurrentLevel("foo"));
+		assertTrue(impl.hasVariableAtCurrentLevel("foo")); //$NON-NLS-1$
 		impl.nestLocal();
-		assertFalse(impl.hasVariableAtCurrentLevel("foo"));
+		assertFalse(impl.hasVariableAtCurrentLevel("foo")); //$NON-NLS-1$
 		impl.unnest();
-		assertTrue(impl.hasVariableAtCurrentLevel("foo"));
+		assertTrue(impl.hasVariableAtCurrentLevel("foo")); //$NON-NLS-1$
 		impl.nest();
 		impl.nest();
 		impl.nest();
-		impl.defineVariable("bar", OBJECT_2);
-		assertTrue(impl.hasVariableAtCurrentLevel("bar"));
+		impl.defineVariable("bar", OBJECT_2); //$NON-NLS-1$
+		assertTrue(impl.hasVariableAtCurrentLevel("bar")); //$NON-NLS-1$
 		impl.unnest();
-		assertFalse(impl.hasVariableAtCurrentLevel("bar"));		
+		assertFalse(impl.hasVariableAtCurrentLevel("bar"));		 //$NON-NLS-1$
 	}
 
 	@Test
@@ -116,50 +116,50 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 	public final void testUnnestingDoesNotRememberVariables() throws NestingLevelException {
 		assertTrue(impl.isGlobal());
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_2);
-		impl.defineVariable("bar", OBJECT_2);
+		impl.defineVariable("foo", OBJECT_2); //$NON-NLS-1$
+		impl.defineVariable("bar", OBJECT_2); //$NON-NLS-1$
 		impl.unnest();
-		assertNull(impl.getVariable("bar"));
-		assertVariableEquals("foo", OBJECT_1);
+		assertNull(impl.getVariable("bar")); //$NON-NLS-1$
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
-		assertNull(impl.getVariable("bar"));
-		assertVariableEquals("foo", OBJECT_1);
+		assertNull(impl.getVariable("bar")); //$NON-NLS-1$
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
 	}
 
 	@Test
 	public final void testScopingShadowsVariable() throws NestingLevelException {
 		assertTrue(impl.isGlobal());
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
 		assertFalse(impl.isGlobal());
-		impl.defineVariable("foo", OBJECT_2);
-		assertVariableEquals("foo", OBJECT_2);
+		impl.defineVariable("foo", OBJECT_2); //$NON-NLS-1$
+		assertVariableEquals("foo", OBJECT_2); //$NON-NLS-1$
 	}
 
 	@Test
 	public final void testFallsBackToHigherNestingLevel() throws NestingLevelException {
 		assertTrue(impl.isGlobal());
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
-		assertVariableEquals("foo", OBJECT_1);
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
 	}
 
 	@Test
-	public final void testDoesNotThrowWhenVariableHasNotBeenSet() throws NestingLevelException {
+	public final void testDoesNotThrowWhenVariableHasNotBeenSet() {
 		assertTrue(impl.isGlobal());
-		assertNull(impl.getVariable("foo"));
+		assertNull(impl.getVariable("foo")); //$NON-NLS-1$
 	}
 
 	@Test
 	public final void testDoesNotFallBackAfterNestingLocally() throws NestingLevelException {
 		assertTrue(impl.isGlobal());
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nestLocal();
-		assertNull(impl.getVariable("foo"));
+		assertNull(impl.getVariable("foo")); //$NON-NLS-1$
 	}
 
 	@Test
@@ -168,14 +168,14 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		impl.nest();
 		impl.nest();
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		final int bookmark = impl.getBookmark();
 		impl.nest();
-		impl.defineVariable("bar", OBJECT_2);
+		impl.defineVariable("bar", OBJECT_2); //$NON-NLS-1$
 		impl.gotoBookmark(bookmark);
 		assertEquals(bookmark, impl.getBookmark());
-		assertVariableEquals("foo", OBJECT_1);
-		assertNull(impl.getVariable("bar"));
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
+		assertNull(impl.getVariable("bar")); //$NON-NLS-1$
 	}
 
 	@Test
@@ -186,16 +186,16 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		impl.nest();
 		impl.nest();
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
 		final int bookmark = impl.getBookmark();
 		impl.unnest();
 		impl.gotoBookmark(bookmark);
-		impl.defineVariable("foo", OBJECT_2);
+		impl.defineVariable("foo", OBJECT_2); //$NON-NLS-1$
 		assertEquals(bookmark, impl.getBookmark());
-		assertVariableEquals("foo", OBJECT_2);
+		assertVariableEquals("foo", OBJECT_2); //$NON-NLS-1$
 		impl.unnest();
-		assertVariableEquals("foo", OBJECT_1);
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
 	}
 
 
@@ -205,7 +205,7 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		impl.nest();
 		impl.nest();
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		impl.nest();
 		impl.nest();
 		impl.nest();
@@ -214,13 +214,13 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		impl.unnest();
 		impl.unnest();
 		impl.gotoBookmark(bookmark);
-		impl.defineVariable("foo", OBJECT_2);
+		impl.defineVariable("foo", OBJECT_2); //$NON-NLS-1$
 		assertEquals(bookmark, impl.getBookmark());
-		assertVariableEquals("foo", OBJECT_2);
+		assertVariableEquals("foo", OBJECT_2); //$NON-NLS-1$
 		impl.unnest();
 		impl.unnest();
 		impl.unnest();
-		assertVariableEquals("foo", OBJECT_1);
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
 	}
 
 	@Test
@@ -229,10 +229,10 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		impl.nest();
 		impl.nest();
 		impl.nest();
-		impl.defineVariable("foo", OBJECT_1);
+		impl.defineVariable("foo", OBJECT_1); //$NON-NLS-1$
 		final int bookmark = impl.getBookmark();
 		impl.nest();
-		impl.defineVariable("bar", OBJECT_2);
+		impl.defineVariable("bar", OBJECT_2); //$NON-NLS-1$
 		impl.nest();
 		impl.nest();
 		impl.nest();
@@ -240,8 +240,8 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		impl.nest();
 		impl.gotoBookmark(bookmark);
 		assertEquals(bookmark, impl.getBookmark());
-		assertVariableEquals("foo", OBJECT_1);
-		assertNull(impl.getVariable("bar"));
+		assertVariableEquals("foo", OBJECT_1); //$NON-NLS-1$
+		assertNull(impl.getVariable("bar")); //$NON-NLS-1$
 	}
 
 	@Test
@@ -256,10 +256,10 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 			try {
 				impl.nest();
 			}
-			catch (final NestingLevelTooDeepException e) {
+			catch (@SuppressWarnings("unused") final NestingLevelTooDeepException e) {
 				return;
 			}
-			fail("Failed to throw an error when attempting to nest after the limit was reached.");
+			fail("Failed to throw an error when attempting to nest after the limit was reached."); //$NON-NLS-1$
 		}
 		else {
 			// We cannot test no limit, but we can try a few times.
@@ -268,7 +268,7 @@ public class IBindingTest extends IFaceTest<IBinding<Object>> {
 		}
 	}
 
-	private void assertVariableEquals(final String name, final Object object) throws NestingLevelException {
+	private void assertVariableEquals(final String name, final Object object) {
 		final Object res = impl.getVariable(name);
 		assertNotNull(res);
 		assertSame(res, object);

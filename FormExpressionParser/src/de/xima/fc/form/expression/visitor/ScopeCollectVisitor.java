@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.common.base.Optional;
 
@@ -38,28 +38,23 @@ import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
 import de.xima.fc.form.expression.node.ASTVariableDeclarationClauseNode;
 
-public class ScopeCollectVisitor
-extends FormExpressionVoidDataVisitorAdapter<Optional<Map<String, IHeaderNode>>, SemanticsException>
-implements IScopeDefinitionsBuilder {
+@ParametersAreNonnullByDefault
+public final class ScopeCollectVisitor
+		extends FormExpressionVoidDataVisitorAdapter<Optional<Map<String, IHeaderNode>>, SemanticsException>
+		implements IScopeDefinitionsBuilder {
 	@Nullable
 	private String currentScope;
 	@Nullable
 	private List<Node> detachQueue;
 
-	@Nonnull
 	private final Map<String, IHeaderNode> globalMap;
-	@Nonnull
 	private final Set<String> requiredSet;
-	@Nonnull
-	private final Map<String, Map<String, IHeaderNode>> manualMap;
-	@Nonnull
+	protected final Map<String, Map<String, IHeaderNode>> manualMap;
 	private final IEvaluationContextContract<?> factory;
-	@Nonnull
 	private final ISeverityConfig config;
 
-	@Nonnull
-	public static IScopeDefinitionsBuilder collect(@Nonnull final Node node,
-			@Nonnull final IEvaluationContextContract<?> factory, @Nonnull final ISeverityConfig config)
+	public static IScopeDefinitionsBuilder collect(final Node node,
+			final IEvaluationContextContract<?> factory, final ISeverityConfig config)
 					throws ParseException {
 		final ScopeCollectVisitor v = new ScopeCollectVisitor(config, factory);
 		node.jjtAccept(v, Optional.<Map<String, IHeaderNode>> absent());
@@ -68,8 +63,8 @@ implements IScopeDefinitionsBuilder {
 		return v;
 	}
 
-	private ScopeCollectVisitor(@Nonnull final ISeverityConfig config,
-			@Nonnull final IEvaluationContextContract<?> factory) {
+	private ScopeCollectVisitor(final ISeverityConfig config,
+			final IEvaluationContextContract<?> factory) {
 		globalMap = new HashMap<>();
 		requiredSet = new HashSet<>();
 		manualMap = new HashMap<>();
@@ -83,11 +78,10 @@ implements IScopeDefinitionsBuilder {
 		getDetachQueue().clear();
 	}
 
-	private boolean provides(@Nonnull final String scope) {
+	private boolean provides(final String scope) {
 		return factory.getLibraryFactory().isProvidingScope(scope) || factory.getExternalFactory().isProvidingScope(scope);
 	}
 
-	@Nonnull
 	private List<Node> getDetachQueue() {
 		return detachQueue != null ? detachQueue : (detachQueue = new ArrayList<>());
 	}
@@ -219,11 +213,13 @@ implements IScopeDefinitionsBuilder {
 		m.put(name, node);
 	}
 
+	@Nullable
 	@Override
 	public IHeaderNode getGlobal(final String name) {
 		return globalMap.get(name);
 	}
 
+	@Nullable
 	@Override
 	public IHeaderNode getManual(final String scope, final String name) {
 		final Map<String, IHeaderNode> m = manualMap.get(scope);
@@ -236,6 +232,7 @@ implements IScopeDefinitionsBuilder {
 		return globalMap.entrySet().iterator();
 	}
 
+	@Nullable
 	@Override
 	public Iterator<Entry<String, IHeaderNode>> getManual(final String scope) {
 		final Map<String, IHeaderNode> m = manualMap.get(scope);
@@ -257,30 +254,5 @@ implements IScopeDefinitionsBuilder {
 	@Override
 	public IScopeDefinitions build() {
 		return new ImmutableScopeDefinitions(globalMap, manualMap, requiredSet);
-	}
-
-	@Override
-	public Iterator<IHeaderNode> getManualAll() {
-		return new ManIter();
-	}
-
-	private class ManIter implements Iterator<IHeaderNode> {
-		private final Iterator<Map<String, IHeaderNode>> it = manualMap.values().iterator();
-		private Iterator<IHeaderNode> it2;
-
-		@Override
-		public boolean hasNext() {
-			return it2.hasNext() || it.hasNext();
-		}
-
-		@Override
-		public IHeaderNode next() {
-			return (it2.hasNext() ? it2 : (it2 = it.next().values().iterator())).next();
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
 	}
 }

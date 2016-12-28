@@ -2,27 +2,28 @@ package de.xima.fc.form.expression.webdemo;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @SuppressWarnings("nls")
+@ParametersAreNonnullByDefault
 public final class CmnCnst {
 	private CmnCnst() {}
 	public final static int TIMEOUT = 20000;
 	public final static TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
-	@Nonnull public static final String URL_PARAM_KEY_CODE = "code";
-	@Nonnull public static final String URL_PARAM_KEY_TYPE = "type";
-	@Nonnull public static final String URL_PARAM_KEY_INDENT = "indent";
-	@Nonnull public static final String URL_PARAM_KEY_CONTEXT = "context";
-	@Nonnull public static final String URL_PARAM_KEY_PREFIX = "prefix";
-	@Nonnull public static final String URL_PARAM_KEY_STRICT = "strict";
-	@Nonnull public static final String URL_PARAM_KEY_OFFSET_LINE_BEGIN = "offsetLineBegin";
-	@Nonnull public static final String URL_PARAM_KEY_OFFSET_COLUMN_BEGIN = "offsetColumnBegin";
-	@Nonnull public static final String URL_PARAM_KEY_OFFSET_LINE_END = "offsetLineEnd";
-	@Nonnull public static final String URL_PARAM_KEY_OFFSET_COLUMN_END = "offsetColumnEnd";
-	@Nonnull public static final String URL_PARAM_VALUE_TYPE_PROGRAM = "program";
-	@Nonnull public static final String URL_PARAM_VALUE_CONTEXT_FORMCYCLE = "formcycle";
-	@Nonnull public static final String URL_PARAM_VALUE_CONTEXT_GENERIC = "generic";
+	public static final String URL_PARAM_KEY_CODE = "code";
+	public static final String URL_PARAM_KEY_TYPE = "type";
+	public static final String URL_PARAM_KEY_INDENT = "indent";
+	public static final String URL_PARAM_KEY_CONTEXT = "context";
+	public static final String URL_PARAM_KEY_PREFIX = "prefix";
+	public static final String URL_PARAM_KEY_STRICT = "strict";
+	public static final String URL_PARAM_KEY_OFFSET_LINE_BEGIN = "offsetLineBegin";
+	public static final String URL_PARAM_KEY_OFFSET_COLUMN_BEGIN = "offsetColumnBegin";
+	public static final String URL_PARAM_KEY_OFFSET_LINE_END = "offsetLineEnd";
+	public static final String URL_PARAM_KEY_OFFSET_COLUMN_END = "offsetColumnEnd";
+	public static final String URL_PARAM_VALUE_TYPE_PROGRAM = "program";
+	public static final String URL_PARAM_VALUE_CONTEXT_FORMCYCLE = "formcycle";
+	public static final String URL_PARAM_VALUE_CONTEXT_GENERIC = "generic";
 
 	public static final String RESPONSE_ERROR = "error";
 	public static final String RESPONSE_ERROR_PARAM_CODE_REQUIRED = "Parameter code must be given.";
@@ -46,4 +47,7 @@ public final class CmnCnst {
 	public static final String RESPONSE_LINT_SEVERITY = "severity";
 	public static final String RESPONSE_LINT_WARNING = "warning";
 	public static final String RESPONSE_LINT_ERROR = "error";
+
+	public static final String DEFAULT_INDENT_PREFIX = "  ";
+	public static final String DEFAULT_CSS_PREFIX = "";
 }

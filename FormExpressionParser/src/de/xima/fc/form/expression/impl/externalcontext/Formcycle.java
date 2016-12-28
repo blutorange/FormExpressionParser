@@ -55,17 +55,18 @@ public class Formcycle {
 		final ImmutableList.Builder<Map<String,String>> builderList = new ImmutableList.Builder<>();
 
 		final ImmutableMap.Builder<String, String> builderMap1 = new ImmutableMap.Builder<>();
-		builderMap1.put("foo", "bar");
-		builderMap1.put("hello", "world");
+		builderMap1.put("foo", "bar"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderMap1.put("hello", "world"); //$NON-NLS-1$ //$NON-NLS-2$
 		builderList.add(builderMap1.build());
 
 		final ImmutableMap.Builder<String, String> builderMap2 = new ImmutableMap.Builder<>();
-		builderMap2.put("error", "true");
-		builderMap2.put("message", "This is an error");
+		builderMap2.put("error", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		builderMap2.put("message", "This is an error"); //$NON-NLS-1$ //$NON-NLS-2$
 		builderList.add(builderMap2.build());
 
 		actionResultMap = builderList.build();
 	}
+
 	@Nonnull
 	public Writer getWriter() {
 		return writer;

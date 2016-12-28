@@ -21,24 +21,24 @@ public class Slf4jLogger implements ILogger {
 		this.level = level;
 	}
 	@Override
-	public void error(@Nullable final String message) {
+	public void error(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.ERROR.numeric)
-			logger.error(message);
+			logger.error(message, cause);
 	}
 	@Override
-	public void warn(@Nullable final String message) {
+	public void warn(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.WARN.numeric)
-			logger.warn(message);
+			logger.warn(message, cause);
 	}
 	@Override
-	public void info(@Nullable final String message) {
+	public void info(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.INFO.numeric)
-			logger.info(message);
+			logger.info(message, cause);
 	}
 	@Override
-	public void debug(@Nullable final String message) {
+	public void debug(@Nullable final String message, @Nullable final Throwable cause) {
 		if (level.numeric >= Level.DEBUG.numeric)
-			logger.debug(message);
+			logger.debug(message, cause);
 	}
 	@Override
 	public void reset() {

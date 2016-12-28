@@ -266,9 +266,11 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 			return (T) evaluateExpressionMethod(EMethod.COERCE, ec, StringLangObject.create(type.getSyntacticalTypeName()));
 		}
 		catch (final EvaluationException e) {
+			ec.getLogger().error(null, e);
 			throw new CoercionException(this, type, ec);
 		}
 		catch (final ClassCastException e) {
+			ec.getLogger().error(null, e);
 			throw new CoercionException(this, type, ec);
 		}
 	}
@@ -322,7 +324,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		@SuppressWarnings("unchecked")
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAccessor(ec);
 		if (func == null)
-			throw new NoSuchAttrAccessorException(NullUtil.toString(property), this, false, ec);
+			throw new NoSuchAttrAccessorException(property.toString(), this, false, ec);
 		return func.evaluate(ec, this, property);
 	}
 
@@ -348,7 +350,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		@SuppressWarnings("unchecked")
 		final IFunction<ALangObject> func = (IFunction<ALangObject>) bracketAssigner(ec);
 		if (func == null)
-			throw new NoSuchAttrAssignerException(NullUtil.toString(property), this, false, ec);
+			throw new NoSuchAttrAssignerException(property.toString(), this, false, ec);
 		func.evaluate(ec, this, property, value);
 	}
 
@@ -421,7 +423,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 		if (o == null)
 			return -1;
 		if (getObjectClass() != o.getObjectClass())
-			return getObjectClass().getClassId() - o.getObjectClass().getClassId();
+			return getObjectClass().getClassId().intValue() - o.getObjectClass().getClassId().intValue();
 		return compareToSameType(o);
 	}
 
@@ -459,7 +461,7 @@ public abstract class ALangObject implements INonNullIterable<ALangObject>, Comp
 	 * @return Details on the object, such as its class and its fields.
 	 */
 	public String inspect() {
-		return NullUtil.toString(new StringBuilder().append(CmnCnst.ToString.INSPECT_A_LANG_OBJECT).append(id));
+		return new StringBuilder().append(CmnCnst.ToString.INSPECT_A_LANG_OBJECT).append(id).toString();
 	}
 
 	public static ALangObject create(@Nullable final ALangObject value) {

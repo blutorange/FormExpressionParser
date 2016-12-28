@@ -15,6 +15,7 @@ import org.junit.runners.Parameterized;
 
 import de.xima.fc.form.expression.iface.evaluate.IEmbedment;
 import de.xima.fc.form.expression.impl.embedment.EEmbedmentContractFactory;
+import de.xima.fc.form.expression.util.CmnCnst;
 
 public class IEmbedmentTest extends IFaceTest<IEmbedment> {
 
@@ -35,7 +36,7 @@ public class IEmbedmentTest extends IFaceTest<IEmbedment> {
 		// Get all embedments and check which scopes they define
 		for (final String emb : impl.getEmbedmentList()) {
 			assertNotNull(emb);
-			impl.setCurrentEmbedment("");
+			impl.setCurrentEmbedment(CmnCnst.NonnullConstant.STRING_EMPTY);
 			final String[] list = impl.getScopeList(emb);
 			impl.setCurrentEmbedment(emb);
 			final String[] listCurr = impl.getScopeListForCurrentEmbedment();

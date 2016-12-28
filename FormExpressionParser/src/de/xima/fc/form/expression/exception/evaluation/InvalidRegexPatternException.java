@@ -9,7 +9,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class InvalidRegexPatternException extends CatchableEvaluationException {
 	private static final long serialVersionUID = 1L;
 	public InvalidRegexPatternException(@Nonnull final String pattern, final int flags, @Nonnull final IEvaluationContext ec) {
-		super(ec, NullUtil.messageFormat(CmnCnst.Error.INVALID_REGEX_PATTERN, pattern, new Integer(flags)));
+		super(ec, NullUtil.messageFormat(CmnCnst.Error.INVALID_REGEX_PATTERN, pattern, Integer.valueOf(flags)));
 		this.pattern = pattern;
 		this.flags = flags;
 	}

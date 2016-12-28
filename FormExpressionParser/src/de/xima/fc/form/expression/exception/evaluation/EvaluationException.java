@@ -31,13 +31,13 @@ public class EvaluationException extends Exception implements IPositionedError {
 		else {
 			ec = null;
 			externalContext = null;
-			this.shortMessage = "";
+			this.shortMessage = CmnCnst.NonnullConstant.STRING_EMPTY;
 		}
 	}
 
 	public EvaluationException(final IEvaluationContext ec) {
 		super(msgWithContext(StringUtils.EMPTY, ec));
-		this.shortMessage = "";
+		this.shortMessage = CmnCnst.NonnullConstant.STRING_EMPTY;
 		this.ec = ec;
 		externalContext = ec.getExternalContext();
 	}
@@ -154,8 +154,8 @@ public class EvaluationException extends Exception implements IPositionedError {
 	private static void appendTraceElement(final StringBuilder sb, @Nullable final ITraceElement el) {
 		sb.append('\t');
 		if (el != null)
-			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_KNOWN_POSITION, el.getMethodName(), el.getBeginLine(),
-					el.getBeginColumn()));
+			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_KNOWN_POSITION, el.getMethodName(),
+					Integer.valueOf(el.getBeginLine()), Integer.valueOf(el.getBeginColumn())));
 		else
 			sb.append(NullUtil.messageFormat(CmnCnst.Error.TRACER_UNKNOWN_POSITION));
 	}

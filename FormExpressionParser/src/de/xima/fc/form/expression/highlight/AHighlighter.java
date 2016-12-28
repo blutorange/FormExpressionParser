@@ -23,7 +23,7 @@ public abstract class AHighlighter<T extends HighlighterState> implements IFormE
 
 	public AHighlighter() {
 	}
-	
+
 	private final void processInternal(final Token token, final T state) throws IOException {
 		// Join all los chars to one string.
 		if (token.kind == FormExpressionParserConstants.LosChar) {
@@ -39,7 +39,7 @@ public abstract class AHighlighter<T extends HighlighterState> implements IFormE
 			final Token embedBegin = state.embedBegin;
 			final Token embedEnd = state.embedEnd;
 			if (state.builder.length() > 0 && embedBegin != null && embedEnd != null)
-				processToken(Token.newToken(FormExpressionParserConstants.LosChar, NullUtil.toString(state.builder), embedBegin.beginLine,
+				processToken(Token.newToken(FormExpressionParserConstants.LosChar, state.builder.toString(), embedBegin.beginLine,
 						embedBegin.beginColumn, embedEnd.endLine, embedEnd.endColumn), state);
 			state.builder.setLength(0);
 			// Process comment tokens, when present.
@@ -53,13 +53,13 @@ public abstract class AHighlighter<T extends HighlighterState> implements IFormE
 			processToken(token, state);
 		}
 	}
-	
+
 	private final void finishInternal(final T state) throws IOException {
 		// Process joined los token.
 		final Token embedBegin = state.embedBegin;
 		final Token embedEnd = state.embedEnd;
 		if (state.builder.length() > 0 && embedBegin != null && embedEnd != null) {
-			processToken(Token.newToken(FormExpressionParserConstants.LosChar, NullUtil.toString(state.builder), embedBegin.beginLine,
+			processToken(Token.newToken(FormExpressionParserConstants.LosChar, state.builder.toString(), embedBegin.beginLine,
 					embedBegin.beginColumn, embedEnd.endLine, embedEnd.endColumn), state);
 		}
 	}
@@ -116,7 +116,7 @@ public abstract class AHighlighter<T extends HighlighterState> implements IFormE
 	protected abstract void writeNewline(int numberOfNewlines, final T state) throws IOException;
 	protected abstract void prepareProcessing(final Color backgroundStyle, final T state) throws IOException;
 	protected abstract void finishProcessing(final Color backgroundStyle, final T state) throws IOException;
-	
+
 	public static class HighlighterState {
 		protected int currentLine, currentColumn;
 		@Nullable
@@ -131,7 +131,7 @@ public abstract class AHighlighter<T extends HighlighterState> implements IFormE
 			styleList = new ArrayList<>(40);
 			builder = new StringBuilder();
 			embedBegin = null;
-			embedEnd = null;			
+			embedEnd = null;
 		}
 		@OverridingMethodsMustInvokeSuper
 		protected void clear() {

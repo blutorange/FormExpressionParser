@@ -1,10 +1,13 @@
 package de.xima.fc.form.expression.iface.parse;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public interface ICallResolvable {
 	/** @return The resolved call ID: Valid IDs must be >=0.*/
-	public int getFunctionId();
+	public Integer getFunctionId();
 	/** @param callId Call ID for resolution. Must be >=0. */
-	public void resolveFunctionId(int functionId);
+	public void resolveFunctionId(Integer functionId);
 	/** @return Whether the call ID was already resolved. */
 	public boolean isFunctionIdResolved();
 	public void resolveClosureTableSize(int closureTableSize);

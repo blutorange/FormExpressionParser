@@ -99,8 +99,8 @@ public enum EDotAccessorBoolean implements IDotAccessorFunction<BooleanLangObjec
 		}
 		;
 
-		private String[] argList;
-		private boolean hasVarArgs;
+		protected String[] argList;
+		protected boolean hasVarArgs;
 
 		private Impl(final boolean hasVarArgs, final String... argList) {
 			NullUtil.checkItemsNotNull(argList);

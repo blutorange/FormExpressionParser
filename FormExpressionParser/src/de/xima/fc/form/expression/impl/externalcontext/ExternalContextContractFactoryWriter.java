@@ -39,7 +39,7 @@ public class ExternalContextContractFactoryWriter extends AGenericExternalContex
 		private final Writer writer;
 		private boolean outputDisabled = false;
 
-		private ExImpl(final Writer writer) {
+		protected ExImpl(final Writer writer) {
 			this.writer = writer;
 		}
 
@@ -94,7 +94,7 @@ public class ExternalContextContractFactoryWriter extends AGenericExternalContex
 				}
 			}
 			else {
-				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command));
+				ec.getLogger().info(NullUtil.messageFormat(CmnCnst.Error.UNKNOWN_COMMAND_FOR_SYSTEM_OUT_CONTEXT, command), null);
 			}
 		}
 

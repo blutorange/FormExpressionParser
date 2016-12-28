@@ -98,8 +98,8 @@ public enum EDotAccessorException implements IDotAccessorFunction<ExceptionLangO
 		}
 		;
 
-		private String[] argList;
-		private boolean hasVarArgs;
+		protected String[] argList;
+		protected boolean hasVarArgs;
 
 		private Impl(final boolean hasVarArgs, final String... argList) {
 			NullUtil.checkItemsNotNull(argList);

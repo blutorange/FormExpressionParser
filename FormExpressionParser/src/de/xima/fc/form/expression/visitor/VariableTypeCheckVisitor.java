@@ -1688,8 +1688,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 		@Override
 		public String toString() {
-			return NullUtil.messageFormat("(return:{0},implicit:{1},throws:{2},labels:{3})", unifiedReturnType,
-					implicitReturnType, hasThrowingJump, labelSet);
+			return NullUtil.messageFormat(CmnCnst.ToString.NODE_INFO, unifiedReturnType,
+					implicitReturnType, Boolean.valueOf(hasThrowingJump), labelSet);
 		}
 	}
 }

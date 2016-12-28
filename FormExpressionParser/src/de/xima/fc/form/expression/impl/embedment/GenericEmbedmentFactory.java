@@ -57,7 +57,7 @@ public class GenericEmbedmentFactory implements IEmbedmentContractFactory {
 		@Nullable
 		private String handlerEmbedment;
 
-		private EmbedmentImpl(final ImmutableMap<String, IEmbedmentHandler> map) {
+		protected EmbedmentImpl(final ImmutableMap<String, IEmbedmentHandler> map) {
 			this.map = map;
 		}
 

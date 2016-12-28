@@ -92,7 +92,6 @@ public class GenericVariableType implements IVariableType {
 			sb.setLength(sb.length()-1);
 			sb.append(']');
 		}
-		@SuppressWarnings("null")
 		@Nonnull
 		final String toString = sb.toString();
 		return toString;

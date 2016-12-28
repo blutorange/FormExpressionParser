@@ -51,8 +51,8 @@ import de.xima.fc.form.expression.node.ASTWithClauseNode;
 
 public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Throwable> implements IFormExpressionReturnDataVisitor<R, T, E> {
 
-	protected static class WrappedNode {
-		private Node node;
+	protected final static class WrappedNode {
+		protected Node node;
 		public int getId() {
 			return node.getId();
 		}
@@ -338,7 +338,7 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 	public R visit(final ASTVariableTypeNode node, final T data) throws E {
 		return processNode(node, data);
 	}
-	
+
 	@Override
 	public R visit(final ASTFunctionArgumentNode node, final T data) throws E {
 		return processNode(node, data);

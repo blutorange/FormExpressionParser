@@ -40,14 +40,14 @@ import de.xima.fc.form.expression.visitor.VariableResolveVisitor.IdPair;
 
 @ParametersAreNonnullByDefault
 public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Integer> {
-	private final Set<Integer> globalVariables;
-	private final Map<Integer, FunctionInfo> functionInfoMap;
-	
+	protected final Set<Integer> globalVariables;
+	protected final Map<Integer, FunctionInfo> functionInfoMap;
+
 	private final IScopeDefinitionsBuilder scopeDefBuilder;
 	private final IEvaluationContextContract<?> factory;
 	private final Stack<String> defaultScopeStack = new Stack<>();
 	private final ISeverityConfig config;
-	private int variableIdProvider = 0;
+	protected int variableIdProvider = 0;
 	private int functionIdProvider = 0;
 
 	private VariableResolveVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
@@ -119,24 +119,25 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		final boolean inLocal = functionInfo.localVariables.remove(variableId);
 		final boolean notInClosure = functionInfo.closureVariables.put(variableId, Integer.valueOf(0)) == null;
 		if (!inLocal && notInClosure)
-			throw new SemanticsException("No such local variable for closure variable: " + node.getVariableName(), node);
+			throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.NO_MAPPING_FROM_LOCAL_TO_CLOSURE, node.getVariableName()), node);
 	}
-	
+
 	private FunctionInfo getFunctionInfoFor(final Integer functionId, final Node node) throws SemanticsException {
 		final FunctionInfo functionInfo = functionInfoMap.get(functionId);
 		if (functionInfo == null)
-			throw new SemanticsException("Function info not set yet: " + functionInfo, node);
+			throw new SemanticsException(NullUtil.messageFormat(CmnCnst.Error.FUNCTION_INFO_NOT_SET, functionId), node);
 		return functionInfo;
 	}
-	
-	private void resolveScopeDefs(final IScopeDefinitionsBuilder scopeDefBuilder)
-			throws SemanticsException {
+
+	private void resolveScopeDefs(final IScopeDefinitionsBuilder scopeDefBuilder) throws SemanticsException {
 		// Global.
 		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
 			final IHeaderNode header = it.next().getValue();
-			header.resolveSource(getNewObjectToSet(-1, header.getNode()), EVariableSource.ENVIRONMENTAL);
+			header.resolveSource(getNewObjectToSet(Integer.valueOf(-1), header.getNode()).intValue(),
+					EVariableSource.ENVIRONMENTAL);
 			if (header.isFunction())
-				((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getBasicSource(), EVariableSource.ENVIRONMENTAL);
+				((ASTFunctionClauseNode) header.getNode()).resolveSource(header.getBasicSource(),
+						EVariableSource.ENVIRONMENTAL);
 		}
 		// Manual scopes.
 		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
@@ -146,15 +147,17 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 				if (it2 != null) {
 					while (it2.hasNext()) {
 						final IHeaderNode header = it2.next().getValue();
-						header.resolveSource(getNewObjectToSet(-1, header.getNode()), EVariableSource.ENVIRONMENTAL);
+						header.resolveSource(getNewObjectToSet(Integer.valueOf(-1), header.getNode()).intValue(),
+								EVariableSource.ENVIRONMENTAL);
 						if (header.isFunction())
-							((ASTFunctionClauseNode)header.getNode()).resolveSource(header.getBasicSource(), EVariableSource.ENVIRONMENTAL);
+							((ASTFunctionClauseNode) header.getNode()).resolveSource(header.getBasicSource(),
+									EVariableSource.ENVIRONMENTAL);
 					}
 				}
 			}
 		}
 	}
-	
+
 	@Nullable
 	private ILibraryScopeContractFactory<?> scopeInfo(final String scope) {
 		final ILibraryScopeContractFactory<?> f1 = factory.getLibraryFactory().getScopeFactory(scope);
@@ -164,12 +167,12 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 
 	@Override
 	protected Integer beforeFunctionNode(final IFunctionNode node, final Integer functionId) {
-		final Integer newFunctionId = functionIdProvider++;
+		final Integer newFunctionId = Integer.valueOf(functionIdProvider++);
 		node.resolveFunctionId(newFunctionId);
 		functionInfoMap.put(newFunctionId, new FunctionInfo(functionId));
 		return newFunctionId;
 	}
-	
+
 	@Override
 	public void visit(final ASTVariableNode node, final Integer functionId) throws ParseException {
 		// First, check if variable exists locally.
@@ -224,7 +227,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 
 		throw new VariableNotResolvableException(node);
 	}
-	
+
 	//
 	// Getting the default scopes.
 	//
@@ -252,21 +255,21 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 				if (!var.getSourceType().isAssignable()) {
 					throw new IllegalVariableAssignmentException(var);
 				}
-				
+
 			}
 		}
 	}
 
 	private Integer getNewObjectToSet(final Integer functionId, final Node node) throws SemanticsException {
-		final int newId = variableIdProvider++;
+		final Integer newId = Integer.valueOf(variableIdProvider++);
 		if (functionId.intValue() >= 0) {
 			// Some local scope.
 			final FunctionInfo functionInfo = getFunctionInfoFor(functionId, node);
-			functionInfo.localVariables.add(Integer.valueOf(newId));
+			functionInfo.localVariables.add(newId);
 		}
 		else
 			// Global scope.
-			globalVariables.add(Integer.valueOf(newId));
+			globalVariables.add(newId);
 		return newId;
 	}
 
@@ -274,7 +277,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 	protected IdPair getNewObjectToSet(final ISourceResolvable res, final Node node, final Integer functionId)
 			throws SemanticsException {
 		final Integer object = getNewObjectToSet(functionId, node);
-		res.resolveSource(object, EVariableSource.ENVIRONMENTAL);
+		res.resolveSource(object.intValue(), EVariableSource.ENVIRONMENTAL);
 		return new IdPair(object, functionId);
 	}
 
@@ -283,12 +286,12 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 					throws ParseException {
 		final VariableResolveVisitor v = new VariableResolveVisitor(scopeDefBuilder, factory, config);
 		v.resolveScopeDefs(scopeDefBuilder);
-		v.bindScopeDefValues(scopeDefBuilder, -1);
-		node.jjtAccept(v, -1);
+		v.bindScopeDefValues(scopeDefBuilder, Integer.valueOf(-1));
+		node.jjtAccept(v, Integer.valueOf(-1));
 		v.binding.reset();
 		return v.new ResImpl(node);
 	}
-	
+
 	protected class ResImpl implements IVariableResolutionResult {
 		private final Map<Integer, Integer> environmentalMap;
 
@@ -297,7 +300,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 			mapEnvironmental();
 			mapClosure(node);
 		}
-		
+
 		@Override
 		public int getEnvironmentalSize() {
 			return environmentalMap.size();
@@ -337,28 +340,28 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		public int getInternalVariableCount() {
 			return variableIdProvider;
 		}
-		
+
 		private void mapClosure(final Node node) throws SemanticsException {
 			for (final FunctionInfo info : functionInfoMap.values()) {
 				int id = 0;
 				for (final Entry<Integer, Integer> entryClosure : info.closureVariables.entrySet())
-					entryClosure.setValue(id++);
+					entryClosure.setValue(Integer.valueOf(id++));
 				if (id > 0xFFFF)
 					throw new SemanticsException(
-							NullUtil.messageFormat("Closure variable count limit exceeded: {0}", id), node);
+							NullUtil.messageFormat(CmnCnst.Error.CLOSURE_VARIABLE_LIMIT_EXCEEDED, Integer.valueOf(id)), node);
 			}
 		}
-				
+
 		private void mapEnvironmental() {
 			int id = 0;
 			for (final Integer oldId : globalVariables)
-				environmentalMap.put(oldId, id++);
+				environmentalMap.put(oldId, Integer.valueOf(id++));
 			for (final FunctionInfo info : functionInfoMap.values())
 				for (final Integer oldId : info.localVariables)
-					environmentalMap.put(oldId, id++);
+					environmentalMap.put(oldId, Integer.valueOf(id++));
 		}
 	}
-	
+
 	protected static class IdPair {
 		public final Integer variableId;
 		public final Integer functionId;
@@ -367,12 +370,12 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 			this.functionId = functionId;
 		}
 	}
-	
+
 	protected static class FunctionInfo {
 		public int parentCount = -1;
 		@Nullable
 		public final Integer parent;
-		// Purely local variables. 
+		// Purely local variables.
 		public final Set<Integer> localVariables;
 		// Variables used by some closure.
 		public final Map<Integer,Integer> closureVariables;

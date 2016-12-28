@@ -15,12 +15,12 @@ import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 
 @ParametersAreNonnullByDefault
 public class NullLangObject extends ALangObject {
-	private NullLangObject() {
+	protected NullLangObject() {
 		super();
 	}
 
 	private static class InstanceHolder {
-		private static NullLangObject INSTANCE = new NullLangObject();
+		protected static NullLangObject INSTANCE = new NullLangObject();
 	}
 
 	@Nullable

@@ -87,6 +87,7 @@ public class HtmlDocumentCommandTest {
 				result = process(test.stuffToWrite);
 			}
 			catch (final Exception e) {
+				e.printStackTrace(System.err);
 				fail(String.format("Test %s threw an exception.", test));
 			}
 			if (!test.expectedResult.equals(result))

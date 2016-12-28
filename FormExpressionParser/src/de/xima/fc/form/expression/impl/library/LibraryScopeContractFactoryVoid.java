@@ -29,7 +29,7 @@ public final class LibraryScopeContractFactoryVoid implements ILibraryScopeContr
 	private final String name;
 	private final ImmutableMap<String, IVariableProvider<?>> map;
 
-	private LibraryScopeContractFactoryVoid(final String name, final ImmutableMap<String, IVariableProvider<?>> map) {
+	protected LibraryScopeContractFactoryVoid(final String name, final ImmutableMap<String, IVariableProvider<?>> map) {
 		this.name = name;
 		this.map = map;
 	}
@@ -64,16 +64,16 @@ public final class LibraryScopeContractFactoryVoid implements ILibraryScopeContr
 
 	private class LibImpl implements ILibraryScope<Void> {
 		private final ImmutableMap<String, IVariableProvider<?>> provider;
-		private final Map<String, ALangObject> map;
+		private final Map<String, ALangObject> objectMap;
 		public LibImpl(final ImmutableMap<String, IVariableProvider<?>> provider) {
 			this.provider = provider;
-			this.map = new HashMap<>();
+			this.objectMap = new HashMap<>();
 			reset();
 		}
 		@Override
 		public ALangObject fetch(final String variableName, final Void object, final IEvaluationContext ec)
 				throws VariableNotDefinedException {
-			final ALangObject res = map.get(variableName);
+			final ALangObject res = objectMap.get(variableName);
 			if (res == null)
 				throw new VariableNotDefinedException(variableName, ec);
 			return res;
@@ -81,9 +81,9 @@ public final class LibraryScopeContractFactoryVoid implements ILibraryScopeContr
 
 		@Override
 		public void reset() {
-			map.clear();
+			objectMap.clear();
 			for (final Entry<String, IVariableProvider<?>> entry : provider.entrySet())
-				map.put(entry.getKey(), entry.getValue().make());
+				objectMap.put(entry.getKey(), entry.getValue().make());
 		}
 	}
 

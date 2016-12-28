@@ -60,7 +60,7 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		catch (final TimeoutException e) {
 			json = new JSONObject();
 			json.put(CmnCnst.RESPONSE_ERROR, String.format(CmnCnst.RESPONSE_ERROR_TIMEOUT_REACHED,
-					new Integer(CmnCnst.TIMEOUT), CmnCnst.TIMEOUT_UNIT, getErrorMessage(e)));
+					Integer.valueOf(CmnCnst.TIMEOUT), CmnCnst.TIMEOUT_UNIT, getErrorMessage(e)));
 		}
 		catch (final CancellationException e) {
 			json = new JSONObject();
@@ -129,10 +129,10 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 		entry.put(CmnCnst.RESPONSE_LINT_TO, to);
 		entry.put(CmnCnst.RESPONSE_LINT_MESSAGE, message);
 		entry.put(CmnCnst.RESPONSE_LINT_SEVERITY, severity);
-		from.put(CmnCnst.RESPONSE_LINT_LINE, beginLine-offset.offsetLineBegin);
-		from.put(CmnCnst.RESPONSE_LINT_COLUMN, beginColumn-offset.offsetColumnBegin);
-		to.put(CmnCnst.RESPONSE_LINT_LINE, endLine-offset.offsetLineEnd);
-		to.put(CmnCnst.RESPONSE_LINT_COLUMN, endColumn-offset.offsetColumnEnd);
+		from.put(CmnCnst.RESPONSE_LINT_LINE, Integer.valueOf(beginLine-offset.offsetLineBegin));
+		from.put(CmnCnst.RESPONSE_LINT_COLUMN, Integer.valueOf(beginColumn-offset.offsetColumnBegin));
+		to.put(CmnCnst.RESPONSE_LINT_LINE, Integer.valueOf(endLine-offset.offsetLineEnd));
+		to.put(CmnCnst.RESPONSE_LINT_COLUMN, Integer.valueOf(endColumn-offset.offsetColumnEnd));
 		lint.add(entry);
 	}
 
@@ -143,6 +143,7 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 			return Integer.parseInt(value, 10);
 		}
 		catch (final NumberFormatException e) {
+			e.printStackTrace(System.err);
 			return defaultValue;
 		}
 	}
@@ -182,17 +183,17 @@ public abstract class AFormExpressionServlet extends HttpServlet {
 	@Nonnull
 	protected static String getIndent(final HttpServletRequest request) {
 		if (request == null)
-			return "  ";
+			return CmnCnst.DEFAULT_INDENT_PREFIX;
 		final String indent= request.getParameter(CmnCnst.URL_PARAM_KEY_INDENT);
-		return indent != null ? indent : "  ";
+		return indent != null ? indent : CmnCnst.DEFAULT_INDENT_PREFIX;
 	}
 
 	@Nonnull
 	protected static String getCssClassPrefix(final HttpServletRequest request) {
 		if (request == null)
-			return "";
+			return CmnCnst.DEFAULT_CSS_PREFIX;
 		final String prefix = request.getParameter(CmnCnst.URL_PARAM_KEY_PREFIX);
-		return prefix != null ? prefix : "";
+		return prefix != null ? prefix : CmnCnst.DEFAULT_CSS_PREFIX;
 	}
 
 	@Nullable
