@@ -1,1 +1,1 @@
-()=>void{var x;if(true)var x;var x;};
+a=0;true&&(a=42);a;

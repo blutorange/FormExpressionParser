@@ -2,13 +2,13 @@ package de.xima.fc.form.expression.test.lang;
 
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.evaluation.EvaluationException;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
-import de.xima.fc.form.expression.impl.config.SeverityConfig;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -24,6 +24,7 @@ import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @SuppressWarnings("nls")
+@NonNullByDefault
 enum SemanticsSuccess implements ITestCase {
 	// Object literals.
 	LITERALS001("null;", NullLangObject.getInstance()),
@@ -200,6 +201,14 @@ enum SemanticsSuccess implements ITestCase {
 	EMETHODREGEX001("#^\\d+$# =~ '123';", Tests.TRUE),
 	EMETHODREGEX002("#^\\d+$# =~ 'a123';", Tests.FALSE),
 
+	EMETHODOBJECT001("42.0.toString;", StringLangObject.create(42)),
+	EMETHODOBJECT002("!!42.0.id;", Tests.TRUE),
+	EMETHODOBJECT003("a=42;b=42;(a=0)||(b=0);b;", Tests.N42),
+	EMETHODOBJECT004("a=0;false||(a=42);a;", Tests.N42),
+	EMETHODOBJECT005("a=0;b=0;(a=42)&&(b=42);b;", Tests.N42),
+	EMETHODOBJECT006("a=0;true&&(a=42);a;", Tests.N42),
+	EMETHODOBJECT007(new Cfg("global scope{boolean b;}b=0&&1;").strict().res(Tests.TRUE)),
+
 	EMETHODSTRING001("'1'=='1';", Tests.TRUE),
 	EMETHODSTRING002("'1'==='1';", Tests.FALSE),
 	EMETHODSTRING003("'1'<'2';", Tests.TRUE),
@@ -301,56 +310,39 @@ enum SemanticsSuccess implements ITestCase {
 
 
 	// Embedment
-	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),
+	EMBED01(new Cfg("<p>[%%=42%]</p>").template().fc().res(StringLangObject.create("<p>42</p>"))),
 	;
 
-	@Nonnull private final String code;
-	private final ALangObject expectedResult;
-	@Nonnull private final ETestType type;
-	@Nonnull private final EContextType context;
+	private final Cfg cfg;
 
-	private SemanticsSuccess(@Nonnull final String code, final ALangObject expectedResult) {
-		this(code, EContextType.GENERIC, expectedResult);
-	}
-
-	private SemanticsSuccess(@Nonnull final String code, @Nonnull final EContextType context,
-			final ALangObject expectedResult) {
-		this(code, ETestType.PROGRAM, context, expectedResult);
-	}
-
-	private SemanticsSuccess(@Nonnull final String code, @Nonnull final ETestType type,
-			@Nonnull final EContextType context, final ALangObject expectedResult) {
-		this.code = code;
-		this.expectedResult = expectedResult;
-		this.context = context;
-		this.type = type;
+	private SemanticsSuccess(final String code, final ALangObject expectedResult) {
+		this(new Cfg(code).res(expectedResult));
 	}
 
 	private SemanticsSuccess(final Cfg cfg) {
-		this.code = cfg.code;
-		this.expectedResult = NullUtil.or(cfg.res, NullLangObject.getInstance());
-		this.context = cfg.context;
-		this.type = cfg.type;
+		this.cfg = cfg;
 	}
 
 	@Override
 	public ETestType getTestType() {
-		return type;
+		return cfg.type;
 	}
 
 	@Override
 	public EContextType getContextType() {
-		return context;
+		return cfg.context;
 	}
 
 	@Override
 	public String getCode() {
-		return code;
+		return cfg.code;
 	}
+	@Nullable
 	@Override
 	public ALangObject getExpectedResult() {
-		return expectedResult;
+		return NullUtil.or(cfg.res, NullLangObject.getInstance());
 	}
+	@Nullable
 	@Override
 	public Class<? extends EvaluationException> getExpectedException() {
 		return null;
@@ -360,6 +352,7 @@ enum SemanticsSuccess implements ITestCase {
 		return true;
 	}
 
+	@Nullable
 	@Override
 	public String getErrorBegin() {
 		return null;
@@ -367,6 +360,6 @@ enum SemanticsSuccess implements ITestCase {
 
 	@Override
 	public ISeverityConfig getSeverityConfig() {
-		return SeverityConfig.getLooseConfig();
+		return cfg.config;
 	}
 }

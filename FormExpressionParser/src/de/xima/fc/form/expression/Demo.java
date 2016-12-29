@@ -41,6 +41,11 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
+ * - safe navigation operator: a?.b?.c or a.?b.c: only accessed the property when the value is not null, returns null otherwise.
+ *   => Did you keep backward compatibility? x?.1:y must continue to work.
+ *   => Consider: a?.b[x=y];
+ *   => short-circuiting may occur when a is null and assignment may never happen
+ *   => definite assignment visitor needs to take this into account
  * - Shortcut evaluation of && and ||.
  * - Allow parametrized dot accessors:
  *    array<boolean> arr;
@@ -64,7 +69,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  */
 public class Demo {
 	@Nonnull
-	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getLooseConfig();
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull

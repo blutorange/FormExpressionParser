@@ -373,7 +373,17 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 			// Children are expressions and cannot contain break/clause/return
 			// clauses.
 			final Node arg = node.jjtGetChild(i);
-			res = res.evaluateExpressionMethod(arg.getSiblingMethod(), ec, jjtAccept(node, arg));
+			final EMethod method = arg.getSiblingMethod();
+			if (method == EMethod.DOUBLE_AMPERSAND)  {
+				final BooleanLangObject lhs = res.coerceBoolean(ec);
+				res = !lhs.booleanValue() ? lhs : jjtAccept(node, arg).coerceBoolean(ec);
+			}
+			else if (method == EMethod.DOUBLE_BAR) {
+				final BooleanLangObject lhs = res.coerceBoolean(ec);
+				res = lhs.booleanValue() ? lhs : jjtAccept(node, arg).coerceBoolean(ec);
+			}
+			else
+				res = res.evaluateExpressionMethod(method, ec, jjtAccept(node, arg));
 		}
 
 		return res;

@@ -3,7 +3,6 @@ package de.xima.fc.form.expression.node;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -83,12 +82,11 @@ public class ASTRegexNode extends ANode {
 		visitor.visit(this);
 	}
 
-	@Nonnull
 	public Pattern getPattern() {
 		return pattern;
 	}
 
-	private static int flags(@Nonnull final String flagString, final int beginIndex) {
+	private static int flags(final String flagString, final int beginIndex) {
 		final int len = flagString.length();
 		int flags = 0;
 		for (int i = beginIndex; i < len; ++i) {

@@ -1,10 +1,12 @@
 package de.xima.fc.form.expression.test.lang;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.Test;
 
 import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
 
+@NonNullByDefault
 public class Tests {
 	final static NumberLangObject N0 = NumberLangObject.create(0);
 	final static NumberLangObject N42 = NumberLangObject.create(42);

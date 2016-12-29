@@ -22,7 +22,6 @@ import de.xima.fc.form.expression.impl.function.EExpressionMethodArray;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodBoolean;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodHash;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodNumber;
-import de.xima.fc.form.expression.impl.function.EExpressionMethodObject;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodRegex;
 import de.xima.fc.form.expression.impl.function.EExpressionMethodString;
 import de.xima.fc.form.expression.impl.function.GenericBracketAccessor;
@@ -36,7 +35,6 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 			.build()),
 	GENERIC(
 			new GenericNamespaceContractFactory.Builder()
-			.addExpressionMethod(EExpressionMethodObject.values())
 			.addExpressionMethod(EExpressionMethodBoolean.values())
 			.addExpressionMethod(EExpressionMethodNumber.values())
 			.addExpressionMethod(EExpressionMethodString.values())

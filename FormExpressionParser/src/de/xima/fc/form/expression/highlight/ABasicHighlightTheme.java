@@ -90,7 +90,7 @@ public abstract class ABasicHighlightTheme implements IFormExpressionHighlightTh
 
 		case BackslashQuotedRegex:
 			return getStyleRegexLiteral();
-			
+
 		case DoubleQuotedString:
 		case SingleQuotedString:
 		case TemplateLiteralOpen:
@@ -135,11 +135,9 @@ public abstract class ABasicHighlightTheme implements IFormExpressionHighlightTh
 		case BarEqual:
 		case CircumflexEqual:
 		case DashEqual:
-		case DoubleAmpersandEqual:
 		case DoubleAngleCloseEqual:
 		case DoubleAngleOpenEqual:
 		case Equal:
-		case DoubleBarEqual:
 		case DoubleStarEqual:
 		case ExclamationDoubleEqual:
 		case ExclamationEqual:

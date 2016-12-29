@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableCollection;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
@@ -98,5 +99,11 @@ public enum VoidClass implements ILangObjectClass {
 	@Override
 	public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 		throw new CoercionException(NullLangObject.getInstance(), VoidClass.INSTANCE, ec);
+	}
+
+	@Nullable
+	@Override
+	public Node makeDefaultNode(final Node prototype) {
+		return null;
 	}
 }

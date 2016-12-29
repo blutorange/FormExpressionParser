@@ -709,6 +709,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		}
 	}
 
+	//FIXME update for && and || methods
 	@Override
 	public NodeInfo visit(final ASTExpressionNode node) throws SemanticsException {
 		// Empty expression node.
@@ -734,14 +735,27 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 				return infoRhs.unifyJumps(infoLhs);
 			}
 			// Check if there is such an expression method.
-			final IValueReturn typeValueReturn = factory.getNamespaceFactory().getExpressionMethodInfo(infoLhs.getImplicitType(), rhs.getSiblingMethod());
-			if (typeValueReturn == null)
-				throw new NoSuchExpressionMethodException(infoLhs.getImplicitType(), rhs.getSiblingMethod(), node.jjtGetChild(i));
-			if (!typeValueReturn.getValue().isAssignableFrom(infoRhs.getImplicitType()))
-				throw new IncompatibleExpressionMethodTypeException(infoLhs.getImplicitType(),
-						rhs.getSiblingMethod(), typeValueReturn.getValue(), infoRhs.getImplicitType(), rhs);
+			final EMethod method = rhs.getSiblingMethod();
+			final IVariableType type;
+			// && and || work with every object and always return a boolean.
+			if (method == EMethod.DOUBLE_AMPERSAND || method == EMethod.DOUBLE_BAR) {
+				checkObject(infoLhs, node.jjtGetChild(i-1));
+				checkObject(infoRhs, rhs);
+				type = SimpleVariableType.BOOLEAN;
+			}
+			else {
+				final IValueReturn typeValueReturn = factory.getNamespaceFactory()
+						.getExpressionMethodInfo(infoLhs.getImplicitType(), method);
+				if (typeValueReturn == null)
+					throw new NoSuchExpressionMethodException(infoLhs.getImplicitType(), rhs.getSiblingMethod(),
+							node.jjtGetChild(i));
+				if (!typeValueReturn.getValue().isAssignableFrom(infoRhs.getImplicitType()))
+					throw new IncompatibleExpressionMethodTypeException(infoLhs.getImplicitType(), rhs.getSiblingMethod(),
+							typeValueReturn.getValue(), infoRhs.getImplicitType(), rhs);
+				type = typeValueReturn.getReturn();
+			}
 			infoLhs.unifyJumps(infoRhs);
-			infoLhs.replaceImplicitType(typeValueReturn.getReturn());
+			infoLhs.replaceImplicitType(type);
 		}
 		return infoLhs;
 	}

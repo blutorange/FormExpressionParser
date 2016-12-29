@@ -401,10 +401,6 @@ TOKEN :
 | 
   < DoubleStarEqual : "**=" >
 | 
-  < DoubleAmpersandEqual : "&&=" >
-| 
-  < DoubleBarEqual : "||=" >
-| 
   < DoubleAngleOpenEqual : "<<=" >
 | 
   < DoubleAngleCloseEqual : ">>=" >
@@ -1452,14 +1448,6 @@ void EqualTypeExpression(EMethod method) #AssignmentExpressionNode(createNode = 
     |
       (
         < TripleAngleCloseEqual > TernaryExpression(EMethod.TRIPLE_ANGLE_CLOSE_EQUAL)
-      )
-    |
-      (
-        < DoubleAmpersandEqual > TernaryExpression(EMethod.DOUBLE_AMPERSAND_EQUAL)
-      )
-    |
-      (
-        < DoubleBarEqual > TernaryExpression(EMethod.DOUBLE_BAR_EQUAL)
       )
     |
       (

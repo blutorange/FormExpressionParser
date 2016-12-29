@@ -61,9 +61,7 @@ public enum EMethod {
 	TRIPLE_ANGLE_OPEN_EQUAL(ExpressionMethod.TRIPLE_ANGLE_OPEN_EQUAL), // <<<=
 	DOUBLE_ANGLE_CLOSE_EQUAL(ExpressionMethod.DOUBLE_ANGLE_CLOSE_EQUAL), // >>=
 	TRIPLE_ANGLE_CLOSE_EQUAL(ExpressionMethod.TRIPLE_ANGLE_CLOSE_EQUAL), // >>>=
-	DOUBLE_AMPERSAND_EQUAL(ExpressionMethod.DOUBLE_AMPERSAND_EQUAL), // &&=
 	BAR_EQUAL(ExpressionMethod.BAR_EQUAL), // |=
-	DOUBLE_BAR_EQUAL(ExpressionMethod.DOUBLE_BAR_EQUAL), // ||=
 	CIRCUMFLEX_EQUAL(ExpressionMethod.AMPERSAND_EQUAL), // ^=
 
 	EQUAL(ExpressionMethod.EQUAL), // =
@@ -119,9 +117,7 @@ public enum EMethod {
 		case SLASH_EQUAL: return EMethod.SLASH;
 		case PERCENT_EQUAL: return EMethod.PERCENT;
 		case AMPERSAND_EQUAL: return EMethod.AMPERSAND;
-		case DOUBLE_AMPERSAND_EQUAL: return EMethod.DOUBLE_AMPERSAND;
 		case BAR_EQUAL: return EMethod.BAR;
-		case DOUBLE_BAR_EQUAL: return EMethod.DOUBLE_BAR;
 		case DOUBLE_ANGLE_OPEN_EQUAL: return EMethod.DOUBLE_ANGLE_OPEN;
 		case DOUBLE_ANGLE_CLOSE_EQUAL: return EMethod.DOUBLE_ANGLE_CLOSE;
 		case TRIPLE_ANGLE_OPEN_EQUAL: return EMethod.TRIPLE_ANGLE_OPEN;
@@ -177,9 +173,7 @@ public enum EMethod {
 		case SLASH_EQUAL:
 		case PERCENT_EQUAL:
 		case AMPERSAND_EQUAL:
-		case DOUBLE_AMPERSAND_EQUAL:
 		case BAR_EQUAL:
-		case DOUBLE_BAR_EQUAL:
 		case DOUBLE_ANGLE_OPEN_EQUAL:
 		case DOUBLE_ANGLE_CLOSE_EQUAL:
 		case TRIPLE_ANGLE_OPEN_EQUAL:
