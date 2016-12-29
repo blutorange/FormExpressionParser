@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
@@ -337,8 +338,28 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		}
 
 		@Override
+		public int getLocalSize(final Integer functionId) {
+			final FunctionInfo info = functionInfoMap.get(functionId);
+			return info != null ? info.localVariables.size() : 0;
+		}
+
+		@Override
 		public int getInternalVariableCount() {
 			return variableIdProvider;
+		}
+
+		@Override
+		public void putBasicSourcedLocalVariables(final Integer functionId, final Set<Integer> set) {
+			final FunctionInfo info = functionInfoMap.get(functionId);
+			if (info != null)
+				set.addAll(info.localVariables);
+		}
+
+		@Override
+		public void putBasicSourcedClosureVariables(final Integer functionId, final Set<Integer> set) {
+			final FunctionInfo info = functionInfoMap.get(functionId);
+			if (info != null)
+				set.addAll(info.closureVariables.keySet());
 		}
 
 		private void mapClosure(final Node node) throws SemanticsException {

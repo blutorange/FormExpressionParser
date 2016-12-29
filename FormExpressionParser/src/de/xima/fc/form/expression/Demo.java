@@ -40,13 +40,14 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
- * TODO
- * - safe navigation operator: a?.b?.c or a.?b.c: only accessed the property when the value is not null, returns null otherwise.
+ * TODO Master to-do list.
+ *
+ * - Safe navigation operator: a?.b?.c or a.?b.c: only accessed the property when the value is not null, returns null otherwise.
  *   => Did you keep backward compatibility? x?.1:y must continue to work.
  *   => Consider: a?.b[x=y];
  *   => short-circuiting may occur when a is null and assignment may never happen
  *   => definite assignment visitor needs to take this into account
- * - Shortcut evaluation of && and ||.
+ *
  * - Allow parametrized dot accessors:
  *    array<boolean> arr;
  *    array<hash<string,string> mapped;
@@ -54,17 +55,25 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  *    method<array<hash<string,string>>,method<hash<string,string>,boolean>> m = arr.<hash<string,string>>map;
  *    mapped = m(mapper);
  *  => Effectively, this is simply adding additional constraints.
+ *
  * - Definitely assigned visitor. See https://docs.oracle.com/javase/specs/jls/se6/html/defAssign.html and http://www.jot.fm/issues/issue_2004_10/article2.pdf
+ *     Must consider these cases:
+ *      - var a;if(maybe()&&(a=0));else a=0;a; // now a is definitely assigned
+ *      - var a;while(maybe()||(a=0)){a=0;};a  // now a is definitely assigned
+ *
  * - Check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
- * - add some type inference
+ *
+ * - Add some type inference
  *    a = 9;   // a must be a number
  *    a = 2+3; // a must be a number
  *    method<string,string> m;
  *    m(a);    // a must be a string
  *    3 + b;   // b must be a number
+ *
  * - A range object like (0..9) [0..9] (0..9] [0..9). Syntax?
+ *
  * - Special modes for outputting text html-escaped for HTML templates.
- * - replace logger with tracer ?
+ *
  * - unparse: los nicer
  */
 public class Demo {

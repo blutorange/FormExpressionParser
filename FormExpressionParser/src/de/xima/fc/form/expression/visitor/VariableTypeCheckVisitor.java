@@ -709,7 +709,6 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		}
 	}
 
-	//FIXME update for && and || methods
 	@Override
 	public NodeInfo visit(final ASTExpressionNode node) throws SemanticsException {
 		// Empty expression node.
