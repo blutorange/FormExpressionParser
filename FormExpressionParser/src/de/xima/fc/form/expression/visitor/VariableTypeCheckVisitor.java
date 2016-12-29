@@ -1135,6 +1135,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 	 */
 	@Override
 	public NodeInfo visit(final ASTExceptionNode node) throws SemanticsException {
+		if (!node.hasErrorMessage())
+			return new NodeInfo(null, SimpleVariableType.EXCEPTION);
 		final NodeInfo info = node.getErrorMessageNode().jjtAccept(this);
 		if (info.hasImplicitType()) {
 			checkObject(info, node.getErrorMessageNode());
@@ -1507,7 +1509,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		for (final EVariableTypeFlag flag : node.getFlags())
 			if (flag != null)
 				builder.setFlag(flag);
-		builder.setBasicType(node.getVariableType());
+		builder.setBasicType(node.getLangObjectClass());
 		for (int i = 0; i < node.getGenericsCount(); ++i) {
 			final NodeInfo info = node.getGenericsNode(i).jjtAccept(this);
 			builder.append(info.hasImplicitType() ? info.getImplicitType()

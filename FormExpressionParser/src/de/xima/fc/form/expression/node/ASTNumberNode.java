@@ -1,10 +1,12 @@
 package de.xima.fc.form.expression.node;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
@@ -14,12 +16,17 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@NonNullByDefault
 public class ASTNumberNode extends ANode {
 	private static final long serialVersionUID = 1L;
-	private double doubleValue;
+	private double doubleValue = 0d;
 
-	public ASTNumberNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTNumberNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
+	}
+
+	public ASTNumberNode(final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTNUMBERNODE);
 	}
 
 	/**
@@ -38,6 +45,7 @@ public class ASTNumberNode extends ANode {
 		super.init(method);
 	}
 
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

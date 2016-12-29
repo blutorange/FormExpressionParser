@@ -13,16 +13,28 @@ import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.FunctionLangObject;
+import de.xima.fc.form.expression.object.NumberLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @NonNullByDefault
 public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObject> {
 	/**
-	 * @return {@link StringLangObject}. The declared name of this function. The
+	 * @return <code>string</code>. The declared name of this function. The
 	 *         empty string when an anonymous function.
 	 */
 	name(Impl.name),
+	/**
+	 * This count does not include varargs. For example, the length of both of these
+	 * functions is 1:
+	 * <pre>
+	 *   (x) => {}
+	 *
+	 *   (x,...y) => {}
+	 * </pre>
+	 * @return <code>number</code>. The number of declared arguments, not including varargs.
+	 */
+	length(Impl.length),
 	;
 
 	@Nullable private FunctionLangObject func;
@@ -93,6 +105,23 @@ public enum EDotAccessorFunction implements IDotAccessorFunction<FunctionLangObj
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.STRING;
+			}
+		},
+		length(false) {
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final FunctionLangObject thisContext,
+					final ALangObject... args) throws EvaluationException {
+				return NumberLangObject.create(thisContext.getDeclaredArgumentCount() - (thisContext.hasVarArgs() ? 1 : 0));
+			}
+
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.NUMBER;
+			}
+
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.NUMBER;
 			}
 		},
 		;

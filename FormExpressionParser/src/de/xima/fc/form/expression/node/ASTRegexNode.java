@@ -6,10 +6,13 @@ import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.google.common.base.Preconditions;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
@@ -19,13 +22,18 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
+@NonNullByDefault
 public class ASTRegexNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	@Nonnull private Pattern pattern = CmnCnst.NonnullConstant.EMPTY_PATTERN;
+	private Pattern pattern = CmnCnst.NonnullConstant.PATTERN_UNMATCHABLE;
 
-	public ASTRegexNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTRegexNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
+	}
+
+	public ASTRegexNode(final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTREGEXNODE);
 	}
 
 	public void init(@Nullable final EMethod method, @Nullable final String regex) throws ParseException {
@@ -44,6 +52,7 @@ public class ASTRegexNode extends ANode {
 		}
 	}
 
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

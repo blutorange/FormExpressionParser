@@ -37,7 +37,6 @@ public final class CmnCnst {
 		public static final String STRING_LF = "\n";
 		public static final String STRING_CR = "\r";
 		public static final String STRING_TAB = "\t";
-		public static final Pattern EMPTY_PATTERN = NullUtil.checkNotNull(Pattern.compile(STRING_EMPTY));
 		public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 		public static final int[] EMPTY_INT_ARRAY = new int[0];
 		public static final Node[] EMPTY_NODE_ARRAY = new Node[0];
@@ -45,6 +44,10 @@ public final class CmnCnst {
 		public static final String[] EMPTY_STRING_ARRAY = new String[0];
 		public static final IVariableType[] EMPTY_VARIABLE_TYPE_ARRAY = new IVariableType[0];
 		public static final EVariableTypeFlag[] EMPTY_VARIABLE_TYPE_FLAG_ARRAY = new EVariableTypeFlag[0];
+		public static final String STRING_PATTERN_UNMATCHABLE = "(?!)";
+		public static final String STRING_PATTERN_ALL_MATCHING = "";
+		public static final Pattern PATTERN_UNMATCHABLE = NullUtil.checkNotNull(Pattern.compile(STRING_PATTERN_UNMATCHABLE));
+		public static final Pattern PATTERN_ALL_MATCHING = NullUtil.checkNotNull(Pattern.compile(STRING_PATTERN_ALL_MATCHING));
 	}
 
 	public final static class CustomScope {
@@ -427,6 +430,8 @@ public final class CmnCnst {
 		public static final String FUNCTION_INFO_NOT_SET = "Function info not set yet for {0}. " + INTERNAL_ERROR;
 		public static final String NO_MAPPING_FROM_LOCAL_TO_CLOSURE = "No such mapping of local to closure source for variable {0}. " + INTERNAL_ERROR;
 		public static final String CLOSURE_VARIABLE_LIMIT_EXCEEDED = "Closure variable count limit exceeded: {0}";
+		public static final String ASSIGNMENT_NODE_EXISTS_ALREADY = "Cannot add assignment node as there exists one already. " + INTERNAL_ERROR;
+		public static final String ILLEGAL_NODE_TYPE = "Expected child {0} to be of type {1}, but it is of type {2}. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

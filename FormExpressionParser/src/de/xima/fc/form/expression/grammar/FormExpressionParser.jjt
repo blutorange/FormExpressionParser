@@ -2185,7 +2185,7 @@ void Exception(EMethod method) #ExceptionNode :
 }
 {
   (
-    < __Exception > < ParenOpen > Expression(null) < ParenClose >
+    < __Exception > < ParenOpen > [ Expression(null) ] < ParenClose >
   )
   {
     jjtThis.init(method);

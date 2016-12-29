@@ -1,9 +1,12 @@
 package de.xima.fc.form.expression.node;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
@@ -11,11 +14,16 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 
+@NonNullByDefault
 public class ASTStatementListNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTStatementListNode(@Nonnull final FormExpressionParser parser, final int nodeId) {
+	public ASTStatementListNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
+	}
+
+	public ASTStatementListNode(final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTSTATEMENTLISTNODE);
 	}
 
 	@Override
@@ -39,10 +47,11 @@ public class ASTStatementListNode extends ANode {
 	}
 
 	@Override
-	public void init(final EMethod method) throws ParseException {
+	public void init(@Nullable final EMethod method) throws ParseException {
 		super.init(method);
 	}
 
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

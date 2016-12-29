@@ -40,7 +40,7 @@ public class ExceptionLangObject extends ALangObject {
 	@Override
 	public void toExpression(final StringBuilder builder) {
 		builder.append(Syntax.EXCEPTION).append(Syntax.PAREN_OPEN);
-		StringLangObject.toExpression(value.getMessage(), builder);
+		StringLangObject.toExpression(value.getShortMessage(), builder);
 		builder.append(Syntax.PAREN_CLOSE);
 	}
 

@@ -168,7 +168,9 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	@Override
 	public Boolean visit(final ASTExceptionNode node) {
 		// Exception is constant when the error message is constant
-		return node.getErrorMessageNode().jjtAccept(this);
+		if (node.hasErrorMessage())
+			return node.getErrorMessageNode().jjtAccept(this);
+		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package de.xima.fc.form.expression.test.lang;
 
+import java.util.regex.Pattern;
+
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +15,7 @@ import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.object.HashLangObject;
 import de.xima.fc.form.expression.object.NullLangObject;
 import de.xima.fc.form.expression.object.NumberLangObject;
+import de.xima.fc.form.expression.object.RegexLangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
 import de.xima.fc.form.expression.test.lang.TestUtil.Cfg;
 import de.xima.fc.form.expression.test.lang.TestUtil.EContextType;
@@ -92,7 +95,7 @@ enum SemanticsSuccess implements ITestCase {
 	PROPOBJECT005("null.toString;", StringLangObject.create("")),
 	PROPOBJECT006("[1,2,3].toString;", StringLangObject.create("[1,2,3]")),
 	PROPOBJECT007("{0:1}.toString;", StringLangObject.create("{0:1}")),
-	PROPOBJECT008("exception('foo').toString;", StringLangObject.create("Custom Exception: foo")),
+	PROPOBJECT008("exception('foo').toString;", StringLangObject.create("foo")),
 	PROPOBJECT009("( x ) => { x ; }.toString;", StringLangObject.create("(x)=>{x;}")),
 
 	PROPHASH001("h={'f':()=>{42;}};h.f();", Tests.N42), // can call methods from hashes
@@ -273,6 +276,29 @@ enum SemanticsSuccess implements ITestCase {
 	GENERAL006(NullUtil.checkNotNull(StringUtils.repeat("if (true) 42;else 0;", 50000)), Tests.N42), // Should not take too long
 	GENERAL007("loginfo('42');", StringLangObject.create("42")), // Log node return
 	GENERAL008("a=42;switch(0){default:a;}", Tests.N42), // Resolving variables in switch default case.
+	GENERAL009("global scope {boolean a;number b;string c;regex d;error e;array<var> f;hash<var,var>g;method<void>h;var i;}[a,b,c,d,e.message,f,g,h,i];", ArrayLangObject.create(
+			BooleanLangObject.getFalseInstance(),
+			NumberLangObject.getZeroInstance(),
+			StringLangObject.getEmptyInstance(),
+			RegexLangObject.getUnmatchableInstance(),
+			StringLangObject.getEmptyInstance(),
+			ArrayLangObject.create(),
+			HashLangObject.create(),
+			NullLangObject.getInstance(),
+			NullLangObject.getInstance()
+			)),
+	GENERAL010("global scope {boolean a=true;number b=1;string c=' ';regex d=#.#;error e=exception('foo');array<var> f=[0];hash<string,string>g={foo:'bar'};method<void>h=(x)=>void{};var i = 42;}[a,b,c,d,e.message,f,g,h.length,i];", ArrayLangObject.create(
+			BooleanLangObject.getTrueInstance(),
+			NumberLangObject.getOneInstance(),
+			StringLangObject.getSpaceInstance(),
+			RegexLangObject.create(Pattern.compile(".")),
+			StringLangObject.create("foo"),
+			ArrayLangObject.create(NumberLangObject.getZeroInstance()),
+			HashLangObject.create(StringLangObject.create("foo"), StringLangObject.create("bar")),
+			NumberLangObject.getOneInstance(),
+			NumberLangObject.getFourtyTwoInstance()
+			)),
+
 
 	// Embedment
 	EMBED01("<p>[%%=42%]</p>", ETestType.TEMPLATE, EContextType.FORMCYCLE, StringLangObject.create("<p>42</p>")),

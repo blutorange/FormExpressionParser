@@ -3,8 +3,11 @@ package de.xima.fc.form.expression.node;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
@@ -13,13 +16,18 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.util.CmnCnst;
 
+@NonNullByDefault
 public class ASTBooleanNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	private boolean booleanValue;
+	private boolean booleanValue = false;
 
-	public ASTBooleanNode(@Nonnull final FormExpressionParser parser, final int id) {
+	public ASTBooleanNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
+	}
+
+	public ASTBooleanNode(final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTBOOLEANNODE);
 	}
 
 	@Override
@@ -55,7 +63,8 @@ public class ASTBooleanNode extends ANode {
 	public boolean getBooleanValue() {
 		return booleanValue;
 	}
-	
+
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		return null;

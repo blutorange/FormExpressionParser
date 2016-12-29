@@ -33,6 +33,7 @@ import java.io.Writer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableList;
@@ -640,7 +641,8 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	public void visit(@Nonnull final ASTExceptionNode node, @Nonnull final String prefix) throws IOException {
 		writer.write(Syntax.EXCEPTION);
 		writer.write(Syntax.PAREN_OPEN);
-		expression(node.getErrorMessageNode(), prefix);
+		if (node.hasErrorMessage())
+			expression(node.getErrorMessageNode(), prefix);
 		writer.write(Syntax.PAREN_CLOSE);
 	}
 
@@ -951,7 +953,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 
 	@Override
 	public void visit(final ASTVariableTypeNode node, final String prefix) throws IOException {
-		writer.write(node.getVariableType().getSyntacticalTypeName());
+		writer.write(node.getLangObjectClass().getSyntacticalTypeName());
 		if (node.hasGenerics()) {
 			final int count = node.getGenericsCount();
 			writer.write(Syntax.ANGLE_OPEN);

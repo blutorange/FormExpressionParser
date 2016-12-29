@@ -45,7 +45,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 
 	@Override
 	public void visit(final ASTVariableTypeNode node, final IVariableTypeBuilder builder) throws SemanticsException {
-		builder.setBasicType(node.getVariableType());
+		builder.setBasicType(node.getLangObjectClass());
 		for (final EVariableTypeFlag flag : node.getFlags())
 			if (flag != null)
 				builder.setFlag(flag);

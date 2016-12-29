@@ -1,8 +1,9 @@
 package de.xima.fc.form.expression.impl.variable;
 
 import javax.annotation.Nullable;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.FormExpressionException;
@@ -23,8 +24,7 @@ public class HeaderNodeImpl implements IHeaderNode {
 
 	private final Node node;
 	private final String variableName;
-	@Nullable
-	private final Node typedNode;
+	@Nullable private final Node typedNode;
 	private final boolean isFunction;
 	private int source = -1;
 	private int closureSource = -1;

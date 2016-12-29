@@ -2,11 +2,13 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
@@ -15,6 +17,7 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IFunctionNode;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
+import de.xima.fc.form.expression.impl.variable.VoidClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -29,6 +32,19 @@ public class ASTFunctionNode extends ANode implements IFunctionNode {
 
 	public ASTFunctionNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
+	}
+
+	/**
+	 * Creates a new function node corresponding to an
+	 * anonymous void function <code>()=>void{}</code>.
+	 * @param prototype Prototype for basic properties.
+	 */
+	public ASTFunctionNode(final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTFUNCTIONNODE);
+		jjtAddChild(new ASTVariableTypeNode(prototype, VoidClass.INSTANCE), 0);
+		jjtAddChild(new ASTEmptyNode(prototype), 1);
+		hasVarArgs = false;
+		hasType = true;
 	}
 
 	public void init(final EMethod method, final boolean hasVarArgs, final boolean hasType) throws ParseException {

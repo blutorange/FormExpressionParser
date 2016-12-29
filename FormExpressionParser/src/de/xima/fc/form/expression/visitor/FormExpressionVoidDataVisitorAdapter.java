@@ -1,6 +1,6 @@
 package de.xima.fc.form.expression.visitor;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
@@ -47,17 +47,15 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
-import de.xima.fc.form.expression.util.Void;
 
+@NonNullByDefault
 public abstract class FormExpressionVoidDataVisitorAdapter<T, E extends Throwable>
 implements IFormExpressionVoidDataVisitor<T, E> {
 
-	@Nonnull
-	protected Void visitChildren(@Nonnull final Node node, @Nonnull final T data) throws E {
+	protected void visitChildren(final Node node, final T data) throws E {
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
 			node.jjtGetChild(i).jjtAccept(this, data);
 		}
-		return Void.NULL;
 	}
 
 	@Override
@@ -267,12 +265,12 @@ implements IFormExpressionVoidDataVisitor<T, E> {
 	public void visit(final ASTScopeGlobalNode node, final T data) throws E {
 		visitChildren(node, data);
 	}
-	
+
 	@Override
 	public void visit(final ASTVariableTypeNode node, final T data) throws E {
 		visitChildren(node, data);
 	}
-	
+
 	@Override
 	public void visit(final ASTFunctionArgumentNode node, final T data) throws E {
 		visitChildren(node, data);

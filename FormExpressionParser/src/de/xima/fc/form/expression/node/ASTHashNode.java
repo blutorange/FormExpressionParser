@@ -1,9 +1,12 @@
 package de.xima.fc.form.expression.node;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
+import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
@@ -11,11 +14,16 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 
+@NonNullByDefault
 public class ASTHashNode extends ANode {
 	private static final long serialVersionUID = 1L;
 
-	public ASTHashNode(@Nonnull final FormExpressionParser parser, final int id) {
+	public ASTHashNode(final FormExpressionParser parser, final int id) {
 		super(parser, id);
+	}
+
+	public ASTHashNode(final Node prototype) {
+		super(prototype, FormExpressionParserTreeConstants.JJTHASHNODE);
 	}
 
 	@Override
@@ -38,11 +46,12 @@ public class ASTHashNode extends ANode {
 	}
 
 	@Override
-	public void init(final EMethod method) throws ParseException {
+	public void init(@Nullable final EMethod method) throws ParseException {
 		assertChildrenEven();
 		super.init(method);
 	}
-		
+
+	@Nullable
 	@Override
 	protected final Node replacementOnChildRemoval(final int i) throws ArrayIndexOutOfBoundsException {
 		removeChildUnconditionally(i % 2 == 0 ? i + 1 : i - 1);

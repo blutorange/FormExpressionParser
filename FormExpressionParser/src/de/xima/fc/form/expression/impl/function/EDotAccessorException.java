@@ -82,7 +82,7 @@ public enum EDotAccessorException implements IDotAccessorFunction<ExceptionLangO
 			@Override
 			public ALangObject evaluate(final IEvaluationContext ec, final ExceptionLangObject thisContext, final ALangObject... args)
 					throws EvaluationException {
-				return StringLangObject.create(thisContext.exceptionValue().getMessage());
+				return StringLangObject.create(thisContext.exceptionValue().getShortMessage());
 			}
 
 			@Override

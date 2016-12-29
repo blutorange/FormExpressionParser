@@ -19,8 +19,8 @@ import de.xima.fc.form.expression.util.CmnCnst;
 
 public class RegexLangObject extends ALangObject {
 	private final static class InstanceHolder {
-		@Nonnull public final static RegexLangObject UNMATCHABLE = new RegexLangObject(Pattern.compile("(?!)")); //$NON-NLS-1$
-		@Nonnull public final static RegexLangObject ALL_MATCHING = new RegexLangObject(Pattern.compile("")); //$NON-NLS-1$
+		@Nonnull public final static RegexLangObject UNMATCHABLE = new RegexLangObject(CmnCnst.NonnullConstant.PATTERN_UNMATCHABLE);
+		@Nonnull public final static RegexLangObject ALL_MATCHING = new RegexLangObject(CmnCnst.NonnullConstant.PATTERN_ALL_MATCHING);
 	}
 
 	@Nonnull private final Pattern value;

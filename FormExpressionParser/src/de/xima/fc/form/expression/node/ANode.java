@@ -307,6 +307,15 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
+	public final void assertChildOfType(final int i, final Class<ASTVariableTypeNode> clazz) throws ParseException {
+		if (!clazz.isAssignableFrom(children[i].getClass()))
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_TYPE, Integer.valueOf(i),
+							clazz.getCanonicalName(), children[i].getClass().getCanonicalName()),
+					beginLine, beginColumn, endLine, endColumn);
+	}
+
+	@Override
 	public final void assertChildrenEven() throws ParseException {
 		if ((children.length & 1) != 0)
 			throw new ParseException(NullUtil.messageFormat(

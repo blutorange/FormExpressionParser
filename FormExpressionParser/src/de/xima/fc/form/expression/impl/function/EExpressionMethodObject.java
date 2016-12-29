@@ -12,20 +12,27 @@ import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.impl.variable.SimpleVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
-import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.object.BooleanLangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @NonNullByDefault
-public enum EExpressionMethodObject implements IMethod2Function<StringLangObject> {
+public enum EExpressionMethodObject implements IMethod2Function<ALangObject> {
 	/**
-	 * @param stringToJoin {@link StringLangObject} The string to be concatenated to this string.
-	 * @return {@link StringLangObject} The concatenation between this string and the argument.
+	 * Objects are coerced to <code>boolean</code>s before evaluation.
+	 * @param orOperand <code>var</code>. Argument for the OR.
+	 * @return <code>boolean</code>. The result of the logical OR disjunction between this object and the argument.
 	 */
-	PLUS(EMethod.PLUS, Impl.CONCATENATE),
+	DOUBLE_BAR(EMethod.DOUBLE_BAR, Impl.OR),
+	/**
+	 * Objects are coerced to <code>boolean</code>s before evaluation.
+	 * @param andOperand <code>var</code>. Argument for the AND.
+	 * @return <code>boolean</code>. The result of the logical AND conjunction between this object and the argument.
+	 */
+	DOUBLE_AMPERSAND(EMethod.DOUBLE_AMPERSAND, Impl.AND),
 	;
 	private final EMethod method;
-	private final IExpressionFunction<StringLangObject> function;
-	private EExpressionMethodObject(final EMethod method, final IExpressionFunction<StringLangObject> function) {
+	private final IExpressionFunction<ALangObject> function;
+	private EExpressionMethodObject(final EMethod method, final IExpressionFunction<ALangObject> function) {
 		this.method = method;
 		this.function = function;
 	}
@@ -34,36 +41,57 @@ public enum EExpressionMethodObject implements IMethod2Function<StringLangObject
 		return method;
 	}
 	@Override
-	public IExpressionFunction<StringLangObject> getFunction() {
+	public IExpressionFunction<ALangObject> getFunction() {
 		return function;
 	}
 
-	private static enum Impl implements IExpressionFunction<StringLangObject> {
-		CONCATENATE(false, "stringToJoin") { //$NON-NLS-1$
+	private static enum Impl implements IExpressionFunction<ALangObject> {
+		OR(false, "orOperand"){ //$NON-NLS-1$
 			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final StringLangObject thisContext,
-					final ALangObject... args) throws EvaluationException {
-				return thisContext.concat(args[0].coerceString(ec));
+			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final BooleanLangObject lhs = thisContext.coerceBoolean(ec);
+				return lhs.booleanValue() ? lhs : args[0].coerceBoolean(ec);
 			}
-
 			@Override
 			public IVariableType getReturnType(final IVariableType thisContext) {
-				return SimpleVariableType.STRING;
+				return SimpleVariableType.BOOLEAN;
 			}
-
-			@Override
-			public IVariableType getValueType(final IVariableType thisContext) {
-				return SimpleVariableType.STRING;
-			}
-
-			@Override
-			public ILangObjectClass getValueClass() {
-				return ELangObjectClass.STRING;
-			}
-
 			@Override
 			public ILangObjectClass getReturnClass() {
-				return ELangObjectClass.STRING;
+				return ELangObjectClass.BOOLEAN;
+			}
+			@Override
+			public IVariableType getValueType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getValueClass() {
+				return ELangObjectClass.OBJECT;
+			}
+		},
+		AND(false, "andOperand"){ //$NON-NLS-1$
+			@Override
+			public ALangObject evaluate(final IEvaluationContext ec, final ALangObject thisContext, final ALangObject... args)
+					throws EvaluationException {
+				final BooleanLangObject lhs = thisContext.coerceBoolean(ec);
+				return !lhs.booleanValue() ? lhs : args[0].coerceBoolean(ec);
+			}
+			@Override
+			public IVariableType getReturnType(final IVariableType thisContext) {
+				return SimpleVariableType.BOOLEAN;
+			}
+			@Override
+			public ILangObjectClass getReturnClass() {
+				return ELangObjectClass.BOOLEAN;
+			}
+			@Override
+			public IVariableType getValueType(final IVariableType thisContext) {
+				return SimpleVariableType.OBJECT;
+			}
+			@Override
+			public ILangObjectClass getValueClass() {
+				return ELangObjectClass.OBJECT;
 			}
 		},
 		;
@@ -100,7 +128,7 @@ public enum EExpressionMethodObject implements IMethod2Function<StringLangObject
 
 		@Override
 		public ILangObjectClass getThisContextType() {
-			return ELangObjectClass.STRING;
+			return ELangObjectClass.OBJECT;
 		}
 	}
 }

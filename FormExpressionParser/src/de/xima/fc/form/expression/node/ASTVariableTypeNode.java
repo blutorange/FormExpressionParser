@@ -2,6 +2,7 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
@@ -90,7 +91,7 @@ public class ASTVariableTypeNode extends ANode {
 		}
 	}
 
-	public ILangObjectClass getVariableType() {
+	public ILangObjectClass getLangObjectClass() {
 		return variableType;
 	}
 

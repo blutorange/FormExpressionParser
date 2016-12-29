@@ -17,10 +17,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 
 @NonNullByDefault
 public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObject> {
-	DOUBLE_BAR(EMethod.DOUBLE_BAR, Impl.OR),
-	DOUBLE_AMPERSAND(EMethod.DOUBLE_AMPERSAND, Impl.AND),
 	CIRCUMFLEX(EMethod.CIRCUMFLEX, Impl.XOR),
-	EXCLAMATION(EMethod.EXCLAMATION, Impl.NOT),
 	;
 	private final EMethod method;
 	private final IExpressionFunction<BooleanLangObject> function;
@@ -42,60 +39,6 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 
 	private static enum Impl implements IExpressionFunction<BooleanLangObject> {
 		/**
-		 * @param orOperand {@link BooleanLangObject}. Argument for the OR.
-		 * @return {@link BooleanLangObject}. The result of the logical OR disjunction between this boolean and the argument.
-		 */
-		OR(false, "orOperand"){ //$NON-NLS-1$
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return thisContext.or(args[0].coerceBoolean(ec));
-			}
-			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
-				return SimpleVariableType.BOOLEAN;
-			}
-			@Override
-			public IVariableType getValueType(final IVariableType thisContext) {
-				return SimpleVariableType.BOOLEAN;
-			}
-			@Override
-			public ILangObjectClass getValueClass() {
-				return ELangObjectClass.BOOLEAN;
-			}
-			@Override
-			public ILangObjectClass getReturnClass() {
-				return ELangObjectClass.BOOLEAN;
-			}
-		},
-		/**
-		 * @param andOperand {@link BooleanLangObject}. Argument for the AND.
-		 * @return {@link BooleanLangObject}. The result of the logical AND conjunction between this boolean and the argument.
-		 */
-		AND(false, "andOperand"){ //$NON-NLS-1$
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return thisContext.and(args[0].coerceBoolean(ec));
-			}
-			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
-				return SimpleVariableType.BOOLEAN;
-			}
-			@Override
-			public IVariableType getValueType(final IVariableType thisContext) {
-				return SimpleVariableType.BOOLEAN;
-			}
-			@Override
-			public ILangObjectClass getValueClass() {
-				return ELangObjectClass.BOOLEAN;
-			}
-			@Override
-			public ILangObjectClass getReturnClass() {
-				return ELangObjectClass.BOOLEAN;
-			}
-		},
-		/**
 		 * @param xorOperand {@link BooleanLangObject}. Argument for the XOR.
 		 * @return {@link BooleanLangObject}. The result of the logical XOR exclusive disjunction between this boolean and the argument.
 		 */
@@ -116,32 +59,6 @@ public enum EExpressionMethodBoolean implements IMethod2Function<BooleanLangObje
 			@Override
 			public ILangObjectClass getValueClass() {
 				return ELangObjectClass.BOOLEAN;
-			}
-			@Override
-			public ILangObjectClass getReturnClass() {
-				return ELangObjectClass.BOOLEAN;
-			}
-		},
-		/**
-		 * @return {@link BooleanLangObject}. The logical negation of this boolean.
-		 */
-		NOT(false) {
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final BooleanLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return thisContext.not();
-			}
-			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
-				return SimpleVariableType.BOOLEAN;
-			}
-			@Override
-			public IVariableType getValueType(final IVariableType thisContext) {
-				return SimpleVariableType.OBJECT;
-			}
-			@Override
-			public ILangObjectClass getValueClass() {
-				return ELangObjectClass.OBJECT;
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {

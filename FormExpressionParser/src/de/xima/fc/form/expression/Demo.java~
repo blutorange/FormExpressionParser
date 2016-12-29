@@ -41,7 +41,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 
 /**
  * TODO
- * - Shortcut evaluation of && and ||.
  * - Allow parametrized dot accessors:
  *    array<boolean> arr;
  *    array<hash<string,string> mapped;
@@ -49,7 +48,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  *    method<array<hash<string,string>>,method<hash<string,string>,boolean>> m = arr.<hash<string,string>>map;
  *    mapped = m(mapper);
  *  => Effectively, this is simply adding additional constraints.
- * - Definitely assigned visitor. See https://docs.oracle.com/javase/specs/jls/se6/html/defAssign.html and http://www.jot.fm/issues/issue_2004_10/article2.pdf
+ * - Definitely assigned visitor.
  * - Check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
  * - add some type inference
  *    a = 9;   // a must be a number
@@ -57,14 +56,14 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  *    method<string,string> m;
  *    m(a);    // a must be a string
  *    3 + b;   // b must be a number
- * - A range object like (0..9) [0..9] (0..9] [0..9). Syntax?
+ * - A range object (0..9) [0..9] (0..9] [0..9)
  * - Special modes for outputting text html-escaped for HTML templates.
  * - replace logger with tracer ?
  * - unparse: los nicer
  */
 public class Demo {
 	@Nonnull
-	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getLooseConfig();
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull

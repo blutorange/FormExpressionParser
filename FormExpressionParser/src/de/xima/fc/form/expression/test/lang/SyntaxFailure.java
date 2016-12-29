@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.test.lang;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import de.xima.fc.form.expression.exception.parse.DuplicateFunctionArgumentException;
 import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IllegalVariableAssignmentException;
@@ -20,6 +21,7 @@ import de.xima.fc.form.expression.exception.parse.NoSuchDotAccessorException;
 import de.xima.fc.form.expression.exception.parse.NoSuchDotAssignerException;
 import de.xima.fc.form.expression.exception.parse.NoSuchExpressionMethodException;
 import de.xima.fc.form.expression.exception.parse.ScopedFunctionOutsideHeaderException;
+import de.xima.fc.form.expression.exception.parse.VariableDeclaredTwiceException;
 import de.xima.fc.form.expression.exception.parse.VariableNotResolvableException;
 import de.xima.fc.form.expression.exception.parse.VariableUsageBeforeDeclarationException;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -83,6 +85,8 @@ enum SyntaxFailure implements ITestCase {
 	TEST049(new Cfg("`$`;").err("Lexical error at line 1, column 3. Encountered \"`\" after \"$\"").err(TokenMgrError.class)),
 	TEST050("function foo(arg1,arg2,args...){}", "Encountered \"...\" at line 1, column 28"),
 	TEST051("function foo(arg1,...arg2,args...){}", "Error during parsing at line 1, column 22: Variable argument specifier allowed only for the final argument."),
+	TEST052(new Cfg("(a,x,b,x)=>void{};").err("Error during parsing at line 1, column 8: Duplicate argument x encountered in function parameters.").err(DuplicateFunctionArgumentException.class)),
+	TEST053(new Cfg("()=>void{var x;if(true)var x;var x;};").err("Error during parsing at line 1, column 30: Variable x was already declared at the current nesting level.").err(VariableDeclaredTwiceException.class)),
 
 	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),

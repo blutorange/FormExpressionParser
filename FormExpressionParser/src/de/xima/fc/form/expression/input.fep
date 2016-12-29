@@ -1,7 +1,1 @@
-function foo() {
-  var i = 0;
-  while (true) {
-    () => {return i;};
-  }
-}
-foo();
+()=>void{var x;if(true)var x;var x;};

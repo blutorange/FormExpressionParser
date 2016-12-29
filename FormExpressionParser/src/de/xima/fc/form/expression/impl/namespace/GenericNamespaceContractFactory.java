@@ -7,9 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.FormExpressionException;
@@ -118,7 +119,8 @@ public final class GenericNamespaceContractFactory implements INamespaceContract
 			final int classId = clazz.getClassId().intValue();
 			if (classId < expressionMethodMap.length && expressionMethodMap[classId] != null) {
 				final IExpressionFunction<?> func = expressionMethodMap[classId].get(method);
-					return func;
+					if (func != null)
+						return func;
 			}
 		}
 		return null;

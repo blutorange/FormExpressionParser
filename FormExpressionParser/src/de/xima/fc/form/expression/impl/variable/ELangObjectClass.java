@@ -9,9 +9,17 @@ import com.google.common.collect.ImmutableCollection;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationContext;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.node.ASTArrayNode;
+import de.xima.fc.form.expression.node.ASTBooleanNode;
+import de.xima.fc.form.expression.node.ASTExceptionNode;
+import de.xima.fc.form.expression.node.ASTHashNode;
+import de.xima.fc.form.expression.node.ASTNumberNode;
+import de.xima.fc.form.expression.node.ASTRegexNode;
+import de.xima.fc.form.expression.node.ASTStringCharactersNode;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.ArrayLangObject;
 import de.xima.fc.form.expression.object.BooleanLangObject;
@@ -66,6 +74,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) {
 			return object;
 		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return null;
+		}
 	},
 	NULL(1, true, NullLangObject.class, CmnCnst.Syntax.VAR, false, true) {
 		@Override
@@ -99,6 +113,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 			throw new CoercionException(NullLangObject.getInstance(), ELangObjectClass.NULL, ec);
 		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return null;
+		}
 	},
 	BOOLEAN(2, true, BooleanLangObject.class, CmnCnst.Syntax.BOOLEAN, false, true) {
 		@Override
@@ -131,6 +151,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		@Override
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) {
 			return object.coerceBoolean(ec);
+		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTBooleanNode(prototype);
 		}
 	},
 	NUMBER(3, true, NumberLangObject.class, CmnCnst.Syntax.NUMBER, true, true) {
@@ -166,6 +192,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 			return object.coerceNumber(ec);
 		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTNumberNode(prototype);
+		}
 	},
 	STRING(4, true, StringLangObject.class, CmnCnst.Syntax.STRING, true, true) {
 		@Override
@@ -200,6 +232,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) {
 			return object.coerceString(ec);
 		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTStringCharactersNode(prototype);
+		}
 	},
 	REGEX(5, true, RegexLangObject.class, CmnCnst.Syntax.REGEX, false, true) {
 		@Override
@@ -232,6 +270,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		@Override
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 			return object.coerceRegex(ec);
+		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTRegexNode(prototype);
 		}
 	},
 	FUNCTION(6, true, FunctionLangObject.class, CmnCnst.Syntax.METHOD, false, true) {
@@ -272,6 +316,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 			return object.coerceFunction(ec);
 		}
 
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return null;
+		}
+
 	},
 	EXCEPTION(7, true, ExceptionLangObject.class, CmnCnst.Syntax.ERROR, false, true) {
 		@Override
@@ -304,6 +354,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		@Override
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 			return object.coerceRegex(ec);
+		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTExceptionNode(prototype);
 		}
 	},
 	ARRAY(8, false, ArrayLangObject.class, CmnCnst.Syntax.ARRAY, true, true) {
@@ -339,6 +395,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 			return object.coerceArray(ec);
 		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTArrayNode(prototype);
+		}
 	},
 	HASH(9, false, HashLangObject.class, CmnCnst.Syntax.HASH, true, true) {
 		@Override
@@ -372,6 +434,12 @@ public enum ELangObjectClass implements ILangObjectClass {
 		@Override
 		public ALangObject coerce(final ALangObject object, final IEvaluationContext ec) throws CoercionException {
 			return object.coerceHash(ec);
+		}
+
+		@Nullable
+		@Override
+		public Node makeDefaultNode(final Node prototype) {
+			return new ASTHashNode(prototype);
 		}
 	};
 

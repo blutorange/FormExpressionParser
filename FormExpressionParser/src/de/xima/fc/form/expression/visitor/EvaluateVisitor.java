@@ -718,7 +718,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 	public ALangObject visit(final ASTExceptionNode node) throws EvaluationException {
 		// Child is an expression and cannot contain any break, continue, or
 		// return clause.
-		final StringLangObject message = jjtAccept(node, node.getErrorMessageNode()).coerceString(ec);
+		final StringLangObject message = node.hasErrorMessage()
+				? jjtAccept(node, node.getErrorMessageNode()).coerceString(ec) : StringLangObject.getEmptyInstance();
 		return ExceptionLangObject.create(message.stringValue(), ec);
 	}
 

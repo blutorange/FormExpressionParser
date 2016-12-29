@@ -15,7 +15,7 @@ import de.xima.fc.form.expression.test.lang.TestUtil.ITestCase;
 
 @SuppressWarnings("nls")
 enum SemanticsFailure implements ITestCase {
-	TEST001("throw exception('HelloWorld');", CustomRuntimeException.class,"Custom Exception: HelloWorld"),
+	TEST001("throw exception('HelloWorld');", CustomRuntimeException.class,"HelloWorld"),
 	TEST004("function foo(arg1,arg2){}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameter(s), but 1 were given."),
 	TEST005("function foo(arg1,arg2,...args){args;}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameter(s), but 1 were given."),
 	TEST006("function foo(){42;}foo(1,2,3);", IllegalNumberOfFunctionParametersException.class, "Function requires 0 parameter(s), but 3 were given."),

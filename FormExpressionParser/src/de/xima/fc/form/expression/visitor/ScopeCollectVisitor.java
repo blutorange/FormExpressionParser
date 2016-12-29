@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Optional;
@@ -33,6 +34,7 @@ import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.impl.ImmutableScopeDefinitions;
 import de.xima.fc.form.expression.impl.variable.HeaderNodeImpl;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
+import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTScopeExternalNode;
 import de.xima.fc.form.expression.node.ASTScopeGlobalNode;
 import de.xima.fc.form.expression.node.ASTScopeManualNode;
@@ -135,7 +137,16 @@ public final class ScopeCollectVisitor
 			visitChildren(node, Optional.<Map<String, IHeaderNode>> absent());
 			if (map.containsKey(node.getVariableName()))
 				throw new DuplicateScopedVariableDeclarationException(node, currentScope);
+			makeDefaultAssignmentNode(node);
 			map.put(node.getVariableName(), new HeaderNodeImpl(node));
+		}
+	}
+
+	private void makeDefaultAssignmentNode(final ASTVariableDeclarationClauseNode node) throws SemanticsException {
+		// Create default node for default value.
+		if (!node.hasAssignment()) {
+			final Node assignmentNode = node.getLangObjectClass().makeDefaultNode(node);
+			node.addAssignmentNode(assignmentNode != null ? assignmentNode : new ASTNullNode(node));
 		}
 	}
 

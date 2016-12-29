@@ -143,7 +143,7 @@ public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDat
 			for (int i = 0; i < node.getArgumentCount(); ++i) {
 				final ISourceResolvable res = node.getArgResolvable(i);
 				if (binding.hasVariableAtCurrentLevel(res.getVariableName()))
-					throw new DuplicateFunctionArgumentException(res.getVariableName(), node);
+					throw new DuplicateFunctionArgumentException(res.getVariableName(), node.getArgumentNode(i));
 				binding.defineVariable(res.getVariableName(), getNewObjectToSet(res, node.getArgumentNode(i), newData));
 			}
 			node.getBodyNode().jjtAccept(this, newData);

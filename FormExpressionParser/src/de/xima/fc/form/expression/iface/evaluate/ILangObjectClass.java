@@ -3,6 +3,7 @@ package de.xima.fc.form.expression.iface.evaluate;
 import java.io.Serializable;
 
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
@@ -10,6 +11,7 @@ import com.google.common.collect.ImmutableCollection;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.exception.evaluation.CoercionException;
+import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
 import de.xima.fc.form.expression.object.ALangObject;
 
@@ -69,6 +71,13 @@ public interface ILangObjectClass extends Serializable {
 	 * @return Whether objects of this type are mutable or immutable.
 	 */
 	public boolean isImmutable();
+
+	/**
+	 * @param prototype Prototype for creating the node.
+	 * @return The default node with the default value for this class; or <code>null</code> when the default <code>null</code>.
+	 */
+	@Nullable
+	public Node makeDefaultNode(Node prototype);
 
 	public boolean equalsClass(ILangObjectClass clazz);
 
