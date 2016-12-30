@@ -23,4 +23,5 @@ public interface IVariableResolutionResult {
 	public int getInternalVariableCount();
 	public void putBasicSourcedClosureVariables(Integer functionId, Set<Integer> set);
 	public void putBasicSourcedLocalVariables(Integer functionId, Set<Integer> set);
+	boolean containsBasicSourcedGlobalVariable(Integer variableId);
 }

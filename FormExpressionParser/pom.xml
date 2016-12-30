@@ -11,7 +11,7 @@
 	<!-- 0.3 Improved semantic checking: checking variable types in methods, 
 		expression, functions, if-conditionals etc. Javascript-like stringf interpolation: 
 		`Three plus four is ${3+4}.` -->
-	<!-- 0.4 (work in progress) Closures for lambda expressions, RangeLangObject. -->
+	<!-- 0.4 (work in progress) Closures for lambda expressions, definite assignment analysis, RangeLangObject. -->
 	<!-- 0.5 (the future) Some type-inference for non-strict mode. -->
 	<version>0.4-SNAPSHOT</version>
 	<name>FormExpressionParser</name>

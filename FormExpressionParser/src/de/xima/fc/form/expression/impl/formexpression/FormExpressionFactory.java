@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Preconditions;
@@ -42,6 +43,7 @@ import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 import de.xima.fc.form.expression.visitor.ClosureConvertVisitor;
 import de.xima.fc.form.expression.visitor.CompileTimeConstantCheckVisitor;
+import de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor;
 import de.xima.fc.form.expression.visitor.JumpCheckVisitor;
 import de.xima.fc.form.expression.visitor.ScopeCollectVisitor;
 import de.xima.fc.form.expression.visitor.UnparseVisitor;
@@ -314,19 +316,32 @@ public final class FormExpressionFactory {
 			final FormExpressionParser parser,
 			final IEvaluationContextContract<T> factory,
 			final ISeverityConfig severityConfig) throws ParseException {
+		// Check if all break, continue and return clauses are sane and there are matching labels.
 		JumpCheckVisitor.check(node);
+		// Collection variables at global and manual scopes.
 		final IScopeDefinitionsBuilder scopeDefBuilder = ScopeCollectVisitor.collect(node, factory, severityConfig);
+		// Hoist non-local variables to global scope.
 		VariableHoistVisitor.hoist(node, scopeDefBuilder, factory, severityConfig);
+		// Resolve variables, shadowed variable names etc.
 		final IVariableResolutionResult resolutionResult = VariableResolveVisitor.resolve(node, scopeDefBuilder, factory,
 				severityConfig);
+		// Finalize scope content.
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
+		// Assignments in scopes must be constant.
 		checkScopeDefsConstancy(scopeDefs);
+		// All variables must be written to before they are read.
+		DefiniteAssignmentCheckVisitor.check(node, scopeDefs, resolutionResult);
+		// Perform some type checking in strict mode.
 		if (severityConfig.hasOption(ESeverityOption.TREAT_UNMATCHING_VARIABLE_TYPES_AS_ERROR)) {
+			// Get declared types for all variables.
 			final IVariableType[] symbolTypeTable = VariableTypeCollectVisitor.collect(node,
 					resolutionResult.getInternalVariableCount(), scopeDefs);
+			// Check if types match.
 			VariableTypeCheckVisitor.check(node, symbolTypeTable, factory, severityConfig, scopeDefs);
 		}
+		// Resolve closures.
 		final int environmentalSymbolTableSize = ClosureConvertVisitor.convert(node, resolutionResult, scopeDefs);
+		// Return the final compiled program.
 		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, factory, environmentalSymbolTableSize);
 	}
 

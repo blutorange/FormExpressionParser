@@ -362,6 +362,11 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 				set.addAll(info.closureVariables.keySet());
 		}
 
+		@Override
+		public boolean containsBasicSourcedGlobalVariable(final Integer variableId) {
+			return globalVariables.contains(variableId);
+		}
+
 		private void mapClosure(final Node node) throws SemanticsException {
 			for (final FunctionInfo info : functionInfoMap.values()) {
 				int id = 0;

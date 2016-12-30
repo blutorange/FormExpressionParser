@@ -432,6 +432,7 @@ public final class CmnCnst {
 		public static final String CLOSURE_VARIABLE_LIMIT_EXCEEDED = "Closure variable count limit exceeded: {0}";
 		public static final String ASSIGNMENT_NODE_EXISTS_ALREADY = "Cannot add assignment node as there exists one already. " + INTERNAL_ERROR;
 		public static final String ILLEGAL_NODE_TYPE = "Expected child {0} to be of type {1}, but it is of type {2}. " + INTERNAL_ERROR;
+		public static final String VARIABLE_USED_BEFORE_ASSIGNMENT = "Variable {0} was used before it was definitely assigned.";
 	}
 
 	public static final class ToString {

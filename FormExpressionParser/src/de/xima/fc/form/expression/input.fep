@@ -1,1 +1,10 @@
-a=0;true&&(a=42);a;
+global scope {
+  var y;
+}
+function maybe() {}
+function foo() {
+  var arr = [[]];
+  var x;
+  arr[0].push(x=0);
+  x;
+}
