@@ -1,7 +1,12 @@
 package de.xima.fc.form.expression.visitor;
 
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -42,8 +47,14 @@ import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDataVisitorAdapter<D, ParseException> {
 	protected final IBinding<T> binding;
 
-	protected AVariableBindingVisitor() {
+	private final IScopeDefinitionsBuilder scopeDefBuilder;
+	@Nullable private Set<String> queueExternal;
+	@Nullable private Map<String, IHeaderNode> queueGlobal;
+	@Nullable private Map<String, Map<String, IHeaderNode>> queueManual;
+
+	protected AVariableBindingVisitor(final IScopeDefinitionsBuilder scopeDefBuilder) {
 		this.binding = new CloneBinding<>();
+		this.scopeDefBuilder = scopeDefBuilder;
 	}
 
 	private void visitNested(final Node node, final D data) throws ParseException {
@@ -55,6 +66,69 @@ public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDat
 		finally {
 			binding.gotoBookmark(bookmark);
 		}
+	}
+
+	protected boolean hasGlobal(final String variableName) {
+		return scopeDefBuilder.hasGlobal(variableName) || (queueGlobal != null && queueGlobal.containsKey(variableName));
+	}
+
+	protected void addGlobal(final String variableName, final IHeaderNode header) {
+		final Map<String, IHeaderNode> queueGlobal = this.queueGlobal != null ? this.queueGlobal
+				: (this.queueGlobal = new HashMap<>());
+		queueGlobal.put(variableName, header);
+	}
+
+	@Nullable
+	protected IHeaderNode getGlobal(final String variableName) {
+		final IHeaderNode header = scopeDefBuilder.getGlobal(variableName);
+		return header == null && queueGlobal != null ? queueGlobal.get(variableName) : header;
+	}
+
+	protected boolean hasManual(final String scope) {
+		return scopeDefBuilder.hasManual(scope) || (queueManual != null && queueManual.containsKey(scope));
+	}
+
+	protected void addManual(final String scope, final String variableName, final IHeaderNode header) {
+		final Map<String, Map<String, IHeaderNode>> queueManual = this.queueManual != null ? this.queueManual
+				: (this.queueManual = new HashMap<>());
+		Map<String, IHeaderNode> map = queueManual.get(scope);
+		if (map == null)
+			queueManual.put(scope, map = new HashMap<>());
+		map.put(variableName, header);
+	}
+
+	@Nullable
+	protected IHeaderNode getManual(final String scope, final String variableName) {
+		final IHeaderNode header = scopeDefBuilder.getManual(scope, variableName);
+		if (header == null && queueManual != null) {
+			final Map<String, IHeaderNode> map = queueManual.get(scope);
+			return map != null ? map.get(variableName) : null;
+		}
+		return header;
+	}
+
+	protected void addExternal(final String scope) {
+		final Set<String> queueExternal = this.queueExternal != null ? this.queueExternal : (this.queueExternal = new HashSet<>());
+		queueExternal.add(scope);
+	}
+
+	protected boolean hasExternal(final String scope) {
+		return scopeDefBuilder.hasExternal(scope) || (queueExternal != null && queueExternal.contains(scope));
+	}
+
+	// entry.getKey() / entry.getValue() cannot be null as we never put null in queueManual
+	@SuppressWarnings("null")
+	protected void finishQueue() {
+		if (queueExternal != null)
+			scopeDefBuilder.addExternal(queueExternal);
+		if (queueGlobal != null)
+			scopeDefBuilder.addGlobal(queueGlobal);
+		if (queueManual != null)
+			for (final Entry<String, Map<String, IHeaderNode>> entry : queueManual.entrySet())
+				scopeDefBuilder.addManual(entry.getKey(), entry.getValue());
+		queueManual = null;
+		queueGlobal = null;
+		queueExternal = null;
 	}
 
 	@Override
@@ -255,24 +329,18 @@ public abstract class AVariableBindingVisitor<T,D> extends FormExpressionVoidDat
 	 * @param scopeDefBuilder
 	 * @throws ParseException
 	 */
-	protected void bindScopeDefValues(final IScopeDefinitionsBuilder scopeDefBuilder, final D data) throws ParseException {
+	protected void bindScopeDefValues(final IScopeDefinitionsBuilder scopeDefBuilder, final D data)
+			throws ParseException {
 		// Global scope.
-		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
-			final IHeaderNode hn = it.next().getValue();
-			hn.getNode().jjtAccept(this, data);
+		for (final IHeaderNode header : scopeDefBuilder.getGlobal().values()) {
+			header.getHeaderValueNode().jjtAccept(this, data);
 		}
 		// Manual scopes.
-		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
-			final String scope = it.next();
-			if (scope != null) {
-				final Iterator<Entry<String, IHeaderNode>> it2 = scopeDefBuilder.getManual(scope);
-				if (it2 != null) {
-					while (it2.hasNext()) {
-						final IHeaderNode hn = it2.next().getValue();
-						hn.getNode().jjtAccept(this, data);
-					}
-				}
-			}
+		for (final Entry<String, Map<String, IHeaderNode>> entry : scopeDefBuilder.getManual().entrySet()) {
+			final String scope = entry.getKey();
+			if (scope != null)
+				for (final IHeaderNode header : entry.getValue().values())
+					header.getHeaderValueNode().jjtAccept(this, data);
 		}
 	}
 

@@ -1,35 +1,36 @@
 package de.xima.fc.form.expression.iface.parse;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+@NonNullByDefault
 public interface IScopeDefinitionsBuilder {
-	public void addGlobal(@Nonnull String name, @Nonnull IHeaderNode node);
-	public void addManual(@Nonnull String scope, @Nonnull String name, @Nonnull IHeaderNode node);
-	public void addExternal(@Nonnull String name);
+	public void addGlobal(String name, IHeaderNode node);
+	public void addGlobal(Map<String, IHeaderNode> entries);
+	public void addManual(String scope, String name, IHeaderNode node);
+	public void addManual(String scope, Map<String, IHeaderNode> entries);
+	public void addExternal(String name);
+	public void addExternal(Collection<String> names);
+
+	public Set<String> getExternal();
 
 	@Nullable
-	public IHeaderNode getGlobal(@Nonnull String name);
+	public IHeaderNode getGlobal(String name);
+	public Map<String,IHeaderNode> getGlobal();
+
 	@Nullable
-	public IHeaderNode getManual(@Nonnull String scope, @Nonnull String name);
+	public IHeaderNode getManual(String scope, String name);
+	public Map<String, Map<String, IHeaderNode>> getManual();
 
-	@Nonnull
-	public Iterator<Entry<String,IHeaderNode>> getGlobal();
-	@Nullable
-	public Iterator<Entry<String,IHeaderNode>> getManual(@Nonnull String scope);
-	@Nonnull
-	public Iterator<String> getManual();
-	@Nonnull
-	public Iterator<String> getExternal();
+	public boolean hasGlobal(String name);
+	public boolean hasManual(String scope, String name);
+	public boolean hasManual(String scope);
+	public boolean hasExternal(String name);
 
-	public boolean hasGlobal(@Nonnull String name);
-	public boolean hasManual(@Nonnull String scope, @Nonnull String name);
-	public boolean hasManual(@Nonnull String scope);
-	public boolean hasExternal(@Nonnull String name);
-
-	@Nonnull
 	public IScopeDefinitions build();
 }

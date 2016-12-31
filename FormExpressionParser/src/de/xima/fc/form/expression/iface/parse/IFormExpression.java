@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.iface.parse;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -61,7 +60,7 @@ public interface IFormExpression<T> extends Serializable {
 	 * @return A list of warnings.
 	 * @throws EvaluationException
 	 */
-	public List<IEvaluationWarning> analyze(final T ex) throws EvaluationException;
+	public ImmutableList<IEvaluationWarning> analyze(final T ex) throws EvaluationException;
 
 	/**
 	 * Specifications to which the external contexts provided to

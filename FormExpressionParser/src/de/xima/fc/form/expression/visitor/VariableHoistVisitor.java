@@ -34,14 +34,14 @@ import de.xima.fc.form.expression.util.Void;
 public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void> {
 	private final IEvaluationContextContract<?> contractFactory;
 	private final ISeverityConfig config;
-	private final IScopeDefinitionsBuilder scopeDefBuilder;
 
 	public VariableHoistVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
 			final IEvaluationContextContract<?> contractFactory, final ISeverityConfig config) {
-		this.scopeDefBuilder = scopeDefBuilder;
+		super(scopeDefBuilder);
 		this.config = config;
 		this.contractFactory = contractFactory;
 	}
+
 
 	private boolean provides(final String scope) {
 		return contractFactory.getLibraryFactory().isProvidingScope(scope)
@@ -52,24 +52,23 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void>
 		// Check if scope of scoped variable exists.
 		// If not, add the required "import", or create a new manual scope.
 		final String scope = node.getScope();
-		if (scope != null && !scopeDefBuilder.hasManual(scope) && !scopeDefBuilder.hasExternal(scope)) {
+		if (scope != null && !hasManual(scope) && !hasExternal(scope)) {
 			if (provides(scope)) {
 				if (config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR))
 					throw new MissingRequireScopeStatementException(scope, node);
-				scopeDefBuilder.addExternal(scope);
+				addExternal(scope);
 			}
 			else {
 				if (config.hasOption(TREAT_MISSING_SCOPE_DECLARATION_AS_ERROR))
 					throw new NoSuchScopeException(scope, node);
-				scopeDefBuilder.addManual(scope, node.getVariableName(),
-						new HeaderNodeImpl(node.getVariableName(), node));
+				addManual(scope, node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
 			}
 		}
 		else if (scope == null && binding.getVariable(node.getVariableName()) == null) {
-			if (!scopeDefBuilder.hasGlobal(node.getVariableName())) {
+			if (!hasGlobal(node.getVariableName())) {
 				if (config.hasOption(TREAT_MISSING_DECLARATION_AS_ERROR))
 					throw new VariableUsageBeforeDeclarationException(node);
-				scopeDefBuilder.addGlobal(node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
+				addGlobal(node.getVariableName(), new HeaderNodeImpl(node.getVariableName(), node));
 			}
 		}
 	}
@@ -85,11 +84,11 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void>
 		if (scopes == null)
 			throw new NoSuchEmbedmentException(embedment, node);
 		for (final String scope : scopes) {
-			if (scope != null && !(scopeDefBuilder.hasManual(scope) || scopeDefBuilder.hasExternal(scope))) {
+			if (scope != null && !(hasManual(scope) || hasExternal(scope))) {
 				if (provides(scope)) {
 					if (config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR))
 						throw new MissingRequireScopeStatementException(scope, node);
-					scopeDefBuilder.addExternal(scope);
+					addExternal(scope);
 				}
 				else {
 					throw new NoSuchScopeException(scope, node);
@@ -134,6 +133,7 @@ public class VariableHoistVisitor extends AVariableBindingVisitor<Boolean, Void>
 		final VariableHoistVisitor v = new VariableHoistVisitor(scopeDefBuilder, contractFactory, config);
 		v.bindScopeDefValues(scopeDefBuilder, Void.NULL);
 		node.jjtAccept(v, Void.NULL);
+		v.finishQueue();
 		v.binding.reset();
 	}
 }

@@ -718,11 +718,13 @@ void ClauseOrStatement(EMethod method) #void :
 }
 {
   (
-    ForLoop(method)
+    LOOKAHEAD(< Identifier > < Colon >)
+    LabeledClause(method)
+  | ForLoop(method, null)
+  | WhileLoop(method, null)
+  | DoWhileLoop(method, null)
+  | SwitchClause(method, null)
   | IfClause(method)
-  | WhileLoop(method)
-  | DoWhileLoop(method)
-  | SwitchClause(method)
   | TryClause(method)
   | WithClause(method)
   | ThrowClause(method)
@@ -731,6 +733,21 @@ void ClauseOrStatement(EMethod method) #void :
   | ReturnClause(method)
   | VariableDeclarationClause(method)
   | Statement(method)
+  )
+}
+
+
+void LabeledClause(EMethod method) #void :
+{
+  Token t = null;
+}
+{
+  [ t = < Identifier > < Colon > ]
+  (
+    ForLoop(method, t)
+  | WhileLoop(method, t)
+  | DoWhileLoop(method, t)
+  | SwitchClause(method, t)
   )
 }
 
@@ -1110,25 +1127,78 @@ void ThrowClause(EMethod method) #ThrowClauseNode :
   }
 }
 
-void SwitchClause(EMethod method) #SwitchClauseNode :
+void SwitchClause(EMethod method, Token label) #SwitchClauseNode :
 {
-  Token label = null;
-  
+  EMethod switchMethod = EMethod.SWITCHCLAUSE;
+  int indexDefault = -1;
 }
 {
   (
-    < Switch > [< AngleOpen > label = < Identifier > < AngleClose >] < ParenOpen > Expression(null) < ParenClose > < BracesOpen >
+    < Switch > < ParenOpen > Expression(null) < ParenClose > < BracesOpen >
+    indexDefault = SwitchBlockStatementGroup()
+    < BracesClose >
+  )
+  {
+    jjtThis.init(method, label != null ? label.image : null, indexDefault);
+  }
+}
+
+int SwitchBlockStatementGroup() #void :
+{
+  Token lastDefault = null;
+  EMethod switchMethod;
+  int index = 0;
+  int indexDefault =-1;
+}
+{
+  (
+    (
+      (
+        (
+          (
+            < Case > Expression(EMethod.SWITCHCASE) < Colon >
+          )
+          {
+            if (lastDefault != null)
+				throw new ParseException(CmnCnst.Error.DEFAULT_CASE_MUST_BE_LAST, lastDefault);
+            switchMethod = EMethod.SWITCHCLAUSE;
+            ++index;
+          }
+        )
+      | lastDefault = < Default > < Colon >
+        {
+          if (indexDefault != - 1) 
+          throw new ParseException(CmnCnst.Error.DEFAULT_USED_MULTIPLE_TIMES, token);
+          indexDefault = index;
+          switchMethod = EMethod.SWITCHDEFAULT;
+          ++index;
+        }
+      )
+      (
+        ClauseOrStatement(switchMethod)
+      )*
+    )*
+  )
+  {
+    return indexDefault;
+  }
+}
+
+/*
+void SwitchClause(EMethod method, Token label) #SwitchClauseNode :
+{
+}
+{
+  (
+    < Switch > < ParenOpen > Expression(null) < ParenClose > < BracesOpen >
     (
       SwitchCase()
     )*
-    [ 
-    SwitchDefault() 
-    ] 
+    [SwitchDefault() ] 
     < BracesClose >
   )
   {
     jjtThis.init(method, label != null ? label.image : null);
-    
   }
 }
 
@@ -1145,7 +1215,9 @@ void SwitchCase() #void :
     )+
   )
 }
+*/
 
+/*
 void SwitchDefault() #void :
 {
 }
@@ -1157,6 +1229,7 @@ void SwitchDefault() #void :
     )+
   )
 }
+*/
 
 void TryClause(EMethod method) #TryClauseNode :
 {
@@ -1179,14 +1252,12 @@ void TryClause(EMethod method) #TryClauseNode :
   }
 }
 
-void DoWhileLoop(EMethod method) #DoWhileLoopNode :
+void DoWhileLoop(EMethod method, Token label) #DoWhileLoopNode :
 {
-  Token label = null;
-  
 }
 {
   (
-    < Do > [< AngleOpen > label = < Identifier > < AngleClose >]
+    < Do >
     BlockOrClause(null) 
     < While > < ParenOpen > Expression(null) < ParenClose > < SemiColon >
   )
@@ -1195,13 +1266,12 @@ void DoWhileLoop(EMethod method) #DoWhileLoopNode :
   }
 }
 
-void WhileLoop(EMethod method) #WhileLoopNode :
+void WhileLoop(EMethod method, Token label) #WhileLoopNode :
 {
-  Token label = null;
 }
 {
   (
-    < While > [< AngleOpen > label = < Identifier > < AngleClose >] < ParenOpen > Expression(null) < ParenClose > 
+    < While > < ParenOpen > Expression(null) < ParenClose > 
     BlockOrClause(null)
   )
   {
@@ -1209,15 +1279,14 @@ void WhileLoop(EMethod method) #WhileLoopNode :
   }
 }
 
-void ForLoop(EMethod method) #ForLoopNode :
+void ForLoop(EMethod method, Token label) #ForLoopNode :
 {
-  Token label = null;
   Token iteratingLoopVariable = null;
   boolean hasType = false;
 }
 {
   (
-    < For > [ < AngleOpen > label = < Identifier > < AngleClose > ] < ParenOpen >
+    < For > < ParenOpen >
     (
       // When we encounter the "in" keyword, we know it must
       // be an enhanced loop, as it is used only here.

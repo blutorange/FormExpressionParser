@@ -442,12 +442,12 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	@Override
 	public void visit(@Nonnull final ASTForLoopNode node, @Nonnull final String prefix) throws IOException {
 		final String next = prefix + config.getIndentPrefix();
-		writer.write(Syntax.FOR);
 		if (node.getLabel() != null) {
-			writer.write(Syntax.ANGLE_OPEN);
 			writer.write(node.getLabel());
-			writer.write(Syntax.ANGLE_CLOSE);
+			writer.write(Syntax.COLON);
+			writer.write(config.getOptionalSpace());
 		}
+		writer.write(Syntax.FOR);
 		writer.write(config.getOptionalSpace());
 		writer.write(Syntax.PAREN_OPEN);
 		if (node.isPlainLoop()) {
@@ -502,12 +502,12 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	public void visit(@Nonnull final ASTWhileLoopNode node, @Nonnull final String prefix) throws IOException {
 		final String next = prefix + config.getIndentPrefix();
 		// header while(foobar) {
-		writer.write(Syntax.WHILE);
 		if (node.getLabel() != null) {
-			writer.write(Syntax.ANGLE_OPEN);
 			writer.write(node.getLabel());
-			writer.write(Syntax.ANGLE_CLOSE);
+			writer.write(Syntax.COLON);
+			writer.write(config.getOptionalSpace());
 		}
+		writer.write(Syntax.WHILE);
 		writer.write(config.getOptionalSpace());
 		writer.write(Syntax.PAREN_OPEN);
 		expression(node.getWhileHeaderNode(), prefix);
@@ -563,6 +563,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		if (node.getLabel() != null) {
 			writer.write(node.getLabel());
 			writer.write(Syntax.COLON);
+			writer.write(config.getOptionalSpace());
 		}
 		writer.write(Syntax.SWITCH);
 		writer.write(config.getOptionalSpace());
@@ -612,12 +613,12 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 	public void visit(@Nonnull final ASTDoWhileLoopNode node, @Nonnull final String prefix) throws IOException {
 		final String next = prefix + config.getIndentPrefix();
 		// header do {
-		writer.write(Syntax.DO);
 		if (node.getLabel() != null) {
-			writer.write(Syntax.ANGLE_OPEN);
 			writer.write(node.getLabel());
-			writer.write(Syntax.ANGLE_CLOSE);
+			writer.write(Syntax.COLON);
+			writer.write(config.getOptionalSpace());
 		}
+		writer.write(Syntax.DO);
 		writer.write(config.getOptionalSpace());
 		writer.write(Syntax.BRACE_OPEN);
 		writer.write(config.getLinefeed());
@@ -813,7 +814,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		writer.write(Syntax.FUNCTION);
 		writer.write(config.getRequiredSpace());
 		if (node.hasType()) {
-			expression(node.getTypeNode(), prefix);
+			expression(node.getReturnTypeNode(), prefix);
 			writer.write(config.getRequiredSpace());
 		}
 		writer.write(insideManualDefs ? node.getVariableName() : node.getCanonicalName());

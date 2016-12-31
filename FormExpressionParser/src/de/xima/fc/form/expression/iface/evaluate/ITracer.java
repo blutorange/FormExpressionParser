@@ -1,9 +1,10 @@
 package de.xima.fc.form.expression.iface.evaluate;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
+
+import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.iface.IReset;
 
@@ -13,7 +14,7 @@ public interface ITracer<T extends ITraceElement> extends IReset {
 	public void appendWarning(IEvaluationWarning warning);
 	/** @return A (copied) list of warnings. This list may be modified safely. */
 
-	public List<IEvaluationWarning> buildWarnings();
+	public ImmutableList<IEvaluationWarning> buildWarnings();
 
 	public void enableWarnings();
 	public void disableWarnings();

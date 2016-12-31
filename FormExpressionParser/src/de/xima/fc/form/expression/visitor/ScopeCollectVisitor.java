@@ -3,12 +3,11 @@ package de.xima.fc.form.expression.visitor;
 import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_SCOPED_FUNCTION_OUTSIDE_HEADER_AS_ERROR;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -32,7 +31,6 @@ import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.impl.ImmutableScopeDefinitions;
-import de.xima.fc.form.expression.impl.variable.HeaderNodeImpl;
 import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTNullNode;
 import de.xima.fc.form.expression.node.ASTScopeExternalNode;
@@ -109,7 +107,6 @@ public final class ScopeCollectVisitor
 		currentScope = node.getScopeName();
 		if (requiredSet.contains(currentScope))
 			throw new ManualScopeAlreadyRequiredException(node);
-		@Nullable
 		Map<String, IHeaderNode> map = manualMap.get(currentScope);
 		if (map == null) {
 			map = new HashMap<>();
@@ -138,7 +135,7 @@ public final class ScopeCollectVisitor
 			if (map.containsKey(node.getVariableName()))
 				throw new DuplicateScopedVariableDeclarationException(node, currentScope);
 			makeDefaultAssignmentNode(node);
-			map.put(node.getVariableName(), new HeaderNodeImpl(node));
+			map.put(node.getVariableName(), node);
 		}
 	}
 
@@ -160,7 +157,7 @@ public final class ScopeCollectVisitor
 			if (map.containsKey(node.getVariableName()))
 				throw new DuplicateScopedVariableDeclarationException(currentScope, node.getVariableName(), node);
 			node.supplyScope(currentScope);
-			map.put(node.getVariableName(), new HeaderNodeImpl(node));
+			map.put(node.getVariableName(), node);
 		}
 		else {
 			// Add function outside scope to the corresponding scope
@@ -168,14 +165,14 @@ public final class ScopeCollectVisitor
 			if (scope == null) {
 				if (hasGlobal(node.getVariableName()))
 					throw new FunctionNameAlreadyDefinedException(node);
-				addGlobal(node.getVariableName(), new HeaderNodeImpl(node));
+				addGlobal(node.getVariableName(), node);
 			}
 			else {
 				if (hasManual(scope) && hasManual(scope, node.getVariableName()))
 					throw new FunctionNameAlreadyDefinedException(node);
 				if (config.hasOption(TREAT_SCOPED_FUNCTION_OUTSIDE_HEADER_AS_ERROR))
 					throw new ScopedFunctionOutsideHeaderException(node);
-				addManual(scope, node.getVariableName(), new HeaderNodeImpl(node));
+				addManual(scope, node.getVariableName(), node);
 			}
 		}
 		// Collect everything from function bodies as well.
@@ -210,8 +207,18 @@ public final class ScopeCollectVisitor
 	}
 
 	@Override
+	public void addGlobal(final Map<String, IHeaderNode> entries) {
+		globalMap.putAll(entries);
+	}
+
+	@Override
 	public void addExternal(final String name) {
 		requiredSet.add(name);
+	}
+
+	@Override
+	public void addExternal(final Collection<String> names) {
+		requiredSet.addAll(names);
 	}
 
 	@Override
@@ -222,6 +229,16 @@ public final class ScopeCollectVisitor
 			manualMap.put(scope, m);
 		}
 		m.put(name, node);
+	}
+
+	@Override
+	public void addManual(final String scope, final Map<String, IHeaderNode> entries) {
+		Map<String, IHeaderNode> m = manualMap.get(scope);
+		if (m == null) {
+			m = new HashMap<>();
+			manualMap.put(scope, m);
+		}
+		m.putAll(entries);
 	}
 
 	@Nullable
@@ -237,29 +254,19 @@ public final class ScopeCollectVisitor
 		return m != null ? m.get(name) : null;
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public Iterator<Entry<String, IHeaderNode>> getGlobal() {
-		return globalMap.entrySet().iterator();
+	public Map<String, IHeaderNode> getGlobal() {
+		return globalMap;
 	}
 
-	@Nullable
 	@Override
-	public Iterator<Entry<String, IHeaderNode>> getManual(final String scope) {
-		final Map<String, IHeaderNode> m = manualMap.get(scope);
-		return m != null ? m.entrySet().iterator() : null;
+	public Map<String, Map<String, IHeaderNode>> getManual() {
+		return manualMap;
 	}
 
-	@SuppressWarnings("null")
 	@Override
-	public Iterator<String> getManual() {
-		return manualMap.keySet().iterator();
-	}
-
-	@SuppressWarnings("null")
-	@Override
-	public Iterator<String> getExternal() {
-		return requiredSet.iterator();
+	public Set<String> getExternal() {
+		return requiredSet;
 	}
 
 	@Override

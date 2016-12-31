@@ -4,7 +4,6 @@ import static de.xima.fc.form.expression.enums.ESeverityOption.TREAT_MISSING_REQ
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -32,7 +31,6 @@ import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableResolutionResult;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
-import de.xima.fc.form.expression.node.ASTFunctionClauseNode;
 import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
@@ -44,7 +42,6 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 	protected final Set<Integer> globalVariables;
 	protected final Map<Integer, FunctionInfo> functionInfoMap;
 
-	private final IScopeDefinitionsBuilder scopeDefBuilder;
 	private final IEvaluationContextContract<?> factory;
 	private final Stack<String> defaultScopeStack = new Stack<>();
 	private final ISeverityConfig config;
@@ -53,7 +50,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 
 	private VariableResolveVisitor(final IScopeDefinitionsBuilder scopeDefBuilder,
 			final IEvaluationContextContract<?> factory, final ISeverityConfig config) {
-		this.scopeDefBuilder = scopeDefBuilder;
+		super(scopeDefBuilder);
 		this.factory = factory;
 		this.config = config;
 		this.globalVariables = new HashSet<>();
@@ -67,8 +64,8 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		// context.
 
 		// Try manual scope.
-		if (scopeDefBuilder.hasManual(scope)) {
-			final IHeaderNode header = scopeDefBuilder.getManual(scope, name);
+		if (hasManual(scope)) {
+			final IHeaderNode header = getManual(scope, name);
 			if (header != null) {
 				if (!header.isBasicSourceResolved())
 					// Should not happen as these variables are resolved
@@ -90,12 +87,12 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 					throw new ScopeMissingVariableException(scope, name, node);
 				return false;
 			}
-			if (!scopeDefBuilder.hasExternal(scope) && config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR)) {
+			if (!hasExternal(scope) && config.hasOption(TREAT_MISSING_REQUIRE_SCOPE_AS_ERROR)) {
 				if (doThrow)
 					throw new MissingRequireScopeStatementException(scope, node);
 				return false;
 			}
-			scopeDefBuilder.addExternal(scope);
+			addExternal(scope);
 			node.resolveSource(-1, info.getSource(), scope);
 			return true;
 		}
@@ -132,28 +129,17 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 
 	private void resolveScopeDefs(final IScopeDefinitionsBuilder scopeDefBuilder) throws SemanticsException {
 		// Global.
-		for (final Iterator<Entry<String, IHeaderNode>> it = scopeDefBuilder.getGlobal(); it.hasNext();) {
-			final IHeaderNode header = it.next().getValue();
-			header.resolveSource(getNewObjectToSet(Integer.valueOf(-1), header.getNode()).intValue(),
+		for (final IHeaderNode header : scopeDefBuilder.getGlobal().values()) {
+			header.resolveSource(getNewObjectToSet(Integer.valueOf(-1), header.getHeaderValueNode()).intValue(),
 					EVariableSource.ENVIRONMENTAL);
-			if (header.isFunction())
-				((ASTFunctionClauseNode) header.getNode()).resolveSource(header.getBasicSource(),
-						EVariableSource.ENVIRONMENTAL);
 		}
 		// Manual scopes.
-		for (final Iterator<String> it = scopeDefBuilder.getManual(); it.hasNext();) {
-			final String scope = it.next();
+		for (final Entry<String, Map<String, IHeaderNode>> entry : scopeDefBuilder.getManual().entrySet()) {
+			final String scope = entry.getKey();
 			if (scope != null) {
-				final Iterator<Entry<String, IHeaderNode>> it2 = scopeDefBuilder.getManual(scope);
-				if (it2 != null) {
-					while (it2.hasNext()) {
-						final IHeaderNode header = it2.next().getValue();
-						header.resolveSource(getNewObjectToSet(Integer.valueOf(-1), header.getNode()).intValue(),
-								EVariableSource.ENVIRONMENTAL);
-						if (header.isFunction())
-							((ASTFunctionClauseNode) header.getNode()).resolveSource(header.getBasicSource(),
-									EVariableSource.ENVIRONMENTAL);
-					}
+				for (final IHeaderNode header : entry.getValue().values()) {
+					header.resolveSource(getNewObjectToSet(Integer.valueOf(-1), header.getHeaderValueNode()).intValue(),
+							EVariableSource.ENVIRONMENTAL);
 				}
 			}
 		}
@@ -202,7 +188,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		}
 
 		// Check if variable exists globally.
-		final IHeaderNode header = scopeDefBuilder.getGlobal(name);
+		final IHeaderNode header = getGlobal(name);
 		if (header != null) {
 			if (!header.isBasicSourceResolved())
 				throw new VariableNotResolvableException(node);
@@ -289,6 +275,7 @@ public class VariableResolveVisitor extends AVariableBindingVisitor<IdPair, Inte
 		v.resolveScopeDefs(scopeDefBuilder);
 		v.bindScopeDefValues(scopeDefBuilder, Integer.valueOf(-1));
 		node.jjtAccept(v, Integer.valueOf(-1));
+		v.finishQueue();
 		v.binding.reset();
 		return v.new ResImpl(node);
 	}

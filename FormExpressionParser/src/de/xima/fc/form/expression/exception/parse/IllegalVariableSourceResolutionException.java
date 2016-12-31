@@ -13,7 +13,7 @@ public class IllegalVariableSourceResolutionException extends IllegalVariableRes
 	private static final long serialVersionUID = 1L;
 
 	public IllegalVariableSourceResolutionException(final IHeaderNode header, final int newSource) {
-		this(header, header.getNode(), newSource);
+		this(header, header.getHeaderValueNode(), newSource);
 	}
 
 	public IllegalVariableSourceResolutionException(final ISourceResolvable resolvable, final Node node,

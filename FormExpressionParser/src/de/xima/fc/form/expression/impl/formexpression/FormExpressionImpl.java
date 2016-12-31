@@ -1,8 +1,7 @@
 package de.xima.fc.form.expression.impl.formexpression;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Preconditions;
@@ -54,7 +53,7 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	public IEvaluationResult evaluate(@Nonnull final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
-		@Nonnull final List<IEvaluationWarning> warnings;
+		@Nonnull final ImmutableList<IEvaluationWarning> warnings;
 		final ALangObject result;
 		try {
 			result = EvaluateVisitor.evaluateCode(node, scopeDefs, symbolTableSize, ec);
@@ -77,10 +76,10 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 	}
 
 	@Override
-	public List<IEvaluationWarning> analyze(final T object) throws EvaluationException {
+	public ImmutableList<IEvaluationWarning> analyze(final T object) throws EvaluationException {
 		Preconditions.checkNotNull(object, CmnCnst.Error.NULL_EXTERNAL_CONTEXT_OBJECT);
 		final IEvaluationContext ec = makeEc(object);
-		@Nonnull final List<IEvaluationWarning> result;
+		@Nonnull final ImmutableList<IEvaluationWarning> result;
 		try {
 			SimulateVisitor.simulate(node, scopeDefs, ec);
 			UnusedVariableCheckVisitor.check(node, scopeDefs, symbolTableSize, ec);
@@ -100,8 +99,8 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 
 	private class ResImpl implements IEvaluationResult {
 		private final ALangObject object;
-		private final List<IEvaluationWarning> warnings;
-		public ResImpl(final ALangObject object, final List<IEvaluationWarning> warnings){
+		private final ImmutableList<IEvaluationWarning> warnings;
+		public ResImpl(final ALangObject object, final ImmutableList<IEvaluationWarning> warnings){
 			this.object = object;
 			this.warnings = warnings;
 		}
@@ -110,7 +109,7 @@ class FormExpressionImpl<T> implements IFormExpression<T> {
 			return object;
 		}
 		@Override
-		public List<IEvaluationWarning> getWarnings() {
+		public ImmutableList<IEvaluationWarning> getWarnings() {
 			return warnings;
 		}
 	}

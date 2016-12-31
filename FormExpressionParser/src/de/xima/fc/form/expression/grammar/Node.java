@@ -11,7 +11,6 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.ITraceElement;
-import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
@@ -110,7 +109,7 @@ public interface Node extends Serializable, ITraceElement {
 
 	public void assertChildrenExactlyOneOf(int count1, int count2) throws ParseException;
 
-	public void assertChildOfType(int i, Class<ASTVariableTypeNode> clazz) throws ParseException;
+	public void assertChildOfType(int i, Class<? extends Node> clazz) throws ParseException;
 
 	/**
 	 * @param count The number of children this node must have at least.

@@ -62,9 +62,9 @@ public class SimulateVisitor extends FormExpressionVoidVoidVisitorAdapter<Evalua
 
 	private void acceptScopeDefs(final IScopeDefinitions scopeDefs) throws EvaluationException {
 		for (final IHeaderNode header: scopeDefs.getGlobal())
-			header.getNode().jjtAccept(this);
+			header.getHeaderValueNode().jjtAccept(this);
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
 			for (final IHeaderNode header: coll)
-				header.getNode().jjtAccept(this);
+				header.getHeaderValueNode().jjtAccept(this);
 	}
 }

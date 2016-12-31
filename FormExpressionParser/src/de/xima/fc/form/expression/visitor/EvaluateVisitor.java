@@ -998,6 +998,6 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 
 	private void applyAll(final Collection<IHeaderNode> coll) throws EvaluationException {
 		for (final IHeaderNode header : coll)
-			setVariable(header, header.getNode().jjtAccept(this));
+			setVariable(header, header.getHeaderValueNode().jjtAccept(this));
 	}
 }

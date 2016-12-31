@@ -43,8 +43,10 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 	public void visit(final ASTFunctionClauseNode node, final Integer functionId) throws SemanticsException {
 		if (!node.isFunctionIdResolved())
 			throw new FunctionIdNotResolvedException(node);
-		node.resolveClosureTableSize(resolutionResult.getClosureSize(node.getFunctionId()));
-		visitSourceResolvable(functionId, node, node);
+		if (!node.isClosureTableSizeResolved())
+			node.resolveClosureTableSize(resolutionResult.getClosureSize(node.getFunctionId()));
+		if (!node.isClosureSourceResolved())
+			visitSourceResolvable(functionId, node, node);
 		for (int i = 0; i < node.getArgumentCount(); ++i)
 			node.getArgumentNode(i).jjtAccept(this, node.getFunctionId());
 		node.getBodyNode().jjtAccept(this, node.getFunctionId());
@@ -111,14 +113,14 @@ public class ClosureConvertVisitor extends FormExpressionVoidDataVisitorAdapter<
 	private void resolveScopeDefs(final IScopeDefinitions scopeDefs) throws SemanticsException {
 		// Global.
 		for (final IHeaderNode header : scopeDefs.getGlobal()) {
-			visitSourceResolvable(Integer.valueOf(-1), header, header.getNode());
-			header.getNode().jjtAccept(this, Integer.valueOf(-1));
+			visitSourceResolvable(Integer.valueOf(-1), header, header.getHeaderValueNode());
+			header.getHeaderValueNode().jjtAccept(this, Integer.valueOf(-1));
 		}
 		// Manual scopes.
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values()) {
 			for (final IHeaderNode header : coll) {
-				visitSourceResolvable(Integer.valueOf(-1), header, header.getNode());
-				header.getNode().jjtAccept(this, Integer.valueOf(-1));
+				visitSourceResolvable(Integer.valueOf(-1), header, header.getHeaderValueNode());
+				header.getHeaderValueNode().jjtAccept(this, Integer.valueOf(-1));
 			}
 		}
 	}

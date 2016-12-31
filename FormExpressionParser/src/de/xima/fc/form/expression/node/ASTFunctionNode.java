@@ -116,8 +116,19 @@ public class ASTFunctionNode extends ANode implements IFunctionNode {
 	}
 
 	@Override
+	public boolean hasReturnType() {
+		return hasType;
+	}
+
+	@Override
 	@Nonnull
 	public Node getTypeNode() {
+		return jjtGetChild(jjtGetNumChildren()-2);
+	}
+
+	@Override
+	@Nonnull
+	public Node getReturnTypeNode() {
 		return jjtGetChild(jjtGetNumChildren()-2);
 	}
 

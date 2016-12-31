@@ -1,10 +1,17 @@
 package de.xima.fc.form.expression.visitor;
 
-import javax.annotation.Nonnull;
+import java.util.Collection;
+
+import javax.annotation.Nullable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.exception.FormExpressionException;
+import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
+import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.node.ASTArrayNode;
 import de.xima.fc.form.expression.node.ASTAssignmentExpressionNode;
 import de.xima.fc.form.expression.node.ASTBooleanNode;
@@ -50,23 +57,13 @@ import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoidVisitor<Boolean, FormExpressionException> {
-	/**
-	 * @param node Node to be checked.
-	 * @return Whether the node is compile-time constant.
-	 */
-	public static boolean check(@Nonnull final Node node) {
-		final CompileTimeConstantCheckVisitor v = new CompileTimeConstantCheckVisitor();
-		return node.jjtAccept(v).booleanValue();
+@NonNullByDefault
+public class CompileTimeConstantCheckVisitor
+		implements IFormExpressionReturnVoidVisitor<Boolean, FormExpressionException> {
+	private CompileTimeConstantCheckVisitor() {
 	}
 
-	public CompileTimeConstantCheckVisitor() {
-		// This visitor can be public as there are
-		// no fields and no special consideration are required.
-	}
-
-	@Nonnull
-	private Boolean visitChildren(@Nonnull final Node node) {
+	private Boolean visitChildren(final Node node) {
 		for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
 			if (!node.jjtGetChild(i).jjtAccept(this).booleanValue())
 				return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
@@ -84,7 +81,8 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 		// Assignment is not compile-time constant.
 		// When there is only one child (which should not happen...),
 		// there is no assignment.
-		return node.jjtGetNumChildren() <= 1 ? CmnCnst.NonnullConstant.BOOLEAN_TRUE : CmnCnst.NonnullConstant.BOOLEAN_TRUE;
+		return node.jjtGetNumChildren() <= 1 ? CmnCnst.NonnullConstant.BOOLEAN_TRUE
+				: CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
 	@Override
@@ -134,7 +132,7 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTIfClauseNode node) {
-		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+		return visitChildren(node);
 	}
 
 	@Override
@@ -183,21 +181,22 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTBreakClauseNode node) {
-		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
 	@Override
 	public Boolean visit(final ASTContinueClauseNode node) {
-		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
 	@Override
 	public Boolean visit(final ASTReturnClauseNode node) {
-		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
 	}
 
 	@Override
 	public Boolean visit(final ASTLogNode node) {
+		// Not constant because of side effects.
 		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 	}
 
@@ -208,11 +207,14 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTUnaryExpressionNode node) {
-		// i++ is definitely not compile-time constant because it involved assignment
+		// i++ is definitely not compile-time constant because it involved
+		// assignment
 		// i++ => i = i + 1
 		return Boolean.valueOf(!node.getUnaryMethod().isAssigning() && visitChildren(node).booleanValue());
 	}
 
+	// TODO [1,2,3][0] is constant, as is {foo:"bar"}.foo
+	// ()=>{42;}() might be considered constant as well
 	@Override
 	public Boolean visit(final ASTPropertyExpressionNode node) {
 		// Function calls are not compile time constant.
@@ -241,7 +243,8 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTLosNode node) {
-		return CmnCnst.NonnullConstant.BOOLEAN_TRUE;
+		// Not constant because of side effects (writing output).
+		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 	}
 
 	@Override
@@ -266,7 +269,8 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTPostUnaryExpressionNode node) {
-		// i++ is definitely not compile-time constant because it involved assignment
+		// i++ is definitely not compile-time constant because it involves
+		// assignment
 		// i++ => i = i + 1
 		return Boolean.valueOf(!node.getUnaryMethod().isAssigning());
 	}
@@ -278,7 +282,7 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTScopeExternalNode node) {
-		// Meta language, not a data lanugage construct.
+		// Meta language construct, not relevant for evaluation.
 		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 	}
 
@@ -289,13 +293,13 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 
 	@Override
 	public Boolean visit(final ASTScopeManualNode node) {
-		// Meta language, not a data language construct.
+		// Meta language construct, not relevant for evaluation.
 		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 	}
 
 	@Override
 	public Boolean visit(final ASTScopeGlobalNode node) {
-		// Meta language, not a data lanugage construct.
+		// Meta language construct, not relevant for evaluation.
 		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
 	}
 
@@ -307,5 +311,21 @@ public class CompileTimeConstantCheckVisitor implements IFormExpressionReturnVoi
 	@Override
 	public Boolean visit(final ASTFunctionArgumentNode node) throws RuntimeException {
 		return CmnCnst.NonnullConstant.BOOLEAN_FALSE;
+	}
+
+	public static void check(final IScopeDefinitions scopeDef) throws HeaderAssignmentNotCompileTimeConstantException {
+		final CompileTimeConstantCheckVisitor visitor = new CompileTimeConstantCheckVisitor();
+		checkScopeDefsConstancy(scopeDef.getGlobal(), visitor);
+		for (final Collection<IHeaderNode> coll : scopeDef.getManual().values())
+			checkScopeDefsConstancy(coll, visitor);
+	}
+
+	private static void checkScopeDefsConstancy(@Nullable final Collection<IHeaderNode> collection,
+			final CompileTimeConstantCheckVisitor visitor) throws HeaderAssignmentNotCompileTimeConstantException {
+		if (collection == null)
+			return;
+		for (final IHeaderNode hn : collection)
+			if (!hn.getHeaderValueNode().jjtAccept(visitor).booleanValue())
+				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getHeaderValueNode());
 	}
 }

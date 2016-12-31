@@ -51,8 +51,6 @@ $(function(){
 	    }
 	})
 	
-	DEBUG = myCodeMirror;
-
 	var selectTheme = $("#theme")
 	var buttonHlgt = $("#buttonHighlight")
 	var buttonFmt = $("#buttonFormat")
@@ -137,9 +135,9 @@ $(function(){
 		out.empty().text("working...")
 		$.post("./HighlightServlet", form.serialize(), null, "json")
 			.done(function(data){
-				console.log(data)
 				out.empty()
 				if (data.error) {
+					console.error(data)
 					out.text(data.error)
 				}
 				else {
@@ -160,9 +158,9 @@ $(function(){
 		out.empty().text("working...")
 		$.post("./FormatServlet", form.serialize(), null, "json")
 			.done(function(data){
-				console.log(data, (data||{}).text)
 				out.empty()
 				if (data.error) {
+					console.error(data)
 					out.text(data.error)
 				}
 				else {
@@ -181,9 +179,9 @@ $(function(){
 		out.empty().text("working...")
 		$.post("./UnformatServlet", form.serialize(), null, "json")
 			.done(function(data){
-				console.log(data, (data||{}).text)
 				out.empty()
 				if (data.error) {
+					console.error(data)
 					out.text(data.error)
 				}
 				else {
@@ -202,9 +200,9 @@ $(function(){
 		out.empty().text("working...")
 		$.post("./EvaluateServlet", form.serialize(), null, "json")
 			.done(function(data){
-				console.log(data)
 				out.empty()
 				if (data.error) {
+					console.error(data)
 					out.append($("<pre></pre>").text(data.error))
 				}
 				else {

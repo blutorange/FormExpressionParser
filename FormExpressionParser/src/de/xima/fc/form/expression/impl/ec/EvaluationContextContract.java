@@ -16,7 +16,7 @@ import de.xima.fc.form.expression.impl.externalcontext.ExternalContextContractFa
 import de.xima.fc.form.expression.impl.library.ELibraryContractFactory;
 import de.xima.fc.form.expression.impl.logger.ELoggerContractFactory;
 import de.xima.fc.form.expression.impl.namespace.ENamespaceContractFactory;
-import de.xima.fc.form.expression.impl.tracer.DummyTracer;
+import de.xima.fc.form.expression.impl.tracer.EDummyTracer;
 import de.xima.fc.form.expression.impl.tracer.GenericTracer;
 
 @NonNullByDefault
@@ -116,7 +116,7 @@ public class EvaluationContextContract<T> implements IEvaluationContextContract<
 
 	@Override
 	public ITracer<Node> makeTracer() {
-		return tracingEnabled ? new GenericTracer() : DummyTracer.INSTANCE;
+		return tracingEnabled ? new GenericTracer() : EDummyTracer.INSTANCE;
 	}
 
 	@Override

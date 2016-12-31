@@ -92,7 +92,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	@Override
 	public void visit(final ASTFunctionClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
 		builder.setBasicType(ELangObjectClass.FUNCTION);
-		builder.append(getType(node));
+		builder.append(getReturnType(node));
 		for (int i = 0; i < node.getArgumentCount(); ++i) {
 			IVariableType type = visitTypedNode(node.getArgResolvable(i));
 			if (node.hasVarArgs() && i == node.getArgumentCount() - 1) {
@@ -126,15 +126,24 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	}
 
 	private <T extends IVariableTyped & Node> IVariableType getType(final T typedNode) throws SemanticsException {
-		return getType(typedNode, typedNode);
+		return getType((IVariableTyped)typedNode, (Node)typedNode);
+	}
+
+	private IVariableType getReturnType(final ASTFunctionClauseNode node) throws SemanticsException {
+		if (!node.hasReturnType())
+			return SimpleVariableType.OBJECT;
+		return getType(node.getReturnTypeNode(), node);
 	}
 
 	private IVariableType getType(final IVariableTyped typed, final Node node) throws SemanticsException {
-		if (!typed.hasType()) {
+		if (!typed.hasType())
 			return SimpleVariableType.OBJECT;
-		}
+		return getType(typed.getTypeNode(), node);
+	}
+
+	private IVariableType getType(final Node typeNode, final Node node) throws SemanticsException {
 		final VariableTypeBuilder newBuilder = new VariableTypeBuilder();
-		typed.getTypeNode().jjtAccept(this, newBuilder);
+		typeNode.jjtAccept(this, newBuilder);
 		try {
 			return newBuilder.build();
 		}
@@ -169,11 +178,11 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	private void visitHeaderNode(final IHeaderNode header) throws SemanticsException {
 		final IVariableType type;
 		if (header.hasType())
-			type = getType(header, header.getNode());
+			type = getType(header, header.getHeaderValueNode());
 		else
 			type = SimpleVariableType.OBJECT;
-		resolveTypedNode(header, header.getNode(), type);
-		header.getNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
+		resolveTypedNode(header, header.getHeaderValueNode(), type);
+		header.getHeaderValueNode().jjtAccept(this, DummyVariableTypeBuilder.INSTANCE);
 	}
 
 	private void visitScopeDefs(final IScopeDefinitions scopeDefs) throws SemanticsException {

@@ -1,5 +1,6 @@
 package de.xima.fc.form.expression.visitor;
 
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
 import static de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor.EType.ALWAYS;
 import static de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor.EType.WHEN_FALSE;
 import static de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor.EType.WHEN_TRUE;
@@ -23,7 +24,6 @@ import de.xima.fc.form.expression.exception.parse.DuplicateLabelException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.UnhandledEnumException;
 import de.xima.fc.form.expression.exception.parse.VariableUsedBeforeAssignmentException;
-import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
@@ -77,13 +77,7 @@ import de.xima.fc.form.expression.node.ASTWithClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
-// TODO Some nodes only analyzed when true or false. Does this make sense?
-//
-// ASTUnaryExpressionNode
-//   !() analyzed only when true / false
-//
-// ASTDoWhileLoopNode
-//  DoFooterNode analyzed only when false
+//TODO Write some tests for definite assignment analysis.
 
 /**
  * Rules for the maps passed around:
@@ -124,8 +118,9 @@ public class DefiniteAssignmentCheckVisitor
 
 	private Map<Integer, Object> jjtAccept(final Node node, final Map<Integer, Object> map, final EType type)
 			throws SemanticsException {
-		// Type is almost always ALWAYS
-		// So we check for the most common case
+		// Type is almost always ALWAYS.
+		// So we check for the most common case.
+		// It also helps limiting the size of the stack.
 		if (typeStack.peek() == type)
 			return node.jjtAccept(this, map);
 		typeStack.push(type);
@@ -213,7 +208,6 @@ public class DefiniteAssignmentCheckVisitor
 		return visitNaryExpressionNode(node, map, node.jjtGetNumChildren());
 	}
 
-	//TODO this is not making sense, visit ALL nodes, not only the first two..
 	public Map<Integer, Object> visitNaryExpressionNode(final ASTExpressionNode node, Map<Integer, Object> map,
 			final int index) throws SemanticsException {
 		// Turn
@@ -435,7 +429,7 @@ public class DefiniteAssignmentCheckVisitor
 		final int count = node.getAssignableNodeCount();
 		for (int i = count; i -->0;) {
 			final Node n = node.getAssignableNode(i);
-			if (n.jjtGetNodeId() == FormExpressionParserTreeConstants.JJTVARIABLENODE
+			if (n.jjtGetNodeId() == JJTVARIABLENODE
 					&& node.getAssignMethod(i) == EMethod.EQUAL)
 				markAssigned(map, (ASTVariableNode)n);
 			else
@@ -604,7 +598,8 @@ public class DefiniteAssignmentCheckVisitor
 	@Override
 	public Map<Integer, Object> visit(final ASTVariableNode node, final Map<Integer, Object> map) throws SemanticsException {
 		final Integer variableId = Integer.valueOf(node.getBasicSource());
-		if (!resolutionResult.containsBasicSourcedGlobalVariable(variableId)
+		if (!node.getSourceType().isDefinitelyAssigned()
+				&& !resolutionResult.containsBasicSourcedGlobalVariable(variableId)
 				&& map.get(Integer.valueOf(node.getBasicSource())) == null)
 			throw new VariableUsedBeforeAssignmentException(node.getVariableName(), node);
 		return map;
@@ -1008,40 +1003,118 @@ public class DefiniteAssignmentCheckVisitor
 		return intersectToLhs(afterS, afterT);
 	}
 
-	//TODO Java does not allow expressions for case(...), I do. Update these rules...
 	/**
-	 * <h1><code>p ; switch ( q ) case r<sub>1</sub> : s<sub>1</sub> ... case r<sub>n</sub> : s<sub>n</sub> ; default: t ; u </code></h1>
+	 * <h1><pre>
+	 *   p ;
+	 *   switch ( q )
+	 *     case r<sub>1</sub>:
+	 *     case r<sub>2</sub>:
+	 *     ...
+	 *     case r<sub>k<sub>1</sub></sub>:
+	 *       [ s<sub>1</sub> ] ;
+	 *     case r<sub>k<sub>1</sub>+1</sub>:
+	 *     case r<sub>k<sub>1</sub>+2</sub>:
+	 *     ...
+	 *     case r<sub>k<sub>2</sub></sub>:
+	 *       s<sub>2</sub> ;
+	 *     ...
+	 *     ...
+	 *     case r<sub>k<sub>n-1</sub>+1</sub>:
+	 *     ...
+	 *     case r<sub>k<sub>n</sub></sub>:
+	 *       s<sub>n</sub> ;
+	 *     default:
+	 *       t ;
+	 *   u ;
+	 * </pre></h1>
 	 * <p><ul>
 	 * <li>BEFORE(q) = BEFORE(switch)</li>
-	 * <li>BEFORE(s<sub>1</sub>) = AFTER(q)</li>
-	 * <li>BEFORE(s<sub>i</sub>) = AFTER(q) &#8745; AFTER(s<sub>i-1</sub>), i &#8712; [2,n]</li>
-	 * <li></li>
-	 * <li>AFTER(switch) </li>
-	 * <li>&#8745;</li>
+	 * <li>BEFORE(r<sub>1</sub>) = AFTER(q)</li>
+	 * <li>BEFORE(r<sub>i</sub>) = AFTER(r<sub>i-1</sub>), i &#8712; [2, k<sub>n</sub>]</li>
+	 * <li>BEFORE(s<sub>i</sub>) = AFTER(q), i &#8712; [1,n]</li>
+	 * <li>AFTER(switch) = &#8898;<sub>i=1</sub><sup>n</sup>{BREAK(s<sub>i</sub>)} &#8745; BREAK(t) &#8745; afterS<sup>iff n > 0 or t exists</sup> &#8745; afterQ <sup>iff t not exists or no block-statement-group after last label</sup></li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
-	 *   var v;
-	 *   try {
-	 *     throw exception(v=0);
-	 *   }
-	 *   catch (e) {
-	 *     v = 0;
-	 *   }
-	 *
 	 *   var u;
-	 *   try {
-	 *     v = 0;
+	 *   var v;
+	 *   var w;
+	 *   switch (v=0) {
+	 *     case 0:
+	 *     case (u=1):
+	 *     case 2:
+	 *       w = 2;
+	 *       break;
+	 *     case u:
+	 *       w = 2;
 	 *   }
-	 *   catch (exception) {
-	 *     v = 0;
-	 *   }
+	 *   u;
+	 *   v;
+	 *   w;
 	 * }
 	 * </pre>
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTSwitchClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// TODO Auto-generated method stub
+		final int count = node.getCaseCount();
+		boolean hasBlockStatement = false;
+		boolean hasExplicitDefault = false;
+		final Map<Integer, Object> afterQ = jjtAccept(node.getSwitchValueNode(), map, ALWAYS);
+		Map<Integer, Object> beforeR = copy(afterQ);
+		Map<Integer, Object> afterS = afterQ;
+		addLabel(node, markAllAssigned(copy(afterQ)), null);
+		int i = 0;
+		while (i < count) {
+			switch(node.getCaseType(i)) {
+			case SWITCHCASE: {
+				beforeR = jjtAccept(node.getCaseNode(i), beforeR, ALWAYS);
+				++i;
+				break;
+			}
+			case SWITCHCLAUSE: {
+				hasBlockStatement = true;
+				Node n = node.getCaseNode(i);
+				afterS = copy(afterQ);
+				do {
+					afterS = jjtAccept(n, afterS, ALWAYS);
+				} while (++i < count && (n = node.getCaseNode(i)).getSiblingMethod() == EMethod.SWITCHCLAUSE);
+				break;
+			}
+			case SWITCHDEFAULT: {
+				hasExplicitDefault = true;
+				hasBlockStatement = true;
+				Node n = node.getCaseNode(i);
+				afterS = copy(afterQ);
+				do {
+					n = node.getCaseNode(i);
+					afterS = jjtAccept(n, afterS, ALWAYS);
+				} while (++i < count && (n = node.getCaseNode(i)).getSiblingMethod() == EMethod.SWITCHDEFAULT);
+				break;
+			}
+			//$CASES-OMITTED$
+			default:
+				throw new UnhandledEnumException(node.getCaseType(i), node.getCaseNode(i));
+			}
+		}
+		final LabelInfo infoBreak  = popLabel(node);
+		if (infoBreak == null)
+			throw new SemanticsException(
+					NullUtil.messageFormat(CmnCnst.Error.NO_MATCHING_LABEL_INFO, node.getLabel()), node);
+		final Map<Integer, Object> afterSwitch = infoBreak.getBreakMap();
+		// Either there is a default label in the switch block or a variable is assigned after the switch expression.
+		//
+		// Either there are no switch labels in the switch block that do not
+		// begin a block-statement-group or a variable is assigned after the
+		// switch expression.
+		if (!node.hasDefaultCase()
+				|| (count > 0 && node.getCaseType(count - 1) == EMethod.SWITCHCASE)
+				|| (node.hasDefaultCase() && !hasExplicitDefault))
+			intersectToLhs(afterSwitch, afterQ);
+		// Either the switch block contains no block-statement-groups or a variable is
+		// assigned after the last block-statement of the last block-statement-group.
+		if (hasBlockStatement)
+			intersectToLhs(afterSwitch, afterS);
+		return afterSwitch;
 	}
 
 	/**
@@ -1702,7 +1775,7 @@ public class DefiniteAssignmentCheckVisitor
 
 	private void visitHeader(@Nullable final IHeaderNode header) throws SemanticsException {
 		if (header != null && header.isFunction())
-			jjtAccept(header.getNode(), Collections.<Integer, Object>emptyMap(), ALWAYS);
+			jjtAccept(header.getHeaderValueNode(), new HashMap<Integer, Object>(), ALWAYS);
 	}
 
 	private <T extends Node & ILabeled> void addLabel(final T node, @Nullable final Map<Integer, Object> forBreak,
@@ -1721,7 +1794,7 @@ public class DefiniteAssignmentCheckVisitor
 	@Nullable
 	private <T extends Node & ILabeled> LabelInfo popLabel(final T node) {
 		final String label = node.getLabel();
-		LabelInfo info;
+		final LabelInfo info;
 		if (label == null)
 			info = labelStack.isEmpty() ? null : labelStack.pop();
 		else
@@ -1759,7 +1832,6 @@ public class DefiniteAssignmentCheckVisitor
 		return getInfo(node, map, fullMap, copy(fullMap), type, labeledNode);
 	}
 
-	//TODO must also visit lambda defined at global scope, not only header functions
 	public static void check(final Node node, final IScopeDefinitions scopeDefs, final IVariableResolutionResult resolutionResult) throws SemanticsException {
 		final DefiniteAssignmentCheckVisitor v = new DefiniteAssignmentCheckVisitor(resolutionResult);
 		for (final IHeaderNode header : scopeDefs.getGlobal())
@@ -1767,22 +1839,26 @@ public class DefiniteAssignmentCheckVisitor
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
 			for (final IHeaderNode header : coll)
 				v.visitHeader(header);
+		node.jjtAccept(v, new HashMap<Integer, Object>());
 	}
 
 	private static class LabelInfo {
+		private final static Map<Integer, Object> EMPTY_MAP = Collections.<Integer,Object>emptyMap();
 		private final Map<Integer, Object> forBreak;
 		private final Map<Integer, Object> forContinue;
 		private Map<Integer, Object> map;
 		public LabelInfo(@Nullable final Map<Integer, Object> forBreak, @Nullable final Map<Integer, Object> forContinue) {
-			this.forBreak = forBreak != null ? forBreak : Collections.<Integer,Object>emptyMap();
-			this.forContinue = forContinue != null ? forContinue : Collections.<Integer,Object>emptyMap();
-			map = Collections.emptyMap();
+			this.forBreak = forBreak != null ? forBreak : EMPTY_MAP;
+			this.forContinue = forContinue != null ? forContinue : EMPTY_MAP;
+			map = EMPTY_MAP;
 		}
 		public Map<Integer, Object> getContinueMap() {
-			return forContinue;
+			// Exception occurs when trying to add objects to the empty map.
+			return forContinue != EMPTY_MAP ? forContinue : new HashMap<Integer, Object>();
 		}
 		public Map<Integer, Object> getBreakMap() {
-			return forBreak;
+			// Exception occurs when trying to add objects to the empty map.
+			return forBreak != EMPTY_MAP ? forBreak : new HashMap<Integer, Object>();
 		}
 		public void intersectToBreak(final Map<Integer, Object> rhs) {
 			intersectToLhs(forBreak, rhs);
@@ -1798,7 +1874,8 @@ public class DefiniteAssignmentCheckVisitor
 			this.map = map;
 		}
 		public Map<Integer, Object> getMap() {
-			return map;
+			// Exception occurs when trying to add objects to the empty map.
+			return map != EMPTY_MAP ? map : new HashMap<Integer, Object>();
 		}
 	}
 

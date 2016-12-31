@@ -2,12 +2,13 @@ package de.xima.fc.form.expression.impl.tracer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+
+import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
@@ -107,8 +108,8 @@ public class GenericTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public List<IEvaluationWarning> buildWarnings() {
-		return warnList != null ? new ArrayList<>(warnList)
-				: NullUtil.checkNotNull(Collections.<IEvaluationWarning> emptyList());
+	public ImmutableList<IEvaluationWarning> buildWarnings() {
+		return warnList != null ? ImmutableList.copyOf(warnList)
+				: NullUtil.checkNotNull(ImmutableList.<IEvaluationWarning>of());
 	}
 }

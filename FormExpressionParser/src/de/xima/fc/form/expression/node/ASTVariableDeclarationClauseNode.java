@@ -15,12 +15,13 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 
 @NonNullByDefault
-public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode implements IVariableTyped {
+public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode implements IVariableTyped, IHeaderNode {
 	private static final long serialVersionUID = 1L;
 
 	public ASTVariableDeclarationClauseNode(final FormExpressionParser parser, final int nodeId) {
@@ -99,5 +100,20 @@ public class ASTVariableDeclarationClauseNode extends ASourceResolvableNode impl
 			return ELangObjectClass.OBJECT;
 		final ASTVariableTypeNode node = getNthChildAsOrNull(0, ASTVariableTypeNode.class);
 		return node != null ? node.getLangObjectClass() : ELangObjectClass.OBJECT;
+	}
+
+	@Override
+	public Node getHeaderValueNode() {
+		return hasAssignment() ? getAssignmentNode() : new ASTNullNode(this);
+	}
+
+	@Override
+	public boolean isFunction() {
+		return false;
+	}
+
+	@Override
+	public Node getHeaderDeclarationNode() {
+		return this;
 	}
 }

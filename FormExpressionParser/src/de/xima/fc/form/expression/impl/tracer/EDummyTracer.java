@@ -1,7 +1,6 @@
 package de.xima.fc.form.expression.impl.tracer;
 
-import java.util.Collections;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
@@ -16,7 +15,7 @@ import de.xima.fc.form.expression.util.NullUtil;
  * @author mad_gaksha
  *
  */
-public enum DummyTracer implements ITracer<Node> {
+public enum EDummyTracer implements ITracer<Node> {
 	INSTANCE;
 	@Override
 	public void setCurrentlyProcessed(final Node object) {
@@ -49,8 +48,8 @@ public enum DummyTracer implements ITracer<Node> {
 	}
 
 	@Override
-	public List<IEvaluationWarning> buildWarnings() {
-		return NullUtil.checkNotNull(Collections.<IEvaluationWarning>emptyList());
+	public ImmutableList<IEvaluationWarning> buildWarnings() {
+		return NullUtil.checkNotNull(ImmutableList.<IEvaluationWarning>of());
 	}
 
 	@Override

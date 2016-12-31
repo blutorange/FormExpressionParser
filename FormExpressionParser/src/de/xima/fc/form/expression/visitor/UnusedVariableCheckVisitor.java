@@ -104,13 +104,13 @@ public class UnusedVariableCheckVisitor extends FormExpressionVoidDataVisitorAda
 
 	private void defineScopeDefs(final IScopeDefinitions scopeDefs) {
 		for (final IHeaderNode header : scopeDefs.getGlobal()) {
-			addToNodeTable(header, header.getDeclarationNode());
-			header.getNode().jjtAccept(this, CmnCnst.NonnullConstant.BOOLEAN_FALSE);
+			addToNodeTable(header, header.getHeaderDeclarationNode());
+			header.getHeaderValueNode().jjtAccept(this, CmnCnst.NonnullConstant.BOOLEAN_FALSE);
 		}
 		for (final Collection<IHeaderNode> coll : scopeDefs.getManual().values())
 			for (final IHeaderNode header : coll) {
-				addToNodeTable(header, header.getDeclarationNode());
-				header.getNode().jjtAccept(this, CmnCnst.NonnullConstant.BOOLEAN_FALSE);
+				addToNodeTable(header, header.getHeaderDeclarationNode());
+				header.getHeaderValueNode().jjtAccept(this, CmnCnst.NonnullConstant.BOOLEAN_FALSE);
 			}
 	}
 

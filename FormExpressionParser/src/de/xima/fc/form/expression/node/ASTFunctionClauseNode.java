@@ -2,10 +2,13 @@ package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.enums.EVariableSource;
 import de.xima.fc.form.expression.exception.FormExpressionException;
+import de.xima.fc.form.expression.exception.parse.IllegalVariableSourceResolutionException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.grammar.ParseException;
@@ -14,13 +17,15 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
 import de.xima.fc.form.expression.iface.parse.IFunctionNode;
+import de.xima.fc.form.expression.iface.parse.IHeaderNode;
+import de.xima.fc.form.expression.iface.parse.IScopedSourceResolvable;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.CmnCnst.Syntax;
 import de.xima.fc.form.expression.util.NullUtil;
 
 @NonNullByDefault
-public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implements IFunctionNode {
+public class ASTFunctionClauseNode extends ANode implements IScopedSourceResolvable, IFunctionNode, IHeaderNode {
 	private static final long serialVersionUID = 1L;
 
 	private boolean hasVarArgs;
@@ -36,10 +41,8 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 		assertChildrenAtLeast(2);
 		if (hasVarArgs && jjtGetNumChildren() == (hasType ? 3 : 2))
 			throw new ParseException(CmnCnst.Error.VAR_ARGS_WITHOUT_ARGUMENTS);
-		final ASTVariableNode var = getNthChildAs(hasType ? 1 : 0, ASTVariableNode.class);
-		final String scope = var.getScope();
-		final String variableName = var.getVariableName();
-		super.init(method, scope, variableName);
+		assertChildOfType(hasType ? 1 : 0, ASTVariableNode.class);
+		super.init(method);
 		this.hasVarArgs = hasVarArgs;
 		this.hasType = hasType;
 	}
@@ -109,7 +112,7 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 
 	public void supplyScope(@Nullable final String scope) {
 		if (scope != null)
-			setScope(scope);
+			getVariableNode().setScope(scope);
 	}
 
 	@Override
@@ -119,12 +122,23 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 
 	@Override
 	public boolean hasType() {
-		return hasType;
+		return true;
 	}
 
 	@Override
 	@Nonnull
 	public Node getTypeNode() {
+		return this;
+	}
+
+	@Override
+	public boolean hasReturnType() {
+		return hasType;
+	}
+
+	@Override
+	@Nonnull
+	public Node getReturnTypeNode() {
 		return jjtGetChild(0);
 	}
 
@@ -165,5 +179,82 @@ public class ASTFunctionClauseNode extends AScopedSourceResolvableNode implement
 	@Override
 	public boolean isClosureTableSizeResolved() {
 		return closureTableSize  >= 0;
+	}
+
+	@Override
+	public Node getHeaderValueNode() {
+		return this;
+	}
+
+	@Override
+	public boolean isFunction() {
+		return true;
+	}
+
+	@Override
+	public Node getHeaderDeclarationNode() {
+		return this;
+	}
+
+	@Override
+	public void resolveSource(final int source, final EVariableSource type) throws IllegalVariableSourceResolutionException {
+		getVariableNode().resolveSource(source, type);
+	}
+
+	@Override
+	public void resolveClosureSource(final int source) throws IllegalVariableSourceResolutionException {
+		getVariableNode().resolveClosureSource(source);
+	}
+
+	@Override
+	public int getBasicSource() {
+		return getVariableNode().getBasicSource();
+	}
+
+	@Override
+	public int getClosureSource() {
+		return getVariableNode().getClosureSource();
+	}
+
+	@Override
+	public EVariableSource getSourceType() {
+		return getVariableNode().getSourceType();
+	}
+
+	@Override
+	public boolean isBasicSourceResolved() {
+		return getVariableNode().isBasicSourceResolved();
+	}
+
+	@Override
+	public boolean isClosureSourceResolved() {
+		return getVariableNode().isClosureSourceResolved();
+	}
+
+	@Override
+	public String getVariableName() {
+		return getVariableNode().getVariableName();
+	}
+
+	@Override
+	public void convertEnvironmentalToClosure() throws IllegalVariableSourceResolutionException {
+		getVariableNode().convertEnvironmentalToClosure();
+	}
+
+	@Override
+	public void resolveSource(final int source, final EVariableSource sourceType, final String scope)
+			throws IllegalVariableSourceResolutionException {
+		getVariableNode().resolveSource(source, sourceType, scope);
+	}
+
+	@Nullable
+	@Override
+	public String getScope() {
+		return getVariableNode().getScope();
+	}
+
+	@Override
+	public boolean hasScope() {
+		return getVariableNode().hasScope();
 	}
 }

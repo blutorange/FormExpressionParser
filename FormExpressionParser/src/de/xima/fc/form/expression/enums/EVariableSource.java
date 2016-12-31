@@ -21,6 +21,11 @@ public enum EVariableSource {
 		public boolean isExternal() {
 			return false;
 		}
+
+		@Override
+		public boolean isDefinitelyAssigned() {
+			return false;
+		}
 	},
 	/**
 	 * <p>
@@ -31,7 +36,7 @@ public enum EVariableSource {
 	 * the graph upwards until a function contains the closure variable.
 	 * </p><p>
 	 * When the <code>source</code> is the value of {@link ISourceResolvable#getSource()},
-	 * <code>(source>>16)&0xFFFF0000</code> is the number of parents we need to go up, and 
+	 * <code>(source>>16)&0xFFFF0000</code> is the number of parents we need to go up, and
 	 * <code>source&0x0000FFFF</code> is the position in the symbol table of that parent
 	 * containing the value of the variable.
 	 * </p>
@@ -51,6 +56,11 @@ public enum EVariableSource {
 		public boolean isExternal() {
 			return false;
 		}
+
+		@Override
+		public boolean isDefinitelyAssigned() {
+			return false;
+		}
 	},
 	/** Variables provided by the {@link IExternalContext} */
 	EXTERNAL_CONTEXT {
@@ -68,8 +78,13 @@ public enum EVariableSource {
 		public boolean isExternal() {
 			return true;
 		}
+
+		@Override
+		public boolean isDefinitelyAssigned() {
+			return true;
+		}
 	},
-	/** Variables provided by some system library {@link ILibrary}. */ 
+	/** Variables provided by some system library {@link ILibrary}. */
 	LIBRARY {
 		@Override
 		public boolean isResolved() {
@@ -84,6 +99,11 @@ public enum EVariableSource {
 		@Override
 		public boolean isExternal() {
 			return false;
+		}
+
+		@Override
+		public boolean isDefinitelyAssigned() {
+			return true;
 		}
 	},
 	/** Variables not resolved yet. */
@@ -102,6 +122,11 @@ public enum EVariableSource {
 		public boolean isExternal() {
 			return false;
 		}
+
+		@Override
+		public boolean isDefinitelyAssigned() {
+			return false;
+		}
 	};
 
 	public abstract boolean isResolved();
@@ -109,4 +134,6 @@ public enum EVariableSource {
 	public abstract boolean isAssignable();
 
 	public abstract boolean isExternal();
+
+	public abstract boolean isDefinitelyAssigned();
 }

@@ -307,7 +307,7 @@ public abstract class ANode implements Node {
 	}
 
 	@Override
-	public final void assertChildOfType(final int i, final Class<ASTVariableTypeNode> clazz) throws ParseException {
+	public final void assertChildOfType(final int i, final Class<? extends Node> clazz) throws ParseException {
 		if (!clazz.isAssignableFrom(children[i].getClass()))
 			throw new ParseException(
 					NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_TYPE, Integer.valueOf(i),

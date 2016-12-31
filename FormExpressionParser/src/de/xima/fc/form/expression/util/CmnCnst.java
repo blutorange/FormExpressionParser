@@ -434,6 +434,8 @@ public final class CmnCnst {
 		public static final String ILLEGAL_NODE_TYPE = "Expected child {0} to be of type {1}, but it is of type {2}. " + INTERNAL_ERROR;
 		public static final String VARIABLE_USED_BEFORE_ASSIGNMENT = "Variable {0} was used before it was definitely assigned.";
 		public static final String NO_MATCHING_LABEL_INFO = "Cannot find matching info for label {0}. " + INTERNAL_ERROR;
+		public static final String DEFAULT_CASE_MUST_BE_LAST = "Default case of a switch statement must occur last.";
+		public static final String DEFAULT_USED_MULTIPLE_TIMES = "Default case must not occur more than once.";
 	}
 
 	public static final class ToString {

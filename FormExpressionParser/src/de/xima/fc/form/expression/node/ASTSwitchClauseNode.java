@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -17,6 +18,7 @@ import de.xima.fc.form.expression.iface.parse.ILabeled;
 public class ASTSwitchClauseNode extends ANode  implements ILabeled {
 	private static final long serialVersionUID = 1L;
 	@Nullable private String label;
+	private int indexDefault = -1;
 
 	public ASTSwitchClauseNode(final FormExpressionParser parser, final int nodeId) {
 		super(parser, nodeId);
@@ -47,10 +49,11 @@ public class ASTSwitchClauseNode extends ANode  implements ILabeled {
 		visitor.visit(this);
 	}
 
-	public void init(@Nullable final EMethod method, @Nullable final String label) throws ParseException {
+	public void init(@Nullable final EMethod method, @Nullable final String label, final int indexDefault) throws ParseException {
 		assertChildrenAtLeast(1);
 		super.init(method);
 		this.label = label;
+		this.indexDefault = indexDefault;
 	}
 
 	@Nullable
@@ -75,7 +78,7 @@ public class ASTSwitchClauseNode extends ANode  implements ILabeled {
 	public int getCaseCount() {
 		return jjtGetNumChildren() - 1;
 	}
-	
+
 	public EMethod getCaseType(final int i) {
 		return jjtGetChild(i+1).getSiblingMethod();
 	}
@@ -85,6 +88,10 @@ public class ASTSwitchClauseNode extends ANode  implements ILabeled {
 	}
 
 	public boolean hasDefaultCase() {
-		return jjtGetChild(jjtGetNumChildren()-1).getSiblingMethod() == EMethod.SWITCHDEFAULT;
+		return indexDefault != -1;
+	}
+
+	public int getDefaultIndex() {
+		return indexDefault;
 	}
 }

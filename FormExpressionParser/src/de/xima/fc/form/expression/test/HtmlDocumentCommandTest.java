@@ -27,7 +27,7 @@ import de.xima.fc.form.expression.impl.formexpression.EvaluationContextImpl;
 import de.xima.fc.form.expression.impl.library.ELibraryContractFactory;
 import de.xima.fc.form.expression.impl.logger.ELoggerContractFactory;
 import de.xima.fc.form.expression.impl.namespace.ENamespaceContractFactory;
-import de.xima.fc.form.expression.impl.tracer.DummyTracer;
+import de.xima.fc.form.expression.impl.tracer.EDummyTracer;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -144,7 +144,7 @@ public class HtmlDocumentCommandTest {
 		}
 		@Override
 		public ITracer<Node> makeTracer() {
-			return DummyTracer.INSTANCE;
+			return EDummyTracer.INSTANCE;
 		}
 		@Override
 		public ILoggerContractFactory getLoggerFactory() {

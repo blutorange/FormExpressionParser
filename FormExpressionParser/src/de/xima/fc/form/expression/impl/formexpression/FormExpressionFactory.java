@@ -4,19 +4,16 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.base.Preconditions;
 
 import de.xima.fc.form.expression.enums.ESeverityOption;
-import de.xima.fc.form.expression.exception.parse.HeaderAssignmentNotCompileTimeConstantException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.FormExpressionParser;
 import de.xima.fc.form.expression.grammar.FormExpressionParserConstants;
@@ -33,7 +30,6 @@ import de.xima.fc.form.expression.iface.config.IUnparseConfig;
 import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
-import de.xima.fc.form.expression.iface.parse.IHeaderNode;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitionsBuilder;
 import de.xima.fc.form.expression.iface.parse.IToken;
@@ -328,7 +324,7 @@ public final class FormExpressionFactory {
 		// Finalize scope content.
 		final IScopeDefinitions scopeDefs = scopeDefBuilder.build();
 		// Assignments in scopes must be constant.
-		checkScopeDefsConstancy(scopeDefs);
+		CompileTimeConstantCheckVisitor.check(scopeDefs);
 		// All variables must be written to before they are read.
 		DefiniteAssignmentCheckVisitor.check(node, scopeDefs, resolutionResult);
 		// Perform some type checking in strict mode.
@@ -343,23 +339,5 @@ public final class FormExpressionFactory {
 		final int environmentalSymbolTableSize = ClosureConvertVisitor.convert(node, resolutionResult, scopeDefs);
 		// Return the final compiled program.
 		return new FormExpressionImpl<>(node, parser.buildComments(), scopeDefs, factory, environmentalSymbolTableSize);
-	}
-
-	private static void checkScopeDefsConstancy(final IScopeDefinitions scopeDef)
-			throws HeaderAssignmentNotCompileTimeConstantException {
-		final CompileTimeConstantCheckVisitor visitor = new CompileTimeConstantCheckVisitor();
-		checkScopeDefsConstancy(scopeDef.getGlobal(), visitor);
-		for (final Collection<IHeaderNode> coll : scopeDef.getManual().values())
-			checkScopeDefsConstancy(coll, visitor);
-	}
-
-	private static void checkScopeDefsConstancy(@Nullable final Collection<IHeaderNode> collection,
-			final CompileTimeConstantCheckVisitor visitor)
-					throws HeaderAssignmentNotCompileTimeConstantException {
-		if (collection == null)
-			return;
-		for (final IHeaderNode hn : collection)
-			if (!hn.getNode().jjtAccept(visitor).booleanValue())
-				throw new HeaderAssignmentNotCompileTimeConstantException(null, hn.getVariableName(), hn.getNode());
 	}
 }

@@ -477,13 +477,13 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	private void visitHeaderNode(@Nullable final String scope, @Nullable final IHeaderNode headerNode) throws SemanticsException {
 		if (headerNode != null) {
-			final NodeInfo infoAssign = headerNode.getNode().jjtAccept(this);
+			final NodeInfo infoAssign = headerNode.getHeaderValueNode().jjtAccept(this);
 			if (!headerNode.isFunction()) {
-				final IVariableType typeDeclared = getDeclaredType(scope, headerNode, headerNode.getNode());
+				final IVariableType typeDeclared = getDeclaredType(scope, headerNode, headerNode.getHeaderValueNode());
 				if (!infoAssign.hasImplicitType())
-					throw new UnreachableCodeException(headerNode.hasType() ? headerNode.getTypeNode() : headerNode.getNode());
+					throw new UnreachableCodeException(headerNode.hasType() ? headerNode.getTypeNode() : headerNode.getHeaderValueNode());
 				if (!typeDeclared.isAssignableFrom(infoAssign.getImplicitType()))
-					throw new IncompatibleVariableAssignmentTypeException(typeDeclared, infoAssign.getImplicitType(), headerNode, headerNode.getNode());
+					throw new IncompatibleVariableAssignmentTypeException(typeDeclared, infoAssign.getImplicitType(), headerNode, headerNode.getHeaderValueNode());
 			}
 		}
 	}

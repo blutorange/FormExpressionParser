@@ -42,7 +42,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 /**
  * TODO Master to-do list.
  *
- * - Enforce boolean for && and || in strict mode, perhaps also for "!" ?
  * - Replace compile-time constant expressions with their evaluated value
  *   => also check that it works with the definite assignment analysis, eg.
  *     function foo() {
@@ -57,18 +56,13 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  *   => short-circuiting may occur when a is null and assignment may never happen
  *   => definite assignment visitor needs to take this into account
  *
- * - Allow parametrized dot accessors:
+ * - Allow parameterized dot accessors:
  *    array<boolean> arr;
  *    array<hash<string,string> mapped;
  *    method<hash<string,string>,boolean> mapper;
  *    method<array<hash<string,string>>,method<hash<string,string>,boolean>> m = arr.<hash<string,string>>map;
  *    mapped = m(mapper);
  *  => Effectively, this is simply adding additional constraints.
- *
- * - Definitely assigned visitor. See https://docs.oracle.com/javase/specs/jls/se6/html/defAssign.html and http://www.jot.fm/issues/issue_2004_10/article2.pdf
- *     Must consider these cases:
- *      - var a;if(maybe()&&(a=0));else a=0;a; // now a is definitely assigned
- *      - var a;while(maybe()||(a=0)){a=0;};a  // now a is definitely assigned
  *
  * - Check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
  *
