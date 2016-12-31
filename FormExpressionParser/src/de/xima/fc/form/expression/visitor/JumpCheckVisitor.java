@@ -10,7 +10,7 @@ import de.xima.fc.form.expression.exception.parse.DuplicateLabelException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.parse.ILabelled;
+import de.xima.fc.form.expression.iface.parse.ILabeled;
 import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
@@ -87,7 +87,7 @@ public class JumpCheckVisitor extends FormExpressionVoidDataVisitorAdapter<Set<S
 		visitLabelledNode(node, labelSet);
 	}
 
-	private <T extends ILabelled & Node> void visitLabelledNode(@Nonnull final T node, @Nonnull final Set<String> labelSet)
+	private <T extends ILabeled & Node> void visitLabelledNode(@Nonnull final T node, @Nonnull final Set<String> labelSet)
 			throws SemanticsException {
 		final String label = node.getLabel();
 		if (label == null) {

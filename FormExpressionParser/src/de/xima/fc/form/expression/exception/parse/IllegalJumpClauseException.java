@@ -5,7 +5,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.grammar.Node;
-import de.xima.fc.form.expression.iface.parse.ILabelled;
+import de.xima.fc.form.expression.iface.parse.ILabeled;
 import de.xima.fc.form.expression.node.ASTReturnClauseNode;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
@@ -14,7 +14,7 @@ import de.xima.fc.form.expression.util.NullUtil;
 public class IllegalJumpClauseException extends SemanticsException {
 	private static final long serialVersionUID = 1L;
 
-	public <T extends ILabelled & Node> IllegalJumpClauseException(final EJump jump, final T node) {
+	public <T extends ILabeled & Node> IllegalJumpClauseException(final EJump jump, final T node) {
 		this(jump, node.getLabel(), node);
 	}
 

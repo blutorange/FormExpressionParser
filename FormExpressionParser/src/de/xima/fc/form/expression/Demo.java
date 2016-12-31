@@ -42,6 +42,15 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 /**
  * TODO Master to-do list.
  *
+ * - Enforce boolean for && and || in strict mode, perhaps also for "!" ?
+ * - Replace compile-time constant expressions with their evaluated value
+ *   => also check that it works with the definite assignment analysis, eg.
+ *     function foo() {
+ *       var v;
+ *       if ((3+3==6))
+ *          v = 0;
+ *       v;
+ *     }
  * - Safe navigation operator: a?.b?.c or a.?b.c: only accessed the property when the value is not null, returns null otherwise.
  *   => Did you keep backward compatibility? x?.1:y must continue to work.
  *   => Consider: a?.b[x=y];

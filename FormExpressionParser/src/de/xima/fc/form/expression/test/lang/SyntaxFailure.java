@@ -50,7 +50,7 @@ enum SyntaxFailure implements ITestCase {
 	TEST013("#(\\d+#", "Error during parsing at line 1, column 1: Encountered invalid regex: Unclosed group near index 4"),
 	TEST014("42 = 42;", "Error during parsing at line 1, column 1: Encountered illegal LVALUE ASTNumberNode in assignment."),
 	TEST015(new Cfg("\"\\\";").err("Lexical error at line 1, column 5. Encountered <EOF> after \"\"\\\";\"").err(TokenMgrError.class)),
-	TEST016("++(1+2);", "Error during parsing at line 1, column 3: Encountered illegal LVALUE ASTParenthesisExpressionNode in prefix operation."),
+	TEST016("++(1+2);", "Error during parsing at line 1, column 4: Encountered illegal LVALUE ASTExpressionNode in prefix operation."),
 	TEST017("++a.b();", "Error during parsing at line 1, column 3: Encountered illegal LVALUE (function call) ASTPropertyExpressionNode(null,NONE(),1:3-1:7) in prefix operation."),
 	TEST018("++--a;", "Error during parsing at line 1, column 3: Encountered illegal LVALUE ASTUnaryExpressionNode in prefix operation."),
 	TEST019("if (true) require scope math;", "Encountered \"require\" at line 1, column 11."),

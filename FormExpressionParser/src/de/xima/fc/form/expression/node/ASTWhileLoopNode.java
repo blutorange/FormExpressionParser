@@ -11,9 +11,9 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.ILabelled;
+import de.xima.fc.form.expression.iface.parse.ILabeled;
 
-public class ASTWhileLoopNode extends ANode implements ILabelled {
+public class ASTWhileLoopNode extends ANode implements ILabeled {
 	private static final long serialVersionUID = 1L;
 
 	public ASTWhileLoopNode(@Nonnull final FormExpressionParser parser, final int nodeId) {

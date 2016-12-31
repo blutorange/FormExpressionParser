@@ -11,12 +11,12 @@ import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisito
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnVoidVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidDataVisitor;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionVoidVoidVisitor;
-import de.xima.fc.form.expression.iface.parse.ILabelled;
+import de.xima.fc.form.expression.iface.parse.ILabeled;
 import de.xima.fc.form.expression.iface.parse.IVariableTyped;
 import de.xima.fc.form.expression.impl.variable.ELangObjectClass;
 import de.xima.fc.form.expression.util.CmnCnst;
 
-public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, IVariableTyped {
+public class ASTForLoopNode extends ASourceResolvableNode implements ILabeled, IVariableTyped {
 	private static final long serialVersionUID = 1L;
 
 	@Nullable
@@ -140,5 +140,9 @@ public class ASTForLoopNode extends ASourceResolvableNode implements ILabelled, 
 	@Nullable
 	public String getLabel() {
 		return label;
+	}
+
+	public boolean hasCondition() {
+		return ((ASTStatementListNode)getPlainConditionNode()).jjtGetNumChildren() > 0;
 	}
 }

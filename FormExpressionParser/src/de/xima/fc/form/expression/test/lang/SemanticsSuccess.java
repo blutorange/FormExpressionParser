@@ -275,6 +275,9 @@ enum SemanticsSuccess implements ITestCase {
 	CONTROL010("i=0;switch<lbl>(1){case (++i): break lbl; case(++i): ++i;};i;", NumberLangObject.create(1)),
 	CONTROL011("(true ? 20 : 0) + (false ? 0 : 22);", Tests.N42),
 	CONTROL012("while<outer>(true){for<inner>(i in 10){if(i>5) break outer;continue inner;}}", NullLangObject.getInstance()),
+	CONTROL013("i=0;do{if(i>41)break;continue;}while(++i);i;", Tests.N42),
+	CONTROL014("v=0;for(;;){v=42;break;};v;", Tests.N42),
+	CONTROL015("v=42;for(;false;){v=0;break;};v;", Tests.N42),
 
 	//General
 	GENERAL001("a=-(b=1);for(i in 20)b=a+(a=b);", NumberLangObject.create(4181)), // Fibonacci

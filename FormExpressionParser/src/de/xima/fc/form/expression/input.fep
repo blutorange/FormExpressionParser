@@ -1,10 +1,10 @@
 global scope {
-  var y;
+  //var y;
 }
-function maybe() {}
+function maybe() {true;}
 function foo() {
-  var arr = [[]];
-  var x;
-  arr[0].push(x=0);
-  x;
+  var v;
+  for (var i in 10)
+    v = 0;
+  v;
 }

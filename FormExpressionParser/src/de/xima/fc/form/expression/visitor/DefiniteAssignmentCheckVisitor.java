@@ -1,5 +1,9 @@
 package de.xima.fc.form.expression.visitor;
 
+import static de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor.EType.ALWAYS;
+import static de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor.EType.WHEN_FALSE;
+import static de.xima.fc.form.expression.visitor.DefiniteAssignmentCheckVisitor.EType.WHEN_TRUE;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,12 +19,15 @@ import javax.annotation.Nullable;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
+import de.xima.fc.form.expression.exception.parse.DuplicateLabelException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
+import de.xima.fc.form.expression.exception.parse.UnhandledEnumException;
 import de.xima.fc.form.expression.exception.parse.VariableUsedBeforeAssignmentException;
 import de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
+import de.xima.fc.form.expression.iface.parse.ILabeled;
 import de.xima.fc.form.expression.iface.parse.IScopeDefinitions;
 import de.xima.fc.form.expression.iface.parse.ISourceResolvable;
 import de.xima.fc.form.expression.iface.parse.IVariableResolutionResult;
@@ -67,6 +74,16 @@ import de.xima.fc.form.expression.node.ASTVariableNode;
 import de.xima.fc.form.expression.node.ASTVariableTypeNode;
 import de.xima.fc.form.expression.node.ASTWhileLoopNode;
 import de.xima.fc.form.expression.node.ASTWithClauseNode;
+import de.xima.fc.form.expression.util.CmnCnst;
+import de.xima.fc.form.expression.util.NullUtil;
+
+// TODO Some nodes only analyzed when true or false. Does this make sense?
+//
+// ASTUnaryExpressionNode
+//   !() analyzed only when true / false
+//
+// ASTDoWhileLoopNode
+//  DoFooterNode analyzed only when false
 
 /**
  * Rules for the maps passed around:
@@ -85,17 +102,30 @@ public class DefiniteAssignmentCheckVisitor
 	private final static Object OBJECT = new Object();
 
 	private final IVariableResolutionResult resolutionResult;
+
+	/** Used to get the most recently requested EType. */
 	private final Deque<EType> typeStack;
+
+	/** Saves all definitely assigned variables before a named break. */
+	private final Map<String, LabelInfo> labelMap;
+
+	/**
+	 * Used to map a break or continue clause without an explicit label to the
+	 * most recent occurrence of a labeled statement.
+	 */
+	private final Deque<LabelInfo> labelStack;
 
 	public DefiniteAssignmentCheckVisitor(final IVariableResolutionResult resolutionResult) {
 		this.resolutionResult = resolutionResult;
 		typeStack = new ArrayDeque<>();
+		labelStack = new ArrayDeque<>();
+		labelMap = new HashMap<>();
 	}
 
 	private Map<Integer, Object> jjtAccept(final Node node, final Map<Integer, Object> map, final EType type)
 			throws SemanticsException {
-		// type is almost always EType.ALWAYS
-		// so we check for the most common case
+		// Type is almost always ALWAYS
+		// So we check for the most common case
 		if (typeStack.peek() == type)
 			return node.jjtAccept(this, map);
 		typeStack.push(type);
@@ -118,15 +148,7 @@ public class DefiniteAssignmentCheckVisitor
 	 * <li>BEFORE(<sub>0</sub>)  = BEFORE(expression)</li>
 	 * <li>BEFORE(s<sub>i</sub>) = BEFORE(s<sub>i-1</sub>), i &#8712; [1...n]</li>
 	 * <li>AFTER(expression)     = AFTER(s<sub>n</sub>)</li>
-	 * </ul>
-	 * The following applies when there are any <code>&&</code> or <code>||</code> operators:
-	 * <ul>
-	 *   <li><code>whenTrue / always</code> and <code>#<sub>i</sub></code> = <code>||</code>: AFTER(expression) = AFTER(s<sub>i-1</sub>)</li>
-	 *   <li><code>whenFalse / always</code> and <code>#<sub>i</sub></code> = <code>&&</code>: AFTER(expression) = AFTER(s<sub>i-1</sub>)</li>
-	 *   <li><code>whenTrue</code> and <code>#<sub>i</sub></code> = <code>&&</code>: No special rules.</li>
-	 *   <li><code>whenFalse</code> and <code>#<sub>i</sub></code> = <code>||</code>: No special rules.</li>
-	 * </ul>
-	 * </p>
+	 * </ul></p>
 	 *
 	 * <pre>
 	 * function foo() {
@@ -141,28 +163,238 @@ public class DefiniteAssignmentCheckVisitor
 	 *   u && v = (w || (x = y = z));
 	 * }
 	 * </pre>
+	 *
+	 * <h1><code>q ; r && s ; t</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(r)         = BEFORE(and)</li>
+	 * <li>BEFORE(s)         = AFTER(r, true)</li>
+	 * <li>AFTER(and, true)  = AFTER(s, true)</li>
+	 * <li>AFTER(and, false) = AFTER(r, false) &#8745; AFTER(s, false)</li>
+	 * <li>AFTER(and)        = AFTER(and, true) &#8745; AFTER(and, false)</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * <pre>
+	 * function foo() {
+	 *  var v;
+	 *  if maybe() && (v=0)
+	 *    0;
+	 *  else
+	 *    v = 0;
+	 *  v;
+	 * }
+	 * </pre>
+	 *
+	 * <h1><code>q ; r || s ; t</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(r)        = BEFORE(or)</li>
+	 * <li>BEFORE(s)        = AFTER(r, false)</li>
+	 * <li>AFTER(or, false) = AFTER(s, false)</li>
+	 * <li>AFTER(or, true)  = AFTER(r, true) &#8745; AFTER(s, true)</li>
+	 * <li>AFTER(or)        = AFTER(or, true) &#8745; AFTER(or, false)</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * <pre>
+	 * function foo() {
+	 *  var v;
+	 *  if maybe() || (v=0))
+	 *    v = 0
+	 *  v;
+	 *
+	 *  var w;
+	 *  (maybe() && (w = 0)) || (w = 0);
+	 *  w;
+	 * }
+	 * </pre>
 	 */
 	@Override
-	public Map<Integer, Object> visit(final ASTExpressionNode node, Map<Integer, Object> map) throws SemanticsException {
-		final int count = node.jjtGetNumChildren();
-		Map<Integer, Object> afterExpression = null;
-		for (int i = 0; i < count; ++i) {
-			final Node n = node.jjtGetChild(i);
-			switch (n.getSiblingMethod()) {
-			case DOUBLE_AMPERSAND:
-				if (typeStack.peek() != EType.WHEN_TRUE && afterExpression == null)
-					afterExpression = copy(map);
+	public Map<Integer, Object> visit(final ASTExpressionNode node, final Map<Integer, Object> map) throws SemanticsException {
+		return visitNaryExpressionNode(node, map, node.jjtGetNumChildren());
+	}
+
+	//TODO this is not making sense, visit ALL nodes, not only the first two..
+	public Map<Integer, Object> visitNaryExpressionNode(final ASTExpressionNode node, Map<Integer, Object> map,
+			final int index) throws SemanticsException {
+		// Turn
+		//   a && b && c && d
+		// into a recursion
+		//   ((a && b) && c) && d
+		switch (index) {
+		case 0:
+			return map;
+		case 1:
+			// Keep current EType, this is like a parenthesized expression.
+			return jjtAccept(node.jjtGetChild(0), map);
+		default:
+			final Node rhs = node.jjtGetChild(index-1);
+			switch (rhs.getSiblingMethod()) {
+			case DOUBLE_AMPERSAND: {
+				// BEFORE(r) = BEFORE(and)
+				final Map<Integer, Object> afterRFalse;
+				final Map<Integer, Object> afterRTrue;
+				typeStack.push(WHEN_FALSE);
+				try {
+					afterRFalse = visitNaryExpressionNode(node, copy(map), index-1);
+				}
+				finally {
+					typeStack.pop();
+				}
+				typeStack.push(WHEN_TRUE);
+				try {
+					afterRTrue = visitNaryExpressionNode(node, map, index-1);
+				}
+				finally {
+					typeStack.pop();
+				}
+
+				// BEFORE(s) = AFTER(r, true)
+				final Map<Integer, Object> afterSFalse = jjtAccept(rhs, copy(afterRTrue), WHEN_FALSE);
+				final Map<Integer, Object> afterSTrue = jjtAccept(rhs, afterRTrue, WHEN_TRUE);
+
+				switch (NullUtil.or(typeStack.peek(), ALWAYS)) {
+				case ALWAYS:
+					// AFTER(and) = AFTER(and, true) ^ AFTER(and, false)
+					//            = AFTER(s, true) ^ AFTER(r, false) ^ AFTER(s, false)
+					map = intersectToLhs(afterSTrue, afterRFalse, afterSFalse);
+					break;
+				case WHEN_FALSE:
+					// AFTER(and, false) = AFTER(r, false) ^ AFTER(s, false)
+					map = intersectToLhs(afterRFalse, afterSFalse);
+					break;
+				case WHEN_TRUE:
+					// AFTER(and, true)  = AFTER(s, true)
+					map = afterSTrue;
+					break;
+				default:
+					throw new UnhandledEnumException(NullUtil.or(typeStack.peek(), ALWAYS), rhs);
+				}
 				break;
-			case DOUBLE_BAR:
-				if (typeStack.peek() != EType.WHEN_FALSE && afterExpression == null)
-					afterExpression = copy(map);
-				break;
-			//$CASES-OMITTED$
-			default:
 			}
-			map = jjtAccept(n, map, EType.ALWAYS);
+			case DOUBLE_BAR: {
+				// BEFORE(r) = BEFORE(or)
+				final Map<Integer, Object> afterRFalse;
+				final Map<Integer, Object> afterRTrue;
+				typeStack.push(WHEN_FALSE);
+				try {
+					afterRFalse = visitNaryExpressionNode(node, copy(map), index-1);
+				}
+				finally {
+					typeStack.pop();
+				}
+				typeStack.push(WHEN_TRUE);
+				try {
+					afterRTrue = visitNaryExpressionNode(node, map, index-1);
+				}
+				finally {
+					typeStack.pop();
+				}
+
+				// BEFORE(s) = AFTER(r, false)
+				final Map<Integer, Object> afterSFalse = jjtAccept(rhs, copy(afterRFalse), WHEN_FALSE);
+				final Map<Integer, Object> afterSTrue = jjtAccept(rhs, afterRFalse, WHEN_TRUE);
+
+				switch (NullUtil.or(typeStack.peek(), ALWAYS)) {
+				case ALWAYS:
+					// AFTER(or) = AFTER(or, true) ^ AFTER(or, false)
+					//           = AFTER(r, true) ^ AFTER(s, true) ^ AFTER(s, false)
+					map = intersectToLhs(afterSFalse, afterRTrue, afterSTrue);
+					break;
+				case WHEN_FALSE:
+					// AFTER(or, false) = AFTER(s, false)
+					map = afterSFalse;
+					break;
+				case WHEN_TRUE:
+					// AFTER(or, true) = AFTER(r, true) ^ AFTER(s, true)
+					map = intersectToLhs(afterRTrue, afterSTrue);
+					break;
+				default:
+					throw new UnhandledEnumException(NullUtil.or(typeStack.peek(), ALWAYS), rhs);
+				}
+				break;
+			}
+			// Only && and || need to be treated specially
+			// $CASES-OMITTED$
+			default:
+				typeStack.push(ALWAYS);
+				try {
+					visitNaryExpressionNode(node, map, index-1);
+				}
+				finally {
+					typeStack.pop();
+				}
+				map = jjtAccept(rhs, map, ALWAYS);
+			}
+			return map;
 		}
-		return afterExpression == null ? map : afterExpression;
+	}
+
+	public Map<Integer, Object> visitBinaryExpression(final Node lhs, final Node rhs, Map<Integer, Object> map)
+			throws SemanticsException {
+		switch (rhs.getSiblingMethod()) {
+		case DOUBLE_AMPERSAND: {
+			// BEFORE(r) = BEFORE(and)
+			final Map<Integer, Object> afterRFalse = jjtAccept(lhs, copy(map), WHEN_FALSE);
+			final Map<Integer, Object> afterRTrue = jjtAccept(lhs, map, WHEN_TRUE);
+
+			// BEFORE(s) = AFTER(r, true)
+			final Map<Integer, Object> afterSFalse = jjtAccept(rhs, copy(afterRTrue), WHEN_FALSE);
+			final Map<Integer, Object> afterSTrue = jjtAccept(rhs, afterRTrue, WHEN_TRUE);
+
+			switch (NullUtil.or(typeStack.peek(), ALWAYS)) {
+			case ALWAYS:
+				// AFTER(and) = AFTER(and, true) ^ AFTER(and, false)
+				//            = AFTER(s, true) ^ AFTER(r, false) ^ AFTER(s, false)
+				map = intersectToLhs(afterSTrue, afterRFalse, afterSFalse);
+				break;
+			case WHEN_FALSE:
+				// AFTER(and, false) = AFTER(r, false) ^ AFTER(s, false)
+				map = intersectToLhs(afterRFalse, afterSFalse);
+				break;
+			case WHEN_TRUE:
+				// AFTER(and, true)  = AFTER(s, true)
+				map = afterSTrue;
+				break;
+			default:
+				throw new UnhandledEnumException(NullUtil.or(typeStack.peek(), ALWAYS), rhs);
+			}
+			break;
+		}
+		case DOUBLE_BAR: {
+			// BEFORE(r) = BEFORE(or)
+			final Map<Integer, Object> afterRFalse = jjtAccept(lhs, copy(map), WHEN_FALSE);
+			final Map<Integer, Object> afterRTrue = jjtAccept(lhs, map, WHEN_TRUE);
+
+			// BEFORE(s) = AFTER(r, false)
+			final Map<Integer, Object> afterSFalse = jjtAccept(rhs, copy(afterRFalse), WHEN_FALSE);
+			final Map<Integer, Object> afterSTrue = jjtAccept(rhs, afterRFalse, WHEN_TRUE);
+
+			switch (NullUtil.or(typeStack.peek(), ALWAYS)) {
+			case ALWAYS:
+				// AFTER(or) = AFTER(or, true) ^ AFTER(or, false)
+				//           = AFTER(r, true) ^ AFTER(s, true) ^ AFTER(s, false)
+				map = intersectToLhs(afterSFalse, afterRTrue, afterSTrue);
+				break;
+			case WHEN_FALSE:
+				// AFTER(or, false) = AFTER(s, false)
+				map = afterSFalse;
+				break;
+			case WHEN_TRUE:
+				// AFTER(or, true) = AFTER(r, true) ^ AFTER(s, true)
+				map = intersectToLhs(afterRTrue, afterSTrue);
+				break;
+			default:
+				throw new UnhandledEnumException(NullUtil.or(typeStack.peek(), ALWAYS), rhs);
+			}
+			break;
+		}
+		// Only && and || need to be treated specially
+		// $CASES-OMITTED$
+		default:
+			map = jjtAccept(lhs, map, ALWAYS);
+			map = jjtAccept(rhs, map, ALWAYS);
+		}
+		return map;
 	}
 
 	/**
@@ -170,8 +402,9 @@ public class DefiniteAssignmentCheckVisitor
 	 * <p>
 	 * Note that here we mark variables as definitely assigned.
 	 * <ul>
-	 * <li>BEFORE(s<sub>n</sub>) = BEFORE(assignment)</li>
-	 * <li>BEFORE(s<sub>i</sub>) = AFTER(s<sub>i+1</sub>), i &#8712; [1,n-1]</li>
+	 * <li>BEFORE(s<sub>n</sub>)   = BEFORE(assignment)</li>
+	 * <li>BEFORE(s<sub>n-1</sub>) = AFTER(s<sub>n</sub>)</li>
+	 * <li>BEFORE(s<sub>i</sub>) = AFTER(s<sub>i+1</sub>) &#8746; {s<sub>i+1</sub>}, i &#8712; [1,n-2]</li>
 	 * <li>AFTER(assignment) = AFTER(s<sub>1</sub></li>
 	 * </ul></p>
 	 * <pre>
@@ -198,7 +431,7 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTAssignmentExpressionNode node, Map<Integer, Object> map) throws SemanticsException {
-		map = jjtAccept(node.getAssignValueNode(), map, EType.ALWAYS);
+		map = jjtAccept(node.getAssignValueNode(), map, ALWAYS);
 		final int count = node.getAssignableNodeCount();
 		for (int i = count; i -->0;) {
 			final Node n = node.getAssignableNode(i);
@@ -206,7 +439,7 @@ public class DefiniteAssignmentCheckVisitor
 					&& node.getAssignMethod(i) == EMethod.EQUAL)
 				markAssigned(map, (ASTVariableNode)n);
 			else
-				map = jjtAccept(n, map, EType.ALWAYS);
+				map = jjtAccept(n, map, ALWAYS);
 		}
 		return map;
 	}
@@ -214,20 +447,28 @@ public class DefiniteAssignmentCheckVisitor
 	/**
 	 * <h1><code>s ; &lt;number&gt; ; t</code></h1>
 	 * <p><ul>
-	 * <li>AFTER(number) = BEFORE(number)</li>
+	 * <li>AFTER(number)        = BEFORE(number)</li>
+	 * <li>AFTER(number, true)  = BEFORE(number)</li>
+	 * <li>AFTER(number, false) = VARS(s)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
 	 *   var v;
 	 *   0.0;
 	 *   v;
+	 *
+	 *   var u;
+	 *   if (0)
+	 *     u = 0;
+	 *   u;
 	 * }
 	 * </pre>
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTNumberNode node, final Map<Integer, Object> map) throws SemanticsException {
+		if (typeStack.peek() == WHEN_FALSE)
+			markAllAssigned(map);
 		return map;
-
 	}
 
 	/**
@@ -235,7 +476,9 @@ public class DefiniteAssignmentCheckVisitor
 	 * <p><ul>
 	 * <li>BEFORE(s<sub>1</sub>) = BEFORE(r)</li>
 	 * <li>BEFORE(s<sub>i</sub>) = BEFORE(s<sub>i-1</sub>), i &#8712; [2,n]</li>
-	 * <li>AFTER(array) = AFTER(s<sub>n</sub>)</li>
+	 * <li>AFTER(array)          = AFTER(s<sub>n</sub>)</li>
+	 * <li>AFTER(array, true)    = AFTER(s<sub>n</sub>)</li>
+	 * <li>AFTER(array, false)   = VARS(r)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -251,7 +494,9 @@ public class DefiniteAssignmentCheckVisitor
 	public Map<Integer, Object> visit(final ASTArrayNode node, Map<Integer, Object> map) throws SemanticsException {
 		final int count = node.jjtGetNumChildren();
 		for (int i = 0; i < count; ++i)
-			map = jjtAccept(node.jjtGetChild(i), map, EType.ALWAYS);
+			map = jjtAccept(node.jjtGetChild(i), map, ALWAYS);
+		if (typeStack.peek() == WHEN_FALSE)
+			markAllAssigned(map);
 		return map;
 	}
 
@@ -261,7 +506,9 @@ public class DefiniteAssignmentCheckVisitor
 	 * <li>BEFORE(k<sub>1</sub>) = BEFORE(r)</li>
 	 * <li>BEFORE(k<sub>i</sub>) = BEFORE(v<sub>i-1</sub>), i &#8712; [2,n]</li>
 	 * <li>BEFORE(v<sub>i</sub>) = BEFORE(k<sub>i</sub>), i &#8712; [1,n]</li>
-	 * <li>AFTER(hash) = AFTER(v<sub>n</sub>)</li>
+	 * <li>AFTER(hash)           = AFTER(v<sub>n</sub>)</li>
+	 * <li>AFTER(hash, true)     = AFTER(v<sub>n</sub>)</li>
+	 * <li>AFTER(hash, false)    = VARS(r)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -277,14 +524,18 @@ public class DefiniteAssignmentCheckVisitor
 	public Map<Integer, Object> visit(final ASTHashNode node, Map<Integer, Object> map) throws SemanticsException {
 		final int count = node.jjtGetNumChildren();
 		for (int i = 0; i < count; ++i)
-			map = jjtAccept(node.jjtGetChild(i), map, EType.ALWAYS);
+			map = jjtAccept(node.jjtGetChild(i), map, ALWAYS);
+		if (typeStack.peek() == WHEN_FALSE)
+			markAllAssigned(map);
 		return map;
 	}
 
 	/**
 	 * <h1><code>s ; &lt;null&gt; ; t</code></h1>
 	 * <p><ul>
-	 * <li>AFTER(null) = BEFORE(null)</li>
+	 * <li>AFTER(null)        = BEFORE(null)</li>
+	 * <li>AFTER(null, true)  = VARS(s)</li>
+	 * <li>AFTER(null, false) = BEFORE(null)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -296,13 +547,16 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTNullNode node, final Map<Integer, Object> map) throws SemanticsException {
+		if (typeStack.peek() == WHEN_TRUE)
+			markAllAssigned(map);
 		return map;
 	}
 
 	/**
-	 * <h1><code>s ; &lt;boolean&gt; ; t</code></h1>
+	 * <h1><code>s ; true ; t</code></h1>
 	 * <p><ul>
-	 * <li>AFTER(boolean) = BEFORE(boolean)</li>
+	 * <li>AFTER(true, true)  = BEFORE(true)</li>
+	 * <li>AFTER(true, false) = VARS(s)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -311,9 +565,24 @@ public class DefiniteAssignmentCheckVisitor
 	 *   v;
 	 * }
 	 * </pre>
+	 * <h1><code>s ; false ; t</code></h1>
+	 * <p><ul>
+	 * <li>AFTER(false, true)  = VARS(s)</li>
+	 * <li>AFTER(false, false) = BEFORE(false)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   if (!false)
+	 *     v = 0;
+	 *   v;
+	 * }
+	 * </pre>
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTBooleanNode node, final Map<Integer, Object> map) throws SemanticsException {
+		if (NullUtil.or(typeStack.peek(), ALWAYS).isOppositeOf(node.getBooleanValue()))
+				markAllAssigned(map);
 		return map;
 	}
 
@@ -334,7 +603,6 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTVariableNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// FIXME Do not throw if variable is global variable.
 		final Integer variableId = Integer.valueOf(node.getBasicSource());
 		if (!resolutionResult.containsBasicSourcedGlobalVariable(variableId)
 				&& map.get(Integer.valueOf(node.getBasicSource())) == null)
@@ -346,7 +614,9 @@ public class DefiniteAssignmentCheckVisitor
 	 * <h1><code>r ; "..." ; t</code></h1>
 	 * <h1><code>r ; '...' ; t</code></h1>
 	 * <p><ul>
-	 * <li>AFTER(string) = BEFORE(string)</li>
+	 * <li>AFTER(string)        = BEFORE(string)</li>
+	 * <li>AFTER(string, true)  = BEFORE(string)</li>
+	 * <li>AFTER(string, false) = VARS(r)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -360,6 +630,8 @@ public class DefiniteAssignmentCheckVisitor
 	 * <li>BEFORE(s<sub>1</sub> = BEFORE(string)</li>
 	 * <li>BEFORE(s<sub>i</sub> = BEFORE(s<sub>i-1</sub>), i &#8712; [2,n]</li>
 	 * <li>AFTER(string) = AFTER(s<sub>n</sub>)</li>
+	 * <li>AFTER(string, true)  = BEFORE(string)</li>
+	 * <li>AFTER(string, false) = VARS(r)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -373,16 +645,20 @@ public class DefiniteAssignmentCheckVisitor
 	public Map<Integer, Object> visit(final ASTStringNode node, Map<Integer, Object> map) throws SemanticsException {
 		final int count = node.getStringNodeCount();
 		for (int i = 0; i < count; ++i)
-			map = jjtAccept(node.getStringNode(i), map, EType.ALWAYS);
+			map = jjtAccept(node.getStringNode(i), map, ALWAYS);
+		if (typeStack.peek() == WHEN_FALSE)
+			markAllAssigned(map);
 		return map;
 	}
 
 	/**
 	 * <h1><code>r ; s<sub>1</sub> ; s<sub>2</sub> ; ... ; s<sub>n</sub> ; t</code></h1>
 	 * <p><ul>
-	 * <li>BEFORE(s<sub>1</sub>) = BEFORE(statement_list)</li>
-	 * <li>BEFORE(s<sub>i</sub>) = AFTER(s<sub>i-1</sub>), i &#8712; [2,n]</li>
-	 * <li>AFTER(statement_list) = AFTER(s<sub>n</sub>)</li>
+	 * <li>BEFORE(s<sub>1</sub>)        = BEFORE(statement_list)</li>
+	 * <li>BEFORE(s<sub>i</sub>)        = AFTER(s<sub>i-1</sub>), i &#8712; [2,n]</li>
+	 * <li>AFTER(statement_list)        = AFTER(s<sub>n</sub>)</li>
+	 * <li>AFTER(statement_list, true)  = AFTER(s<sub>n</sub>, true)</li>
+	 * <li>AFTER(statement_list, false) = AFTER(s<sub>n</sub>, false)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -396,10 +672,11 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTStatementListNode node, Map<Integer, Object> map) throws SemanticsException {
-		final int count = node.jjtGetNumChildren();
-		for (int i = 0; i < count; ++i) {
-			map = jjtAccept(node.jjtGetChild(i), map, EType.ALWAYS);
-		}
+		final int count = node.jjtGetNumChildren() - 1;
+		for (int i = 0; i < count; ++i)
+			map = jjtAccept(node.jjtGetChild(i), map, ALWAYS);
+		if (count >= 0)
+			map = jjtAccept(node.jjtGetChild(count), map);
 		return map;
 	}
 
@@ -456,24 +733,126 @@ public class DefiniteAssignmentCheckVisitor
 			// BEFORE(r) = AFTER(q, true)
 			// BEFORE(s) = AFTER(q, false)
 			// AFTER(if) = AFTER(r) ^ AFTER(s)
-			final Map<Integer, Object> afterQTrue = jjtAccept(node.getConditionNode(), copy(map), EType.WHEN_TRUE);
-			final Map<Integer, Object> afterQFalse = jjtAccept(node.getConditionNode(), map, EType.WHEN_FALSE);
-			final Map<Integer, Object> afterR = jjtAccept(node.getIfNode(), afterQTrue, EType.ALWAYS);
-			final Map<Integer, Object> afterS = jjtAccept(node.getElseNode(), afterQFalse, EType.ALWAYS);
+			final Map<Integer, Object> afterQTrue = jjtAccept(node.getConditionNode(), copy(map), WHEN_TRUE);
+			final Map<Integer, Object> afterQFalse = jjtAccept(node.getConditionNode(), map, WHEN_FALSE);
+			final Map<Integer, Object> afterR = jjtAccept(node.getIfNode(), afterQTrue, ALWAYS);
+			final Map<Integer, Object> afterS = jjtAccept(node.getElseNode(), afterQFalse, ALWAYS);
 			return intersectToLhs(afterR, afterS);
 		}
 		// BEFORE(s)  = BEFORE(if)
 		// BEFORE(t)  = AFTER(s, true)
-		final Map<Integer, Object> afterSTrue = jjtAccept(node.getConditionNode(), copy(map), EType.WHEN_TRUE);
-		final Map<Integer, Object> afterSFalse = jjtAccept(node.getConditionNode(), map, EType.WHEN_FALSE);
-		final Map<Integer, Object> afterT = jjtAccept(node.getIfNode(), afterSTrue, EType.ALWAYS);
+		final Map<Integer, Object> afterSTrue = jjtAccept(node.getConditionNode(), copy(map), WHEN_TRUE);
+		final Map<Integer, Object> afterSFalse = jjtAccept(node.getConditionNode(), map, WHEN_FALSE);
+		final Map<Integer, Object> afterT = jjtAccept(node.getIfNode(), afterSTrue, ALWAYS);
 		// AFTER(if)  = AFTER(T) ^ AFTER(s, false)
 		return intersectToLhs(afterT, afterSFalse);
 	}
 
+	/**
+	 * <h1><code>p ; for ( q ; r ; s ) { t } ; u</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(q)  = BEFORE(for)</li>
+	 * <li>BEFORE(r)  = AFTER(q)</li>
+	 * <li>BEFORE(t)  = AFTER(r, true)</li>
+	 * <li>BEFORE(s)  = AFTER(t) &#8745; CONTINUE(t, label)</li>
+	 * <li>AFTER(for) = BREAK(t, label) &#8745; AFTER(r, false)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   for ( ; maybe()  || (v=0) ;)
+	 *     v = 0;
+	 *   v;
+	 * }
+	 * </pre>
+	 *
+	 * <h1><code>p ; for ( q ; ; s ) { t } ; u</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(q)  = BEFORE(for)</li>
+	 * <li>BEFORE(t)  = AFTER(q)</li>
+	 * <li>BEFORE(s)  = AFTER(t) &#8745; CONTINUE(t, label)</li>
+	 * <li>AFTER(for) = BREAK(t, label)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   for (;;)
+	 *     if (maybe() && (v=0))
+	 *       break;
+	 *   v;
+	 * }
+	 *
+	 * </pre>
+	 * <h1><code>r ; for ( &lt;variable&gt; in s ) { t } ; u</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(s)  = BEFORE(for)</li>
+	 * <li>BEFORE(t)  = AFTER(s) &#8746; {&lt;variable&gt;}</li>
+	 * <li>AFTER(for) = AFTER(s)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   for ( i in (v=10));
+	 *   v;
+	 *
+	 *   var u;
+	 *   for ( i in 10 )
+	 *     u = 0;
+	 *   u;
+	 * }
+	 * </pre>
+	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTForLoopNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// TODO Auto-generated method stub
+		if (node.isEnhancedLoop()) {
+			// BEFORE(s) = BEFORE(for)
+			final Map<Integer, Object> afterS = jjtAccept(node.getEnhancedIteratorNode(), map, ALWAYS);
+
+			// BEFORE(t) = AFTER(s) &#8746; {&lt;variable&gt;}
+			final Map<Integer, Object> beforeT = markAssigned(copy(afterS), node);
+			jjtAccept(node.getBodyNode(), beforeT, ALWAYS);
+
+			// AFTER(for) = AFTER(s)
+			return afterS;
+		}
+
+		if (node.hasCondition()) {
+			// BEFORE(q) = BEFORE(for)
+			final Map<Integer, Object> afterQ = jjtAccept(node.getPlainInitializerNode(), map, ALWAYS);
+
+			// BEFORE(r) = AFTER(q)
+			final Map<Integer, Object> afterRTrue = jjtAccept(node.getPlainConditionNode(), copy(afterQ), WHEN_TRUE);
+			final Map<Integer, Object> afterRFalse = jjtAccept(node.getPlainConditionNode(), afterQ, WHEN_FALSE);
+
+			// BEFORE(t) = AFTER(r, true)
+			final LabelInfo infoT = getInfoBoth(node.getBodyNode(), afterRTrue, ALWAYS, node);
+			final Map<Integer, Object> afterT = infoT.getMap();
+			final Map<Integer, Object> breakT = infoT.getBreakMap();
+			final Map<Integer, Object> continueT = infoT.getContinueMap();
+
+			// BEFORE(s) = AFTER(t) ^ CONTINUE(t, label)
+			final Map<Integer, Object> beforeS = intersectToLhs(afterT, continueT);
+			jjtAccept(node.getPlainIncrementNode(), beforeS, ALWAYS);
+
+			// AFTER(for) = BREAK(t, label) ^ AFTER(r, false)
+			return intersectToLhs(breakT, afterRFalse);
+		}
+
+		// BEFORE(q) = BEFORE(for)
+		final Map<Integer, Object> afterQ = jjtAccept(node.getPlainInitializerNode(), map, ALWAYS);
+
+		// BEFORE(t) = AFTER(q)
+		final LabelInfo infoT = getInfoBoth(node.getBodyNode(), afterQ, ALWAYS, node);
+		final Map<Integer, Object> afterT = infoT.getMap();
+		final Map<Integer, Object> breakT = infoT.getBreakMap();
+		final Map<Integer, Object> continueT = infoT.getContinueMap();
+
+		// BEFORE(s) = AFTER(t) ^ CONTINUE(t, label)
+		final Map<Integer, Object> beforeS = intersectToLhs(afterT, continueT);
+		jjtAccept(node.getPlainIncrementNode(), beforeS, ALWAYS);
+
+		// AFTER(for) = BREAK(t, label)
+		return breakT;
 	}
 
 	/**
@@ -485,7 +864,7 @@ public class DefiniteAssignmentCheckVisitor
 	 * <ul>
 	 * <li>BEFORE(s)    = BEFORE(while)</li>
 	 * <li>BEFORE(t)    = AFTER(s, true)</li>
-	 * <li>AFTER(while) = AFTER(t, label) &#8745; AFTER(s, false)</li>
+	 * <li>AFTER(while) = BREAK(t, label) &#8745; AFTER(s, false)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -533,14 +912,64 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTWhileLoopNode node, final Map<Integer, Object> map) throws SemanticsException {
-		//FIXME handle labels, breaks, continues
 		// BEFORE(s)    = BEFORE(while)
+		final Map<Integer,Object> afterSTrue = jjtAccept(node.getWhileHeaderNode(), copy(map), WHEN_TRUE);
+		final Map<Integer,Object> afterSFalse = jjtAccept(node.getWhileHeaderNode(), map, WHEN_FALSE);
+
 		// BEFORE(t)    = AFTER(s, true)
-		final Map<Integer,Object> afterSTrue = jjtAccept(node.getWhileHeaderNode(), copy(map), EType.WHEN_TRUE);
-		final Map<Integer,Object> afterSFalse = jjtAccept(node.getWhileHeaderNode(), map, EType.WHEN_TRUE);
-		final Map<Integer,Object> afterT = jjtAccept(node.getBodyNode(), afterSTrue, EType.ALWAYS);
-		// AFTER(while) = AFTER(t, label) ^ AFTER(s, false)
+		final Map<Integer, Object> afterT = getInfoBreak(node.getBodyNode(), afterSTrue, ALWAYS, node);
+
+		// AFTER(while) = BREAK(t, label) ^ AFTER(s, false)
 		return intersectToLhs(afterT, afterSFalse);
+	}
+
+	/**
+	 * <h1><code>r ; do { s } while ( t ) ; u </code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(s) = BEFORE(do)</li>
+	 * <li>BEFORE(t) = AFTER(s) &#8745; CONTINUE(s, label)</li>
+	 * <li>AFTER(do) = AFTER(t, false) &#8745; BREAK(s, label)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   do {
+	 *     if (maybe())
+	 *       continue;
+	 *     v = 0;
+	 *   } while(v);
+	 *
+	 *   var u;
+	 *   do {
+	 *     if (maybe() && (u = 0))
+	 *       continue;
+	 *   } while(u);
+	 *
+	 *   var w;
+	 *   do {
+	 *     break;
+	 *   } while(maybe() || (w=0));
+	 *   w;
+	 *
+	 *   var x;
+	 *   do {
+	 *     break;
+	 *     x = 0;
+	 *   } while(maybe());
+	 *   x;
+	 * }
+	 * </pre>
+	 */
+	@Override
+	public Map<Integer, Object> visit(final ASTDoWhileLoopNode node, final Map<Integer, Object> map) throws SemanticsException {
+		final LabelInfo labelS = this.getInfoBoth(node.getBodyNode(), map, ALWAYS, node);
+		final Map<Integer, Object> afterS = labelS.getMap();
+		final Map<Integer, Object> breakS = labelS.getBreakMap();
+		final Map<Integer, Object> continueS = labelS.getContinueMap();
+		final Map<Integer, Object> beforeT = intersectToLhs(continueS, afterS);
+		jjtAccept(node.getDoFooterNode(), copy(beforeT), WHEN_TRUE);
+		final Map<Integer, Object> afterTFalse = jjtAccept(node.getDoFooterNode(), beforeT, WHEN_FALSE);
+		return intersectToLhs(afterTFalse, breakS);
 	}
 
 	/**
@@ -572,41 +1001,75 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTTryClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
-		final Map<Integer, Object> afterS = jjtAccept(node.getTryNode(), copy(map), EType.ALWAYS);
+		final Map<Integer, Object> afterS = jjtAccept(node.getTryNode(), copy(map), ALWAYS);
 		// Add exception variable.
 		markAssigned(map, node);
-		final Map<Integer, Object> afterT = jjtAccept(node.getTryNode(), map, EType.ALWAYS);
+		final Map<Integer, Object> afterT = jjtAccept(node.getTryNode(), map, ALWAYS);
 		return intersectToLhs(afterS, afterT);
 	}
 
+	//TODO Java does not allow expressions for case(...), I do. Update these rules...
+	/**
+	 * <h1><code>p ; switch ( q ) case r<sub>1</sub> : s<sub>1</sub> ... case r<sub>n</sub> : s<sub>n</sub> ; default: t ; u </code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(q) = BEFORE(switch)</li>
+	 * <li>BEFORE(s<sub>1</sub>) = AFTER(q)</li>
+	 * <li>BEFORE(s<sub>i</sub>) = AFTER(q) &#8745; AFTER(s<sub>i-1</sub>), i &#8712; [2,n]</li>
+	 * <li></li>
+	 * <li>AFTER(switch) </li>
+	 * <li>&#8745;</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   try {
+	 *     throw exception(v=0);
+	 *   }
+	 *   catch (e) {
+	 *     v = 0;
+	 *   }
+	 *
+	 *   var u;
+	 *   try {
+	 *     v = 0;
+	 *   }
+	 *   catch (exception) {
+	 *     v = 0;
+	 *   }
+	 * }
+	 * </pre>
+	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTSwitchClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public Map<Integer, Object> visit(final ASTDoWhileLoopNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
 	 * <h1><code>r ; exception(s) ; t </code></h1>
 	 * <p><ul>
-	 * <li>BEFORE(s) = BEFORE(exception)</li>
-	 * <li>AFTER(exception) = AFTER(s)</li>
+	 * <li>BEFORE(s)               = BEFORE(exception)</li>
+	 * <li>AFTER(exception)        = AFTER(s)</li>
+	 * <li>AFTER(exception, true)  = AFTER(s)</li>
+	 * <li>AFTER(exception, false) = VARS(r)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
 	 *   var v;
 	 *   exception(v=0);
 	 *   v;
+	 *
+	 *   var u;
+	 *   if (exception())
+	 *     u = 0;
+	 *   u;
 	 * }
 	 * </pre>
 	 *
 	 * <h1><code>s ; exception() ; t </code></h1>
 	 * <p><ul>
-	 * <li>AFTER(exception) = BEFORE(exception)</li>
+	 * <li>AFTER(exception)        = BEFORE(exception)</li>
+	 * <li>AFTER(exception, true)  = AFTER(s)</li>
+	 * <li>AFTER(exception, false) = VARS(r)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -617,27 +1080,92 @@ public class DefiniteAssignmentCheckVisitor
 	 * </pre>
 	 */
 	@Override
-	public Map<Integer, Object> visit(final ASTExceptionNode node, final Map<Integer, Object> map) throws SemanticsException {
+	public Map<Integer, Object> visit(final ASTExceptionNode node, Map<Integer, Object> map) throws SemanticsException {
 		if (node.hasErrorMessage())
-			return jjtAccept(node.getErrorMessageNode(), map, EType.ALWAYS);
+			map = jjtAccept(node.getErrorMessageNode(), map, ALWAYS);
+		if (typeStack.peek() == WHEN_FALSE)
+			markAllAssigned(map);
 		return map;
 	}
 
+	/**
+	 * <h1><code>r ; throw s ; t</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(s)    = BEFORE(throw)</li>
+	 * <li>AFTER(throw) = VARS(r)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   try {
+	 *     var v;
+	 *     if (true)
+	 *       throw exception();
+	 *     else
+	 *       v = 0;
+	 *     v;
+	 *   }
+	 * }
+	 * </pre>
+	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTThrowClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// TODO Auto-generated method stub
-
+		// BEFORE(s)    = BEFORE(throw)
+		jjtAccept(node.getThrowNode(), map, ALWAYS);
+		// AFTER(throw) = VARS(r)
+		return markAllAssigned(map);
 	}
 
+	/**
+	 * <h1><code>r ; break [&lt;label&gt;] ; t</code></h1>
+	 * <p><ul>
+	 * <li>AFTER(break) = VARS(r)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   while (maybe() || (v=0)) {
+	 *     if (maybe()) {
+	 *       v = 0;
+	 *       break;
+	 *     }
+	 *   }
+	 *   v;
+	 * }
+	 * </pre>
+	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTBreakClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// TODO Auto-generated method stub
+		final String label = node.getLabel();
+		final LabelInfo info = label == null ? labelStack.peek() : labelMap.get(label);
+		if (info != null)
+			info.intersectToBreak(map);
+		return markAllAssigned(map);
 	}
 
+	/**
+	 * <h1><code>r ; continue [&lt;label&gt;] ; t</code></h1>
+	 * <p><ul>
+	 * <li>AFTER(continue) = VARS(r)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   do {
+	 *     if (maybe())
+	 *       continue;
+	 *     v = 0;
+	 *   } while (v>0)
+	 *   v;
+	 * }
+	 * </pre>
+	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTContinueClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// TODO Auto-generated method stub
-
+		final String label = node.getLabel();
+		final LabelInfo info = label == null ? labelStack.peek() : labelMap.get(label);
+		if (info != null)
+			info.intersectToContinue(map);
+		return markAllAssigned(map);
 	}
 
 	/**
@@ -661,11 +1189,22 @@ public class DefiniteAssignmentCheckVisitor
 	 *   r;
 	 * }
 	 * </pre>
+	 * <h1><code>s ; return ; t</code></h1>
+	 * <p><ul>
+	 * <li>AFTER(return) = VARS(r)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var v;
+	 *   return v;
+	 *   v;
+	 * }
+	 * </pre>
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTReturnClauseNode node, Map<Integer, Object> map) throws SemanticsException {
 		if (node.hasReturn())
-			map = jjtAccept(node.getReturnNode(), map, EType.ALWAYS);
+			map = jjtAccept(node.getReturnNode(), map, ALWAYS);
 		// No need to copy the map as the set of variables can only be changed when
 		// we enter a function or lambda, and both ASTFunctionClauseNode and
 		// ASTFunctionNode make a copy of the map.
@@ -688,7 +1227,7 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTLogNode node, final Map<Integer, Object> map) throws SemanticsException {
-		return jjtAccept(node.getLogMessageNode(), map, EType.ALWAYS);
+		return jjtAccept(node.getLogMessageNode(), map, ALWAYS);
 	}
 
 	/**
@@ -725,14 +1264,14 @@ public class DefiniteAssignmentCheckVisitor
 		// VARS(s) = VARS(r) v VARS(lambda)
 		addNewVars(newMap, vars);
 
-		jjtAccept(node.getBodyNode(), newMap, EType.ALWAYS);
+		jjtAccept(node.getBodyNode(), newMap, ALWAYS);
 
 		// AFTER(lambda) = BEFORE(lambda)
 		return map;
 	}
 
 	/**
-	 * <h1><code>r ; ( !s | +s | -s | ++s | --s | s++ | s-- | ~s ) ; t</code></h1>
+	 * <h1><code>r ; ( +s | -s | ++s | --s | s++ | s-- | ~s ) ; t</code></h1>
 	 * <p>
 	 * Note that we also need to check whether the variable was already assigned
 	 * when the unary method is assigning (++s, --s). Assuming the variable was
@@ -748,18 +1287,50 @@ public class DefiniteAssignmentCheckVisitor
 	 *   x;
 	 * }
 	 * </pre>
+	 *
+	 * <h1><code>r ; !s ; t</code></h1>
+	 * <p><ul>
+	 * <li>BEFORE(s)         = BEFORE(not)</li>
+	 * <li>AFTER(and, true)  = AFTER(s, false)</li>
+	 * <li>AFTER(and, false) = AFTER(s, true)</li>
+	 * <li>AFTER(and)        = AFTER(s,true) &#8745; AFTER(s, false) = AFTER(s)</li>
+	 * </ul></p>
+	 * <pre>
+	 * function foo() {
+	 *   var y;
+	 *   if (!(maybe() && (y=false)))
+	 *     y;
+	 * }
+	 * </pre>
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTUnaryExpressionNode node, final Map<Integer, Object> map)
 			throws SemanticsException {
-		return jjtAccept(node.getUnaryNode(), map, EType.ALWAYS);
+		if (node.getUnaryMethod() == EMethod.EXCLAMATION) {
+			switch (NullUtil.or(typeStack.peek(), ALWAYS)) {
+			case ALWAYS:
+				// AFTER(and) = AFTER(s)
+				return jjtAccept(node.getUnaryNode(), map, ALWAYS);
+			case WHEN_FALSE:
+				// AFTER(and, false)  = AFTER(s, true)
+				jjtAccept(node.getUnaryNode(), copy(map), WHEN_FALSE);
+				return jjtAccept(node.getUnaryNode(), map, WHEN_TRUE);
+			case WHEN_TRUE:
+				// AFTER(and, true)  = AFTER(s, false)
+				jjtAccept(node.getUnaryNode(), copy(map), WHEN_TRUE);
+				return jjtAccept(node.getUnaryNode(), map, WHEN_FALSE);
+			default:
+				throw new UnhandledEnumException(NullUtil.or(typeStack.peek(), ALWAYS), node.getUnaryNode());
+			}
+		}
+		return jjtAccept(node.getUnaryNode(), map, ALWAYS);
 	}
 
 	/** @see #visit(ASTUnaryExpressionNode, Map) */
 	@Override
 	public Map<Integer, Object> visit(final ASTPostUnaryExpressionNode node, final Map<Integer, Object> map)
 			throws SemanticsException {
-		return jjtAccept(node.getUnaryNode(), map, EType.ALWAYS);
+		return jjtAccept(node.getUnaryNode(), map, ALWAYS);
 	}
 
 	/**
@@ -782,10 +1353,10 @@ public class DefiniteAssignmentCheckVisitor
 	@Override
 	public Map<Integer, Object> visit(final ASTPropertyExpressionNode node, Map<Integer, Object> map)
 			throws SemanticsException {
-		map = jjtAccept(node.getStartNode(), map, EType.ALWAYS);
+		map = jjtAccept(node.getStartNode(), map, ALWAYS);
 		final int count = node.getPropertyNodeCount();
 		for (int i = 0; i < count; ++i)
-			map = jjtAccept(node.getPropertyNode(i), map, EType.ALWAYS);
+			map = jjtAccept(node.getPropertyNode(i), map, ALWAYS);
 		return map;
 	}
 
@@ -811,8 +1382,10 @@ public class DefiniteAssignmentCheckVisitor
 	/**
 	 * <h1><code>r ; with(...) (s) ; t</code></h1>
 	 * <p><ul>
-	 * <li>BEFORE(s) = BEFORE(with)</li>
-	 * <li>AFTER(with) = AFTER(s)</li>
+	 * <li>BEFORE(s)          = BEFORE(with)</li>
+	 * <li>AFTER(with, true)  = AFTER(s, true)</li>
+	 * <li>AFTER(with, false) = AFTER(s, false)</li>
+	 * <li>AFTER(with)        = AFTER(s)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -826,7 +1399,8 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTWithClauseNode node, final Map<Integer, Object> map) throws SemanticsException {
-		return jjtAccept(node.getBodyNode(), map, EType.ALWAYS);
+		// Keep the current type, this is like a parenthesis expression.
+		return jjtAccept(node.getBodyNode(), map);
 	}
 
 	/**
@@ -859,7 +1433,7 @@ public class DefiniteAssignmentCheckVisitor
 		// VARS(s) = VARS(r) v VARS(lambda)
 		addNewVars(newMap, vars);
 
-		jjtAccept(node.getBodyNode(), newMap, EType.ALWAYS);
+		jjtAccept(node.getBodyNode(), newMap, ALWAYS);
 
 		// AFTER(lambda) = BEFORE(lambda)
 		return map;
@@ -908,7 +1482,9 @@ public class DefiniteAssignmentCheckVisitor
 	/**
 	 * <h1><code>s ; #...# ; t</code></h1>
 	 * <p><ul>
-	 * <li>AFTER(regex) = BEFORE(regex)</li>
+	 * <li>AFTER(regex)        = BEFORE(regex)</li>
+	 * <li>AFTER(regex, true)  = BEFORE(regex)</li>
+	 * <li>AFTER(regex, false) = VARS(s)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -920,17 +1496,20 @@ public class DefiniteAssignmentCheckVisitor
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTRegexNode node, final Map<Integer, Object> map) throws SemanticsException {
+		if (typeStack.peek() == WHEN_FALSE)
+			markAllAssigned(map);
 		return map;
 	}
 
 	/**
 	 * <h1><code>p ; q ? r : s ; t</code></h1>
 	 * <p><ul>
-	 * <li>BEFORE(q) = BEFORE(ternary)</li>
-	 * <li>BEFORE(r) = AFTER(q, true)</li>
-	 * <li>BEFORE(s) = AFTER(q, false)</li>
-	 * <li>AFTER(ternary) = AFTER(r) &#8745; AFTER(s)</li>
-	 * <li></li>
+	 * <li>BEFORE(q)             = BEFORE(ternary)</li>
+	 * <li>BEFORE(r)             = AFTER(q, true)</li>
+	 * <li>BEFORE(s)             = AFTER(q, false)</li>
+	 * <li>AFTER(ternary, true)  = AFTER(r, true) &#8745; AFTER(s, true)</li>
+	 * <li>AFTER(ternary, false) = AFTER(r, false) &#8745; AFTER(s, false)</li>
+	 * <li>AFTER(ternary)        = AFTER(ternary, true) &#8745; AFTER(ternary, false)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -941,27 +1520,49 @@ public class DefiniteAssignmentCheckVisitor
 	 *   var w;
 	 *   (maybe() && (w=0)) ? w : w = 0;
 	 *   w;
+	 *
+	 *   var u;
+	 *
 	 * }
 	 * </pre>
 	 */
 	@Override
 	public Map<Integer, Object> visit(final ASTTernaryExpressionNode node, final Map<Integer, Object> map) throws SemanticsException {
-		// BEFORE(q) = BEFORE(if)
+		// BEFORE(q) = BEFORE(ternary)
+		final Map<Integer, Object> afterQTrue = jjtAccept(node.getConditionNode(), copy(map), WHEN_TRUE);
+		final Map<Integer, Object> afterQFalse = jjtAccept(node.getConditionNode(), map, WHEN_FALSE);
+
 		// BEFORE(r) = AFTER(q, true)
+		final Map<Integer, Object> afterRTrue = jjtAccept(node.getIfNode(), copy(afterQTrue), WHEN_TRUE);
+		final Map<Integer, Object> afterRFalse = jjtAccept(node.getIfNode(), afterQTrue, WHEN_FALSE);
+
 		// BEFORE(s) = AFTER(q, false)
-		// AFTER(if) = AFTER(r) ^ AFTER(s)
-		final Map<Integer, Object> afterQTrue = jjtAccept(node.getConditionNode(), copy(map), EType.WHEN_TRUE);
-		final Map<Integer, Object> afterQFalse = jjtAccept(node.getConditionNode(), map, EType.WHEN_FALSE);
-		final Map<Integer, Object> afterR = jjtAccept(node.getIfNode(), afterQTrue, EType.ALWAYS);
-		final Map<Integer, Object> afterS = jjtAccept(node.getElseNode(), afterQFalse, EType.ALWAYS);
-		return intersectToLhs(afterR, afterS);
+		final Map<Integer, Object> afterSTrue = jjtAccept(node.getElseNode(), copy(afterQFalse), WHEN_TRUE);
+		final Map<Integer, Object> afterSFalse = jjtAccept(node.getElseNode(), afterQFalse, WHEN_FALSE);
+
+		switch (NullUtil.or(typeStack.peek(), ALWAYS)) {
+		case ALWAYS:
+			// AFTER(ternary)        = AFTER(ternary, true) &#8745; AFTER(ternary, false)
+			//                       = AFTER(r, false) ^ AFTER(s, false) ^ AFTER(r, true) ^ AFTER(s, true)
+			return intersectToLhs(afterRFalse, afterSFalse, afterRTrue, afterSTrue);
+		case WHEN_FALSE:
+			// AFTER(ternary, false) = AFTER(r, false) ^ AFTER(s, false)
+			return intersectToLhs(afterRFalse, afterSFalse);
+		case WHEN_TRUE:
+			// AFTER(ternary, true)  = AFTER(r, true) ^ AFTER(s, true)
+			return intersectToLhs(afterRTrue, afterSTrue);
+		default:
+			throw new UnhandledEnumException(NullUtil.or(typeStack.peek(), ALWAYS), node);
+		}
 	}
 
 	/**
 	 * <h1><code>r ; ( s ) ; t</code></h1>
 	 * <p><ul>
-	 * <li>BEFORE(s) = BEOFRE(parenthesis)</li>
-	 * <li>AFTER(parenthesis) = AFTER(s)</li>
+	 * <li>BEFORE(s)                 = BEFORE(parenthesis)</li>
+	 * <li>AFTER(parenthesis, true)  = AFTER(s, true)</li>
+	 * <li>AFTER(parenthesis, false) = AFTER(s, false)</li>
+	 * <li>AFTER(parenthesis)        = AFTER(s)</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -996,7 +1597,7 @@ public class DefiniteAssignmentCheckVisitor
 			throws SemanticsException {
 		final int count = node.jjtGetNumChildren();
 		for (int i = 0; i < count; ++i)
-			map = jjtAccept(node.jjtGetChild(i), map, EType.ALWAYS);
+			map = jjtAccept(node.jjtGetChild(i), map, ALWAYS);
 		return map;
 	}
 
@@ -1020,17 +1621,17 @@ public class DefiniteAssignmentCheckVisitor
 			throws SemanticsException {
 		final int count = node.jjtGetNumChildren();
 		for (int i = 0; i < count; ++i)
-			map = jjtAccept(node.jjtGetChild(i), map, EType.ALWAYS);
+			map = jjtAccept(node.jjtGetChild(i), map, ALWAYS);
 		return map;
 	}
 
 	/**
 	 * <h1><code>r ; var &lt;variable&gt; = s ; t</code></h1>
 	 * <p>
-	 * Note that here we mark the variable as definitely assigned.
+	 * Here we mark the variable as definitely assigned.
 	 * <ul>
 	 * <li>BEFORE(s) = BEOFRE(declaration)</li>
-	 * <li>AFTER(declaration) = AFTER(s)</li>
+	 * <li>AFTER(declaration) = AFTER(s) &#8746; {&lt;variable&gt;}</li>
 	 * </ul></p>
 	 * <pre>
 	 * function foo() {
@@ -1044,7 +1645,7 @@ public class DefiniteAssignmentCheckVisitor
 	public Map<Integer, Object> visit(final ASTVariableDeclarationClauseNode node, Map<Integer, Object> map)
 			throws SemanticsException {
 		if (node.hasAssignment()) {
-			map = jjtAccept(node.getAssignmentNode(), map, EType.ALWAYS);
+			map = jjtAccept(node.getAssignmentNode(), map, ALWAYS);
 			markAssigned(map, node);
 		}
 		return map;
@@ -1101,7 +1702,61 @@ public class DefiniteAssignmentCheckVisitor
 
 	private void visitHeader(@Nullable final IHeaderNode header) throws SemanticsException {
 		if (header != null && header.isFunction())
-			jjtAccept(header.getNode(), Collections.<Integer, Object>emptyMap(), EType.ALWAYS);
+			jjtAccept(header.getNode(), Collections.<Integer, Object>emptyMap(), ALWAYS);
+	}
+
+	private <T extends Node & ILabeled> void addLabel(final T node, @Nullable final Map<Integer, Object> forBreak,
+			@Nullable final Map<Integer, Object> forContinue) throws SemanticsException {
+		final String label = node.getLabel();
+		final LabelInfo info = new LabelInfo(forBreak, forContinue);
+		if (label == null) {
+			labelStack.push(info);
+		}
+		else {
+			if (labelMap.put(label, info) != null)
+				throw new DuplicateLabelException(node);
+		}
+	}
+
+	@Nullable
+	private <T extends Node & ILabeled> LabelInfo popLabel(final T node) {
+		final String label = node.getLabel();
+		LabelInfo info;
+		if (label == null)
+			info = labelStack.isEmpty() ? null : labelStack.pop();
+		else
+			info = labelMap.remove(label);
+		return info;
+	}
+
+	private <T extends ILabeled & Node> LabelInfo getInfo(final Node node, Map<Integer, Object> map,
+			@Nullable final Map<Integer, Object> forBreak, @Nullable final Map<Integer, Object> forContinue,
+			final EType type, final T labeledNode) throws SemanticsException {
+		addLabel(labeledNode, forBreak, forContinue);
+		final LabelInfo info;
+		try {
+			map = jjtAccept(node, map, type);
+		}
+		finally {
+			info = popLabel(labeledNode);
+		}
+		if (info == null)
+			throw new SemanticsException(
+					NullUtil.messageFormat(CmnCnst.Error.NO_MATCHING_LABEL_INFO, labeledNode.getLabel()), node);
+		info.setMap(map);
+		return info;
+	}
+
+	private <T extends ILabeled & Node> Map<Integer, Object> getInfoBreak(final Node node, final Map<Integer, Object> map,
+			final EType type, final T labeledNode) throws SemanticsException {
+		final LabelInfo info = getInfo(node, map, markAllAssigned(copy(map)), null, type, labeledNode);
+		return info.getBreakMap();
+	}
+
+	private <T extends ILabeled & Node> LabelInfo getInfoBoth(final Node node, final Map<Integer, Object> map,
+			final EType type, final T labeledNode) throws SemanticsException {
+		final Map<Integer, Object> fullMap = markAllAssigned(copy(map));
+		return getInfo(node, map, fullMap, copy(fullMap), type, labeledNode);
 	}
 
 	//TODO must also visit lambda defined at global scope, not only header functions
@@ -1114,10 +1769,59 @@ public class DefiniteAssignmentCheckVisitor
 				v.visitHeader(header);
 	}
 
-	private static enum EType {
-		WHEN_TRUE,
-		WHEN_FALSE,
-		ALWAYS;
+	private static class LabelInfo {
+		private final Map<Integer, Object> forBreak;
+		private final Map<Integer, Object> forContinue;
+		private Map<Integer, Object> map;
+		public LabelInfo(@Nullable final Map<Integer, Object> forBreak, @Nullable final Map<Integer, Object> forContinue) {
+			this.forBreak = forBreak != null ? forBreak : Collections.<Integer,Object>emptyMap();
+			this.forContinue = forContinue != null ? forContinue : Collections.<Integer,Object>emptyMap();
+			map = Collections.emptyMap();
+		}
+		public Map<Integer, Object> getContinueMap() {
+			return forContinue;
+		}
+		public Map<Integer, Object> getBreakMap() {
+			return forBreak;
+		}
+		public void intersectToBreak(final Map<Integer, Object> rhs) {
+			intersectToLhs(forBreak, rhs);
+		}
+		public void intersectToContinue(final Map<Integer, Object> rhs) {
+			intersectToLhs(forContinue, rhs);
+		}
+		@Override
+		public String toString() {
+			return NullUtil.messageFormat(CmnCnst.ToString.LABEL_INFO, forBreak, forContinue);
+		}
+		public void setMap(final Map<Integer, Object> map) {
+			this.map = map;
+		}
+		public Map<Integer, Object> getMap() {
+			return map;
+		}
+	}
+
+	protected static enum EType {
+		ALWAYS {
+			@Override
+			public boolean isOppositeOf(final boolean b) {
+				return false;
+			}
+		},
+		WHEN_TRUE {
+			@Override
+			public boolean isOppositeOf(final boolean b) {
+				return !b;
+			}
+		},
+		WHEN_FALSE{
+			@Override
+			public boolean isOppositeOf(final boolean b) {
+				return b;
+			}
+		};
+		public abstract boolean isOppositeOf(boolean b);
 	}
 
 	/**
@@ -1152,21 +1856,53 @@ public class DefiniteAssignmentCheckVisitor
 	 * @param rhs Second map.
 	 * @return The result for chaining.
 	 */
-	private static Map<Integer, Object> intersectToLhs(final Map<Integer, Object> lhs, final Map<Integer, Object> rhs) {
+	protected static Map<Integer, Object> intersectToLhs(final Map<Integer, Object> lhs, final Map<Integer, Object> rhs) {
 		for (final Entry<Integer, Object> entryLhs : lhs.entrySet())
 			if (entryLhs.getValue() != null && rhs.get(entryLhs.getKey()) == null)
 				entryLhs.setValue(null);
 		return lhs;
 	}
 
-	// Marks all variables as set.
+	/**
+	 * Same as {@link #intersectToLhs(Map, Map)}, but intersects three sets instead of two.
+	 * @see #intersectToLhs(Map, Map)
+	 */
+	private static Map<Integer, Object> intersectToLhs(final Map<Integer, Object> lhs, final Map<Integer, Object> rhs1,
+			final Map<Integer, Object> rhs2) {
+		Integer key;
+		for (final Entry<Integer, Object> entryLhs : lhs.entrySet())
+			if (entryLhs.getValue() != null && (rhs1.get(key = entryLhs.getKey()) == null || rhs2.get(key) == null))
+				entryLhs.setValue(null);
+		return lhs;
+	}
+
+	/**
+	 * Same as {@link #intersectToLhs(Map, Map)}, but intersects four sets instead of two.
+	 * @see #intersectToLhs(Map, Map)
+	 */
+	private static Map<Integer, Object> intersectToLhs(final Map<Integer, Object> lhs, final Map<Integer, Object> rhs1,
+			final Map<Integer, Object> rhs2, final Map<Integer, Object> rhs3) {
+		Integer key;
+		for (final Entry<Integer, Object> entryLhs : lhs.entrySet())
+			if (entryLhs.getValue() != null
+					&& (rhs1.get(key = entryLhs.getKey()) == null || rhs2.get(key) == null || rhs3.get(key) == null))
+				entryLhs.setValue(null);
+		return lhs;
+	}
+
+	/**
+	 * Marks all variables as set.
+	 * @param map Map to be changed.
+	 * @return The map with all variables marked as assigned.
+	 */
 	private static Map<Integer, Object> markAllAssigned(final Map<Integer, Object> map) {
 		for (final Entry<?,Object> entry : map.entrySet())
 			entry.setValue(OBJECT);
 		return map;
 	}
 
-	private static void markAssigned(final Map<Integer, Object> map, final ISourceResolvable resolvable) {
+	private static Map<Integer, Object> markAssigned(final Map<Integer, Object> map, final ISourceResolvable resolvable) {
 		map.put(Integer.valueOf(resolvable.getBasicSource()), OBJECT);
+		return map;
 	}
 }

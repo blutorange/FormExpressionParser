@@ -514,7 +514,8 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		if (node.isPlainLoop()) {
 			// Plain for loop
 			jjtAccept(node, node.getPlainInitializerNode());
-			whileloop: while (jjtAccept(node, node.getPlainConditionNode()).coerceBoolean(ec).booleanValue()) {
+			final boolean noCondition = !node.hasCondition();
+			whileloop: while (noCondition || jjtAccept(node, node.getPlainConditionNode()).coerceBoolean(ec).booleanValue()) {
 				res = jjtAccept(node, node.getBodyNode());
 				// Handle break, continue, return.
 				switch (ec.getJumpType()) {

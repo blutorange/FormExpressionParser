@@ -32,7 +32,6 @@ public class ASTAssignmentExpressionNode extends ANode {
 		return null;
 	}
 
-
 	@Override
 	public <R, T, E extends Throwable> R jjtAccept(final IFormExpressionReturnDataVisitor<R, T, E> visitor, final T data) throws E {
 		return visitor.visit(this, data);

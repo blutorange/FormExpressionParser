@@ -2,6 +2,6 @@ package de.xima.fc.form.expression.iface.parse;
 
 import javax.annotation.Nullable;
 
-public interface ILabelled {
+public interface ILabeled {
 	@Nullable public String getLabel();
 }

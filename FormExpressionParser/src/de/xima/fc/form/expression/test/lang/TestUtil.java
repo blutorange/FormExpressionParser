@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import de.xima.fc.form.expression.exception.FormExpressionException;
@@ -25,6 +26,7 @@ import de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory;
 import de.xima.fc.form.expression.impl.writer.StringBuilderWriter;
 import de.xima.fc.form.expression.object.ALangObject;
 import de.xima.fc.form.expression.object.StringLangObject;
+import de.xima.fc.form.expression.util.NullUtil;
 
 @SuppressWarnings("nls")
 public final class TestUtil {
@@ -145,19 +147,19 @@ public final class TestUtil {
 			try {
 				switch (test.getContextType()) {
 				case FORMCYCLE:
-					final IFormExpression<Formcycle> feForm = parse(test.getCode(), test.getTestType(),
-							EEvaluationContextContractFormcycle.INSTANCE, test.getSeverityConfig());
+					final IFormExpression<Formcycle> feForm = reserialize(parse(test.getCode(), test.getTestType(),
+							EEvaluationContextContractFormcycle.INSTANCE, test.getSeverityConfig()));
 					if (test.isPerformEvaluation())
 						res = evaluateFormcycle(feForm, test.getTestType());
 					break;
 				case GENERIC:
-					final IFormExpression<Writer> feGeneric = parse(test.getCode(), test.getTestType(),
-							EEvaluationContextContractWriter.INSTANCE, test.getSeverityConfig());
+					final IFormExpression<Writer> feGeneric = reserialize(parse(test.getCode(), test.getTestType(),
+							EEvaluationContextContractWriter.INSTANCE, test.getSeverityConfig()));
 					if (test.isPerformEvaluation())
 						res = evaluateGeneric(feGeneric, test.getTestType());
 					break;
 				default:
-					break;
+					throw new RuntimeException("Unknown context type: " + test.getContextType());
 				}
 			}
 			catch (final TokenMgrError e) {
@@ -216,6 +218,12 @@ public final class TestUtil {
 				fail(msg);
 			}
 		}
+	}
+
+	@Nonnull
+	private static <T> IFormExpression<T> reserialize(final IFormExpression<T> expression) {
+		final byte[] bytes = SerializationUtils.serialize(expression);
+		return NullUtil.checkNotNull(SerializationUtils.<IFormExpression<T>>deserialize(bytes));
 	}
 
 	private static ALangObject evaluateGeneric(@Nonnull final IFormExpression<Writer> fe, @Nonnull final ETestType type)
