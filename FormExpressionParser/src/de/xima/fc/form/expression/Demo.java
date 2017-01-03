@@ -27,6 +27,7 @@ import de.xima.fc.form.expression.highlight.style.EHighlightThemePack;
 import de.xima.fc.form.expression.iface.config.ISeverityConfig;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationResult;
 import de.xima.fc.form.expression.iface.evaluate.IEvaluationWarning;
+import de.xima.fc.form.expression.iface.factory.IExternalContextContractFactory;
 import de.xima.fc.form.expression.iface.factory.IFormExpressionFactory;
 import de.xima.fc.form.expression.iface.parse.IEvaluationContextContract;
 import de.xima.fc.form.expression.iface.parse.IFormExpression;
@@ -42,6 +43,10 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
 /**
  * TODO Master to-do list.
  *
+ * - Redo library/external scope contract factory: there are method for getting
+ *   a scope contract factory, but also methods for fetching variables directly?
+ *   Eg. {@link IExternalContextContractFactory#getScopeFactory(String)}, but also
+ *   {@lini IExternalContext#fetchScopedVariable(String, String, de.xima.fc.form.expression.iface.evaluate.IEvaluationContext)}
  * - Replace compile-time constant expressions with their evaluated value
  *   => also check that it works with the definite assignment analysis, eg.
  *     function foo() {
