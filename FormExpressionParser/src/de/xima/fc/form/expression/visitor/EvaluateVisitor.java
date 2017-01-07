@@ -40,6 +40,7 @@ import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTDotPropertyNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
@@ -797,6 +798,13 @@ public class EvaluateVisitor implements IFormExpressionReturnVoidVisitor<ALangOb
 		// Need not do anything as variables are already resolved.
 		// Need not check for must jump as we return immediately anyway.
 		return jjtAccept(node, node.getBodyNode());
+	}
+
+	@Override
+	public ALangObject visit(final ASTDotPropertyNode node) throws EvaluationException {
+		// During evaluation, we do not need variable types,
+		// but only the property name.
+		return StringLangObject.create(node.getName());
 	}
 
 	@Override

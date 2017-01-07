@@ -9,6 +9,7 @@ import de.xima.fc.form.expression.object.ALangObject;
 
 @NonNullByDefault
 public interface IDotAccessorFunction<T extends ALangObject> extends IFunction<T>, Serializable {
-	public IVariableType getReturnType(IVariableType thisContext);
+	public IVariableType getReturnType(IVariableType thisContext, IVariableType[] dotGenerics);
 	public ILangObjectClass getReturnClass();
+	public boolean supportsGenerics(IVariableType[] dotGenerics);
 }

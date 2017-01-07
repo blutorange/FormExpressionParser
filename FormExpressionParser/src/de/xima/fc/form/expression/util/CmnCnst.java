@@ -400,7 +400,8 @@ public final class CmnCnst {
 		public static final String INCOMPATIBLE_BRACKET_ASSIGNER_VALUE_TYPES = "Bracket assigner for type {0} does not accept values of this type to be assigned.";
 		public static final String INCOMPATIBLE_BRACKET_ASSIGNER_PROPERTY_TYPES = "Bracket assigner for type {0} does not accept values of this type for the property to be assigned to.";
 		public static final String NO_SUCH_EXPRESSION_METHOD = "No such expression method {0} for type {1}.";
-		public static final String NO_SUCH_DOT_ACCESSOR = "No such dot accesor named {0} for type {1}.";
+		public static final String NO_SUCH_DOT_ACCESSOR_WITH_GENERICS = "No such dot accesor named <{0}>{1} for type {2}.";
+		public static final String NO_SUCH_DOT_ACCESSOR_WITHOUT_GENERICS = "No such dot accesor named {0} for type {1}.";
 		public static final String NO_SUCH_BRACKET_ACCESSOR = "No such bracket accesor for type {0}.";
 		public static final String NO_SUCH_BRACKET_ASSIGNER = "No such bracket assigner for type {0}.";
 		public static final String NO_SUCH_DOT_ASSIGNER = "No such dot assigner named {0} for type {1}.";
@@ -436,6 +437,9 @@ public final class CmnCnst {
 		public static final String NO_MATCHING_LABEL_INFO = "Cannot find matching info for label {0}. " + INTERNAL_ERROR;
 		public static final String DEFAULT_CASE_MUST_BE_LAST = "Default case of a switch statement must occur last.";
 		public static final String DEFAULT_USED_MULTIPLE_TIMES = "Default case must not occur more than once.";
+		public static final String ILLEGAL_GENERIC_IN_DOT_PROPERTY_ASSIGNMENT = "Attempt to use dot assigner {0} with generic specifiers.";
+		public static final String TYPE_NODE_WITHOUT_IMPLICIT_TYPE = "Type node {0} did not return implicit type. " + INTERNAL_ERROR;
+		public static final String VARIABLE_TYPE_CHECKER_VISITED_DOT_PROPERTY_NODE = "Visited dot property node. " + INTERNAL_ERROR;
 	}
 
 	public static final class ToString {

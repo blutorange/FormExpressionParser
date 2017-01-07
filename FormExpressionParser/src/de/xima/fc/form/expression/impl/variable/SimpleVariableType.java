@@ -96,4 +96,9 @@ public enum SimpleVariableType implements IVariableType {
 	public IVariableType upconvert(final ILangObjectClass superClass) {
 		return GenericVariableType.upconvert(this, superClass);
 	}
+
+	@Override
+	public boolean equalsOverNull(final IVariableType that) {
+		return GenericVariableType.equalsOverNull(this, that);
+	}
 }

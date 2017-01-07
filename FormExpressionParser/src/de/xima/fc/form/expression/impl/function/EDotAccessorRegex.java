@@ -77,8 +77,13 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 	}
 
 	@Override
-	public IVariableType getReturnType(final IVariableType thisContext) {
-		return impl.getReturnType(thisContext);
+	public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
+		return impl.getReturnType(thisContext, dotGenerics);
+	}
+
+	@Override
+	public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+		return impl.supportsGenerics(dotGenerics);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<RegexLangObject> {
@@ -92,13 +97,18 @@ public enum EDotAccessorRegex implements IDotAccessorFunction<RegexLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forSimpleFunction(SimpleVariableType.BOOLEAN, SimpleVariableType.STRING);
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		;

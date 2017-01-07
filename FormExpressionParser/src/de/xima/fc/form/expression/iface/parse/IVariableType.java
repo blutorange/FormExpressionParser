@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.annotation.Nullable;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import javax.annotation.concurrent.Immutable;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.google.common.collect.ImmutableCollection;
 
@@ -95,6 +96,23 @@ public interface IVariableType extends Serializable {
 	public boolean hasFlag(EVariableTypeFlag flag);
 
 	public ImmutableCollection<EVariableTypeFlag> getFlags();
+
+	/**
+	 * Checks whether this type equals the given type, allowing generics
+	 * that are <code>null</code> as a wildcard.
+	 * <ul>
+	 *   <li>string.equalsOverNull(number) => false</li>
+	 *   <li>string.equalsOverNull(null) => true</li>
+	 *   <li>null.equalsOverNull(string) => true</li>
+	 *   <li>null.equalsOverNull(null) => true</li>
+	 *   <li>array&lt;string&gt;.equalsOverNull(array&lt;number&gt;) => false</li>
+	 *   <li>array&lt;string&gt;.equalsOverNull(array&lt;null&gt;) => true</li>
+	 *   <li>method&lt;string, null&gt;.equalsOverNull(array&lt;string&gt;) => false</li>
+	 * </ul>
+	 * @param thatType Type to check this type against.
+	 * @return Whether this is the same as the given type, allowing for wildcards.
+	 */
+	public boolean equalsOverNull(IVariableType thatType);
 
 	/**
 	 * @param superClass Super class to convert this type to.

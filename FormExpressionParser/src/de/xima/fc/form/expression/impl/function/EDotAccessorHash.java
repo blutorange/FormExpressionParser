@@ -94,8 +94,13 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 	}
 
 	@Override
-	public IVariableType getReturnType(final IVariableType thisContext) {
-		return impl.getReturnType(thisContext);
+	public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
+		return impl.getReturnType(thisContext, dotGenerics);
+	}
+
+	@Override
+	public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+		return impl.supportsGenerics(dotGenerics);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<HashLangObject> {
@@ -107,13 +112,18 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forSimpleFunction(thisContext.getGeneric(1), thisContext.getGeneric(0));
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		contains(false, "key") { //$NON-NLS-1$
@@ -125,7 +135,7 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGeneric) {
 				// hash<string, number> => boolean
 				// function<boolean, string>
 				return GenericVariableType.forSimpleFunction(SimpleVariableType.BOOLEAN, thisContext.getGeneric(0));
@@ -134,6 +144,11 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		length(false) {
@@ -144,13 +159,18 @@ public enum EDotAccessorHash implements IDotAccessorFunction<HashLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.NUMBER;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		}
 		;

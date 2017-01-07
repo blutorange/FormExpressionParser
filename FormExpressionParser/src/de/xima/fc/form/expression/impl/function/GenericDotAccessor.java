@@ -55,7 +55,8 @@ public abstract class GenericDotAccessor<T extends ALangObject> implements IGene
 		}
 
 		@Override
-		public IVariableType getReturnType(final IVariableType thisContext, final String property) {
+		public IVariableType getReturnType(final IVariableType thisContext, final String property,
+				final IVariableType[] dotGenerics) {
 			return thisContext.getGeneric(1);
 		}
 
@@ -72,6 +73,11 @@ public abstract class GenericDotAccessor<T extends ALangObject> implements IGene
 		@Override
 		public ILangObjectClass getReturnClass() {
 			return ELangObjectClass.OBJECT;
+		}
+
+		@Override
+		public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+			return dotGenerics.length == 0;
 		}
 	};
 

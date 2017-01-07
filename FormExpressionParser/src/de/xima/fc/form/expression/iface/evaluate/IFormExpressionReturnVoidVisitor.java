@@ -9,6 +9,7 @@ import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTDotPropertyNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
@@ -92,4 +93,5 @@ public interface IFormExpressionReturnVoidVisitor<R,E extends Throwable>
 	public R visit(ASTVariableTypeNode node) throws E;
 	public R visit(ASTFunctionArgumentNode node) throws E;
 	public R visit(ASTStringCharactersNode node) throws E;
+	public R visit(ASTDotPropertyNode node) throws E;
 }

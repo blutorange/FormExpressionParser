@@ -80,4 +80,9 @@ public enum VoidType implements IVariableType {
 	public String toString() {
 		return getBasicLangClass().getSyntacticalTypeName();
 	}
+
+	@Override
+	public boolean equalsOverNull(final IVariableType that) {
+		return GenericVariableType.equalsOverNull(this, that);
+	}
 }

@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.iface.factory;
 
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -18,7 +19,7 @@ public interface INamespaceContractFactory extends IContractFactory<INamespace> 
 	@Nullable
 	public IValue getDotAssignerInfo(IVariableType thisContext, String property);
 	@Nullable
-	public IReturn getDotAccessorInfo(IVariableType thisContext, String property);
+	public IReturn getDotAccessorInfo(IVariableType thisContext, String property, IVariableType[] dotGenerics);
 
 	public static interface IValueReturn extends IValue, IReturn {}
 	public static interface IPropertyValue extends IProperty, IValue {}

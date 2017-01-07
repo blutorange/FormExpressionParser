@@ -1,6 +1,7 @@
 package de.xima.fc.form.expression.node;
 
 import javax.annotation.Nullable;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import de.xima.fc.form.expression.enums.EMethod;
@@ -96,7 +97,15 @@ public class ASTPropertyExpressionNode extends ANode {
 	 * @throws ClassCastException When the node is not a dot property type node.
 	 */
 	public String getDotPropertyName(final int i) throws ClassCastException {
-		return ((ASTIdentifierNameNode)jjtGetChild(i+1)).getName();
+		return ((ASTDotPropertyNode)jjtGetChild(i+1)).getName();
+	}
+
+	public int getDotPropertyVariableTypeCount(final int i) throws ClassCastException {
+		return ((ASTDotPropertyNode)jjtGetChild(i+1)).getVariableTypeCount();
+	}
+
+	public Node getDotPropertyVariableTypeNode(final int i, final int j) throws ClassCastException {
+		return ((ASTDotPropertyNode)jjtGetChild(i+1)).getVariableTypeNode(j);
 	}
 
 	public int getParenthesisArgNodeCount(final int i) {

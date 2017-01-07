@@ -22,6 +22,7 @@ import de.xima.fc.form.expression.enums.EJump;
 import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.enums.EVariableTypeFlag;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
+import de.xima.fc.form.expression.exception.parse.IllegalGenericTypeInDotPropertyAssignmentException;
 import de.xima.fc.form.expression.exception.parse.IllegalJumpClauseException;
 import de.xima.fc.form.expression.exception.parse.IllegalNumberOfFunctionParametersException;
 import de.xima.fc.form.expression.exception.parse.IllegalNumberOfVarArgFunctionParametersException;
@@ -80,6 +81,7 @@ import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTDotPropertyNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
@@ -500,10 +502,11 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			switch (node.getPropertyType(i)) {
 			case DOT: {
 				final String property = node.getDotPropertyName(i);
+				final IVariableType[] dotGenerics = getDotGenerics(node, i);
 				final IReturn typeReturn = factory.getNamespaceFactory().getDotAccessorInfo(infoRes.getImplicitType(),
-						property);
+						property, dotGenerics);
 				if (typeReturn == null)
-					throw new NoSuchDotAccessorException(infoRes.getImplicitType(), property,
+					throw new NoSuchDotAccessorException(infoRes.getImplicitType(), property, dotGenerics,
 							i == 0 ? node.getStartNode() : node.getPropertyNode(i - 1));
 				infoRes.replaceImplicitType(typeReturn.getReturn());
 				break;
@@ -565,6 +568,8 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 					final NodeInfo infoArg = node.getParenthesisArgNode(i, j).jjtAccept(this);
 					if (!infoArg.hasImplicitType())
 							throw new UnreachableCodeException(node.getPropertyNode(i));
+					final IVariableType dbg1=typeFunction.getGeneric(j+1);
+					final IVariableType dbg2=infoArg.getImplicitType();
 					if (!typeFunction.getGeneric(j+1).isAssignableFrom(infoArg.getImplicitType()))
 						throw new IncompatibleFunctionParameterTypeException(typeFunction.getGeneric(j + 1),
 								infoArg.getImplicitType(), node.getParenthesisArgNode(i, j));
@@ -580,6 +585,20 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			}
 		}
 		return infoRes;
+	}
+
+	private IVariableType[] getDotGenerics(final ASTPropertyExpressionNode node, final int i) throws SemanticsException {
+		final IVariableType[] dotGenerics = new IVariableType[node.getDotPropertyVariableTypeCount(i)];
+		for (int j = 0; j < dotGenerics.length; ++j) {
+			final NodeInfo info = node.getDotPropertyVariableTypeNode(i, j).jjtAccept(this);
+			if (!info.hasImplicitType())
+				throw new SemanticsException(
+						NullUtil.messageFormat(CmnCnst.Error.TYPE_NODE_WITHOUT_IMPLICIT_TYPE,
+								node.getDotPropertyVariableTypeNode(i, j)),
+						node.getDotPropertyVariableTypeNode(i, j));
+			dotGenerics[j] = info.getImplicitType();
+		}
+		return dotGenerics;
 	}
 
 	private void assignmentStep(final EMethod method, final Node node, final NodeInfo infoCurrent)
@@ -617,17 +636,22 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 			switch (nodeProperty.getPropertyType(nodeProperty.getPropertyNodeCount() - 1)) {
 			case DOT: {
 				final String property = nodeProperty.getDotPropertyName(nodeProperty.getPropertyNodeCount() - 1);
+				if (nodeProperty.getDotPropertyVariableTypeCount(nodeProperty.getPropertyNodeCount() - 1)  != 0)
+					throw new IllegalGenericTypeInDotPropertyAssignmentException(property, nodeProperty);
 				// Compound assignments (a.b+=c etc.) are the same as a.b=a.b+c
 				// etc.
 				// First we need to evaluate the last attribute accessor (a.b),
 				// then the expression method (+).
 				if (method != EMethod.EQUAL) {
-					final IReturn typeDot = factory.getNamespaceFactory()
-							.getDotAccessorInfo(infoProperty.getImplicitType(), property);
+					final IReturn typeDot = factory.getNamespaceFactory().getDotAccessorInfo(
+							infoProperty.getImplicitType(), property,
+							CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_ARRAY);
 					if (typeDot == null)
 						throw new NoSuchDotAccessorException(infoProperty.getImplicitType(), property,
+								CmnCnst.NonnullConstant.EMPTY_VARIABLE_TYPE_ARRAY,
 								nodeProperty.getPropertyNode(nodeProperty.getPropertyNodeCount() - 1));
-					final IValueReturn typeMethod = factory.getNamespaceFactory().getExpressionMethodInfo(typeDot.getReturn(), method.equalMethod(nodeProperty));
+					final IValueReturn typeMethod = factory.getNamespaceFactory()
+							.getExpressionMethodInfo(typeDot.getReturn(), method.equalMethod(nodeProperty));
 					if (typeMethod == null)
 						throw new NoSuchExpressionMethodException(typeDot.getReturn(),
 								method.equalMethod(nodeProperty), nodeProperty);
@@ -1491,7 +1515,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 
 	@Override
 	public NodeInfo visit(final ASTVariableDeclarationClauseNode node) throws SemanticsException {
-		final IVariableType type = this.getDeclaredType(null, node);
+		final IVariableType type = getDeclaredType(null, node);
 		if (node.hasAssignment()) {
 			final NodeInfo info = node.getAssignmentNode().jjtAccept(this);
 			if (!info.hasImplicitType())
@@ -1553,6 +1577,11 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 		v.visitScopeDefs(scopeDefs);
 		final NodeInfo info = node.jjtAccept(v);
 		return info.hasImplicitType() ? info.getImplicitType() : null;
+	}
+
+	@Override
+	public NodeInfo visit(final ASTDotPropertyNode node) throws SemanticsException {
+		throw new SemanticsException(CmnCnst.Error.VARIABLE_TYPE_CHECKER_VISITED_DOT_PROPERTY_NODE, node);
 	}
 
 	protected static class NodeInfo {

@@ -250,7 +250,7 @@ public final class GenericNamespaceContractFactory implements INamespaceContract
 
 	@Nullable
 	@Override
-	public IReturn getDotAccessorInfo(final IVariableType thisContext, final String property) {
+	public IReturn getDotAccessorInfo(final IVariableType thisContext, final String property, final IVariableType[] dotGenerics) {
 		final IFunction<?> func = dotAccessor(thisContext.getBasicLangClass(), property);
 		if (func == null)
 			return null;
@@ -258,10 +258,14 @@ public final class GenericNamespaceContractFactory implements INamespaceContract
 		// Casting is better than repeating the search for a fitting function.
 		if (func instanceof IDotAccessorFunction<?>) {
 			final IDotAccessorFunction<?> f = ((IDotAccessorFunction<?>) func);
-			return new Return(f.getReturnType(convertedThisContext));
+			if (!f.supportsGenerics(dotGenerics))
+				return null;
+			return new Return(f.getReturnType(convertedThisContext, dotGenerics));
 		}
 		final IGenericDotAccessorFunction<?> f = ((IGenericDotAccessorFunction<?>) func);
-		return new Return(f.getReturnType(convertedThisContext, property));
+		if (!f.supportsGenerics(dotGenerics))
+			return null;
+		return new Return(f.getReturnType(convertedThisContext, property, dotGenerics));
 	}
 
 	@NotThreadSafe

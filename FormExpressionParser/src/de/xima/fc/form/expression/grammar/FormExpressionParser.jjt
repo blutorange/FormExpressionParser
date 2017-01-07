@@ -228,21 +228,6 @@ MORE :
   < ~[ ] >
 }
 
-< AFTER_DOT >
-TOKEN:
-{
-  < IdentifierAfterDot : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "_", "0"-"9" ])* > : CODE
-}
-
-< AFTER_DOT >
-SKIP :
-{
-  " "
-| "\t"
-| "\n"
-| "\r"
-}
-
 < TEMPLATE_LITERAL >
 TOKEN:
 {
@@ -333,7 +318,7 @@ TOKEN :
 |
   < Colon : ":" >
 |
-  < Dot : "." > : AFTER_DOT
+  < Dot : "." >
 |
   < SemiColon : ";" >
 |
@@ -1912,7 +1897,7 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
     FunctionTypeUnaryExpression(method)
     (
       < Dot >
-      IdentifierNameAfterDot(EMethod.DOT)
+      DotProperty(EMethod.DOT)
     | < BracketOpen > Expression(EMethod.BRACKET) < BracketClose >
     | < ParenOpen > FunctionArgumentList(EMethod.PARENTHESIS) < ParenClose >
     )*
@@ -1925,16 +1910,23 @@ void PropertyExpression(EMethod method) #PropertyExpressionNode(createNode = jjt
   }
 }
 
-void IdentifierNameAfterDot(EMethod method) #IdentifierNameNode :
+void DotProperty(EMethod method) #DotPropertyNode :
 {
-  Token t; 
+  Token t;
 }
 {
   (
-    t = < IdentifierAfterDot >
+    [
+      < AngleOpen > VariableType(null)
+      (
+        < Comma > VariableType(null)
+      )*
+      < AngleClose >
+    ]
   )
+  t = < Identifier >
   {
-    jjtThis.init(method, t.getNonnullImage());    
+    jjtThis.init(method, t.getNonnullImage());
   }
 }
 

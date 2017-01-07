@@ -74,19 +74,19 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 	@Override
 	public void visit(final ASTTryClauseNode node, final IVariableTypeBuilder builder) throws SemanticsException {
 		visitTypedNode(node, SimpleVariableType.EXCEPTION);
-		node.getTryNode().jjtAccept(this, builder);
-		node.getCatchNode().jjtAccept(this, builder);
+		node.getTryNode().jjtAccept(this, new VariableTypeBuilder());
+		node.getCatchNode().jjtAccept(this, new VariableTypeBuilder());
 	}
 
 	@Override
 	public void visit(final ASTForLoopNode node, final IVariableTypeBuilder builder) throws SemanticsException {
 		if (node.isEnhancedLoop()) {
 			visitTypedNode(node);
-			node.getEnhancedIteratorNode().jjtAccept(this, builder);
-			node.getBodyNode().jjtAccept(this, builder);
+			node.getEnhancedIteratorNode().jjtAccept(this, new VariableTypeBuilder());
+			node.getBodyNode().jjtAccept(this, new VariableTypeBuilder());
 		}
 		else
-			visitChildren(node, builder);
+			visitChildren(node, new VariableTypeBuilder());
 	}
 
 	@Override
@@ -101,7 +101,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 			}
 			builder.append(type);
 		}
-		node.getBodyNode().jjtAccept(this, builder);
+		node.getBodyNode().jjtAccept(this, new VariableTypeBuilder());
 	}
 
 	@Override
@@ -113,7 +113,7 @@ extends FormExpressionVoidDataVisitorAdapter<IVariableTypeBuilder, SemanticsExce
 				varArgParam(node, i);
 			}
 		}
-		node.getBodyNode().jjtAccept(this, builder);
+		node.getBodyNode().jjtAccept(this, new VariableTypeBuilder());
 	}
 
 	private <T extends IArgumentResolvable & Node> IVariableType varArgParam(final T node, final int i)

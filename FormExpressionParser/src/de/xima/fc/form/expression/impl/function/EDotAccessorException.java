@@ -73,8 +73,13 @@ public enum EDotAccessorException implements IDotAccessorFunction<ExceptionLangO
 	}
 
 	@Override
-	public IVariableType getReturnType(final IVariableType thisContext) {
-		return impl.getReturnType(thisContext);
+	public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
+		return impl.getReturnType(thisContext, dotGenerics);
+	}
+
+	@Override
+	public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+		return impl.supportsGenerics(dotGenerics);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<ExceptionLangObject> {
@@ -86,7 +91,7 @@ public enum EDotAccessorException implements IDotAccessorFunction<ExceptionLangO
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return SimpleVariableType.STRING;
 
 			}
@@ -94,6 +99,12 @@ public enum EDotAccessorException implements IDotAccessorFunction<ExceptionLangO
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.STRING;
+			}
+
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		}
 		;

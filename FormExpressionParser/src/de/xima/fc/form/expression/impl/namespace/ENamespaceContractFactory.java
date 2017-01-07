@@ -95,7 +95,7 @@ public enum ENamespaceContractFactory implements INamespaceContractFactory {
 	}
 	@Nullable
 	@Override
-	public IReturn getDotAccessorInfo(final IVariableType thisContext, final String property) {
-		return impl.getDotAccessorInfo(thisContext, property);
+	public IReturn getDotAccessorInfo(final IVariableType thisContext, final String property, final IVariableType[] dotGenerics) {
+		return impl.getDotAccessorInfo(thisContext, property, dotGenerics);
 	}
 }

@@ -85,8 +85,13 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 	}
 
 	@Override
-	public IVariableType getReturnType(final IVariableType thisContext) {
-		return impl.getReturnType(thisContext);
+	public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
+		return impl.getReturnType(thisContext, dotGenerics);
+	}
+
+	@Override
+	public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+		return impl.supportsGenerics(dotGenerics);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<NumberLangObject> {
@@ -98,13 +103,18 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.NUMBER;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		nan(false) {
@@ -115,13 +125,18 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.NUMBER;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		infinite(false) {
@@ -132,13 +147,18 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return SimpleVariableType.BOOLEAN;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.BOOLEAN;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		finite(false) {
@@ -149,13 +169,18 @@ public enum EDotAccessorNumber implements IDotAccessorFunction<NumberLangObject>
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType dotGenerics[]) {
 				return SimpleVariableType.BOOLEAN;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.BOOLEAN;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		;

@@ -19,6 +19,7 @@ import de.xima.fc.form.expression.exception.FormExpressionException;
 import de.xima.fc.form.expression.exception.IllegalVariableTypeException;
 import de.xima.fc.form.expression.iface.evaluate.ILangObjectClass;
 import de.xima.fc.form.expression.iface.parse.IVariableType;
+import de.xima.fc.form.expression.iface.parse.IVariableTypeBuilder;
 import de.xima.fc.form.expression.util.CmnCnst;
 import de.xima.fc.form.expression.util.NullUtil;
 
@@ -57,6 +58,11 @@ public class GenericVariableType implements IVariableType {
 	@Override
 	public boolean equalsType(final IVariableType that) {
 		return equalsType(this, that);
+	}
+
+	@Override
+	public boolean equalsOverNull(final IVariableType that) {
+		return equalsOverNull(this, that);
 	}
 
 	@Override
@@ -178,11 +184,11 @@ public class GenericVariableType implements IVariableType {
 			return true;
 		if (thisType.isA(ELangObjectClass.NULL) || thatType.isA(ELangObjectClass.OBJECT))
 			return false;
+		if (equalsOverNull(thisType, thatType))
+			return true;
 		for (IVariableType i = thatType; i != null; i = i.getBasicLangClass().getSuperType(i)) {
 			if (thisType.getBasicLangClass().getClassId().equals(i.getBasicLangClass().getClassId())
 					&& thisType.getGenericCount() == i.getGenericCount() && thisType.getFlags().equals(i.getFlags())) {
-				if (genericsAllNull(i))
-					return true;
 				for (int j = 0; j < i.getGenericCount(); ++j)
 					if (!thisType.getGeneric(j).equalsType(i.getGeneric(j)))
 						return false;
@@ -190,6 +196,23 @@ public class GenericVariableType implements IVariableType {
 			}
 		}
 		return false;
+	}
+
+	public static boolean equalsOverNull(final IVariableType thisType, final IVariableType thatType) {
+		if (thisType.isA(ELangObjectClass.NULL) || thatType.isA(ELangObjectClass.NULL))
+			return true;
+		if (thisType.isA(VoidClass.INSTANCE) || thatType.isA(VoidClass.INSTANCE))
+			return false;
+		if (!thisType.isA(thatType.getBasicLangClass()))
+			return false;
+		if (thisType.getGenericCount() != thatType.getGenericCount())
+			return false;
+		if (!thisType.getFlags().equals(thatType.getFlags()))
+			return false;
+		for (int i = thisType.getGenericCount(); i-- > 0;)
+			if (!thisType.getGeneric(i).equalsOverNull(thatType.getGeneric(i)))
+				return false;
+		return true;
 	}
 
 	public static IVariableType union(final IVariableType thisType, final IVariableType thatType) {
@@ -203,12 +226,22 @@ public class GenericVariableType implements IVariableType {
 		// superclass.
 		for (IVariableType i = thisType; i != null; i = i.getBasicLangClass().getSuperType(i)) {
 			for (IVariableType j = thatType; j != null; j = j.getBasicLangClass().getSuperType(j)) {
-				if (i.equals(j) || i.getGenericCount() == j.getGenericCount() && i.isA(j.getBasicLangClass())
-						&& thisType.getFlags().equals(thatType.getFlags()) && (genericsAllNull(i) || genericsAllNull(j)))
+				if (i.equals(j))
 					return i;
+				if (i.getGenericCount() == j.getGenericCount() && i.isA(j.getBasicLangClass())
+						&& thisType.getFlags().equals(thatType.getFlags()) && i.equalsOverNull(j))
+					return combineNull(i,j);
 			}
 		}
 		return SimpleVariableType.OBJECT;
+	}
+
+	private static IVariableType combineNull(final IVariableType thisType, final IVariableType thatType) {
+		final IVariableTypeBuilder b = new VariableTypeBuilder();
+		b.setBasicType(thisType.isA(ELangObjectClass.NULL) ? thatType.getBasicLangClass() : thisType.getBasicLangClass());
+		for (int i = 0; i < thisType.getGenericCount(); ++i)
+			b.append(combineNull(thisType.getGeneric(i), thatType.getGeneric(i)));
+		return b.build();
 	}
 
 	public static boolean equalsType(final IVariableType thisType, final IVariableType thatType) {

@@ -6,6 +6,7 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTBREAKCLAUSENODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTCOMPARISONEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTCONTINUECLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTDOTPROPERTYNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEQUALEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEXCEPTIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTEXPRESSIONNODE;
@@ -21,12 +22,15 @@ import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstan
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTPROPERTYEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTREGEXNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTRETURNCLAUSENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTSTRINGCHARACTERSNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTSTRINGNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTTERNARYEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTTHROWCLAUSENODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTUNARYEXPRESSIONNODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLEDECLARATIONCLAUSENODE;
 import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVARIABLETYPENODE;
+import static de.xima.fc.form.expression.grammar.FormExpressionParserTreeConstants.JJTVOID;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -54,6 +58,7 @@ import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTDotPropertyNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
@@ -242,6 +247,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		case JJTFUNCTIONNODE:
 		case JJTHASHNODE:
 		case JJTIDENTIFIERNAMENODE:
+		case JJTDOTPROPERTYNODE:
 		case JJTLOGNODE:
 		case JJTNULLNODE:
 		case JJTNUMBERNODE:
@@ -251,11 +257,14 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		case JJTREGEXNODE:
 		case JJTRETURNCLAUSENODE:
 		case JJTSTRINGNODE:
+		case JJTSTRINGCHARACTERSNODE:
 		case JJTTERNARYEXPRESSIONNODE:
 		case JJTTHROWCLAUSENODE:
 		case JJTUNARYEXPRESSIONNODE:
 		case JJTVARIABLENODE:
 		case JJTVARIABLEDECLARATIONCLAUSENODE:
+		case JJTVARIABLETYPENODE:
+		case JJTVOID:
 			writer.write(Syntax.SEMI_COLON);
 			break;
 		}
@@ -978,5 +987,22 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 			writer.write(config.getRequiredSpace());
 		}
 		writer.write(node.getVariableName());
+	}
+
+	@Override
+	public void visit(final ASTDotPropertyNode node, final String prefix) throws IOException {
+		final int count = node.getVariableTypeCount();
+		if (count > 0) {
+			writer.write(Syntax.ANGLE_OPEN);
+			for (int i = 0; i < count; ++i) {
+				expression(node.getVariableTypeNode(i), prefix);
+				if (count > 1 && i < count-1) {
+					writer.write(Syntax.COMMA);
+					writer.write(config.getOptionalSpace());
+				}
+			}
+			writer.write(Syntax.ANGLE_CLOSE);
+		}
+		writer.write(node.getName());
 	}
 }

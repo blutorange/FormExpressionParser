@@ -71,8 +71,8 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	 */
 	sortBy(Impl.sortBy),
 	map(Impl.map),
-	mapString(Impl.mapString),
-	mapNumber(Impl.mapNumber),
+//	mapString(Impl.mapString),
+//	mapNumber(Impl.mapNumber),
 	/**
 	 * Resizes the array to the given length and fills it with the
 	 * given object. All array entries then point to the same object.
@@ -145,8 +145,13 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 	}
 
 	@Override
-	public IVariableType getReturnType(final IVariableType thisContext) {
-		return impl.getReturnType(thisContext);
+	public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
+		return impl.getReturnType(thisContext, dotGenerics);
+	}
+
+	@Override
+	public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+		return impl.supportsGenerics(dotGenerics);
 	}
 
 	private static enum Impl implements IDotAccessorFunction<ArrayLangObject> {
@@ -163,13 +168,18 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), SimpleVariableType.NUMBER);
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		push(true, "anObjectToAdd", "moreObjectsToAdd") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -182,7 +192,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				// array<number>.push(number, number) => array<number>
 				// function<array<number>, number, array<number>)
 				return GenericVariableType.forVarArgFunction(thisContext, thisContext.getGeneric(0), thisContext.getGeneric(0));
@@ -191,6 +201,10 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		length(false) {
@@ -201,13 +215,18 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return SimpleVariableType.NUMBER;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.NUMBER;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		sort(false) {
@@ -219,13 +238,18 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return thisContext;
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.ARRAY;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		sortBy(false, "comparator") { //$NON-NLS-1$
@@ -246,7 +270,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				// array<string>.sort(comparator) => array<string>
 				// function<array<string>, function<number, string, string>>
 				return GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), GenericVariableType
@@ -257,6 +281,11 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
 			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
+			}
 		},
 		map(false, "mapper") { //$NON-NLS-1$
 			@Override
@@ -266,46 +295,22 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
-				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(thisContext.getGeneric(0)),
-						GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), thisContext.getGeneric(0)));
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
+				IVariableType type = dotGenerics.length > 0 ? dotGenerics[0] : null;
+				if (type == null)
+					type = thisContext.getGeneric(0);
+				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(type),
+						GenericVariableType.forSimpleFunction(type, thisContext.getGeneric(0)));
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
 			}
-		},
-		mapString(false, "mapper") { //$NON-NLS-1$
+
 			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return map(thisContext, args[0], ec);
-			}
-			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
-				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(SimpleVariableType.STRING),
-						GenericVariableType.forSimpleFunction(SimpleVariableType.STRING, thisContext.getGeneric(0)));
-			}
-			@Override
-			public ILangObjectClass getReturnClass() {
-				return ELangObjectClass.FUNCTION;
-			}
-		},
-		mapNumber(false, "mapper") { //$NON-NLS-1$
-			@Override
-			public ALangObject evaluate(final IEvaluationContext ec, final ArrayLangObject thisContext, final ALangObject... args)
-					throws EvaluationException {
-				return map(thisContext, args[0], ec);
-			}
-			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
-				return GenericVariableType.forSimpleFunction(GenericVariableType.forArray(SimpleVariableType.NUMBER),
-						GenericVariableType.forSimpleFunction(SimpleVariableType.NUMBER, thisContext.getGeneric(0)));
-			}
-			@Override
-			public ILangObjectClass getReturnClass() {
-				return ELangObjectClass.FUNCTION;
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length < 2;
 			}
 		},
 		fill(false, "fillerValue", "newLength") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -325,12 +330,17 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return thisContext;
 			}
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forSimpleFunction(thisContext, thisContext.getGeneric(0), SimpleVariableType.NUMBER);
 			}
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		fillWith(false, "producer", "newLength") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -349,7 +359,7 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 				return thisContext;
 			}
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forSimpleFunction(thisContext,
 						GenericVariableType.forSimpleFunction(thisContext.getGeneric(0), SimpleVariableType.NUMBER),
 						SimpleVariableType.NUMBER);
@@ -357,6 +367,11 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.FUNCTION;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		copy(false) {
@@ -367,13 +382,18 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forArray(thisContext.getGeneric(0));
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.ARRAY;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		},
 		deepCopy(false) {
@@ -384,13 +404,18 @@ public enum EDotAccessorArray implements IDotAccessorFunction<ArrayLangObject> {
 			}
 
 			@Override
-			public IVariableType getReturnType(final IVariableType thisContext) {
+			public IVariableType getReturnType(final IVariableType thisContext, final IVariableType[] dotGenerics) {
 				return GenericVariableType.forArray(thisContext.getGeneric(0));
 			}
 
 			@Override
 			public ILangObjectClass getReturnClass() {
 				return ELangObjectClass.ARRAY;
+			}
+
+			@Override
+			public boolean supportsGenerics(final IVariableType[] dotGenerics) {
+				return dotGenerics.length == 0;
 			}
 		}
 		;

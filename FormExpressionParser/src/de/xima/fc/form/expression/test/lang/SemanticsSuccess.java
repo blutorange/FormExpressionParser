@@ -123,7 +123,7 @@ enum SemanticsSuccess implements ITestCase {
 			ArrayLangObject.create(
 					ArrayLangObject.create(StringLangObject.create("foofoofoofoofoo"),StringLangObject.create("barbarbarbarbar")),
 					ArrayLangObject.create(StringLangObject.create("foofoofoo"),StringLangObject.create("barbarbar")))),
-	CLOSURE004("()=>{arr=[];for(i in 3){arr.push(()=>{return 21*i;});}arr;}().mapNumber((m)=>{m();});", ArrayLangObject.create(
+	CLOSURE004("()=>{arr=[];for(i in 3){arr.push(()=>{return 21*i;});}arr;}().<number>map((m)=>{m();});", ArrayLangObject.create(
 			Tests.N42,Tests.N42,Tests.N42)),
 
 	// Attribute assigners

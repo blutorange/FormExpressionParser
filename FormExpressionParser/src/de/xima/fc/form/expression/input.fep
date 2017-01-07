@@ -1,6 +1,9 @@
-switch (0) {
-  case 0:
-  case 1:
-    a;
-  default:
+function array<array<number>> foo(number n) {
+    array<number> arr = [];
+    arr.fill(n,n);
+	return arr.<array<number>>map((number x) => {
+	  return [x,x+2];
+	});
 }
+function hash<string,number> bar(){return true?{null:5}:{"":null};}
+foo(20);

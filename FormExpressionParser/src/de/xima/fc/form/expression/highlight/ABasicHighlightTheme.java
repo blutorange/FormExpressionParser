@@ -70,9 +70,6 @@ public abstract class ABasicHighlightTheme implements IFormExpressionHighlightTh
 		case Identifier:
 			return getStyleIdentifier();
 
-		case IdentifierAfterDot:
-			return getStyleAttributeIdentifier();
-
 		case False:
 		case True:
 			return getStyleBooleanLiteral();

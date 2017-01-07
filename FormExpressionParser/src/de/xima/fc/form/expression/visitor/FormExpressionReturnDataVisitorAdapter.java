@@ -12,6 +12,7 @@ import de.xima.fc.form.expression.node.ASTBreakClauseNode;
 import de.xima.fc.form.expression.node.ASTComparisonExpressionNode;
 import de.xima.fc.form.expression.node.ASTContinueClauseNode;
 import de.xima.fc.form.expression.node.ASTDoWhileLoopNode;
+import de.xima.fc.form.expression.node.ASTDotPropertyNode;
 import de.xima.fc.form.expression.node.ASTEmptyNode;
 import de.xima.fc.form.expression.node.ASTEqualExpressionNode;
 import de.xima.fc.form.expression.node.ASTExceptionNode;
@@ -343,6 +344,12 @@ public abstract class FormExpressionReturnDataVisitorAdapter<R, T, E extends Thr
 
 	@Override
 	public R visit(final ASTFunctionArgumentNode node, final T data) throws E {
+		return processNode(node, data);
+	}
+
+
+	@Override
+	public R visit(final ASTDotPropertyNode node, final T data) throws E {
 		return processNode(node, data);
 	}
 }

@@ -200,9 +200,9 @@ public abstract class ANode implements Node {
 		for (int i = start; i <= end; ++i) {
 			final Node n = children[i];
 			if (!clazz.isAssignableFrom(n.getClass()))
-				throw new ParseException(NullUtil.messageFormat(
-						CmnCnst.Error.NODE_INCORRECT_TYPE,
-						n.getClass().getSimpleName(), clazz.getSimpleName()));
+				throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INCORRECT_TYPE,
+						n.getClass().getSimpleName(), clazz.getSimpleName()), getBeginLine(), getBeginColumn(),
+						getEndLine(), getEndColumn());
 			args[i - start] = clazz.cast(n);
 		}
 		return args;
@@ -213,7 +213,7 @@ public abstract class ANode implements Node {
 		final Node n = children[index];
 		if (!clazz.isAssignableFrom(n.getClass()))
 			throw new ParseException(NullUtil.messageFormat(CmnCnst.Error.NODE_INCORRECT_TYPE, n.getClass().getSimpleName(),
-					clazz.getSimpleName()));
+					clazz.getSimpleName()), getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 		return clazz.cast(n);
 	}
 
@@ -249,7 +249,8 @@ public abstract class ANode implements Node {
 	@Override
 	public final Node getFirstChild() throws ParseException {
 		if (children.length == 0)
-			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN);
+			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN, getBeginLine(), getBeginColumn(),
+					getEndLine(), getEndColumn());
 		return children[0];
 	}
 
@@ -257,7 +258,8 @@ public abstract class ANode implements Node {
 	@Override
 	public final Node getLastChild() throws ParseException {
 		if (children.length == 0)
-			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN);
+			throw new ParseException(CmnCnst.Error.NODE_WITHOUT_CHILDREN, getBeginLine(), getBeginColumn(),
+					getEndLine(), getEndColumn());
 		return children[children.length-1];
 	}
 
@@ -269,25 +271,28 @@ public abstract class ANode implements Node {
 	@Override
 	public final void assertChildrenBetween(final int atLeast, final int atMost) throws ParseException {
 		if (children.length < atLeast || children.length > atMost)
-			throw new ParseException(NullUtil.messageFormat(
-					CmnCnst.Error.NODE_COUNT_BETWEEN,
-					Integer.valueOf(atLeast), Integer.valueOf(atMost), Integer.valueOf(children.length)));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_BETWEEN, Integer.valueOf(atLeast),
+							Integer.valueOf(atMost), Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
 	public final void assertChildrenExactly(final int count) throws ParseException {
 		if (children.length != count)
-			throw new ParseException(NullUtil.messageFormat(
-					CmnCnst.Error.NODE_COUNT_EXACTLY,
-					Integer.valueOf(count), Integer.valueOf(children.length)));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_EXACTLY, Integer.valueOf(count),
+							Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
 	public final void assertChildrenExactlyOneOf(final int count1, final int count2) throws ParseException {
 		if (children.length != count1 && children.length != count2)
-			throw new ParseException(NullUtil.messageFormat(
-					CmnCnst.Error.NODE_COUNT_EXACTLY_ONE_OF,
-					Integer.valueOf(count1), Integer.valueOf(count2), Integer.valueOf(children.length)));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_EXACTLY_ONE_OF, Integer.valueOf(count1),
+							Integer.valueOf(count2), Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
@@ -295,7 +300,8 @@ public abstract class ANode implements Node {
 		if (children.length < count)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_AT_LEAST,
-					Integer.valueOf(count), Integer.valueOf(children.length)));
+					Integer.valueOf(count), Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
@@ -303,7 +309,8 @@ public abstract class ANode implements Node {
 		if (children.length > count)
 			throw new ParseException(NullUtil.messageFormat(
 					CmnCnst.Error.NODE_COUNT_AT_MOST,
-					Integer.valueOf(count), Integer.valueOf(children.length)));
+					Integer.valueOf(count), Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
@@ -312,23 +319,23 @@ public abstract class ANode implements Node {
 			throw new ParseException(
 					NullUtil.messageFormat(CmnCnst.Error.ILLEGAL_NODE_TYPE, Integer.valueOf(i),
 							clazz.getCanonicalName(), children[i].getClass().getCanonicalName()),
-					beginLine, beginColumn, endLine, endColumn);
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
 	public final void assertChildrenEven() throws ParseException {
 		if ((children.length & 1) != 0)
-			throw new ParseException(NullUtil.messageFormat(
-					CmnCnst.Error.NODE_COUNT_NOT_EVEN,
-					Integer.valueOf(children.length)));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_NOT_EVEN, Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
 	public final void assertChildrenOdd() throws ParseException {
 		if ((children.length & 1) != 1)
-			throw new ParseException(NullUtil.messageFormat(
-					CmnCnst.Error.NODE_COUNT_NOT_ODD,
-					Integer.valueOf(children.length)));
+			throw new ParseException(
+					NullUtil.messageFormat(CmnCnst.Error.NODE_COUNT_NOT_ODD, Integer.valueOf(children.length)),
+					getBeginLine(), getBeginColumn(), getEndLine(), getEndColumn());
 	}
 
 	@Override
