@@ -13,10 +13,28 @@ public enum EEmbedmentContractFactory implements IEmbedmentContractFactory {
 	GENERAL(new GenericEmbedmentFactory.Builder()
 			.addHandler(EmbedmentHandlerBundleGeneral.values())
 			.build()),
-	FORMCYCLE(
+	FORMCYCLE_ALL(
 			new GenericEmbedmentFactory.Builder()
 			.addHandler(EmbedmentHandlerBundleGeneral.values())
 			.addHandler(EmbedmentHandlerBundleFormcycle.values())
+			.build()),
+	FORMCYCLE_FORM_FIELD(
+			new GenericEmbedmentFactory.Builder()
+			.addHandler(EmbedmentHandlerBundleGeneral.values())
+			.addHandler(EmbedmentHandlerBundleFormcycle.FORM_FIELD_SILENT)
+			.addHandler(EmbedmentHandlerBundleFormcycle.FORM_FIELD_VERBOSE)
+			.build()),
+	FORMCYCLE_SYSTEM(
+			new GenericEmbedmentFactory.Builder()
+			.addHandler(EmbedmentHandlerBundleGeneral.values())
+			.addHandler(EmbedmentHandlerBundleFormcycle.SYSTEM_SILENT)
+			.addHandler(EmbedmentHandlerBundleFormcycle.SYSTEM_VERBOSE)
+			.build()),
+	FORMCYCLE_TEMPLATE(
+			new GenericEmbedmentFactory.Builder()
+			.addHandler(EmbedmentHandlerBundleGeneral.values())
+			.addHandler(EmbedmentHandlerBundleFormcycle.TEMPLATE_SILENT)
+			.addHandler(EmbedmentHandlerBundleFormcycle.TEMPLATE_VERBOSE)
 			.build()),
 	;
 	@Nonnull

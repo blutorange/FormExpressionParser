@@ -18,7 +18,7 @@ import de.xima.fc.form.expression.impl.library.ELibraryContractFactory;
 @NonNullByDefault
 public enum EEvaluationContextContractFormcycle implements IEvaluationContextContract<Formcycle> {
 	INSTANCE(new EvaluationContextContract.Builder<Formcycle>()
-			.setEmbedment(EEmbedmentContractFactory.FORMCYCLE)
+			.setEmbedment(EEmbedmentContractFactory.FORMCYCLE_ALL)
 			.setLibrary(ELibraryContractFactory.GENERIC)
 			.setExternal(EExternalContextContractFactoryFormcycle.INSTANCE)
 			.setTracing(true)

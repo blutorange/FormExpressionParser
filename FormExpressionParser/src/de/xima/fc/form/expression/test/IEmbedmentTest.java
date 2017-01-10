@@ -109,7 +109,7 @@ public class IEmbedmentTest extends IFaceTest<IEmbedment> {
 
 	@Parameterized.Parameters
 	public static Collection<Object[]> instancesToTest() {
-		return getInstancesToTest(IEmbedment.class, EEmbedmentContractFactory.FORMCYCLE.make(),
+		return getInstancesToTest(IEmbedment.class, EEmbedmentContractFactory.FORMCYCLE_ALL.make(),
 				EEmbedmentContractFactory.GENERAL.make());
 	}
 }

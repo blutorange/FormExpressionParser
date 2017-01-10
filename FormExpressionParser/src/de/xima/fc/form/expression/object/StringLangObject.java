@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -159,14 +160,14 @@ public class StringLangObject extends ALangObject {
 	 *         not be an instance of {@link StringLangObject}.
 	 */
 	@Nonnull
-	public static StringLangObject create(final String value) {
+	public static StringLangObject create(@Nullable final String value) {
 		if (value == null)
 			return StringLangObject.getEmptyInstance();
 		return new StringLangObject(value);
 	}
 
 	@Nonnull
-	public static StringLangObject create(final Object object) {
+	public static StringLangObject create(@Nullable final Object object) {
 		if (object == null)
 			return StringLangObject.getEmptyInstance();
 		return new StringLangObject(NullUtil.toString(object));
