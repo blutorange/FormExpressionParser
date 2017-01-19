@@ -4335,7 +4335,7 @@ void SwitchDefault() #void :
   }
 
   final public void FunctionTypeUnaryExpression(EMethod method) throws ParseException {
- /*@bgen(jjtree) #ParenthesisExpressionNode( createNode = jjtree . nodeArity ( ) != 1) */
+ /*@bgen(jjtree) #ParenthesisExpressionNode( createNode) */
   ASTParenthesisExpressionNode jjtn000 = new ASTParenthesisExpressionNode(this, JJTPARENTHESISEXPRESSIONNODE);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
@@ -4373,6 +4373,7 @@ void SwitchDefault() #void :
             jj_consume_token(ParenOpen);
             Expression(method);
             jj_consume_token(ParenClose);
+                                                          createNode = true;
             break;
           default:
             jj_la1[102] = jj_gen;
@@ -4381,7 +4382,7 @@ void SwitchDefault() #void :
           }
         }
       }
-    jjtree.closeNodeScope(jjtn000,  createNode = jjtree . nodeArity ( ) != 1);
+    jjtree.closeNodeScope(jjtn000,  createNode);
     jjtc000 = false;
     jjtn000.jjtSetLastToken(getToken(0));
     if (createNode) {
@@ -4403,7 +4404,7 @@ void SwitchDefault() #void :
     {if (true) throw (Error)jjte000;}
     } finally {
     if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000,  createNode = jjtree . nodeArity ( ) != 1);
+      jjtree.closeNodeScope(jjtn000,  createNode);
       jjtn000.jjtSetLastToken(getToken(0));
     }
     }

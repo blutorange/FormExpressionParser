@@ -23,7 +23,7 @@ import de.xima.fc.form.expression.enums.EMethod;
 import de.xima.fc.form.expression.exception.parse.DuplicateLabelException;
 import de.xima.fc.form.expression.exception.parse.SemanticsException;
 import de.xima.fc.form.expression.exception.parse.UnhandledEnumException;
-import de.xima.fc.form.expression.exception.parse.VariableUsedBeforeAssignmentException;
+import de.xima.fc.form.expression.exception.parse.VariableReadBeforeAssignmentException;
 import de.xima.fc.form.expression.grammar.Node;
 import de.xima.fc.form.expression.iface.evaluate.IFormExpressionReturnDataVisitor;
 import de.xima.fc.form.expression.iface.parse.IHeaderNode;
@@ -602,7 +602,7 @@ public class DefiniteAssignmentCheckVisitor
 		if (!node.getSourceType().isDefinitelyAssigned()
 				&& !resolutionResult.containsBasicSourcedGlobalVariable(variableId)
 				&& map.get(Integer.valueOf(node.getBasicSource())) == null)
-			throw new VariableUsedBeforeAssignmentException(node.getVariableName(), node);
+			throw new VariableReadBeforeAssignmentException(node.getVariableName(), node);
 		return map;
 	}
 

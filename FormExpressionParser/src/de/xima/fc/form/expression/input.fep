@@ -1,9 +1,1 @@
-function array<array<number>> foo(number n) {
-    array<number> arr = [];
-    arr.fill(n,n);
-	return arr.<array<number>>map((number x) => {
-	  return [x,x+2];
-	});
-}
-function hash<string,number> bar(){return true?{null:5}:{"":null};}
-foo(20);
+(9 != null ? 8 : "") + ((8 != null ? 8 : ""));

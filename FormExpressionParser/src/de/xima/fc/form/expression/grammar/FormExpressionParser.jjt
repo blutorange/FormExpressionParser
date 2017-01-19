@@ -1960,7 +1960,7 @@ void FunctionArgumentList(EMethod method) #ArrayNode :
   }
 }
 
-void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(createNode = jjtree.nodeArity() != 1) :
+void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(createNode) :
 {
   boolean createNode = false;
 }
@@ -1984,7 +1984,7 @@ void FunctionTypeUnaryExpression(EMethod method) #ParenthesisExpressionNode(crea
       Function(method)
     |
       (
-        < ParenOpen > Expression(method) < ParenClose >
+        < ParenOpen > Expression(method) < ParenClose > { createNode = true; }
       )
     )
   )

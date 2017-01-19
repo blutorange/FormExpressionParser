@@ -192,6 +192,8 @@ enum SemanticsSuccess implements ITestCase {
 			NumberLangObject.create(1),
 			NumberLangObject.create(3))),
 	EMETHODARRAY007("[]-[1,3];", ArrayLangObject.create()),
+	EMETHODARRAY008("global scope {array<string>x=['foo','foobar'];}x.<number>map((string s)=>{return s.length;});",
+			ArrayLangObject.create(NumberLangObject.create(3), NumberLangObject.create(6))),
 
 	EMETHODHASH001("{0:42}+{1:42};", HashLangObject.create(
 			NumberLangObject.create(0), Tests.N42,

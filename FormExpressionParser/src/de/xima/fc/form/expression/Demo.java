@@ -61,14 +61,6 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  *   => short-circuiting may occur when a is null and assignment may never happen
  *   => definite assignment visitor needs to take this into account
  *
- * - Allow parameterized dot accessors:
- *    array<boolean> arr;
- *    array<hash<string,string> mapped;
- *    method<hash<string,string>,boolean> mapper;
- *    method<array<hash<string,string>>,method<hash<string,string>,boolean>> m = arr.<hash<string,string>>map;
- *    mapped = m(mapper);
- *  => Effectively, this is simply adding additional constraints.
- *
  * - Check for errors even in loose config mode: "var v; v.toStr" is always wrong as there is not class on the class path with such an attr accessor => check every possible sub-type, introduce a treat_unmatching_declared_types_as_error option.
  *
  * - Add some type inference

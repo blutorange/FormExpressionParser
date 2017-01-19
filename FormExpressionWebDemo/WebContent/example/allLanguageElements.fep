@@ -94,8 +94,8 @@ switch (name) {
 
 // Labels
 // Supported, but remember good coding styles!
-while<outer> (true) {
-  for<inner> (i in 10) {
+outer: while (true) {
+  inner: for (i in 10) {
     if (i > 5) break outer;
     continue inner;
   }

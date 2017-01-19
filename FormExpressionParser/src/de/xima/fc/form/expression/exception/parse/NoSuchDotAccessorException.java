@@ -23,7 +23,7 @@ public class NoSuchDotAccessorException extends SemanticsException {
 			final IVariableType[] dotGenerics) {
 		if (dotGenerics.length > 0)
 			return NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_DOT_ACCESSOR_WITH_GENERICS,
-					StringUtils.join(dotGenerics), property, thisContext);
+					StringUtils.join(dotGenerics,','), property, thisContext);
 		return NullUtil.messageFormat(CmnCnst.Error.NO_SUCH_DOT_ACCESSOR_WITHOUT_GENERICS, property, thisContext);
 	}
 

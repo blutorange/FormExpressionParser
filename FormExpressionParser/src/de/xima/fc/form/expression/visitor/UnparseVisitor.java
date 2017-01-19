@@ -822,7 +822,7 @@ public class UnparseVisitor implements IFormExpressionVoidDataVisitor<String, IO
 		// header function foo(bar) {
 		writer.write(Syntax.FUNCTION);
 		writer.write(config.getRequiredSpace());
-		if (node.hasType()) {
+		if (node.hasReturnType()) {
 			expression(node.getReturnTypeNode(), prefix);
 			writer.write(config.getRequiredSpace());
 		}

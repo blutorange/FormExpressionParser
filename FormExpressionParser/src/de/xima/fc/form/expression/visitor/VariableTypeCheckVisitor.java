@@ -507,7 +507,7 @@ public final class VariableTypeCheckVisitor implements IFormExpressionReturnVoid
 						property, dotGenerics);
 				if (typeReturn == null)
 					throw new NoSuchDotAccessorException(infoRes.getImplicitType(), property, dotGenerics,
-							i == 0 ? node.getStartNode() : node.getPropertyNode(i - 1));
+							node.getPropertyNode(i));
 				infoRes.replaceImplicitType(typeReturn.getReturn());
 				break;
 			}

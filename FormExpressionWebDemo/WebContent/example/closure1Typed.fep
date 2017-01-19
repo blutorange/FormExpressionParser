@@ -24,7 +24,7 @@ n3 = m2(15);
 n2 = m1(10);
 n4 = m2(20);
 
-result = [n1(2),n2(2),n3(2),n4(2),n1(4),n2(4),n3(4),n4(4)].mapString((number x) => {
+result = [n1(2),n2(2),n3(2),n4(2),n1(4),n2(4),n3(4),n4(4)].<string>map((number x) => {
   return x.toString;
 });
 
