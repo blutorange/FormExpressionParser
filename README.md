@@ -1,14 +1,41 @@
 # FormExpressionParser
 
-- Entry class is de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory
-- This provides access to the two static method forTemplate() and forProgram() that return a IFormExpressionFactory.
-- IFormExpressionFactory#parse(String code, IEvaluationContextContractFactory factory, ISeverityConfig config)
+- Entry class is `de.xima.fc.form.expression.impl.formexpression.FormExpressionFactory`
+- This provides access to the two static method `forTemplate()` and `forProgram()` that return a IFormExpressionFactory.
+- IFormExpressionFactory#compile(String code, IEvaluationContextContract factory, ISeverityConfig config)
 - Code is the code you want to parse.
-- For the config, use SeverityConfig#getStrictConfig() and SeverityConfig#LooseConfig()
-- For the factory, use for example EWriterContractFactory or EFormcycleContractFactory
-- This gives you a IFormExpression for execution.
-- Its main method is ALangObject evaluate(@Nonnull final T object) throws EvaluationException
+- For the config, use `SeverityConfig#getStrictConfig()` and `SeverityConfig#LooseConfig()`
+- For the factory, use for example `EEvaluationContextContractWriter.INSTANCE` or `EEvaluationContextContractPrintStream.INSTANCE`.
+- This gives you a `IFormExpression` for executing the code.
+- Its main method is `ALangObject evaluate(@Nonnull final T object)` throws EvaluationException
 - This returns the result of running the code.
+
+Here is a simple code sample to get you started:
+
+``` java
+try {
+	// Code we want to evaluate.
+	final String code = "If I grow a banana and buy two more, I've got [%%=1+2%] bananas.";
+	FormExpressionFactory.forTemplate() 							 // A factory for parsing code.
+			.compile(code, 											 // The actual code.
+					EEvaluationContextContractPrintStream.INSTANCE,  // Does not define additional variables
+																	 // or functions and dumps the output to
+																	 // a print stream.
+					SeverityConfig.getLooseConfig())                 // Do not do any type checking.
+		.evaluate(System.out);										 // Evaluate the result, dumping output to
+																	 // stdout.
+}
+// A ParseException is thrown when the code is invalid syntactically.
+catch (final ParseException parseException) {
+	System.out.println(String.format("Failed to parse the code: %s (%s", parseException.getMessage(),
+			parseException.getBeginLine()));
+}
+// A ParseException is thrown when the code throws an error during runtime.
+catch (final EvaluationException evalException) {
+	System.out.println(String.format("Failed to evaluate the code: %s (%s", evalException.getMessage(),
+			evalException.getBeginLine()));
+}
+```
 
 # What is it?
 
@@ -47,8 +74,9 @@ compared to JavaScript to allow checking for used/unused variables.
 
 Some features that are supported:
 
-  - Anonymous functions
+  - Anonymous functions like ES6: `(x) => {x+x;}`
   - Closures
+  - String interpolation like ES6: ``1 and 2 makes ${1+2}``
   - Namespaces
   - Extending it via Java, adding new functions.
   - Common imperative constructs like for, foreach, do, while, if-else.
