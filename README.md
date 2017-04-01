@@ -14,26 +14,26 @@ Here is a simple code sample to get you started:
 
 ``` java
 try {
-	// Code we want to evaluate.
-	final String code = "If I grow a banana and buy two more, I've got [%%=1+2%] bananas.";
-	FormExpressionFactory.forTemplate() 							 // A factory for parsing code.
-			.compile(code, 											 // The actual code.
-					EEvaluationContextContractPrintStream.INSTANCE,  // Does not define additional variables
-																	 // or functions and dumps the output to
-																	 // a print stream.
-					SeverityConfig.getLooseConfig())                 // Do not do any type checking.
-		.evaluate(System.out);										 // Evaluate the result, dumping output to
-																	 // stdout.
+    // Code we want to evaluate.
+    final String code = "If I grow a banana and buy two more, I've got [%%=1+2%] bananas.";
+    FormExpressionFactory.forTemplate()                          // A factory for parsing code.
+        .compile(code,                                           // The actual code.
+                 EEvaluationContextContractPrintStream.INSTANCE, // Does not define additional variables
+                                                                 // or functions and dumps the output to
+                                                                 // a print stream.
+                 SeverityConfig.getLooseConfig())                // Do not do any type checking.
+        .evaluate(System.out);                                   // Evaluate the result, dumping output to
+                                                                 // stdout.
 }
 // A ParseException is thrown when the code is invalid syntactically.
 catch (final ParseException parseException) {
-	System.out.println(String.format("Failed to parse the code: %s (%s", parseException.getMessage(),
-			parseException.getBeginLine()));
+    System.out.println(String.format("Failed to parse the code: %s (%s", parseException.getMessage(),
+            parseException.getBeginLine()));
 }
 // A ParseException is thrown when the code throws an error during runtime.
 catch (final EvaluationException evalException) {
-	System.out.println(String.format("Failed to evaluate the code: %s (%s", evalException.getMessage(),
-			evalException.getBeginLine()));
+    System.out.println(String.format("Failed to evaluate the code: %s (%s", evalException.getMessage(),
+            evalException.getBeginLine()));
 }
 ```
 
