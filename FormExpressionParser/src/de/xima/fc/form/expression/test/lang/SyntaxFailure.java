@@ -15,6 +15,7 @@ import de.xima.fc.form.expression.exception.parse.IncompatibleVariableConversion
 import de.xima.fc.form.expression.exception.parse.IncompatibleVoidReturnTypeException;
 import de.xima.fc.form.expression.exception.parse.IterationNotSupportedException;
 import de.xima.fc.form.expression.exception.parse.MissingRequireScopeStatementException;
+import de.xima.fc.form.expression.exception.parse.MissingReturnException;
 import de.xima.fc.form.expression.exception.parse.NoSuchBracketAccessorException;
 import de.xima.fc.form.expression.exception.parse.NoSuchBracketAssignerException;
 import de.xima.fc.form.expression.exception.parse.NoSuchDotAccessorException;
@@ -87,6 +88,8 @@ enum SyntaxFailure implements ITestCase {
 	TEST051("function foo(arg1,...arg2,args...){}", "Error during parsing at line 1, column 22: Variable argument specifier allowed only for the final argument."),
 	TEST052(new Cfg("(a,x,b,x)=>void{};").err("Error during parsing at line 1, column 8: Duplicate argument x encountered in function parameters.").err(DuplicateFunctionArgumentException.class)),
 	TEST053(new Cfg("()=>void{var x;if(true)var x;var x;};").err("Error during parsing at line 1, column 30: Variable x was already declared at the current nesting level.").err(VariableDeclaredTwiceException.class)),
+
+	RETURN001(new Cfg("function number foo(){if(true)return 0;}").err("Error during parsing at line 1, column 1: Function must explicitly return a value of type number for all code paths in strict mode.").err(MissingReturnException.class).strict()),
 
 	STRICT001(new Cfg("a = b;").err("Error during parsing at line 1, column 1: Variable a was not declared. Variables must be declared before they are used in strict mode.").err(VariableUsageBeforeDeclarationException.class).strict()),
 	STRICT002(new Cfg("function foo::bar(){};").err("Error during parsing at line 1, column 1: Occurence of function foo::bar at top level. Scoped function must be defined in a scope block in strict mode.").err(ScopedFunctionOutsideHeaderException.class).strict()),

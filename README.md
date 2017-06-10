@@ -27,13 +27,15 @@ try {
 }
 // A ParseException is thrown when the code is invalid syntactically.
 catch (final ParseException parseException) {
-    System.out.println(String.format("Failed to parse the code: %s (%s", parseException.getMessage(),
-            parseException.getBeginLine()));
+    System.out.println(String.format("Failed to parse the code: %s (%s)",
+        parseException.getMessage(),
+        parseException.getBeginLine()));
 }
 // A ParseException is thrown when the code throws an error during runtime.
 catch (final EvaluationException evalException) {
-    System.out.println(String.format("Failed to evaluate the code: %s (%s", evalException.getMessage(),
-            evalException.getBeginLine()));
+    System.out.println(String.format("Failed to evaluate the code: %s (%s)",
+        evalException.getMessage(),
+        evalException.getBeginLine()));
 }
 ```
 

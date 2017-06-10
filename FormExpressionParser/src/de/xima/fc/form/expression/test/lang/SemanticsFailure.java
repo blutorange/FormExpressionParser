@@ -20,16 +20,21 @@ enum SemanticsFailure implements ITestCase {
 	TEST005("function foo(arg1,arg2,...args){args;}foo(1);", IllegalNumberOfFunctionParametersException.class, "Function requires 2 parameter(s), but 1 were given."),
 	TEST006("function foo(){42;}foo(1,2,3);", IllegalNumberOfFunctionParametersException.class, "Function requires 0 parameter(s), but 3 were given."),
 	;
+
 	@Nonnull private final String code;
 	@Nonnull private final EContextType context;
+
 	private final String errorBegin;
 	private final Class<? extends EvaluationException> expectedException;
+
 	private SemanticsFailure (@Nonnull final String code, final Class<? extends EvaluationException> exception) {
 		this(code, exception, null);
 	}
+
 	private SemanticsFailure (@Nonnull final String code, final Class<? extends EvaluationException> exception, final String errorBegin) {
 		this(code, exception, EContextType.GENERIC, errorBegin);
 	}
+
 	private SemanticsFailure (@Nonnull final String code, final Class<? extends EvaluationException> exception, @Nonnull final EContextType context, final String errorBegin) {
 		this.code = code;
 		this.expectedException = exception;

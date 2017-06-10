@@ -78,7 +78,7 @@ import de.xima.fc.form.expression.visitor.DumpVisitor;
  */
 public class Demo {
 	@Nonnull
-	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getLooseConfig();
+	private static final ISeverityConfig SEVERITY_CONFIG = SeverityConfig.getStrictConfig();
 	@Nonnull
 	private static final IEvaluationContextContract<Formcycle> CONTRACT_FACTORY = EEvaluationContextContractFormcycle.INSTANCE;
 	@Nonnull
@@ -88,6 +88,7 @@ public class Demo {
 
 	public static void main(final String args[]) throws TokenMgrError {
 		final String code = readArgs(args);
+
 		if (code == null)
 			throw new FormExpressionException("Code must not be null."); //$NON-NLS-1$
 
